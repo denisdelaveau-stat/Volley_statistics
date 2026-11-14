@@ -1,4 +1,4 @@
-# Volley Live Capture – v1.0.0 (iPhone package)
+# Volley Live Capture – v1.1.0 (iPhone package)
 
 Touch-first app to record a volleyball match rally by rally on an iPhone.
 It runs **100 % offline** once installed on the Home Screen. No account, no server, no App Store.
@@ -52,8 +52,9 @@ publish the folder as is.
 * **NEW MATCH** → Team (names, match name, format, roster 7–12 with name and position)
   → Starting 7 → Initial rotation and first rally → **START SET 1**.
 * Every rally: **Player → Action → Result** (3 taps). Data is saved on the phone after each tap on the result.
-* **⇄ SUBSTITUTION**, **UNDO LAST**, **STATISTICS ▼** are on the capture screen.
-* At the end of a set: **START SET n →**. At the end of the match: **SAVE MATCH .JSON**.
+* **⇄ SUBSTITUTION**, **UNDO LAST**, **SAVE .JSON**, **REPORT .HTML**, **STATISTICS ▼** are on the capture screen.
+* **STATISTICS ▼ → Attackers**: one chart per OH / MB / OPP with entries in the log (points, errors, differential), for the current set or the whole match.
+* At the end of a set: **START SET n →**. At the end of the match: **SAVE MATCH .JSON** and **MATCH REPORT .HTML**.
 
 ## Backup and transfer: SAVE .JSON / OPEN MATCH .JSON
 
@@ -63,11 +64,17 @@ publish the folder as is.
 * The phone keeps **one match at a time**: save the current one before NEW MATCH or OPEN.
 * Recommended: SAVE .JSON at the end of each set.
 
+## Match report: REPORT .HTML
+
+* Generates `<match name>_report.html`: one **self-contained** file (no script, no external file, opens offline on any phone or PC).
+* Content: result and sets, per-player table by action (point / error / neutral), one chart per attacker over the whole match, substitutions, full action log.
+* On iPhone the Share sheet opens: Save to Files, AirDrop, Mail, Messages.
+
 ## Updating the app
 
 1. Replace the changed files on the host.
-2. In `sw.js` change `CACHE = 'volley-live-capture-v1.0.0'` to a new value (e.g. `v1.0.1`),
-   and the version label `v1.0.0` in `index.html`.
+2. In `sw.js` change `CACHE = 'volley-live-capture-v1.1.0'` to a new value (e.g. `v1.1.1`),
+   and the version label `v1.1.0` in `index.html`.
 3. On the iPhone open the app once with network, close it and open it again.
    Match data in the phone is kept.
 
@@ -78,6 +85,11 @@ python serve_local.py
 ```
 Then open the printed `http://<pc-ip>:8000/` address in Safari on an iPhone on the same Wi-Fi.
 Everything works except offline mode (iOS requires HTTPS for it).
+
+## Version history
+
+* **1.1.0** – Attacker charts in STATISTICS; self-contained HTML match report (REPORT .HTML / MATCH REPORT .HTML).
+* **1.0.0** – First iPhone package: setup, live capture, rotation and libero, substitutions, set and match end, JSON save/open, offline mode.
 
 ## Requirements
 

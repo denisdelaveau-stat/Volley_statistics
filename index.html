@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Volley Live Capture</title>
 <meta name="theme-color" content="#1e2a4a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -11,6 +10,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>Volley Live Capture</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:16px;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:#222}
@@ -230,10 +230,52 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
 .sub-grid button small{display:block;font-size:11px;font-weight:600;color:#475569}
 .sub-cancel{margin-top:12px;width:100%;min-height:52px;border:0;border-radius:12px;background:#e5e7eb;font-size:16px;font-weight:800}
 .sub-empty{color:#991b1b;font-weight:700;padding:10px 0}
+
+/* ---- attackers section + report ---- */
+.att-section{margin:14px 0}
+.att-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.att-head h3{margin:0;font-size:18px}
+.att-scope{display:flex;gap:6px}
+.att-scope button{min-height:40px;padding:6px 12px;border:2px solid #1e2a4a;background:#fff;border-radius:10px;font-weight:800;font-size:13px}
+.att-scope button.on{background:#1e2a4a;color:#fff}
+.att-note{font-size:12px;color:#64748b;margin:4px 0 8px}
+.att-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.att-card{background:#fff;border:1px solid #e2e8f0;border-left:8px solid #94a3b8;border-radius:12px;padding:10px}
+.att-card.role-oh{border-left-color:#2563eb}.att-card.role-mb{border-left-color:#b45309}.att-card.role-opp{border-left-color:#dc2626}
+.att-card h4{margin:0;font-size:16px}.att-card .att-kpi{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;font-size:12px;font-weight:800}
+.att-kpi span{padding:3px 7px;border-radius:6px;background:#f1f5f9}
+.att-kpi .k-p{background:#dcfce7;color:#166534}.att-kpi .k-e{background:#fee2e2;color:#991b1b}.att-kpi .k-n{background:#e2e8f0;color:#334155}.att-kpi .k-d{background:#1e2a4a;color:#fff}
+.att-card svg{width:100%;height:auto;display:block}
+.att-legend{font-size:11px;color:#475569;margin-top:2px}.att-legend b{display:inline-block;width:16px;height:3px;vertical-align:middle;margin:0 3px 0 8px}
+.att-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.att-tbl th,.att-tbl td{padding:3px 4px;text-align:center;border-bottom:1px solid #eef0f3}.att-tbl th:first-child,.att-tbl td:first-child{text-align:left}
+.att-empty{padding:12px;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;font-size:14px}
+.report-btn{background:#0f766e!important;border-color:#0f766e!important;color:#fff!important}
+.set-over .report-btn2{margin-top:8px;background:#0f766e!important;color:#fff!important}
+.set-over .report-btn2[hidden]{display:none}
 #homeInstall{font-size:13px;line-height:1.35;max-width:420px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.6);border-radius:12px;padding:10px 12px;color:#fde68a}
 #homeInstall[hidden]{display:none}
 #appVersion{font-size:11px;opacity:.55}
-</style></head><body>
+</style><script type="text/plain" id="attCss">.att-section{margin:14px 0}
+.att-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.att-head h3{margin:0;font-size:18px}
+.att-scope{display:flex;gap:6px}
+.att-scope button{min-height:40px;padding:6px 12px;border:2px solid #1e2a4a;background:#fff;border-radius:10px;font-weight:800;font-size:13px}
+.att-scope button.on{background:#1e2a4a;color:#fff}
+.att-note{font-size:12px;color:#64748b;margin:4px 0 8px}
+.att-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.att-card{background:#fff;border:1px solid #e2e8f0;border-left:8px solid #94a3b8;border-radius:12px;padding:10px}
+.att-card.role-oh{border-left-color:#2563eb}.att-card.role-mb{border-left-color:#b45309}.att-card.role-opp{border-left-color:#dc2626}
+.att-card h4{margin:0;font-size:16px}.att-card .att-kpi{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;font-size:12px;font-weight:800}
+.att-kpi span{padding:3px 7px;border-radius:6px;background:#f1f5f9}
+.att-kpi .k-p{background:#dcfce7;color:#166534}.att-kpi .k-e{background:#fee2e2;color:#991b1b}.att-kpi .k-n{background:#e2e8f0;color:#334155}.att-kpi .k-d{background:#1e2a4a;color:#fff}
+.att-card svg{width:100%;height:auto;display:block}
+.att-legend{font-size:11px;color:#475569;margin-top:2px}.att-legend b{display:inline-block;width:16px;height:3px;vertical-align:middle;margin:0 3px 0 8px}
+.att-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.att-tbl th,.att-tbl td{padding:3px 4px;text-align:center;border-bottom:1px solid #eef0f3}.att-tbl th:first-child,.att-tbl td:first-child{text-align:left}
+.att-empty{padding:12px;border:1px dashed #cbd5e1;border-radius:10px;color:#64748b;font-size:14px}
+</script>
+</head><body>
 <div id="setupScreen" hidden>
   <h2 id="suTitle">New match</h2><div class="su-sub" id="suSub"></div>
   <div class="su-steps"><span id="suS1">1 TEAM</span><span id="suS2">2 STARTING 7</span><span id="suS3">3 ROTATION</span></div>
@@ -248,13 +290,13 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
   <button type="button" class="home-btn home-open" id="homeOpen">OPEN MATCH .JSON</button><input type="file" id="homeFile" accept=".json,application/json" hidden>
   <div class="home-last" id="homeLast"></div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b> then <b>Add to Home Screen</b>, and always start the app from its icon (Safari and the installed app keep separate data).</div>
-  <div id="appVersion">v1.0.0</div>
+  <div id="appVersion">v1.1.0</div>
 </div>
 
 
 <section class="capture" id="capturePanel" aria-label="Live action capture">
   <div class="capture-head"><h2 id="captureTitle">Live input</h2><div class="score-live" id="liveScore">A 0 : 0 B</div><div class="sets-line" id="setsLine"></div></div>
-  <div class="set-over" id="setOver" hidden><h3 id="setOverTitle"></h3><p id="setOverText"></p><button type="button" id="nextSetBtn">START SET 2 →</button></div>
+  <div class="set-over" id="setOver" hidden><h3 id="setOverTitle"></h3><p id="setOverText"></p><button type="button" id="nextSetBtn">START SET 2 →</button><button type="button" id="reportBtn2" class="report-btn2" hidden>MATCH REPORT .HTML</button></div>
   <div class="pick-chip" id="pickChip" hidden></div>
   <div class="steps">
 <div class="step active" data-step="player"><p class="step-title">1. Player</p><div class="touch-grid players">
@@ -267,13 +309,14 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
       <button type="button" class="touch neutral" data-result="neutral">Neutral</button><button type="button" class="touch point" data-result="point">Point</button><button type="button" class="touch error" data-result="error">Error</button>
     </div></div>
   </div>
-  <div class="capture-tools"><button type="button" id="captureBack" class="back-only" hidden>← CHANGE</button><button type="button" id="captureUndo" class="undo-only">UNDO LAST</button><button type="button" id="captureSaveJson" class="save-json">SAVE .JSON</button></div>
+  <div class="capture-tools"><button type="button" id="captureBack" class="back-only" hidden>← CHANGE</button><button type="button" id="captureUndo" class="undo-only">UNDO LAST</button><button type="button" id="captureSaveJson" class="save-json">SAVE .JSON</button><button type="button" id="captureReport" class="report-btn">REPORT .HTML</button></div>
   <div class="capture-status" id="captureStatus" aria-live="polite"></div>
   <div class="history-wrap"><table class="history"><thead><tr><th>#</th><th>Time</th><th>Action</th><th>Result</th><th>Player</th><th>Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div>
 </section>
 
 <button type="button" id="statsToggle" class="stats-toggle" aria-expanded="false" aria-controls="statsPanel">STATISTICS <span id="statsArrow">▼</span></button>
 <div id="statsPanel" class="stats-panel" hidden>
+<section class="att-section" id="attSection"><div class="att-head"><h3>Attackers</h3><div class="att-scope"><button type="button" data-scope="set" class="on">CURRENT SET</button><button type="button" data-scope="match">MATCH</button></div></div><div class="att-note">One chart per OH / MB / OPP with entries in the log, after each of the player's actions.</div><div class="att-grid" id="attGrid"></div></section>
 
 <div class="point-origin-charts" aria-label="Point origin statistics for current set">
   <div class="pie-card"><h3>Team A</h3><div class="pie-sub">Current set - point origin</div><div id="teamAPie" class="pie-chart"></div><div id="teamAPieLegend" class="pie-legend"></div></div>
@@ -290,7 +333,7 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
   <div id="errorDiffChart" class="error-chart"></div>
 </div>
 
-<h1>Set score progression - Team A 25 : 23 Team B</h1>
+<h1 id="progTitle">Set score progression</h1>
 <div class="sub">Score after each point played, with the lead (A - B) as bars underneath. Use the checkboxes below to show or hide the coloured markers and the action strip. Hover (or tap) a point for details. Below, for each attacker: cumulative points and differential (points - errors) on the same graph.</div>
 <div class="card">
 <svg id="chart" viewBox="0 0 1200 724" preserveAspectRatio="xMidYMid meet"></svg>
@@ -305,6 +348,46 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
   var m=null;try{m=JSON.parse(localStorage.getItem('volleyCapture.match.v1')||'null')}catch(e){}
   window.VOLLEY_MATCH=m;
   // ---- set & match rules (derived from events only) ----
+  window.VolleyStats=(function(){
+    var ACTS=['attack','block','service','reception','defense','set'],ALAB={attack:'Attack',block:'Block',service:'Service',reception:'Reception',defense:'Defense',set:'Set'};
+    var RN={setter:'Setter',oh:'OH',mb:'MB',opp:'OPP',libero:'Libero'};
+    function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+    function info(mm,n){var r=(mm&&mm.team&&mm.team.roster)||[];for(var i=0;i<r.length;i++)if(r[i].number===n)return r[i];return null}
+    function attackers(mm,evs){
+      var r=(mm&&mm.team&&mm.team.roster)||[],seen={};(evs||[]).forEach(function(e){if(e.player!=='A')seen[e.player]=1});
+      return r.filter(function(x){return (x.position==='oh'||x.position==='mb'||x.position==='opp')&&seen[x.number]})
+        .sort(function(a,b){var o={oh:0,opp:1,mb:2};return (o[a.position]-o[b.position])||(a.number-b.number)});
+    }
+    function series(evs,n){var p=0,e=0,out=[],setMarks=[],last=null;(evs||[]).forEach(function(x){if(x.player!==n)return;var st=x.set||1;if(last!==null&&st!==last)setMarks.push(out.length);last=st;if(x.result==='point')p++;else if(x.result==='error')e++;out.push({p:p,e:e,d:p-e})});return {pts:out,setMarks:setMarks}}
+    function byAction(evs,n){var t={};ACTS.forEach(function(a){t[a]={point:0,error:0,neutral:0}});(evs||[]).forEach(function(x){if(x.player===n&&t[x.action]&&t[x.action][x.result]!==undefined)t[x.action][x.result]++});return t}
+    function svg(sr){
+      var pts=sr.pts,W=420,H=210,L=34,R=10,T=12,B=28,N=Math.max(1,pts.length),hi=1,lo=0;
+      pts.forEach(function(q){hi=Math.max(hi,q.p,q.e,q.d);lo=Math.min(lo,q.d)});hi+=1;lo=Math.min(lo-1,0);
+      function X(i){return (L+(W-L-R)*i/N).toFixed(1)}function Y(v){return (T+(H-T-B)*(hi-v)/(hi-lo)).toFixed(1)}
+      var o='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Arial,sans-serif">';
+      var step=Math.max(1,Math.ceil((hi-lo)/6));
+      for(var v=lo;v<=hi;v+=step){o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#eef0f3"/><text x="'+(L-5)+'" y="'+(+Y(v)+4)+'" font-size="10" text-anchor="end" fill="#64748b">'+v+'</text>'}
+      sr.setMarks.forEach(function(i){o+='<line x1="'+X(i)+'" x2="'+X(i)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="#94a3b8" stroke-dasharray="4 3"/>'});
+      o+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(0)+'" y2="'+Y(0)+'" stroke="#475569" stroke-width="1.2"/>';
+      var xs=Math.max(1,Math.ceil(N/8));for(var i=0;i<=N;i+=xs)o+='<text x="'+X(i)+'" y="'+(H-B+14)+'" font-size="10" text-anchor="middle" fill="#64748b">'+i+'</text>';
+      o+='<text x="'+(L+(W-L-R)/2)+'" y="'+(H-3)+'" font-size="10" text-anchor="middle" fill="#475569">player actions</text>';
+      function line(key,col,w,dash){var d='M'+X(0)+' '+Y(0),prev=0;pts.forEach(function(q,i){d+=' L'+X(i+1)+' '+Y(prev)+' L'+X(i+1)+' '+Y(q[key]);prev=q[key]});return '<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>'}
+      o+=line('e','#dc2626',2.5)+line('p','#16a34a',2.5)+line('d','#1e2a4a',3,'6 3');
+      return o+'</svg>';
+    }
+    function card(mm,evs,x){
+      var sr=series(evs,x.number),t=byAction(evs,x.number),tot={p:0,e:0,n:0};
+      ACTS.forEach(function(a){tot.p+=t[a].point;tot.e+=t[a].error;tot.n+=t[a].neutral});
+      var df=tot.p-tot.e;
+      var h='<div class="att-card role-'+x.position+'" data-att="'+x.number+'"><h4>#'+x.number+' '+esc(x.name||'')+' \u00B7 '+RN[x.position]+'</h4>';
+      h+='<div class="att-kpi"><span class="k-p">Pts '+tot.p+'</span><span class="k-e">Err '+tot.e+'</span><span class="k-n">Neu '+tot.n+'</span><span class="k-d">Diff '+(df>0?'+':'')+df+'</span></div>';
+      h+=svg(sr)+'<div class="att-legend"><b style="background:#16a34a"></b>points<b style="background:#dc2626"></b>errors<b style="background:#1e2a4a"></b>points \u2212 errors</div><table class="att-tbl"><tr><th>Action</th><th>Pt</th><th>Err</th><th>Neu</th></tr>';
+      ACTS.forEach(function(a){var r=t[a];if(r.point+r.error+r.neutral)h+='<tr><td>'+ALAB[a]+'</td><td>'+r.point+'</td><td>'+r.error+'</td><td>'+r.neutral+'</td></tr>'});
+      return h+'</table></div>';
+    }
+    function cards(mm,evs){var at=attackers(mm,evs);return at.length?at.map(function(x){return card(mm,evs,x)}).join(''):'<div class="att-empty">No OH / MB / OPP action in the log yet.</div>'}
+    return {attackers:attackers,series:series,byAction:byAction,svg:svg,card:card,cards:cards,esc:esc,info:info,ACTS:ACTS,ALAB:ALAB,RN:RN};
+  })();
   window.VolleySets=(function(){
     function setsToWin(mm){return (mm&&mm.format&&mm.format.setsToWin===2)?2:3}
     function decidingSet(mm){return setsToWin(mm)*2-1}
@@ -458,6 +541,8 @@ var DATA=[{"n": 1, "a": 1, "b": 0, "w": "A", "c": 0}, {"n": 2, "a": 2, "b": 0, "
   try { var storedData=JSON.parse(localStorage.getItem(STORAGE_DATA)||'null'); if(Array.isArray(storedData)) DATA=storedData.map(function(p){if(p&&p.c==='A')p.c=0;return p}); } catch(e){}
 var PC={1:'#6A1B9A',2:'#00ACC1',3:'#FB8C00',4:'#1E88E5',5:'#EC407A',6:'#FDD835',7:'#6D4C41'};
 var PN={1:'Setter',2:'Libero',3:'',4:'MB',5:'OH',6:'OH',7:'OPP'};
+(function(){var m=window.VOLLEY_MATCH,RN={setter:'Setter',oh:'OH',mb:'MB',opp:'OPP',libero:'Libero'},PAL=['#6A1B9A','#00ACC1','#FB8C00','#1E88E5','#EC407A','#FDD835','#6D4C41','#43A047','#8E24AA','#F4511E','#3949AB','#00897B'];
+  if(m&&m.team&&m.team.roster){PN={};m.team.roster.forEach(function(r,i){PN[r.number]=(r.name?r.name+' \u00B7 ':'')+(RN[r.position]||'');if(!PC[r.number])PC[r.number]=PAL[i%PAL.length]})}})();
 var GREY='#9E9E9E',GREEN='#2E7D32',RED='#C62828';
 function cat(p){
   if(p.w==='A') return p.c===0?'A0':'A'+p.c;
@@ -600,7 +685,7 @@ document.getElementById('none').addEventListener('click',function(){setAll(false
 setAll(true);   // default: all indicators selected (use Clear all or the checkboxes to hide some)
 
 // ---- per-attacker chart: cumulative points + differential (points - errors) on the same graph
-var ATT=[5,6,7];                       // attackers: 5 & 6 = OH, 7 = OPP (edit to add e.g. 4 = MB)
+var ATT=(function(){var m=window.VOLLEY_MATCH;if(!m||!m.team||!m.team.roster)return [5,6,7];return m.team.roster.filter(function(r){return r.position==='oh'||r.position==='mb'||r.position==='opp'}).map(function(r){return r.number}).filter(function(n){return DATA.some(function(p){return p.c===n})})})();                       // attackers: 5 & 6 = OH, 7 = OPP (edit to add e.g. 4 = MB)
 var LINE={6:'#E0A800'};                // darker line for the yellow player (readability)
 var DIFFC='#263238';
 var ERRC='#FF0000';                    // vivid red for errors
@@ -820,6 +905,54 @@ function renderErrorCharts(events){
     }
     function saveMatch(){localStorage.setItem(KM_,JSON.stringify(MATCH))}
     function tn(t){return t==='team1'?((MATCH&&MATCH.team.name)||'Team A'):((MATCH&&MATCH.opponent.name)||'Team B')}
+    var attScope='set';
+    function renderAttackers(){
+      var g=document.getElementById('attGrid');if(!g||!MATCH)return;
+      var evs=attScope==='set'?EVENTS.filter(function(e){return (e.set||1)===curSet()}):EVENTS;
+      g.innerHTML=window.VolleyStats.cards(MATCH,evs);
+    }
+    document.querySelectorAll('#attSection [data-scope]').forEach(function(b){b.addEventListener('click',function(){
+      attScope=b.dataset.scope;document.querySelectorAll('#attSection [data-scope]').forEach(function(x){x.classList.toggle('on',x===b)});renderAttackers()})});
+    function buildReport(){
+      var VSt=window.VolleyStats,E=VSt.esc,su=VS.summary(MATCH,EVENTS),tA=MATCH.team.name||'Team A',tB=MATCH.opponent.name||'Team B';
+      var css='body{font-family:-apple-system,Segoe UI,Arial,sans-serif;margin:0;background:#f3f5f7;color:#17202a}main{max-width:1100px;margin:0 auto;padding:16px}h1{margin:0;font-size:24px}h2{font-size:18px;margin:22px 0 8px;border-bottom:2px solid #1e2a4a;padding-bottom:4px}'
+        +'.hero{background:#1e2a4a;color:#fff;border-radius:14px;padding:16px}.hero .res{font-size:20px;font-weight:800;margin-top:6px}.hero .sub{opacity:.8;font-size:13px;margin-top:4px}'
+        +'.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;background:#fff;font-size:13px}th,td{padding:5px 6px;border-bottom:1px solid #e5e7eb;text-align:center}th{background:#f1f5f9}td{white-space:nowrap}td:first-child,th:first-child{text-align:left}'
+        +'.sets td.w{background:#dcfce7;font-weight:800}.sets td.l{background:#fee2e2}'
+        +document.getElementById('attCss').textContent+'.foot{color:#64748b;font-size:11px;margin:20px 0}';
+      var won=su.matchWinner?('Match won by '+(su.matchWinner==='team1'?tA:tB)):('In progress \u00B7 set '+curSet());
+      var h='<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(MATCH.name||'Match report')+'</title><style>'+css+'</style></he'+'ad><body><main>';
+      h+='<div class="hero"><h1>'+E(tA)+' vs '+E(tB)+'</h1><div class="res">'+E(won)+' \u00B7 Sets '+su.wonA+' : '+su.wonB+'</div><div class="sub">'+E(MATCH.name||'')+' \u00B7 '+new Date(MATCH.createdAt||Date.now()).toLocaleDateString()+' \u00B7 best of '+(su.setsToWin*2-1)+' \u00B7 '+EVENTS.length+' actions</div></div>';
+      h+='<h2>Sets</h2><div class="tw"><table class="sets"><tr><th>Set</th><th>'+E(tA)+'</th><th>'+E(tB)+'</th><th>Winner</th><th>Subs</th></tr>';
+      su.sets.forEach(function(x){var ns=(MATCH.subs||[]).filter(function(q){return q.set===x.set}).length;h+='<tr><td>Set '+x.set+(x.target===15?' (to 15)':'')+'</td><td class="'+(x.winner==='team1'?'w':x.winner?'l':'')+'">'+x.a+'</td><td class="'+(x.winner==='team2'?'w':x.winner?'l':'')+'">'+x.b+'</td><td>'+(x.winner?E(x.winner==='team1'?tA:tB):'in progress')+'</td><td>'+ns+'</td></tr>'});
+      h+='</table></div>';
+      var tot={p:0,e:0,n:0};h+='<h2>Players (P / E / N = point / error / neutral)</h2><div class="tw"><table><tr><th>Player</th><th>Pos.</th>';VSt.ACTS.forEach(function(a){h+='<th>'+VSt.ALAB[a]+'</th>'});h+='<th>Pts</th><th>Err</th><th>Diff</th></tr>';
+      (MATCH.team.roster||[]).forEach(function(r){
+        var t=VSt.byAction(EVENTS,r.number),p=0,e=0,n=0;VSt.ACTS.forEach(function(a){p+=t[a].point;e+=t[a].error;n+=t[a].neutral});if(!(p+e+n))return;
+        tot.p+=p;tot.e+=e;tot.n+=n;
+        h+='<tr><td>#'+r.number+' '+E(r.name||'')+'</td><td>'+(VSt.RN[r.position]||'')+'</td>';VSt.ACTS.forEach(function(a){var x=t[a];h+='<td>'+((x.point+x.error+x.neutral)?x.point+' / '+x.error+' / '+x.neutral:'')+'</td>'});
+        h+='<td>'+p+'</td><td>'+e+'</td><td>'+(p-e>0?'+':'')+(p-e)+'</td></tr>'});
+      var adv=EVENTS.filter(function(x){return x.player==='A'&&x.winningTeam==='team2'}).length;
+      h+='<tr><td><b>Team total</b></td><td></td>'+VSt.ACTS.map(function(){return '<td></td>'}).join('')+'<td><b>'+tot.p+'</b></td><td><b>'+tot.e+'</b></td><td><b>'+(tot.p-tot.e)+'</b></td></tr></table></div>';
+      h+='<p style="font-size:13px">Points recorded with the ADVERSE button ('+E(tB)+'): '+adv+'</p>';
+      h+='<h2>Attackers \u00B7 whole match (dashed vertical line = new set)</h2><div class="att-grid">'+VSt.cards(MATCH,EVENTS)+'</div>';
+      if((MATCH.subs||[]).length){h+='<h2>Substitutions</h2><div class="tw"><table><tr><th>Set</th><th>After action #</th><th>In</th><th>Out</th></tr>';MATCH.subs.forEach(function(q){var i=VSt.info(MATCH,q['in']),o=VSt.info(MATCH,q.out);h+='<tr><td>'+q.set+'</td><td>'+q.at+'</td><td>#'+q['in']+' '+E((i&&i.name)||'')+'</td><td>#'+q.out+' '+E((o&&o.name)||'')+'</td></tr>'});h+='</table></div>'}
+      h+='<h2>Action log</h2><div class="tw"><table><tr><th>#</th><th>Set</th><th>Time</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr>';
+      EVENTS.forEach(function(x){var r=x.player==='A'?null:VSt.info(MATCH,x.player);h+='<tr><td>'+x.id+'</td><td>'+(x.set||1)+'</td><td>'+E(x.time||'')+'</td><td>'+(x.player==='A'?'Adverse':'#'+x.player+(r&&r.name?' '+E(r.name):''))+'</td><td>'+E(x.action)+'</td><td>'+E(x.result)+'</td><td>'+x.scoreA+' : '+x.scoreB+'</td></tr>'});
+      h+='</table></div><div class="foot">Generated by Volley Live Capture on '+new Date().toLocaleString()+'. Self-contained file, no network needed.</div></main></bo'+'dy></ht'+'ml>';
+      return h;
+    }
+    function exportReport(){
+      if(!MATCH){status.textContent='No match to report.';return}
+      var name=String(MATCH.name||'match').trim().replace(/[\\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').slice(0,80)+'_report.html';
+      var blob=new Blob([buildReport()],{type:'text/html'});
+      try{var file=new File([blob],name,{type:'text/html'});if(navigator.canShare&&navigator.canShare({files:[file]})&&/iPhone|iPad|iPod/.test(navigator.userAgent)){navigator.share({files:[file],title:name}).catch(function(){});status.textContent='Report: '+name;return}}catch(x){}
+      var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},1500);
+      status.textContent='Report: '+name;
+    }
+    window.buildMatchReport=buildReport;
+    document.getElementById('captureReport').addEventListener('click',exportReport);
+    document.getElementById('reportBtn2').addEventListener('click',exportReport);
     function renderSets(){
       var line=document.getElementById('setsLine'),box=document.getElementById('setOver'),panel=document.getElementById('capturePanel');
       if(!MATCH){line.innerHTML='';box.hidden=true;panel.classList.remove('locked');return}
@@ -832,10 +965,10 @@ function renderErrorCharts(events){
         box.hidden=false;box.className='set-over match';
         t.textContent='MATCH WON BY '+tn(su.matchWinner).toUpperCase();
         tx.textContent='Sets '+su.wonA+' : '+su.wonB+' \u00B7 '+su.sets.map(function(x){return x.a+'-'+x.b}).join(', ');
-        nb.textContent='SAVE MATCH .JSON';nb.dataset.mode='save';panel.classList.add('locked');
+        nb.textContent='SAVE MATCH .JSON';nb.dataset.mode='save';panel.classList.add('locked');document.getElementById('reportBtn2').hidden=false;
         if(MATCH.status!=='completed'){MATCH.status='completed';saveMatch()}
       }else if(c&&c.winner){
-        box.hidden=false;box.className='set-over set';
+        box.hidden=false;box.className='set-over set';document.getElementById('reportBtn2').hidden=true;
         t.textContent='SET '+c.set+' FINISHED';
         tx.textContent='Won by '+tn(c.winner)+' '+Math.max(c.a,c.b)+'-'+Math.min(c.a,c.b)+' \u00B7 Sets '+su.wonA+' : '+su.wonB;
         nb.textContent='START SET '+(c.set+1)+(c.set+1===VS.decidingSet(MATCH)?' (to 15)':'')+' \u2192';nb.dataset.mode='next';panel.classList.add('locked');
@@ -846,7 +979,7 @@ function renderErrorCharts(events){
     }
     function showStep(name){step=name;document.querySelectorAll('#capturePanel .step').forEach(function(x){x.classList.toggle('active',x.getAttribute('data-step')===name)});updateChip();}
     function render(){
-      var sc=lastScore();score.textContent='A '+sc.a+' : '+sc.b+' B';hist.innerHTML='';renderSets();
+      var sc=lastScore();score.textContent='A '+sc.a+' : '+sc.b+' B';hist.innerHTML='';renderSets();renderAttackers();
       EVENTS.slice().reverse().forEach(function(e){var tr=document.createElement('tr');tr.innerHTML='<td>'+e.id+'</td><td>'+e.time+'</td><td>'+e.action+'</td><td>'+e.result+'</td><td>'+e.player+'</td><td>'+e.scoreA+' : '+e.scoreB+'</td>';hist.appendChild(tr)});
       status.innerHTML=EVENTS.length?'<span class="last-event">Last:</span> #'+EVENTS[EVENTS.length-1].player+' '+EVENTS[EVENTS.length-1].action+' / '+EVENTS[EVENTS.length-1].result:'Ready for a new action.';      updateOriginPies(EVENTS);
       renderErrorCharts(EVENTS);
