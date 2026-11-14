@@ -1,97 +1,57 @@
-# Volley Live Capture – v1.1.0 (iPhone package)
+# Volley Live Capture – v1.1.3 (iPhone package)
 
-Touch-first app to record a volleyball match rally by rally on an iPhone.
-It runs **100 % offline** once installed on the Home Screen. No account, no server, no App Store.
-All match data stays on the phone.
+Touch-first web app (PWA) to record a volleyball match rally by rally on an iPhone.
+Runs **100 % offline** once added to the Home Screen. All match data stays on the phone.
 
-## Package content
+## Repository content
 
-| File | Role |
+| Path | Role |
 |---|---|
-| `index.html` | The whole application (HTML, CSS, JavaScript, no dependency) |
-| `manifest.webmanifest` | Home Screen app definition (name, icon, standalone mode) |
-| `sw.js` | Service worker: caches every file so the app starts without network |
+| `index.html` | The application (single file, no external dependency) |
+| `manifest.webmanifest` | Home Screen app definition |
+| `sw.js` | Offline cache (cache name `volley-live-capture-v1.1.3`) |
 | `icons/` | Home Screen icons (180, 192, 512 px) |
-| `serve_local.py` | Optional: quick test from a PC on the same Wi-Fi (online only) |
+| `serve_local.py` | Optional quick test from a PC on the same Wi-Fi (online only) |
+| `docs/IMPLEMENTATION_SPEC.md` | General implementation specification |
+| `docs/IOS_IMPLEMENTATION_SPEC.md` | iOS / Safari specific implementation specification |
+| `docs/INSTALL_IPHONE.md` | Installation and update procedure on iPhone |
+| `tests/test_e2e_pwa.py` | End-to-end test (Playwright, iPhone viewport, offline) |
+| `CHANGELOG.md` | Version history |
 
-## Why a Home Screen app (and not just opening the .html file)
+## Publish (static HTTPS hosting)
 
-* An `.html` file opened from the iPhone **Files** app is shown in a preview that does not run the
-  JavaScript reliably ("A script did not run correctly on this page").
-* iOS only allows offline caching (service worker) for pages served over **HTTPS**.
-* An app added to the Home Screen gets its own durable storage, exempt from Safari's
-  7-day deletion of website data.
+The folder root **is** the web root: push it as-is to any static HTTPS host
+(e.g. GitHub Pages: *Settings → Pages → Deploy from branch → `main` / root*).
+HTTPS is mandatory for the offline service worker on iPhone.
 
-So the package must be published **once** on any HTTPS static host, then installed on the phone.
-After installation the phone never needs the network again.
+## Update an existing installation (→ v1.1.3)
 
-## Install – recommended: GitHub Pages (free, ~10 minutes, done once)
+1. On the phone: **SAVE .JSON** the current match (safety).
+2. Replace **all** files on the HTTPS host with the content of this folder.
+3. On the iPhone, with network: open the app from its icon, close it completely, open it again.
+   The Home screen shows **v1.1.3**. Match data on the phone is kept.
 
-1. Create a free account on github.com and a **public** repository, e.g. `volley-live`.
-2. *Add file → Upload files*: drag the **content** of this folder (`index.html`, `manifest.webmanifest`,
-   `sw.js`, `icons/`) to the root of the repository → *Commit changes*.
-3. *Settings → Pages → Source: Deploy from a branch → Branch: main / (root) → Save*.
-4. After 1–2 minutes the app is at `https://<your-user>.github.io/volley-live/`.
-   (Only the empty app is public; your match data never leaves the phone.)
+## First installation
 
-Any other HTTPS static host (Cloudflare Pages, Netlify, your own server) works the same way:
-publish the folder as is.
+See [`docs/INSTALL_IPHONE.md`](docs/INSTALL_IPHONE.md).
 
-## Install on the iPhone
+## In a match
 
-1. Open the URL in **Safari** (Wi-Fi or 4G, only this once).
-2. Tap **Share** → **Add to Home Screen** → keep *Open as Web App* on → **Add**.
-3. Start **Volley Live** from its icon. Open it once while still online so the offline cache is filled.
-4. Test: switch on Airplane mode, close the app, start it again → it must open normally.
+* NEW MATCH → Team (names, match name, format, roster 7–12) → Starting 7 → Rotation + first rally.
+* Each rally: **Player → Action → Result** (3 taps). Saved on the phone after every rally.
+* Opponent: one generic player button **ADVERSE** → one generic action → Neutral / Point / Error.
+* ⇄ SUBSTITUTION, UNDO LAST, STATISTICS ▼ on the capture screen; START SET n → between sets.
+* **SAVE .JSON** → Share sheet → *Save to Files*. **REPORT .HTML** → self-contained match report.
+* **OPEN MATCH .JSON** (Home) reloads a saved match. One match at a time on the phone.
 
-> Always use the app from its **icon**. Safari and the installed app have separate data.
-> The yellow hint on the Home screen is shown only when the page is opened in a Safari tab.
+## Tests
 
-## Using it during a match
-
-* **NEW MATCH** → Team (names, match name, format, roster 7–12 with name and position)
-  → Starting 7 → Initial rotation and first rally → **START SET 1**.
-* Every rally: **Player → Action → Result** (3 taps). Data is saved on the phone after each tap on the result.
-* **⇄ SUBSTITUTION**, **UNDO LAST**, **SAVE .JSON**, **REPORT .HTML**, **STATISTICS ▼** are on the capture screen.
-* **STATISTICS ▼ → Attackers**: one chart per OH / MB / OPP with entries in the log (points, errors, differential), for the current set or the whole match.
-* At the end of a set: **START SET n →**. At the end of the match: **SAVE MATCH .JSON** and **MATCH REPORT .HTML**.
-
-## Backup and transfer: SAVE .JSON / OPEN MATCH .JSON
-
-* **SAVE .JSON** creates `<match name>.json`. On iPhone the Share sheet opens: choose
-  **Save to Files** (iCloud Drive or On My iPhone), or AirDrop / Mail it to your PC.
-* **OPEN MATCH .JSON** on the Home screen reloads a saved match (score, history, court, statistics).
-* The phone keeps **one match at a time**: save the current one before NEW MATCH or OPEN.
-* Recommended: SAVE .JSON at the end of each set.
-
-## Match report: REPORT .HTML
-
-* Generates `<match name>_report.html`: one **self-contained** file (no script, no external file, opens offline on any phone or PC).
-* Content: result and sets, per-player table by action (point / error / neutral), one chart per attacker over the whole match, substitutions, full action log.
-* On iPhone the Share sheet opens: Save to Files, AirDrop, Mail, Messages.
-
-## Updating the app
-
-1. Replace the changed files on the host.
-2. In `sw.js` change `CACHE = 'volley-live-capture-v1.1.0'` to a new value (e.g. `v1.1.1`),
-   and the version label `v1.1.0` in `index.html`.
-3. On the iPhone open the app once with network, close it and open it again.
-   Match data in the phone is kept.
-
-## Quick test from a PC (optional, online only)
-
+```bash
+pip install playwright && playwright install chromium
+python tests/test_e2e_pwa.py      # expects: 22 checks -> ALL PASSED
 ```
-python serve_local.py
-```
-Then open the printed `http://<pc-ip>:8000/` address in Safari on an iPhone on the same Wi-Fi.
-Everything works except offline mode (iOS requires HTTPS for it).
 
-## Version history
+## Release rule
 
-* **1.1.0** – Attacker charts in STATISTICS; self-contained HTML match report (REPORT .HTML / MATCH REPORT .HTML).
-* **1.0.0** – First iPhone package: setup, live capture, rotation and libero, substitutions, set and match end, JSON save/open, offline mode.
-
-## Requirements
-
-* iPhone / iPad with iOS 16.4 or later recommended (Share sheet with files, Home Screen web apps).
-* About 0.2 MB of storage.
+At every change: bump the version in `index.html` (`appVersion`), in `sw.js` (`CACHE`),
+in this file and in `CHANGELOG.md`, then run the tests.
