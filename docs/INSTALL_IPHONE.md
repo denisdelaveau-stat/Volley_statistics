@@ -1,32 +1,41 @@
-# Installation on iPhone – Volley Live Capture v1.1.3
+# Installation on iPhone – Volley Live Capture v1.3.2
+
+Screens: `Volley_Live_Capture_Screens_v1.3.2.pdf` (page 11).
 
 ## Prerequisites
-- iPhone with a recent iOS version and **Safari**.
-- The repository content published on an **HTTPS** static host (e.g. GitHub Pages).
-  `http://` (e.g. `serve_local.py`) works for a quick online test only: no offline mode.
+- iPhone with **Safari**.
+- Repository published on an **HTTPS** static host (e.g. GitHub Pages). Not the professional SharePoint / OneDrive.
 
 ## First installation
-1. On the iPhone, open the HTTPS URL in **Safari** (not Chrome, not an in-app browser).
-2. Tap **Share** → **Add to Home Screen** → keep the name *Volley Live* → **Add**.
-3. Start the app **from its icon**, with network, once. The Home screen shows **v1.1.3**.
-4. Close the app, enable **Airplane mode**, start it again from its icon → it must open.
-   The app is now 100 % offline.
+1. Open the HTTPS address in **Safari** (not Chrome, not an in-app browser).
+2. **Share → Add to Home Screen → Add**. The *Volley Live* icon appears.
+3. Start the app **from its icon** once, with network. Home shows **v1.3.2**.
+4. Airplane mode, close the app, start it again from its icon: it must open.
 
 ## Update
-1. In the app: **SAVE .JSON** the current match → *Save to Files* (safety copy).
-2. Publish the new files on the host (replace all files).
-3. With network: open the app from its icon, close it completely (swipe up), open it again.
-4. Check the version on the Home screen. Match data stored on the phone is kept.
+1. In the app: **SAVE .JSON** → *Save to Files* (safety copy).
+2. Push the new files to the host.
+3. With network: open the app from its icon, close it completely, open it again.
+4. Check the version on Home. The stored match is kept (v1.1.x matches open at Advanced level).
+
+## Choosing the detail level
+| Situation | Level |
+|---|---|
+| Following the score from the stands, one hand | **Basic** – Team → Point / Error |
+| Who scores and who errs, without action detail | **Intermediate** – Player → Point / Error |
+| Full statistics by action (coach, statistician) | **Advanced** – Player → Action → Result |
+
+The level is fixed for the whole match.
 
 ## Good practice
-- Always use the app from its **icon**: Safari and the installed app keep **separate** data.
-- Save the match (.JSON) at the end of each set; share it via the Share sheet (Files, AirDrop, mail).
-- If iOS has not opened the app for several weeks, it can clear website data:
-  reload the last .JSON with **OPEN MATCH .JSON**.
+- Always start from the **icon**: Safari and the installed app keep **separate** data.
+- **SAVE .JSON** at the end of each set; **REPORT .HTML** at the end of the match.
+- One match stored at a time; deleting the icon deletes the data.
+- Set Auto-Lock to *Never* during a match.
 
 ## Troubleshooting
 | Symptom | Action |
 |---|---|
-| Old version still displayed | Open with network, close completely, reopen (twice if needed). |
-| Does not open in Airplane mode | It was never started from the icon with network: repeat step 3. |
-| Match missing | Home → **OPEN MATCH .JSON** → select the saved file. |
+| Old version still displayed | Open with network, close completely, reopen (twice if needed) |
+| Does not open in Airplane mode | Never started from the icon with network: repeat step 3 |
+| Match missing | Home → **OPEN MATCH .JSON** → select the saved file |

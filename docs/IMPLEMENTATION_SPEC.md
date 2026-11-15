@@ -1,91 +1,121 @@
-# Volley Live Capture – General Implementation Specification (v1.1.3)
+# Volley Live Capture – General Implementation Specification (v1.3.2)
+
+Functional rules: *Volley Live Capture – Functional Specification v1.3.2* (FR-xx references).
+Screens: `Volley_Live_Capture_Screens_v1.3.2.pdf` (letters A–AA).
 
 ## 1. Purpose
-Record a volleyball match rally by rally from the bench, on a phone, with no network,
-and produce statistics and a shareable report. The capture data must be **saved, recoverable,
-shareable and independent of the front end** (plain JSON file).
+Record a volleyball match rally by rally on a phone, with no network, and produce statistics and a
+shareable report. Since v1.2.0 the amount of detail recorded per rally is chosen at setup
+(**detail level**). Capture data stays saved, recoverable, shareable and independent of the front end.
 
 ## 2. Architecture
 | Layer | Implementation |
 |---|---|
 | UI | Single file `index.html` (HTML + CSS + vanilla JS, no library, no build step) |
-| Offline | `sw.js` service worker, cache-first, versioned cache `volley-live-capture-vX.Y.Z` |
-| Install | `manifest.webmanifest` + `icons/` (standalone Home Screen app) |
-| Live storage | `localStorage` (written after every rally) |
-| Exchange format | `<match name>.json` (export / import), `<match name>_report.html` (self-contained report) |
+| Offline | `sw.js`, cache-first, cache `volley-live-capture-v1.3.2` (6 files) |
+| Install | `manifest.webmanifest` + `icons/` |
+| Live storage | `localStorage`, written after every rally |
+| Exchange | `<match name>.json`, `<match name>_report.html` |
 
-### localStorage keys
-| Key | Content |
+| localStorage key | Content |
 |---|---|
-| `volleyCapture.match.v1` | Match definition and state (teams, roster, format, sets, rotation, substitutions) |
+| `volleyCapture.match.v1` | Match definition and state, including `detailLevel` |
 | `volleyCapture.events.v1` | Ordered list of rally events |
-| `volleyCapture.chartData.v1` | Point-by-point data used by the charts |
-| `volleyCapture.stage` | Current screen (home / setup / capture) |
+| `volleyCapture.chartData.v1` | Point-by-point chart data |
+| `volleyCapture.stage` (session) | Screen to open after reload |
 
-## 3. Screen flow
-1. **Home** – NEW MATCH, CONTINUE / VIEW MATCH, OPEN MATCH .JSON, last match summary, version label.
-2. **Team setup** – team / opponent / match names, format (best of 3 or 5), roster of 7 to 12 players
-   (number, name, position: setter, OH, MB, OPP, libero).
-3. **Starting 7** – six court players + libero.
-4. **Rotation** – P1…P6 assignment and first rally (serve or receive).
-5. **Live capture** – scoreboard, court view, capture panel, statistics.
+## 3. Detail level (v1.2.0)
+| Level | `detailLevel` | Capture steps | Results | Setup screens |
+|---|---|---|---|---|
+| Basic | `basic` | `player` (team) → `result` | point, error | SETUP 1 only |
+| Intermediate | `intermediate` | `player` → `result` | point, error | SETUP 1 → 2 → 3 |
+| Advanced | `advanced` (default) | `player` → `action` → `result` | neutral, point, error | SETUP 1 → 2 → 3 |
 
-## 4. Live capture
-### 4.1 Scoreboard
-- Format `A : B` without team letters; each value in a black square with **red digits** (gym style).
-- Under it: sets won (`Sets x : y`), finished set scores (`S1 25-10`…), format reminder.
+### 3.1 How the level drives the code
+- At start-up: `LVL = match.detailLevel || 'advanced'`, exposed as `window.VOLLEY_LEVEL` and as
+  `<html data-level="…">` (CSS: 2-column result grid at Basic / Intermediate).
+- Step titles: Basic "1. Team"; Basic / Intermediate result step "2. Result"; Neutral button `hidden`.
+- Player tap: at Basic / Intermediate the action step is skipped and `choice.action` is set to
+  `team` (Basic, own team), `generic` (Intermediate, own player) or `adverse` (opponent), then the
+  result step opens. ← CHANGE from the result step returns to step 1.
+- `commit()` is unchanged: winning team and point origin come from player + result.
+- Basic: the player grid is replaced by two buttons `data-player="T"` (own team) and
+  `data-player="A"` (opponent); `updateCourt()` only computes the serving side.
 
-### 4.2 Court view
-- Only the six players on court are shown, at their real position (P4 P3 P2 at the net, P5 P6 P1 behind),
-  coloured by role; the server is highlighted (`SERVE`). Bench players are shown on a third row.
-- Rotation is applied automatically on side-out; libero in / out for middle blockers in back row.
-
-### 4.3 Rally entry – 3 steps
-1. **Player** (own team) or the single generic **ADVERSE** button (opponent).
-2. **Action** – reception, defence, set, attack, block, service, ordered by likelihood for the player's role.
-   Opponent: one generic action.
-3. **Result** – Neutral, Point, Error.
-
-Each event stores: `id, set, timestamp, time, action, result, player, winningTeam, pointOrigin, scoreA, scoreB`.
-
-### 4.4 Set and match rules
-- Sets 1–4: 25 points with a 2-point lead; deciding set: 15 points with a 2-point lead.
-- At set end the interface shows *Set finished, won by …* and offers **START SET n**;
-  at match end *MATCH WON* and **SAVE MATCH .JSON**.
-- Serve of the next set alternates.
-
-### 4.5 Substitutions and corrections
-- ⇄ SUBSTITUTION at any time: tap the player on court, then the incoming bench player.
-  Counter per set (`Subs set n (k/6)`), confirmation above 6.
-- UNDO LAST removes the last event (and the last substitution if it was the last action).
-
-## 5. Statistics
-- Score progression of the current set with lead bars and filterable markers.
-- Point origin per team (points won vs opponent errors) and error differential.
-- **Attackers** (OH, MB, OPP with entries in the log), scope *Current set* / *Match*:
-  one chart per attacker (points, errors, points − errors) + table Pt / Err / Neu per action.
-- Consolidated charts *All attackers – points scored over time* and *– differential*,
-  with a legend `Player n (Name · Role)` per curve.
-
-## 6. Files
-### 6.1 Match JSON
+## 4. Setup
+- SETUP 1: team, opponent, match name, format, then `<select id="suLevel">` (Basic / Intermediate /
+  Advanced) with `#suLevelHint`. A `change` event re-renders the screen.
+- Basic: roster block removed, *First rally* card shown, button START SET 1, step bar "1 TEAM" only.
+  The roster selection is kept in memory if the user switches back before starting.
+- Match written at START SET 1 (Basic):
 ```json
-{ "format": "volley-live-capture", "version": 1, "savedAt": "<ISO date>",
-  "match": { "...": "teams, roster, sets, subs, status" },
-  "score": { "team1": 0, "team2": 0 },
-  "events": [ ], "chartData": [ ] }
+{ "detailLevel": "basic", "team": { "name": "Antibes", "players": [], "roster": [] },
+  "opponent": { "name": "Nice" }, "startingLineup": null, "startingRotation": null,
+  "firstRally": { "antibesState": "service" },
+  "format": { "setsToWin": 2, "setPoints": 25, "decidingSetPoints": 15 }, "currentSet": 1 }
 ```
-File name: match name with spaces replaced by `_`, e.g. `Test_offline.json`.
-Import through **OPEN MATCH .JSON** restores the full state.
+  Intermediate / Advanced: same object as v1.1.x plus `"detailLevel"`.
 
-### 6.2 HTML report
-Self-contained HTML (inline CSS / SVG, no script dependency), file `<match name>_report.html`.
+## 5. Live capture layout (top → bottom)
+1. Title, scoreboard (black squares; digits **green** if Team A ahead, **red** if behind, **white** if tied – class `lead` / `trail` / `tie` on `#liveScore`), sets line with level chip (BASIC / INTERMEDIATE / ADVANCED).
+2. Step area: Basic = serving line + two team buttons; others = serving line, **SERVICE / RECEPTION badge**
+   (`#phaseBadge`, green / amber, directly above the NET), court, bench, ADVERSE, ⇄ SUBSTITUTION.
+   The badge replaces the role legend (v1.3.2); it is refreshed by `updateCourt()` from `st.serving`.
+3. ← CHANGE (during input) and UNDO LAST, centred.
+4. Status line, history, STATISTICS ▼.
+5. SAVE .JSON / REPORT .HTML at the bottom with their own status line.
 
-## 7. Versioning and release
-- Semantic version shown on Home (`#appVersion`) and used in the service-worker cache name.
-- Every release: bump `index.html`, `sw.js`, `README.md`, `CHANGELOG.md`; run `tests/test_e2e_pwa.py`.
+## 6. Events per level
+| Level | `player` | `action` | `result` |
+|---|---|---|---|
+| Basic | `"T"` / `"A"` | `team` / `adverse` | point / error |
+| Intermediate | number / `"A"` | `generic` / `adverse` | point / error |
+| Advanced | number / `"A"` | 6 actions / `adverse` | neutral / point / error |
 
-## 8. Verification (tests/test_e2e_pwa.py – 22 checks)
-Manifest and icons, service worker active and cache content, offline start, setup, capture,
-substitution, set and match end, JSON and HTML export, restart and JSON re-import offline,
-red scoreboard digits, legend layout, no JavaScript error.
+Chart rows: own team at Basic coded `T` (category "A - team point"), opponent `0`.
+
+## 7. Rules
+- Scoring: own point → A +1 (earned); own error → B +1 (opponent_error); ADVERSE point → B +1;
+  ADVERSE error → A +1; neutral (Advanced only) → unchanged.
+- Serve: first rally choice, alternating each set; rally winner serves. Rotation and libero rule at
+  Intermediate / Advanced only. Sets 25 / deciding 15, 2-point lead, all levels.
+
+## 8. Statistics and report
+| Section | Basic | Intermediate | Advanced |
+|---|---|---|---|
+| Score progression, point-origin pies, error charts | ✔ | ✔ | ✔ |
+| Attacker cards | hidden | ✔ (row "No action detail", no Neu) | ✔ |
+| All-attackers charts | not drawn | ✔ | ✔ |
+| Report – players | points per team | Pts / Err / Diff | P / E / N by action |
+
+The report header states the level. All-attackers charts are skipped when no attacker has an event.
+
+## 9. Files
+JSON format unchanged (`format: "volley-live-capture"`, `version: 1`), `match.detailLevel` added.
+A file without `detailLevel` opens at Advanced level.
+
+## 9b. Player focus (v1.3.2)
+- SETUP 1: each player row has a **Focus** checkbox (`data-ifocus`), **checked by default**.
+  Stored in `team.roster[].focus` (`true` / `false`). Files without the field (≤ v1.2.0) → all players focus.
+- Applies at **Intermediate** and **Advanced** levels (Basic has no roster).
+- CAPTURE step 1: a court / bench cell whose player has `focus=false` shows its zone and **TEAM** (dashed grey),
+  no number, and cannot be tapped (class `nofocus`). Rotation, serve ring and libero logic are unchanged.
+- A blue **TEAM** button (`#teamFocusBtn`, `data-player="T"`) is shown above ADVERSE whenever at least one
+  player on court / bench has no focus. It records events for **all players without focus** with `player: "T"`.
+  - Advanced: TEAM → 6 actions (default order) → Neutral / Point / Error.
+  - Intermediate: TEAM → Point / Error (`action: "generic"`).
+  - Scoring like an own player: Point → team1 earned, Error → team2 opponent_error.
+- Substitution mode: non-focus cells stay tappable so they can be substituted; a focus substitute is then proposed.
+- Statistics: TEAM events count in team totals and point-origin / error charts, not in individual attacker cards.
+  Report: a row "TEAM (players without focus)" in the players table (Intermediate and Advanced).
+
+## 10. Verification – `tests/test_e2e_pwa.py` (69 checks)
+| Group | Checks |
+|---|---|
+| PWA: manifest, version, service worker, cache, offline start | P1–P5 |
+| Setup list, default, description, iOS font size | L-01, L-02, L-02b |
+| Advanced (v1.1.x): layout, scoreboard, action order, results, ADVERSE, rotation, UNDO, substitution, files | A1–A14 |
+| Basic: setup path, 2 steps, scoring, serving, stats, set end, report, persistence, re-open | L-03 … L-06b, L-11a–c, L-13a–b, L-14a |
+| Intermediate: court, 2 steps, generic action, rotation, CHANGE, substitution, cards, match end, report | L-07a … L-09, L-13c–d, L-14b |
+| Focus: checkbox default, storage, TEAM cells / button, Advanced & Intermediate TEAM events, substitution, report, old files | F-01 … F-16 |
+| v1.1.x file opens as Advanced; no JS error | L-12, E |

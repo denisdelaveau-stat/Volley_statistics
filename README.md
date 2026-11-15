@@ -1,57 +1,56 @@
-# Volley Live Capture – v1.1.3 (iPhone package)
+# Volley Live Capture – v1.3.2 (iPhone package)
 
 Touch-first web app (PWA) to record a volleyball match rally by rally on an iPhone.
 Runs **100 % offline** once added to the Home Screen. All match data stays on the phone.
 
-## Repository content
+## New in v1.3.2 – player focus
+On *Team setup* each player has a **Focus** checkbox (checked by default). At Intermediate and Advanced
+levels, players with focus are proposed by number on the court; players without focus are not: their
+court cells show **TEAM**, and one blue **TEAM** button records the actions of all of them together.
 
+## Detail level (since v1.2.0)
+Chosen on the first setup screen (*Team setup*), fixed for the whole match:
+
+| Level | Input per rally | Results |
+|---|---|---|
+| Basic | Team → Result (2 taps, no roster) | Point · Error |
+| Intermediate | Player / ADVERSE → Result (2 taps) | Point · Error |
+| Advanced (default) | Player / ADVERSE → Action → Result (3 taps) | Neutral · Point · Error |
+
+## Repository content
 | Path | Role |
 |---|---|
 | `index.html` | The application (single file, no external dependency) |
 | `manifest.webmanifest` | Home Screen app definition |
-| `sw.js` | Offline cache (cache name `volley-live-capture-v1.1.3`) |
+| `sw.js` | Offline cache (cache name `volley-live-capture-v1.3.2`) |
 | `icons/` | Home Screen icons (180, 192, 512 px) |
 | `serve_local.py` | Optional quick test from a PC on the same Wi-Fi (online only) |
 | `docs/IMPLEMENTATION_SPEC.md` | General implementation specification |
-| `docs/IOS_IMPLEMENTATION_SPEC.md` | iOS / Safari specific implementation specification |
-| `docs/INSTALL_IPHONE.md` | Installation and update procedure on iPhone |
-| `tests/test_e2e_pwa.py` | End-to-end test (Playwright, iPhone viewport, offline) |
+| `docs/IOS_IMPLEMENTATION_SPEC.md` | iOS / Safari implementation specification |
+| `docs/INSTALL_IPHONE.md` | Installation and update on iPhone |
+| `docs/Volley_Live_Capture_Screens_v1.3.2.pdf` | Screens of v1.2.0 (3 levels) + installation; Focus screens in `docs/img/focus_v1.3.2.png` |
+| `tests/test_e2e_pwa.py` | End-to-end test (Playwright, iPhone viewport, offline) – 69 checks |
 | `CHANGELOG.md` | Version history |
 
 ## Publish (static HTTPS hosting)
+The repository root **is** the web root. Push it as-is, then on GitHub:
+*Settings → Pages → Deploy from a branch → `main` / root → Save*.
+HTTPS is mandatory for offline mode on iPhone. Do not use the professional SharePoint / OneDrive.
 
-The folder root **is** the web root: push it as-is to any static HTTPS host
-(e.g. GitHub Pages: *Settings → Pages → Deploy from branch → `main` / root*).
-HTTPS is mandatory for the offline service worker on iPhone.
+## Update an installed iPhone (→ v1.3.2)
+1. In the app: **SAVE .JSON** the current match (safety).
+2. Push the new files.
+3. iPhone, with network: open the app from its icon, close it completely, open it again → Home shows **v1.3.2**.
+   The stored match is kept; matches and files from v1.1.x open at **Advanced** level.
 
-## Update an existing installation (→ v1.1.3)
-
-1. On the phone: **SAVE .JSON** the current match (safety).
-2. Replace **all** files on the HTTPS host with the content of this folder.
-3. On the iPhone, with network: open the app from its icon, close it completely, open it again.
-   The Home screen shows **v1.1.3**. Match data on the phone is kept.
-
-## First installation
-
-See [`docs/INSTALL_IPHONE.md`](docs/INSTALL_IPHONE.md).
-
-## In a match
-
-* NEW MATCH → Team (names, match name, format, roster 7–12) → Starting 7 → Rotation + first rally.
-* Each rally: **Player → Action → Result** (3 taps). Saved on the phone after every rally.
-* Opponent: one generic player button **ADVERSE** → one generic action → Neutral / Point / Error.
-* ⇄ SUBSTITUTION, UNDO LAST, STATISTICS ▼ on the capture screen; START SET n → between sets.
-* **SAVE .JSON** → Share sheet → *Save to Files*. **REPORT .HTML** → self-contained match report.
-* **OPEN MATCH .JSON** (Home) reloads a saved match. One match at a time on the phone.
+First installation: see [`docs/INSTALL_IPHONE.md`](docs/INSTALL_IPHONE.md).
 
 ## Tests
-
 ```bash
 pip install playwright && playwright install chromium
-python tests/test_e2e_pwa.py      # expects: 22 checks -> ALL PASSED
+python tests/test_e2e_pwa.py      # expected: 69 checks -> ALL PASSED
 ```
 
 ## Release rule
-
-At every change: bump the version in `index.html` (`appVersion`), in `sw.js` (`CACHE`),
-in this file and in `CHANGELOG.md`, then run the tests.
+At every change: bump the version in `index.html` (`appVersion`), `sw.js` (`CACHE`), this file,
+`CHANGELOG.md` and `tests/test_e2e_pwa.py` (`VERSION`); run the tests; regenerate the screens PDF.
