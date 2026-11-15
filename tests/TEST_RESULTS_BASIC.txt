@@ -1,0 +1,10 @@
+PASS 2 boutons uniques
+PASS Antibes en haut, NET au milieu, Nice en bas
+PASS Antibes droite O -> T point (1:0)
+PASS Antibes gauche X -> T error (1:1)
+PASS Nice droite O -> A point (1:2)
+PASS Nice gauche X -> A error (2:2)
+PASS double tap rapide -> 1 event
+PASS UNDO
+PASS aucune erreur JS
+9 / 9

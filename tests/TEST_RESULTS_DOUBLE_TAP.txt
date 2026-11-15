@@ -1,0 +1,12 @@
+PASS version v1.5.0
+PASS INTER double tap rapide -> 1 event
+PASS INTER 2 taps a 150 ms -> +1 event
+PASS INTER tap apres 450 ms -> accepte
+PASS UNDO double tap -> 1 seul undo
+PASS UNDO apres 450 ms -> accepte
+PASS BASIC double tap POINT -> 1 event
+PASS BASIC tap suivant apres 450 ms
+PASS ADV double tap joueur -> reste etape Action
+PASS ADV double tap Point -> 1 event
+PASS ADV saisie normale 3 taps -> 2 events
+11 / 11

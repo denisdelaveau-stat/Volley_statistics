@@ -1,0 +1,20 @@
+PASS version v1.5.0
+PASS etape 1: carte Saved teams
+PASS equipe sauvegardee (8 joueurs, noms, postes, focus)
+PASS message Saved
+PASS modification: meme nom ecrase (9 joueurs, #3 renomme)
+PASS rechargement equipe: nom, 9 joueurs, noms, focus
+PASS etape 2: carte Saved starting 7
+PASS 7 sauvegarde puis modifie (mb2=9)
+PASS rechargement du 7
+PASS etape 3: carte Saved rotations + ROTATE +1
+PASS ROTATE +1: P2->P1, P1->P6, P6->P5, P5->P4, P4->P3, P3->P2 {'p6': 1, 'p5': 9, 'p4': 5, 'p3': 7, 'p2': 4, 'p1': 3}
+PASS 6 rotations = position de depart
+PASS 2 rotations sauvegardees
+PASS rechargement rotation Setter P1
+PASS suppression rotation
+PASS match cree avec la composition rechargee
+PASS bibliotheque conservee apres creation du match
+PASS joueur absent (#9) signale, poste laisse vide
+PASS aucune erreur JS
+19 / 19
