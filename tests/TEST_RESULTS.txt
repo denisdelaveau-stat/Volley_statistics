@@ -1,0 +1,15 @@
+PASS 30 jersey numbers
+PASS roster max 12
+PASS user guide button
+PASS user guide opens PDF
+PASS PDF exists
+PASS Focus court hidden normal
+PASS Focus bench hidden normal
+PASS Focus available substitution
+PASS large TEAM retained
+PASS saved library retained
+PASS ROTATE +1 retained
+PASS version
+PASS cache
+PASS PDF precache
+14 / 14

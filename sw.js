@@ -1,7 +1,7 @@
 /* Volley Live Capture - offline service worker.
    Bump CACHE when any file changes so installed phones pick up the new version. */
-var CACHE = 'volley-live-capture-v1.5.0';
-var ASSETS = ['./', 'index.html', 'manifest.webmanifest',
+var CACHE = 'volley-live-capture-v1.5.3';
+var ASSETS = ['./', 'index.html','user_guide.pdf', 'manifest.webmanifest',
   'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));
