@@ -1,50 +1,83 @@
-# Volley Live Capture v1.5.0 - Functional Specification
+# Volley Live Capture v1.6.0 — Functional Specification
 
 ## 1. Purpose
-Touch-first volleyball match capture for iPhone/tablet with offline-capable PWA operation, JSON match persistence, HTML report generation, live statistics and three input detail levels.
+Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
 
-## 2. Match creation
-1. HOME: NEW MATCH, CONTINUE / VIEW MATCH, OPEN MATCH .JSON.
-2. SETUP 1: team/opponent/match name, match format, detail level and roster for Intermediate/Advanced.
-3. SETUP 2: starting seven (Intermediate/Advanced).
-4. SETUP 3: initial P1-P6 rotation and first service/reception (Intermediate/Advanced).
+## 2. Match creation and reusable setup
+1. Home: NEW MATCH, CONTINUE / VIEW MATCH, OPEN MATCH .JSON.
+2. Setup 1: team/opponent/match name, match format, detail level and roster for Intermediate/Advanced.
+3. Setup 2: starting seven for Intermediate/Advanced.
+4. Setup 3: initial P1–P6 rotation and first service/reception for Intermediate/Advanced.
 5. Capture screen.
 
-## 3. Saved setup library - new in v1.5.0
-The setup library is independent from match data and uses `localStorage` key `volleyCapture.library.v1`.
+The v1.5 setup library remains available for saved teams, starting sevens and rotations. ROTATE +1 applies P2→P1, P1→P6, P6→P5, P5→P4, P4→P3 and P3→P2; six rotations restore the initial composition.
 
-### 3.1 Saved teams
-SETUP 1 can SAVE, LOAD, DELETE and update a named team. A team stores team name, player numbers, player names, positions and Focus state. Loading a team removes unavailable players from a current starting seven and resets the rotation. Saving with an existing name updates it after confirmation.
+## 3. Cross-mode normative behaviour
+- **Automatic return:** after an accepted event, return immediately to the mode’s primary selection screen.
+- **Continue:** records the selected action with result `neutral`; no score change is made.
+- **Phase banner:** SERVICE/RECEPTION describes the tracked team’s state, is read-only and updates from service state.
+- **Undo:** one neutral grey/white **UNDO LAST** control removes exactly the latest accepted event. Red is reserved for Error.
+- **Substitution:** while active, rally capture is suspended and no scoring event is created by player selection.
+- **Duplicate protection:** after an accepted result, further rally-entry results are ignored for 400 ms. Navigation, statistics and export are not guarded.
 
-### 3.2 Saved starting seven
-SETUP 2 can SAVE, LOAD, DELETE and update a named starting seven: OH1, OH2, MB1, MB2, SET, OPP and LIB. Loading validates player numbers against the current roster. Unavailable players leave an empty slot and are reported to the user.
+## 4. Basic mode
+- No player or action attribution.
+- For each team: red ✕ Error zone on the left, team name in the centre, green ✓ Point zone on the right.
+- Tracked team above NET; opponent below NET.
+- Each result is accepted in one tap.
 
-### 3.3 Saved initial rotations
-SETUP 3 can SAVE, LOAD, DELETE and update named P1-P6 rotations. Loading validates the rotation against the current starting-seven pool.
+| Tap | Player | Result | Score |
+|---|---|---|---|
+| Tracked team ✕ | `T` | `error` | Opponent +1 |
+| Tracked team ✓ | `T` | `point` | Tracked team +1 |
+| Opponent ✕ | `A` | `error` | Tracked team +1 |
+| Opponent ✓ | `A` | `point` | Opponent +1 |
 
-### 3.4 ROTATE +1
-SETUP 3 provides ROTATE +1. Clockwise mapping: P2->P1, P1->P6, P6->P5, P5->P4, P4->P3, P3->P2. Six rotations restore the same composition. A rotated composition can be saved under a new name.
+## 5. Intermediate mode
+- Court and bench show individually selectable Focus players.
+- At most one Focus player is selected and visibly highlighted.
+- Selected Focus player → tracked-team ✕/✓ records that player in two taps total.
+- No selected player → tracked-team ✕/✓ records `TEAM` (`T`) in one tap.
+- Opponent ✕/✓ records `ADVERSE` (`A`) directly in one tap.
+- Non-Focus players are not individually selectable during normal capture.
+- Selection clears after an accepted event.
 
-## 4. Detail levels
-- Basic: one split team button above the NET and one below it; left X = Error, right O = Point; one tap records the rally.
-- Intermediate: focused player / TEAM / ADVERSE split buttons; one tap records Point or Error. Non-focused players use TEAM.
-- Advanced: Player -> Action -> Neutral / Point / Error.
+## 6. Advanced mode
+### 6.1 Primary screen
+Focus players are selectable on court/bench. When at least one player is non-Focus, a direct TEAM result bar is displayed. ADVERSE always has a direct result bar below NET.
 
-## 5. Scoring and match rules
-Normal sets finish at >=25 with a two-point margin. The deciding set finishes at >=15 with a two-point margin. Match win is based on the configured winning-set count. A completed set locks normal rally capture until the next set starts. A completed match is marked completed.
+### 6.2 Combined Action/Result grid
+A selected player opens one fixed grid. One result tap completes the event and returns to player selection.
 
-## 6. Rotation, libero and substitutions
-Rotation is clockwise after side-out. Starting positions P1-P6 and libero replacement rules are retained from the existing implementation. Substitutions are available during the match and are persisted with set/action position.
+| Action | Error | Point | Continue |
+|---|---:|---:|---:|
+| Attack | Yes | Yes | Yes |
+| Block | Yes | Yes | Yes |
+| Defence | Yes | No | Yes |
+| Reception | Yes | No | Yes |
+| Service | Yes | Yes | Yes |
+| Set | Yes | No | Yes |
 
-## 7. Persistence and export
+Unavailable Point cells have no active hit target. Continue uses the circular dual-arrow SVG and persists `neutral`.
+
+## 7. Scoring and match rules
+Normal sets finish at 25 or more with a two-point margin. The deciding set finishes at 15 or more with a two-point margin. A completed set locks normal rally capture until the next set starts; a completed match is marked completed.
+
+| Actor | Result | Winning team | Point origin |
+|---|---|---|---|
+| Tracked player / TEAM | Error | Opponent | `opponent_error` |
+| Tracked player / TEAM | Point | Tracked team | `earned` |
+| ADVERSE | Error | Tracked team | `opponent_error` |
+| ADVERSE | Point | Opponent | `earned` |
+| Advanced player | Continue | None | None |
+
+## 8. Persistence, reports and statistics
 - Match state/events: localStorage.
-- Setup library: independent localStorage key `volleyCapture.library.v1`.
-- SAVE .JSON exports portable match data.
-- OPEN MATCH .JSON restores portable match data.
+- Setup library: independent key `volleyCapture.library.v1`.
+- SAVE .JSON exports portable match data; OPEN MATCH .JSON restores it.
 - REPORT .HTML exports a self-contained report.
+- Score, point origin, error charts, set progression and attacker statistics are rebuilt from events.
+- Portable match JSON schema remains version 1.
 
-## 8. Statistics
-Current-set point origin, error evolution/differential, set progression, and attacker statistics for OH/MB/OPP are retained.
-
-## 9. Acceptance criteria
-v1.5.0 acceptance requires: setup library save/load/update/delete, missing-player validation, ROTATE +1 and six-rotation round trip, Basic capture, split input, double-tap protection, match creation from loaded setups, JSON/report/statistics continuity, and no uncaught JavaScript errors in automated browser tests.
+## 9. Acceptance
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.0 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.

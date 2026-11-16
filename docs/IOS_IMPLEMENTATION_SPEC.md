@@ -1,22 +1,27 @@
-# Volley Live Capture v1.5.0 - iOS Implementation Specification
+# Volley Live Capture v1.6.0 — iOS Implementation Specification
 
 ## Target
-iPhone/iPad Safari and Add to Home Screen PWA. Primary test viewport: 390 x 844 CSS pixels.
+- iPhone/iPad Safari and Add to Home Screen PWA.
+- Primary automated viewport: 390 × 844 CSS px.
+- Minimum result touch target: 44 × 44 CSS px; implemented result targets are at least 60 px high.
 
 ## Installation/update
 1. Host the complete folder through HTTPS.
 2. Open once in Safari while online.
-3. Share -> Add to Home Screen.
-4. For an update, deploy `index.html` and a `sw.js` whose cache ID is `volley-live-capture-v1.5.0`, open online once, fully close the installed app and reopen it.
+3. Share → Add to Home Screen.
+4. For an update, deploy `index.html` and `sw.js` together.
+5. Confirm cache ID `volley-live-capture-v1.6.0`, fully close the installed app, reopen and verify `v1.6.0` on Home.
+
+## Touch and accessibility
+- Capture controls use `touch-action: manipulation`.
+- Error is left/red/✕; Point is right/green/✓. Icons and accessible labels prevent colour-only meaning.
+- Continue is a dark-grey button with an inline circular dual-arrow SVG and action-specific `aria-label`.
+- SERVICE/RECEPTION is a non-interactive status element.
+- The 400 ms guard starts after an accepted result; it does not block player → result speed.
+- Undo is neutral grey/white.
 
 ## Persistence caveat
-Safari and the installed Home-screen PWA may use distinct storage contexts. Create/save the team/lineup/rotation library in the context used courtside. Export match JSON regularly for portability.
+Safari and the installed Home-screen PWA may use distinct storage contexts. Create the saved setup library in the context used courtside and export match JSON regularly.
 
-## Touch UX
-- `touch-action: manipulation` on capture controls.
-- 400 ms fast-double-tap protection on capture controls from v1.4.1 is retained.
-- Basic/Intermediate are optimized for one-tap input.
-- v1.5.0 saved setup controls are normal form controls and intentionally are not part of rally double-tap suppression.
-
-## Offline
-App-shell files must remain in the service-worker precache list. Test offline after one successful online load and service-worker activation.
+## Offline verification
+After one successful online load and service-worker activation, enable Airplane Mode, relaunch the Home-screen app, record and undo events, then confirm persistence after a second relaunch.

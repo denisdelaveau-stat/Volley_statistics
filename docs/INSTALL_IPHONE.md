@@ -1,41 +1,25 @@
-# Installation on iPhone – Volley Live Capture v1.3.2
-
-Screens: `Volley_Live_Capture_Screens_v1.3.2.pdf` (page 11).
-
-## Prerequisites
-- iPhone with **Safari**.
-- Repository published on an **HTTPS** static host (e.g. GitHub Pages). Not the professional SharePoint / OneDrive.
+# Install or update Volley Live Capture v1.6.0 on iPhone
 
 ## First installation
-1. Open the HTTPS address in **Safari** (not Chrome, not an in-app browser).
-2. **Share → Add to Home Screen → Add**. The *Volley Live* icon appears.
-3. Start the app **from its icon** once, with network. Home shows **v1.3.2**.
-4. Airplane mode, close the app, start it again from its icon: it must open.
+1. Publish the complete package through HTTPS.
+2. Open `index.html` in Safari while online.
+3. Tap Share → Add to Home Screen.
+4. Start from the Home-screen icon and verify `v1.6.0` on Home.
+5. Create a short test match, close the app, reopen it and confirm CONTINUE / VIEW MATCH restores it.
 
-## Update
-1. In the app: **SAVE .JSON** → *Save to Files* (safety copy).
-2. Push the new files to the host.
-3. With network: open the app from its icon, close it completely, open it again.
-4. Check the version on Home. The stored match is kept (v1.1.x matches open at Advanced level).
+## Update from an older version
+1. Deploy all v1.6.0 files, including `sw.js`.
+2. Confirm the service-worker cache ID is `volley-live-capture-v1.6.0`.
+3. Open the hosted app online once.
+4. Fully close Safari and the Home-screen app.
+5. Reopen the Home-screen app. If the old version remains, repeat the online open/close cycle once.
 
-## Choosing the detail level
-| Situation | Level |
-|---|---|
-| Following the score from the stands, one hand | **Basic** – Team → Point / Error |
-| Who scores and who errs, without action detail | **Intermediate** – Player → Point / Error |
-| Full statistics by action (coach, statistician) | **Advanced** – Player → Action → Result |
+## Courtside verification
+- Basic: four result zones score the correct team.
+- Intermediate: select one Focus player, then record a result; verify the selection clears.
+- Advanced: record Attack Point and Reception Continue; verify Continue does not change score.
+- Confirm Undo removes one event, substitution creates no rally, and rapid double-tap creates one result.
+- Test once in Airplane Mode after the online shell has loaded.
 
-The level is fixed for the whole match.
-
-## Good practice
-- Always start from the **icon**: Safari and the installed app keep **separate** data.
-- **SAVE .JSON** at the end of each set; **REPORT .HTML** at the end of the match.
-- One match stored at a time; deleting the icon deletes the data.
-- Set Auto-Lock to *Never* during a match.
-
-## Troubleshooting
-| Symptom | Action |
-|---|---|
-| Old version still displayed | Open with network, close completely, reopen (twice if needed) |
-| Does not open in Airplane mode | Never started from the icon with network: repeat step 3 |
-| Match missing | Home → **OPEN MATCH .JSON** → select the saved file |
+## Data safety
+Safari and the installed app can have separate local storage. Use the same context courtside and export JSON regularly.

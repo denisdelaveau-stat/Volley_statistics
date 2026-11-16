@@ -1,34 +1,40 @@
-# Volley Live Capture v1.5.0 - Implementation Specification
+# Volley Live Capture v1.6.0 — Implementation Specification
 
-## Runtime
-Single-page HTML/CSS/vanilla JavaScript application. No runtime framework. Match and library data use browser localStorage. The service worker provides the offline shell when hosted on HTTPS/localhost.
+## Runtime and storage
+Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reusable setup data use browser localStorage. The service worker provides the offline shell over HTTPS/localhost.
 
-## Main storage keys
-- `volleyCapture.match.v1`: current match configuration/status.
-- `volleyCapture.events.v1`: action log.
-- `volleyCapture.chartData.v1`: chart event projection.
-- `volleyCapture.library.v1`: saved teams, starting sevens and rotations.
+| Key | Content |
+|---|---|
+| `volleyCapture.match.v1` | Current match configuration/status |
+| `volleyCapture.events.v1` | Accepted action log |
+| `volleyCapture.chartData.v1` | Scoring-event projection for charts |
+| `volleyCapture.library.v1` | Saved teams, starting sevens and rotations |
 
-`volleyCapture.library.v1` schema:
-```json
-{
-  "team": {"<name>": {"team":"...","roster":[],"info":{},"savedAt":"..."}},
-  "lineup": {"<name>": {"lineup":{},"savedAt":"..."}},
-  "rot": {"<name>": {"rot":{},"savedAt":"..."}}
-}
-```
+## Capture implementation
+The v1.6 block in `index.html` delegates all normative result controls from the capture panel:
+- `.vlc-result-bar`: shared Basic/Intermediate/Advanced TEAM/ADVERSE grammar.
+- `[data-vlc-result="error|point"]`: full-area result zones.
+- `[data-adv-row]`: six fixed Advanced action rows.
+- `[data-adv-result="error|point|neutral"]`: combined Advanced result controls.
+- `primary()`: clears selection and returns to the player/team selection step.
+- `commit(player, action, result)`: delegates to the existing event model and arms the post-result guard only when the event count increases.
 
-## v1.5.0 setup-library functions
-`libGet`, `libPut`, `libHtml`, `libSave`, `libLoad`, `libDel` implement local library persistence and setup-screen UI. Saving an existing key requests confirmation. Loading a lineup/rotation validates membership against current roster/starting-seven state.
+Internal values remain:
+- players: number, `T` (TEAM), `A` (ADVERSE);
+- actions: `attack`, `block`, `defense`, `reception`, `service`, `set`, `generic`, `team`, `adverse`;
+- results: `point`, `error`, `neutral`.
 
-## Rotation helper
-`rotatePlus1()` applies one clockwise displacement: P2->P1->P6->P5->P4->P3->P2. Rotation stays editable and can be saved under a new library name.
+## Continue asset
+Continue is a reusable inline SVG containing two circular arrows. The same generated markup is used for every Advanced Continue cell. It is announced through the button `aria-label`; the SVG itself is decorative.
 
-## Detail modes
-Basic and Intermediate use one-tap split-input handlers. Advanced retains the 3-step handler. Existing score calculation is event-derived. Statistics are regenerated from events rather than independently persisted totals.
+## Focus and substitution
+`updateCourt()` retains service, rotation, libero and Focus rendering. Normal capture ignores `.nofocus` cells. In substitution mode, the v1.6 capture handler yields player taps to the existing substitution handler and blocks all result controls.
+
+## Duplicate-entry guard
+`LOCK_MS` is 400 ms. The guard is armed only after an accepted result. Player selection and the following combined result are not separated by an artificial delay. Statistics, navigation and export controls remain outside the guard.
 
 ## Compatibility
-The v1.5.0 library is additive and does not change the portable match JSON schema. Existing match files remain readable. NEW MATCH clears match/event/chart state, not `volleyCapture.library.v1`.
+No migration is required. Portable match JSON remains format version 1, and existing `point`, `error` and `neutral` events remain readable. The setup-library schema introduced in v1.5.0 is unchanged.
 
 ## Service worker
-Use a cache identifier containing `v1.5.0`. Whenever `index.html` changes, increment the cache identifier to force iPhone PWA refresh.
+`sw.js` uses `volley-live-capture-v1.6.0`. Increment the cache ID whenever shell content changes.

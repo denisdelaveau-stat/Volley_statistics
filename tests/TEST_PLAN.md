@@ -1,22 +1,25 @@
-# v1.5.0 Test Plan
+# Volley Live Capture v1.6.0 — Automated Test Plan
 
-## Automated suites in package
-- `test_library_v1_5_0.py`: team/lineup/rotation library lifecycle, ROTATE +1, missing-player handling, match creation and persistence.
-- `test_basic_split.py`: Basic one-tap capture, NET layout, score and undo.
-- `test_double_tap.py`: fast-double-tap guard in capture flows.
+## Environment
+- Python 3, `pytest`, Playwright and Chromium.
+- Primary viewport: iPhone 390 × 844 CSS px, device scale factor 2.
+- Run from the package root: `pytest -q tests`.
+- Optional browser override: `CHROMIUM_PATH=/path/to/chrome pytest -q tests`.
 
-## Expected baseline from v1.5.0 build session
-- Setup library: 19/19.
-- Basic: 9/9.
-- Double-tap: 11/11.
+## Coverage
+| Requirement | Automated coverage |
+|---|---|
+| UI-BAS-01 | Four Basic Error/Point semantics, icon, colour, placement and minimum target size |
+| UI-INT-01/02 | Focus selection, selected highlight, player attribution, automatic clear, TEAM fallback, ADVERSE direct entry |
+| UI-ADV-01/02/03 | Fixed action order, combined result entry, neutral Continue, unavailable Point cells |
+| UI-SUB-01 | Rally capture suspended while substitution mode is active |
+| UI-UNDO-01 | Exactly the latest event is removed and a finished set is unlocked when applicable |
+| UI-GRD-01 | One accepted event for rapid repeated result taps; no delay between player and result taps |
+| UI-PHA-01 | Read-only phase banner follows service state |
+| Regression | Set win at 26–24, setup library, ROTATE +1, report generation, PWA cache version, no JavaScript errors |
 
-## Manual iPhone acceptance
-1. Install/update PWA and check Home displays v1.5.0.
-2. Save a team, kill/reopen app, load team, edit one player, save and reload.
-3. Save/load a starting seven.
-4. Save rotation, press ROTATE +1 six times, verify original positions restored.
-5. Start Basic/Intermediate/Advanced matches and record rallies.
-6. Verify set 25+2, deciding set 15+2 and match completion.
-7. Perform substitution and undo.
-8. Export/open JSON and generate HTML report.
-9. Enable Airplane mode after online activation and verify the app launches and captures offline.
+## Manual iPhone checks
+1. Install/update from HTTPS and verify `v1.6.0` on Home.
+2. Confirm safe-area layout and all result targets in portrait and landscape.
+3. Confirm VoiceOver announces team/action plus Error, Point or Continue.
+4. Capture several rallies offline, close the Home-screen app, reopen, and verify persistence.

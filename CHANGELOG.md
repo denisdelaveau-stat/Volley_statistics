@@ -1,5 +1,29 @@
 # Changelog – Volley Live Capture
 
+## v1.6.0 – 2026-11-16
+### Added
+- Normative Basic, Intermediate and Advanced capture UI from the approved English functional specification.
+- Advanced combined Action/Result grid in fixed order: Attack, Block, Defence, Reception, Service, Set.
+- Reusable inline SVG for Continue; the persisted result remains `neutral`.
+- Automated acceptance coverage for UI-BAS-01, UI-INT-01/02, UI-ADV-01/02/03, UI-SUB-01, UI-UNDO-01, UI-GRD-01 and UI-PHA-01.
+
+### Changed
+- Basic now uses separate full-area Error and Point zones around the team name.
+- Intermediate changed from split-player direct entry to optional Focus-player selection followed by the tracked-team result; TEAM and ADVERSE remain one tap.
+- Advanced changed from Player → Action → Result to Player → combined Action/Result. TEAM non-Focus and ADVERSE are one tap.
+- Error is left/red/✕ and Point is right/green/✓ in every team-result bar.
+- Undo is neutral grey/white; red is reserved for Error.
+- Duplicate-entry protection now starts after an accepted result instead of after every capture tap.
+- PWA cache and visible application version bumped to v1.6.0.
+
+### Compatibility
+- Portable match JSON format remains version 1. No data migration is required.
+- Saved teams, starting sevens, rotations and ROTATE +1 remain compatible with v1.5.0.
+
+### Verification
+- JavaScript syntax validation and full Playwright/pytest suite.
+- Primary automated viewport: 390 × 844 CSS px.
+
 ## v1.3.2 – 2026-11-15
 ### Changed
 - Scoreboard colour follows Team A's situation in the current set: **green** when ahead, **red** when behind,
