@@ -1,0 +1,27 @@
+Volley Live Capture v1.6.5 automated verification
+Date: 17 November 2026
+
+Command: python3 -m pytest -q tests
+Result: 14 passed in 32.96s
+Primary viewport: 390 x 844 CSS px, device scale factor 2
+Uncaught JavaScript errors in automated scenarios: 0
+
+v1.6.5 correction coverage:
+- UI-ADV-POS-01 and UI-ADV-POS-02 absent from section 8 Target UI Matrix.
+- UI-ADV-POS-01 and UI-ADV-POS-02 present exactly once in section 10 Automated Acceptance Test Catalogue.
+- Word document control and page footers verified at version 1.5.
+- 11 original inline images and 22 media package entries preserved.
+- Root and docs Word specification copies verified byte-identical.
+- Replacement screenshot PDF verified at 5 A4 pages: Basic, Intermediate, Advanced, compact live header and Setup 1.
+- Existing Basic, Intermediate, Advanced, position matrix, substitution, Undo, score/set, rotation/history, report and PWA regressions passed.
+
+Static verification:
+- JavaScript syntax valid for 6 executable inline scripts and sw.js.
+- Visible application version: v1.6.5.
+- PWA cache ID: volley-live-capture-v1.6.5.
+- Portable match JSON format remains version 1.
+
+Word rendering verification:
+- LibreOffice headless conversion succeeded: 18 pages.
+- 186 paragraphs, 11 tables and 11 inline images readable through python-docx.
+- Section 8 contains 10 rows including the header; section 10 contains 19 rows including the header.

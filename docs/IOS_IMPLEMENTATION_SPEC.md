@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.3 — iOS Implementation Specification
+# Volley Live Capture v1.6.5 — iOS Implementation Specification
 
 ## Target
 - iPhone/iPad Safari and Add to Home Screen PWA.
@@ -10,15 +10,16 @@
 2. Open once in Safari while online.
 3. Share → Add to Home Screen.
 4. For an update, deploy `index.html` and `sw.js` together.
-5. Confirm cache ID `volley-live-capture-v1.6.3`, fully close the installed app, reopen and verify `v1.6.3` on Home.
+5. Confirm cache ID `volley-live-capture-v1.6.5`, fully close the installed app, reopen and verify `v1.6.5` on Home.
 
 ## Touch and accessibility
 - Capture controls use `touch-action: manipulation`.
 - Error is left/red/✕; Point is right/green/✓. Icons and accessible labels prevent colour-only meaning.
 - Continue is a dark-grey button with an inline circular dual-arrow SVG and action-specific `aria-label`.
-- SERVICE/RECEPTION is a non-interactive status element.
+- SERVICE/RECEPTION is a non-interactive status element. Rotation is a separate centred black `Rotation N` line without a coloured background.
 - The 400 ms guard starts after an accepted result; it does not block player → result speed.
 - Undo is neutral grey/white.
+- BENCH controls remain at the 44 px minimum touch height; confirm text remains readable on the target device.
 
 ## Persistence caveat
 Safari and the installed Home-screen PWA may use distinct storage contexts. Create the saved setup library in the context used courtside and export match JSON regularly.

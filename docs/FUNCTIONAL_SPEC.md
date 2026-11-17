@@ -1,11 +1,11 @@
-# Volley Live Capture v1.6.3 — Functional Specification
+# Volley Live Capture v1.6.5 — Functional Specification
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
 
 ## 2. Match creation and reusable setup
 1. Home: NEW MATCH, CONTINUE / VIEW MATCH, OPEN MATCH .JSON.
-2. Setup 1: team/opponent/match name, match format, detail level and roster for Intermediate/Advanced.
+2. Setup 1: team/opponent/match name, match format, colour-coded detail level and roster for Intermediate/Advanced. The roster maximum is selectable from 7 to 20 and defaults to 12.
 3. Setup 2: starting seven for Intermediate/Advanced.
 4. Setup 3: initial P1–P6 rotation and first service/reception for Intermediate/Advanced.
 5. Capture screen.
@@ -16,6 +16,7 @@ The v1.5 setup library remains available for saved teams, starting sevens and ro
 - **Automatic return:** after an accepted event, return immediately to the mode’s primary selection screen.
 - **Continue:** records the selected action with result `neutral`; no score change is made.
 - **Phase banner:** SERVICE/RECEPTION describes the tracked team’s state, is read-only and updates from service state.
+- **Rotation indicator:** Intermediate/Advanced display only `Rotation N` as centred black text without a coloured background; service ownership remains in the phase banner, score underline and P1 marker.
 - **Undo:** one neutral grey/white **UNDO LAST** control removes exactly the latest accepted event. Red is reserved for Error.
 - **Substitution:** while active, rally capture is suspended and no scoring event is created by player selection.
 - **Duplicate protection:** after an accepted result, further rally-entry results are ignored for 400 ms. Navigation, statistics and export are not guarded.
@@ -90,6 +91,7 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 - SAVE .JSON exports portable match data; OPEN MATCH .JSON restores it.
 - REPORT .HTML exports a self-contained report.
 - Score, point origin, error charts, set progression and attacker statistics are rebuilt from events.
+- Every new event stores the integer pre-rally `rotation`; History exposes the same value in a Rotation column. Legacy events without the field remain valid and display `—`.
 - Portable match JSON schema remains version 1.
 
 
@@ -98,7 +100,14 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 - Sets won are shown in compact badges outside the left and right rally scores.
 - A visible line directly below the rally score marks the team currently serving; it updates after every side-out and at set start.
 - The match/set title, Best-of/set-target/mode metadata strip and primary Player instruction are not displayed during capture.
-- The BENCH replacement-player and SUBSTITUTION controls are shorter and narrower than court/result controls, centred as one pair, and retain a minimum 44 × 44 CSS px touch target.
+- The BENCH replacement-player and SUBSTITUTION controls are shorter and narrower than court/result controls, centred as one pair, and use the minimum 44 px readable touch height.
 
-## 10. Acceptance
-Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.3 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+## 10. Setup 1 visual and roster rules
+- Detail level background: Advanced pale red (`#fee2e2`), Intermediate pale yellow (`#fef9c3`), Basic pale green (`#dcfce7`).
+- Roster maximum drop-down values: 7–20 inclusive; default 12.
+- The maximum drives the `selected (min 7, max N)` label, disables additional number buttons at the limit and blocks NEXT while selected count exceeds the chosen limit.
+- Basic mode hides roster controls as before.
+
+## 11. Acceptance
+
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.5 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.

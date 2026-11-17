@@ -1,5 +1,37 @@
 # Changelog – Volley Live Capture
 
+## v1.6.5 – 2026-11-17
+### Fixed
+- Moved acceptance scenarios `UI-ADV-POS-01` and `UI-ADV-POS-02` out of section 8 Target UI Matrix and into section 10 Automated Acceptance Test Catalogue in the English Word specification.
+- Replaced the obsolete v1.3.2 screenshot PDF with current v1.6.5 captures of Basic, Intermediate, Advanced, the compact live header and Setup 1.
+- Replaced the separate root-level Word specification copy with the corrected document version 1.5.
+
+### Changed
+- Bumped the visible application version and PWA cache to v1.6.5 so documentation/package integrity changes propagate to installed clients.
+- Added automated package checks for specification table placement, document version and preservation of all 11 original inline images.
+- Regenerated package SHA-256 manifests.
+
+### Compatibility
+- No capture behavior or match-data schema changed from v1.6.4. Portable match JSON remains format version 1.
+
+## v1.6.4 – 2026-11-17
+### Added
+- Added a Rotation column to live History.
+- Persisted the pre-rally integer `rotation` on every new event for future rotation statistics.
+- Added pale Detail level colours on Setup 1: Advanced red, Intermediate yellow and Basic green.
+- Added a configurable roster maximum from 7 to 20 players; the default remains 12.
+- Added browser acceptance coverage for rotation display/persistence/history, setup colours and roster-limit enforcement.
+
+### Changed
+- Replaced the coloured server/rotation sentence with plain centred black `Rotation N` text beneath the score.
+- Reduced BENCH replacement-player and SUBSTITUTION controls to the minimum readable 44 px touch height and narrower fixed widths.
+- Updated the English Word UI specification while retaining all 11 original embedded source visuals.
+- Bumped the visible application version and PWA cache to v1.6.4.
+
+### Compatibility
+- Portable match JSON stays at format version 1. Older events without `rotation` remain readable and display `—` in History.
+- Saved setup teams without `maxPlayers` continue to load with a compatible default.
+
 ## v1.6.3 – 2026-11-17
 ### Changed
 - Made the BENCH replacement-player and SUBSTITUTION controls shorter, narrower and centred.
