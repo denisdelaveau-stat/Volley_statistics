@@ -1,4 +1,4 @@
-"""v1.6.5 compact live header and BENCH acceptance tests."""
+"""v1.6.6 compact live header and BENCH acceptance tests."""
 from helpers import open_match, wait_guard
 
 
@@ -39,10 +39,10 @@ def test_bench_controls_are_smaller_and_centred(browser):
     row = page.locator(".bench-row").bounding_box()
     court = page.locator('.court-grid [data-zone="p2"]').bounding_box()
 
-    assert 44 <= bench["height"] <= 46
-    assert 44 <= sub["height"] <= 46
-    assert bench["width"] <= 84
-    assert sub["width"] <= 148
+    assert 35 <= bench["height"] <= 37
+    assert 35 <= sub["height"] <= 37
+    assert bench["width"] <= 68
+    assert sub["width"] <= 124
     assert sub["x"] > bench["x"] + bench["width"]
     pair_left = bench["x"]
     pair_right = sub["x"] + sub["width"]

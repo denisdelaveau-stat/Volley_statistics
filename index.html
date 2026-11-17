@@ -336,7 +336,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   <button type="button" class="home-btn home-open" id="homeOpen">OPEN MATCH .JSON</button><input type="file" id="homeFile" accept=".json,application/json" hidden>
   <div class="home-last" id="homeLast"></div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b> then <b>Add to Home Screen</b>, and always start the app from its icon (Safari and the installed app keep separate data).</div>
-  <div id="appVersion">v1.6.5</div>
+  <div id="appVersion">v1.6.6</div>
 </div>
 <section class="capture" id="capturePanel" aria-label="Live action capture">
   <div class="capture-head"><h2 id="captureTitle" hidden>Live input</h2><div class="score-live board tie" id="liveScore" role="status" aria-live="polite"><span class="set-badge set-badge-a" aria-label="Sets won by left team">0</span><span class="score-side side-a"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by right team">0</span></div><div class="sets-line" id="setsLine" hidden></div></div>
@@ -355,7 +355,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   </div>
   <div class="capture-tools"><button type="button" id="captureBack" class="back-only" hidden>← CHANGE</button><button type="button" id="captureUndo" class="undo-only">UNDO LAST</button></div>
   <div class="capture-status" id="captureStatus" aria-live="polite"></div>
-  <div class="history-wrap"><table class="history"><thead><tr><th>#</th><th>Time</th><th>Action</th><th>Result</th><th>Player</th><th>Rotation</th><th>Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div>
+  <div class="history-wrap"><table class="history"><thead><tr><th>#</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div>
 </section>
 <button type="button" id="statsToggle" class="stats-toggle" aria-expanded="false" aria-controls="statsPanel">STATISTICS <span id="statsArrow">▼</span></button>
 <div id="statsPanel" class="stats-panel" hidden>
@@ -534,7 +534,9 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
       var sl=document.getElementById('subLog');sl.textContent=st.subs.length?('Subs set '+(m.currentSet||1)+' ('+st.subs.length+'/6): '+st.subs.map(function(x){return '#'+x['in']+' for #'+x.out}).join(' \u00B7 ')):'';
       var cs=document.getElementById('courtStatus'),tn=m.team.name||'Team A';
       var pb=document.getElementById('phaseBadge');if(pb){pb.className='phase-badge '+(st.serving==='A'?'srv':'rcv');pb.textContent=st.serving==='A'?'SERVICE':'RECEPTION'}
-      cs.className='court-status '+(st.serving==='A'?'srv':'rcv');cs.textContent='Rotation '+st.rotations
+      var setterZone='';POS.some(function(k){if(roleOf[st.rot[k]]==='setter'){setterZone=k.slice(1);return true}return false});
+      var rotationConfig=(st.rotations%6)+1,rotationCycle=Math.floor(st.rotations/6)+1;
+      cs.className='court-status '+(st.serving==='A'?'srv':'rcv');cs.textContent='Rot. P'+(setterZone||'?')+' | R'+rotationConfig+' | C'+rotationCycle
       if(window.updateScoreService)window.updateScoreService(st.serving);
     };
     // ---------- substitution mode ----------
@@ -1055,7 +1057,7 @@ function renderErrorCharts(events){
     function showStep(name){step=name;document.querySelectorAll('#capturePanel .step').forEach(function(x){x.classList.toggle('active',x.getAttribute('data-step')===name)});updateChip();}
     function render(){
       var sc=lastScore(),suHead=MATCH?VS.summary(MATCH,EVENTS):{wonA:0,wonB:0};score.classList.remove('lead','trail','tie');score.classList.add(sc.a>sc.b?'lead':sc.a<sc.b?'trail':'tie');score.innerHTML='<span class="set-badge set-badge-a" aria-label="Sets won by '+tn('team1')+'">'+suHead.wonA+'</span><span class="score-side side-a"><span class="digit-box" aria-label="'+tn('team1')+' score">'+sc.a+'</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box" aria-label="'+tn('team2')+' score">'+sc.b+'</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by '+tn('team2')+'">'+suHead.wonB+'</span>';score.title=tn('team1')+' '+sc.a+' : '+sc.b+' '+tn('team2')+' · Sets '+suHead.wonA+' : '+suHead.wonB;hist.innerHTML='';renderSets();renderAttackers();
-      EVENTS.slice().reverse().forEach(function(e){var tr=document.createElement('tr');tr.innerHTML='<td>'+e.id+'</td><td>'+e.time+'</td><td>'+e.action+'</td><td>'+e.result+'</td><td>'+e.player+'</td><td>'+(e.rotation==null?'—':e.rotation)+'</td><td>'+e.scoreA+' : '+e.scoreB+'</td>';hist.appendChild(tr)});
+      EVENTS.slice().reverse().forEach(function(e){var tr=document.createElement('tr');tr.innerHTML='<td>'+e.id+'</td><td>'+e.player+'</td><td>'+e.action+'</td><td>'+e.result+'</td><td>'+e.scoreA+' : '+e.scoreB+'</td>';hist.appendChild(tr)});
       status.innerHTML=EVENTS.length?'<span class="last-event">Last:</span> #'+EVENTS[EVENTS.length-1].player+' '+EVENTS[EVENTS.length-1].action+' / '+EVENTS[EVENTS.length-1].result:'Ready for a new action.';      updateOriginPies(EVENTS);
       renderErrorCharts(EVENTS);
       if(window.updateCourt)window.updateCourt(EVENTS);
@@ -1163,7 +1165,7 @@ function renderErrorCharts(events){
   });
   if(stage==='capture')home.hidden=true;
   // ---------- SETUP WIZARD ----------
-  var MAX_ROSTER=20;
+  var MAX_ROSTER=30;
   var S=window.__S={level:'advanced',setsToWin:3,name:'',step:1,team:'',opp:'',maxPlayers:12,roster:[],info:{},lineup:{},rot:{},first:null,curSlot:null,curPos:null};
   var PLAB=[['setter','SET'],['oh','OH'],['mb','MB'],['opp','OPP'],['libero','LIB']];
   var SLOTPOS={oh1:'oh',oh2:'oh',mb1:'mb',mb2:'mb',setter:'setter',opp:'opp',libero:'libero'};
@@ -1233,7 +1235,7 @@ function renderErrorCharts(events){
     if(S.step===1){
       $('suTitle').textContent='Team setup';$('suSub').textContent='Names and roster (tap the jersey numbers)';
       h=libHtml('team')+'<div class="su-card"><label>Your team</label><input type="text" id="suTeam" placeholder="Team A" value="'+esc(S.team)+'"><label>Opponent</label><input type="text" id="suOpp" placeholder="Team B" value="'+esc(S.opp)+'"><label>Match name (file name)</label><input type="text" id="suName" placeholder="'+esc(defName())+'" value="'+esc(S.name||'')+'"><div class="su-hint">File: '+esc(fileName(S.name||defName()))+'</div><label>Match format</label><div class="su-format"><button type="button" class="su-btn su-slot'+(S.setsToWin===2?' sel':'')+'" data-fmt="2">2 WINNING SETS<small>best of 3 \u00B7 set 3 to 15</small></button><button type="button" class="su-btn su-slot'+(S.setsToWin===3?' sel':'')+'" data-fmt="3">3 WINNING SETS<small>best of 5 \u00B7 set 5 to 15</small></button></div>'+lvlHtml()+'</div><div class="su-card roster-card">'+rosterMaxHtml()+'<label>Roster · '+S.roster.length+' / '+S.maxPlayers+' selected (min 7, max '+S.maxPlayers+')</label><div class="su-grid su-nums">';
-      for(var n=1;n<=20;n++){var isSel=S.roster.indexOf(n)>-1;h+='<button type="button" class="su-btn'+(isSel?' sel':'')+'" data-n="'+n+'"'+((!isSel&&S.roster.length>=S.maxPlayers)?' disabled':'')+'>'+n+'</button>';}
+      for(var n=1;n<=MAX_ROSTER;n++){var isSel=S.roster.indexOf(n)>-1;h+='<button type="button" class="su-btn'+(isSel?' sel':'')+'" data-n="'+n+'"'+((!isSel&&S.roster.length>=S.maxPlayers)?' disabled':'')+'>'+n+'</button>';}
       h+='</div></div>';
       if(S.roster.length){h+='<div class="su-card"><label>Name &amp; position of each player</label>';
         S.roster.forEach(function(n){
@@ -1450,6 +1452,28 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
 .vlc-action-name{flex-direction:column;align-items:flex-start;justify-content:center}
 .vlc-action-name small{display:block;margin-top:2px;font-size:9px;line-height:1.1;letter-spacing:.04em;text-transform:uppercase;color:#64748b}
 #capturePanel.result-guard .vlc-result-zone,#capturePanel.result-guard .vlc-action-result{opacity:.58;transition:opacity .05s}
+/* v1.6.6 UI refinement: compact spacing, semantic colours and readable minimum controls. */
+#capturePanel .capture-head{margin-bottom:6px}
+#capturePanel .steps{margin-top:0}
+#capturePanel .court-status{margin:0 0 6px}
+.phase-badge{margin:0 0 6px;padding:4px 8px;border-width:1px;border-radius:8px;font-size:15px;line-height:1.15}
+.phase-badge.rcv{background:#2563eb;border-color:#1d4ed8;color:#fff}
+.vlc-net{margin:8px 0;padding:4px;font-size:13px;line-height:1}
+.bench-row{gap:6px}
+.bench-row .touch{flex:0 0 66px;width:66px;height:36px;min-height:36px;max-height:36px;padding:2px 5px;font-size:14px}
+.bench-row .touch .rl{font-size:8px}
+.bench-row .sub-toggle{flex:0 0 122px;width:122px;height:36px;min-height:36px;max-height:36px;padding:3px 5px;font-size:11px;line-height:1}
+.vlc-result-bar{min-height:60px;margin:7px 0}
+.vlc-result-zone{min-height:56px;font-size:27px}
+.vlc-result-label{padding:5px;font-size:18px}
+#captureUndo,.capture-tools .undo-only{background:#fed7aa!important;border:2px solid #fb923c!important;color:#9a3412!important}
+#captureUndo:active{background:#fdba74!important;border-color:#f97316!important}
+.vlc-action-row[data-adv-row="attack"] .vlc-action-name,.vlc-action-row[data-adv-row="block"] .vlc-action-name{background:#ffedd5;color:#9a3412}
+.vlc-action-row[data-adv-row="defense"] .vlc-action-name,.vlc-action-row[data-adv-row="reception"] .vlc-action-name{background:#dcfce7;color:#166534}
+.vlc-action-row[data-adv-row="service"] .vlc-action-name,.vlc-action-row[data-adv-row="set"] .vlc-action-name{background:#dbeafe;color:#1e40af}
+.vlc-action-row.is-rare{opacity:.50}
+@media(max-width:360px){.bench-row .touch{flex-basis:62px;width:62px}.bench-row .sub-toggle{flex-basis:114px;width:114px;font-size:10px}}
+@media(max-height:480px) and (orientation:landscape){.bench-row .touch,.bench-row .sub-toggle{height:36px;min-height:36px;max-height:36px}.vlc-result-bar,.vlc-result-zone{min-height:54px}}
 @media(max-width:430px){.vlc-result-bar{grid-template-columns:64px minmax(0,1fr) 64px}.vlc-result-label{font-size:17px}.vlc-action-row,.vlc-action-head{grid-template-columns:minmax(88px,1.25fr) repeat(3,minmax(50px,1fr));gap:4px}.vlc-action-name{font-size:15px;padding:8px}.vlc-action-result{min-height:60px;font-size:21px}.vlc-action-result.continue{font-size:0}.vlc-action-result.continue svg{width:30px!important;height:30px!important}}
 @media(max-height:480px) and (orientation:landscape){.vlc-result-bar{min-height:58px}.vlc-result-zone{min-height:58px}.vlc-action-row{grid-template-columns:minmax(96px,1.3fr) repeat(3,1fr)}.vlc-action-result,.vlc-action-na{min-height:48px}}
 </style>

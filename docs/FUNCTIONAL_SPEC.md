@@ -1,11 +1,11 @@
-# Volley Live Capture v1.6.5 — Functional Specification
+# Volley Live Capture v1.6.6 — Functional Specification
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
 
 ## 2. Match creation and reusable setup
 1. Home: NEW MATCH, CONTINUE / VIEW MATCH, OPEN MATCH .JSON.
-2. Setup 1: team/opponent/match name, match format, colour-coded detail level and roster for Intermediate/Advanced. The roster maximum is selectable from 7 to 20 and defaults to 12.
+2. Setup 1: team/opponent/match name, match format, colour-coded detail level and roster for Intermediate/Advanced. The roster maximum is selectable from 7 to 30 and defaults to 12.
 3. Setup 2: starting seven for Intermediate/Advanced.
 4. Setup 3: initial P1–P6 rotation and first service/reception for Intermediate/Advanced.
 5. Capture screen.
@@ -15,9 +15,9 @@ The v1.5 setup library remains available for saved teams, starting sevens and ro
 ## 3. Cross-mode normative behaviour
 - **Automatic return:** after an accepted event, return immediately to the mode’s primary selection screen.
 - **Continue:** records the selected action with result `neutral`; no score change is made.
-- **Phase banner:** SERVICE/RECEPTION describes the tracked team’s state, is read-only and updates from service state.
-- **Rotation indicator:** Intermediate/Advanced display only `Rotation N` as centred black text without a coloured background; service ownership remains in the phase banner, score underline and P1 marker.
-- **Undo:** one neutral grey/white **UNDO LAST** control removes exactly the latest accepted event. Red is reserved for Error.
+- **Phase banner:** SERVICE/RECEPTION describes the tracked team’s state, is read-only and updates from service state. SERVICE is green; RECEPTION is blue. Both use the same reduced-height geometry.
+- **Rotation indicator:** Intermediate/Advanced display `Rot. Pn | Rn | Cn` as centred black text without a coloured background. `P` is the setter's current court position and has priority, `R` is the 1–6 rotation configuration, and `C` is the full rotation cycle. The line is equally spaced between the score and the phase banner.
+- **Undo:** one light-orange **UNDO LAST** control removes exactly the latest accepted event. Error remains red and meaning never relies on colour alone.
 - **Substitution:** while active, rally capture is suspended and no scoring event is created by player selection.
 - **Duplicate protection:** after an accepted result, further rally-entry results are ignored for 400 ms. Navigation, statistics and export are not guarded.
 
@@ -62,7 +62,7 @@ A selected player opens one fixed grid. One result tap completes the event and r
 Unavailable Point cells have no active hit target. Continue uses the circular dual-arrow SVG and persists `neutral`.
 
 ### 6.3 Position/action guidance
-The six rows remain visible in the fixed order above for every selected player. Expected actions use full emphasis. Rare legal actions are attenuated but remain tappable. Only Libero Attack, Block and Service are blocked.
+The six rows remain visible in the fixed order above for every selected player. Attack and Block action labels use light orange; Defence and Reception use light green; Service and Set use light blue. Expected actions use full emphasis. Rare legal actions retain the same colour families at reduced emphasis and remain tappable. Only Libero Attack, Block and Service are blocked.
 
 | Position | Attack | Block | Reception | Defence | Service | Set |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -91,7 +91,7 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 - SAVE .JSON exports portable match data; OPEN MATCH .JSON restores it.
 - REPORT .HTML exports a self-contained report.
 - Score, point origin, error charts, set progression and attacker statistics are rebuilt from events.
-- Every new event stores the integer pre-rally `rotation`; History exposes the same value in a Rotation column. Legacy events without the field remain valid and display `—`.
+- Every new event stores the integer pre-rally `rotation` for statistics and compatibility. Live History deliberately hides time and rotation and shows only `#`, `Player`, `Action`, `Result`, `Score` in that order.
 - Portable match JSON schema remains version 1.
 
 
@@ -100,14 +100,16 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 - Sets won are shown in compact badges outside the left and right rally scores.
 - A visible line directly below the rally score marks the team currently serving; it updates after every side-out and at set start.
 - The match/set title, Best-of/set-target/mode metadata strip and primary Player instruction are not displayed during capture.
-- The BENCH replacement-player and SUBSTITUTION controls are shorter and narrower than court/result controls, centred as one pair, and use the minimum 44 px readable touch height.
+- The BENCH replacement-player and SUBSTITUTION controls are reduced to compact readable 66 × 36 and 122 × 36 CSS px controls at the primary iPhone viewport and remain centred as one pair.
+- The black NET band uses half the previous vertical padding.
+- TEAM/ADVERSE result rows are reduced from 76 to 60 CSS px while keeping legible symbols and labels.
 
 ## 10. Setup 1 visual and roster rules
 - Detail level background: Advanced pale red (`#fee2e2`), Intermediate pale yellow (`#fef9c3`), Basic pale green (`#dcfce7`).
-- Roster maximum drop-down values: 7–20 inclusive; default 12.
+- Roster maximum drop-down values: 7–30 inclusive; default 12. Jersey buttons are available from 1 through 30.
 - The maximum drives the `selected (min 7, max N)` label, disables additional number buttons at the limit and blocks NEXT while selected count exceeds the chosen limit.
 - Basic mode hides roster controls as before.
 
 ## 11. Acceptance
 
-Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.5 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.6 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.

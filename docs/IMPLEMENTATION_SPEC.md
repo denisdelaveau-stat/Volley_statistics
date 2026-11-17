@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.5 — Implementation Specification
+# Volley Live Capture v1.6.6 — Implementation Specification
 
 ## Runtime and storage
 Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reusable setup data use browser localStorage. The service worker provides the offline shell over HTTPS/localhost.
@@ -11,7 +11,7 @@ Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reu
 | `volleyCapture.library.v1` | Saved teams, starting sevens and rotations |
 
 ## Capture implementation
-The v1.6.5 block in `index.html` delegates all normative result controls from the capture panel:
+The v1.6 block in `index.html` delegates all normative result controls from the capture panel:
 - `.vlc-result-bar`: shared Basic/Intermediate/Advanced TEAM/ADVERSE grammar.
 - `[data-vlc-result="error|point"]`: full-area result zones.
 - `[data-adv-row]`: six fixed Advanced action rows.
@@ -40,21 +40,24 @@ Continue is a reusable inline SVG containing two circular arrows. The same gener
 `LOCK_MS` is 400 ms. The guard is armed only after an accepted result. Player selection and the following combined result are not separated by an artificial delay. Statistics, navigation and export controls remain outside the guard.
 
 ## Compatibility
-No migration is required. Portable match JSON remains format version 1, and existing `point`, `error` and `neutral` events remain readable. New events add the optional integer `rotation`; older events display `—` in History. Saved team library entries may add optional `maxPlayers`; entries without it use the compatible default.
+No migration is required. Portable match JSON remains format version 1, and existing `point`, `error` and `neutral` events remain readable. Event `time` and integer `rotation` remain persisted but are hidden from live History. Saved team library entries may add optional `maxPlayers`; entries without it use the compatible default.
 
 ## Service worker
-`sw.js` uses `volley-live-capture-v1.6.5`. Increment the cache ID whenever shell content changes.
+`sw.js` uses `volley-live-capture-v1.6.6`. Increment the cache ID whenever shell content changes.
 
 
-## v1.6.5 rotation and setup changes
-- `#courtStatus` renders only `Rotation N` with transparent background, black text and centred alignment in court-based modes.
-- The event is tagged with the rotation active before that rally; a side-out updates the live indicator for the next rally.
-- `#captureHistory` adds the Rotation column and tolerates legacy missing values.
+## v1.6.6 rotation, setup and presentation changes
+- `#courtStatus` renders `Rot. Pn | Rn | Cn` with transparent background, black text, centred alignment and equal score/banner spacing.
+- The event is tagged with the integer rotation active before that rally; a side-out updates setter position, configuration and cycle for the next rally.
+- `#captureHistory` renders only `#`, `Player`, `Action`, `Result`, `Score` while event time/rotation metadata remains intact.
 - `#suLevel` receives a class derived from the selected level; CSS applies the three pale backgrounds.
-- `S.maxPlayers` defaults to 12, is changed by `#suRosterMax`, limits jersey selection and is saved as `team.rosterMax` / library `maxPlayers`.
+- `S.maxPlayers` defaults to 12, supports 7–30, limits jersey selection across buttons 1–30 and is saved as `team.rosterMax` / library `maxPlayers`.
+- RECEPTION is blue; phase and NET bands are thinner; Undo is light orange.
+- Advanced action labels use light orange (Attack/Block), light green (Defence/Reception) and light blue (Service/Set), with rare rows retaining reduced opacity.
 
 ## Compact capture UI retained from v1.6.3
 - `.score-live.board` contains two `.score-side` wrappers, external `.set-badge` values and one `.service-line` per team.
 - `window.updateScoreService('A'|'B')` is called from both Basic and court-based service-state renderers after every replay.
 - `#captureTitle`, `#setsLine` and the primary player-step title remain non-rendered; completion banners and match reports keep full match/set context.
-- `.bench-row` uses a centred flex pair; `#benchBtn` is 82 × 44 CSS px and `#subToggle` is 146 × 44 CSS px at the primary viewport, with smaller widths at 360 px and below.
+- `.bench-row` uses a centred flex pair; `#benchBtn` is 66 × 36 CSS px and `#subToggle` is 122 × 36 CSS px at the primary viewport.
+- `.vlc-result-bar` is 60 CSS px high at the primary viewport.

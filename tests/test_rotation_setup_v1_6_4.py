@@ -1,11 +1,11 @@
-"""v1.6.5 rotation persistence, history and setup acceptance tests."""
+"""v1.6.6 rotation detail, hidden-history metadata and setup acceptance tests."""
 from helpers import APP_URI, events, open_match, wait_guard
 
 
 def test_rotation_is_plain_centred_and_persisted_per_event(browser):
     page, errors = open_match(browser, "advanced", focus_off=(4,))
     status = page.locator("#courtStatus")
-    assert status.inner_text() == "Rotation 0"
+    assert status.inner_text() == "Rot. P1 | R1 | C1"
     style = status.evaluate(
         "e => ({background:getComputedStyle(e).backgroundColor, color:getComputedStyle(e).color, align:getComputedStyle(e).textAlign})"
     )
@@ -17,18 +17,19 @@ def test_rotation_is_plain_centred_and_persisted_per_event(browser):
     page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
     wait_guard(page)
     page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
-    assert status.inner_text() == "Rotation 1"
+    assert status.inner_text() == "Rot. P6 | R2 | C1"
     wait_guard(page)
     page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
 
     saved = events(page)
     assert [event["rotation"] for event in saved] == [0, 0, 1]
     assert page.locator(".history thead th").all_inner_texts() == [
-        "#", "Time", "Action", "Result", "Player", "Rotation", "Score"
+        "#", "Player", "Action", "Result", "Score"
     ]
     rows = page.locator("#captureHistory tr")
-    assert rows.nth(0).locator("td").nth(5).inner_text() == "1"
-    assert rows.nth(1).locator("td").nth(5).inner_text() == "0"
+    assert rows.nth(0).locator("td").count() == 5
+    assert rows.nth(0).locator("td").nth(1).inner_text() == "A"
+    assert [event["rotation"] for event in saved] == [0, 0, 1]
     assert not errors
     page.close()
 
@@ -55,6 +56,8 @@ def test_setup_detail_colours_and_configurable_roster_maximum(browser):
 
     roster_max = page.locator("#suRosterMax")
     assert roster_max.input_value() == "12"
+    assert roster_max.locator("option").last.inner_text() == "30"
+    assert page.locator('[data-n="30"]').count() == 1
     roster_max.select_option("8")
     for number in range(1, 9):
         page.locator(f'[data-n="{number}"]').click()

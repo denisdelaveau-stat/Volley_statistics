@@ -1,5 +1,25 @@
 # Changelog – Volley Live Capture
 
+## v1.6.6 – 2026-11-17
+### Changed
+- Reduced the BENCH replacement-player and SUBSTITUTION controls to compact readable 66×36 and 122×36 CSS px controls at the primary iPhone viewport.
+- Extended Setup 1 Roster maximum from 7–20 to 7–30 and exposed jersey buttons 1–30.
+- Halved the vertical padding of the black NET band.
+- Replaced `Rotation N` with `Rot. Pn | Rn | Cn`, prioritising the setter position, followed by the 1–6 rotation configuration and full-cycle count; equalised spacing above and below the line.
+- Changed RECEPTION to blue and reduced the SERVICE/RECEPTION banner height.
+- Changed every Undo control to light orange.
+- Reduced TEAM/ADVERSE result rows from 76 to 60 CSS px.
+- Added semantic Advanced action-label colours: Attack/Block light orange, Defence/Reception light green, Service/Set light blue; rare legal rows remain lighter.
+- Reduced on-screen History to `#`, `Player`, `Action`, `Result`, `Score`; time and rotation remain stored in event logs and available to statistics/reporting.
+
+### Documentation and verification
+- Updated the English Word UI specification to document version 1.6 while preserving all 11 original inline images and 22 media package entries.
+- Replaced the screenshot PDF with current v1.6.6 captures and added browser acceptance coverage for all nine UI changes.
+- Bumped the visible application version and PWA cache to v1.6.6 and regenerated SHA-256 manifests.
+
+### Compatibility
+- Portable match JSON remains format version 1. Existing `time` and integer `rotation` event fields are unchanged; only their live History columns are hidden.
+
 ## v1.6.5 – 2026-11-17
 ### Fixed
 - Moved acceptance scenarios `UI-ADV-POS-01` and `UI-ADV-POS-02` out of section 8 Target UI Matrix and into section 10 Automated Acceptance Test Catalogue in the English Word specification.

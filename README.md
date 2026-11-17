@@ -1,13 +1,15 @@
-# Volley Live Capture v1.6.5
+# Volley Live Capture v1.6.6
 
 Offline-capable volleyball match capture web app for iPhone and tablet.
 
-## v1.6.5 highlights
-- Corrected the English Word UI specification (document version 1.5): `UI-ADV-POS-01/02` are now in the automated acceptance catalogue, not the Target UI Matrix.
-- Preserved all 11 original inline images and 22 embedded media entries in the corrected Word document.
-- Replaced the obsolete v1.3.2 screenshot PDF with current Basic, Intermediate, Advanced, compact-header and Setup 1 captures.
-- Supplied the corrected Word specification in both `docs/` and package root.
-- Capture behavior and match-data compatibility are unchanged from v1.6.4.
+## v1.6.6 highlights
+- More compact BENCH, NET, phase banner and TEAM/ADVERSE rows.
+- Setup roster maximum extended to 30 players.
+- Rotation line now shows setter position, rotation configuration and cycle: `Rot. P5 | R3 | C2`.
+- RECEPTION is blue; Undo is light orange.
+- Advanced action labels use orange, green and blue semantic groups while rare legal actions stay lighter.
+- Live History shows only `#`, `Player`, `Action`, `Result`, `Score`; hidden time/rotation metadata remains in events.
+- English Word UI specification version 1.6 preserves all original images; the screenshot PDF reflects the current UI.
 
 ## Run locally
 ```bash
@@ -19,10 +21,10 @@ Open the displayed local URL in a browser. For iPhone use, deploy the folder ove
 ```bash
 python3 -m pytest -q tests
 ```
-The suite validates Basic, Intermediate and Advanced capture, rotation persistence/history, configurable setup, compact live layout, substitutions, scoring, sets, report generation, offline cache, specification table placement and image preservation.
+The suite validates the three capture modes, scoring, rotation persistence, compact layout, semantic colours, setup limits, history columns, documentation integrity and offline cache.
 
 ## Data compatibility
-Portable match JSON remains format version 1. Existing events without `rotation` remain readable; saved setup teams without `maxPlayers` load with the compatible default.
+Portable match JSON remains format version 1. Existing events retain `time` and integer `rotation`; these values are still saved for reports/statistics but are hidden from live History.
 
 ## iPhone update
-Deploy the whole folder. The service-worker cache ID must contain `v1.6.5`. Open the hosted app online once, then fully close and reopen the Home-screen app. Verify `v1.6.5` on Home before courtside use.
+Deploy the whole folder. The service-worker cache ID must contain `v1.6.6`. Open the hosted app online once, then fully close and reopen the Home-screen app. Verify `v1.6.6` on Home before courtside use.

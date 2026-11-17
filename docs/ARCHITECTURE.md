@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.5 — Architecture
+# Volley Live Capture v1.6.6 — Architecture
 
 ## Components
 - `index.html`: setup wizard, capture UI, event/scoring engine, rotation/substitution, statistics and exports.
@@ -14,7 +14,7 @@
 NEW MATCH resets the active match without deleting reusable setup templates.
 
 ## Event-derived state
-Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. v1.6.5 also snapshots the pre-rally integer rotation onto each new event so later statistics do not need to infer historical state. The portable file stays at format version 1; the new field is optional for backward compatibility.
+Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally integer rotation is snapshotted onto each new event so later statistics do not need to infer historical state. v1.6.6 hides time and rotation from live History without removing either event field. The portable file stays at format version 1.
 
 ## Capture layers
 1. Court renderer owns player, Focus, service, rotation, libero and substitution state.

@@ -1,4 +1,4 @@
-"""v1.6.5 Word specification placement and media-preservation checks."""
+"""v1.6.6 Word specification placement, UI rules and media-preservation checks."""
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -11,8 +11,11 @@ ROOT_COPY = ROOT / "Volley_Live_Capture_UI_Functional_Specification_EN_With_Orig
 
 def test_corrected_specification_catalogue_and_original_images():
     doc = Document(DOC)
-    assert doc.tables[1].cell(2, 1).text.strip() == "1.5"
-    assert all("Version 1.5" in " ".join(p.text for p in section.footer.paragraphs) for section in doc.sections)
+    assert doc.tables[1].cell(2, 1).text.strip() == "1.6"
+    assert all("Version 1.6" in " ".join(p.text for p in section.footer.paragraphs) for section in doc.sections)
+    full_text = "\n".join(p.text for p in doc.paragraphs)
+    for requirement in ("Rot. Pn | Rn | Cn", "7 through 30", "light orange", "# · Player · Action · Result · Score"):
+        assert requirement in full_text
     matrix_ids = [row.cells[0].text.strip() for row in doc.tables[8].rows]
     catalogue_ids = [row.cells[0].text.strip() for row in doc.tables[9].rows]
     for scenario in ("UI-ADV-POS-01", "UI-ADV-POS-02"):

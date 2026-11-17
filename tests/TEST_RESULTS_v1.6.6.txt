@@ -1,0 +1,26 @@
+Volley Live Capture v1.6.6 automated verification
+Date: 17 November 2026
+
+Command: python3 -m pytest -q tests
+Result: 16 passed in 35.29s
+Primary browser viewport: 390 × 844 CSS px, device scale factor 2
+Uncaught JavaScript errors in automated scenarios: 0
+
+Modification UI 5 coverage:
+- BENCH replacement/SUBSTITUTION controls: 66×36 / 122×36 CSS px and centred.
+- Setup roster maximum: 7–30; jersey buttons 1–30; limit enforcement retained.
+- NET vertical padding: 4 px.
+- Rotation: Rot. Pn | Rn | Cn, setter position/configuration/cycle and equal vertical spacing.
+- RECEPTION: blue; phase banner reduced in height.
+- Undo: light orange.
+- TEAM/ADVERSE result rows: 60 CSS px.
+- Advanced action labels: requested orange/green/blue groups; rare legal rows remain lighter.
+- History: exactly #, Player, Action, Result, Score; time and rotation remain in stored events.
+
+Artifact verification:
+- JavaScript syntax valid for 6 executable inline scripts and sw.js.
+- English Word specification: document version 1.6; 11 original inline images and 22 media package entries preserved; root/docs copies byte-identical.
+- Screenshot PDF: 5 A4 pages generated from the current v1.6.6 UI.
+- Visible application version: v1.6.6.
+- PWA cache ID: volley-live-capture-v1.6.6.
+- Portable match JSON format remains version 1.
