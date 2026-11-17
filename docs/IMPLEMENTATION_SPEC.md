@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.2 — Implementation Specification
+# Volley Live Capture v1.6.3 — Implementation Specification
 
 ## Runtime and storage
 Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reusable setup data use browser localStorage. The service worker provides the offline shell over HTTPS/localhost.
@@ -11,7 +11,7 @@ Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reu
 | `volleyCapture.library.v1` | Saved teams, starting sevens and rotations |
 
 ## Capture implementation
-The v1.6.2 block in `index.html` delegates all normative result controls from the capture panel:
+The v1.6.3 block in `index.html` delegates all normative result controls from the capture panel:
 - `.vlc-result-bar`: shared Basic/Intermediate/Advanced TEAM/ADVERSE grammar.
 - `[data-vlc-result="error|point"]`: full-area result zones.
 - `[data-adv-row]`: six fixed Advanced action rows.
@@ -42,4 +42,11 @@ Continue is a reusable inline SVG containing two circular arrows. The same gener
 No migration is required. Portable match JSON remains format version 1, and existing `point`, `error` and `neutral` events remain readable. The setup-library schema introduced in v1.5.0 is unchanged.
 
 ## Service worker
-`sw.js` uses `volley-live-capture-v1.6.2`. Increment the cache ID whenever shell content changes.
+`sw.js` uses `volley-live-capture-v1.6.3`. Increment the cache ID whenever shell content changes.
+
+
+## v1.6.3 compact capture UI
+- `.score-live.board` contains two `.score-side` wrappers, external `.set-badge` values and one `.service-line` per team.
+- `window.updateScoreService('A'|'B')` is called from both Basic and court-based service-state renderers after every replay.
+- `#captureTitle`, `#setsLine` and the primary player-step title remain non-rendered; completion banners and match reports keep full match/set context.
+- `.bench-row` uses centred compact columns; `#benchBtn` and `#subToggle` keep a minimum height of 48 CSS px (44 CSS px in short landscape viewports).

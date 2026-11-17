@@ -1,16 +1,19 @@
-# Release v1.6.2 — 17 November 2026
+# Release v1.6.3 — 17 November 2026
 
-Volley Live Capture v1.6.2 adds the approved player-position/action guidance to the Advanced capture grid while preserving the v1.6.1 Intermediate behavior.
+Volley Live Capture v1.6.3 reduces visual load during live capture and compacts the BENCH controls without changing capture semantics or stored match data.
 
-## Position-aware Advanced grid
-- The six action rows always remain visible in this order: **Attack, Block, Defence, Reception, Service, Set**.
-- Actions expected for the selected player's position use full emphasis.
-- Rare but legal actions are faded, not removed or disabled, so an unusual OH set or OPP reception can still be captured.
-- Only Libero **Attack**, **Block** and **Service** are blocked and non-selectable.
-- The approved matrix is documented in the English Word specification and in `docs/FUNCTIONAL_SPEC.md`.
+## Live capture header
+- Only the current rally score remains in the top capture header.
+- Small outside badges show sets won by the left and right teams.
+- A cyan underline below the relevant rally score identifies the serving team and follows side-out changes.
+- The previous match title, Best-of/set/mode strip and primary Player instruction are no longer displayed.
+
+## BENCH
+- The replacement-player and SUBSTITUTION controls are shorter and narrower.
+- The two controls remain side by side, centred, and keep iPhone touch targets of at least 44 CSS px.
 
 ## Compatibility
-The match and event JSON formats remain unchanged. Existing v1.6.1 data requires no migration. The service-worker cache identifier is `volley-live-capture-v1.6.2`.
+The match and event JSON formats remain unchanged. Existing v1.6.2 data requires no migration. The service-worker cache identifier is `volley-live-capture-v1.6.3`.
 
 ## Verification
-The browser suite verifies the matrix for Setter, OH, OPP, MB and Libero, fixed ordering, rare-action capture, Libero blocking, the prior normative UI and the existing PWA/regression behavior. Manual iPhone/Safari, VoiceOver and offline-relaunch checks remain required on the target device.
+Run `python3 -m pytest -q tests`. Manual iPhone Safari/Home-screen, offline relaunch, VoiceOver and portrait/landscape checks remain recommended on the target device.

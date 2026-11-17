@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.2 — Functional Specification
+# Volley Live Capture v1.6.3 — Functional Specification
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
@@ -92,5 +92,13 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 - Score, point origin, error charts, set progression and attacker statistics are rebuilt from events.
 - Portable match JSON schema remains version 1.
 
-## 9. Acceptance
-Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.2 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+
+## 9. Compact live header and BENCH controls
+- The live capture header displays only the current rally score.
+- Sets won are shown in compact badges outside the left and right rally scores.
+- A visible line directly below the rally score marks the team currently serving; it updates after every side-out and at set start.
+- The match/set title, Best-of/set-target/mode metadata strip and primary Player instruction are not displayed during capture.
+- The BENCH replacement-player and SUBSTITUTION controls are shorter and narrower than court/result controls, centred as one pair, and retain a minimum 44 × 44 CSS px touch target.
+
+## 10. Acceptance
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.3 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.

@@ -1,0 +1,37 @@
+Volley Live Capture v1.6.3 automated verification
+Date: 17 November 2026
+
+Command: python3 -m pytest -q tests
+Result: 11 passed in 31.59s
+Primary browser viewport: 390 x 844 CSS px, device scale factor 2
+Uncaught JavaScript errors in automated scenarios: 0
+
+v1.6.3 compact UI coverage:
+- Live capture title, set-format/mode metadata strip and primary Player instruction verified hidden.
+- Rally score verified with won-set badges outside the left and right scores.
+- Service underline verified below Team A at set start and below Team B after an opponent side-out.
+- BENCH replacement-player control measured at 96 x 56 CSS px.
+- BENCH SUBSTITUTION control measured at 184 x 56 CSS px.
+- Court player control measured at 108 x 84 CSS px for comparison.
+- Compact BENCH pair verified horizontally centred with no overflow at 390 CSS px.
+
+Regression coverage:
+- Basic, Intermediate and Advanced capture semantics passed.
+- Focus selection, ADVERSE locking, substitution isolation and double-entry guard passed.
+- Position/action matrix, rare legal actions and Libero prohibitions passed.
+- Set completion/Undo, setup library, report generation and PWA cache checks passed.
+
+Static verification:
+- JavaScript syntax valid for 6 inline scripts and sw.js.
+- Visible application version and PWA cache ID updated to v1.6.3.
+
+Word specification verification:
+- Document-control version: 1.3.
+- Inline original visuals retained: 11 / 11.
+- Existing embedded media payloads preserved byte-for-byte from v1.6.2: 22 / 22.
+- LibreOffice render succeeded: 17-page PDF used for validation only.
+
+Manual checks pending on target device:
+- iPhone Safari/Home-screen update and offline relaunch.
+- VoiceOver announcements and real-device touch behaviour.
+- Portrait/landscape safe-area verification.

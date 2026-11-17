@@ -84,7 +84,7 @@ def test_advanced_combined_grid_and_one_tap_team_opponent(browser):
     event = events(page)[-1]
     assert (event["player"], event["action"], event["result"], event["winningTeam"]) == (3, "reception", "neutral", None)
     assert page.locator('[data-step="player"]').get_attribute("class").endswith("active")
-    assert page.inner_text("#liveScore").replace("\n", "") == "0:0"
+    assert page.locator("#liveScore .digit-box").all_inner_texts() == ["0", "0"]
 
     wait_guard(page)
     assert not page.locator('[data-vlc-actor="T"]').is_hidden()  # player 4 has Focus disabled

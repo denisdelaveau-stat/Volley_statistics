@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.2 — Architecture
+# Volley Live Capture v1.6.3 — Architecture
 
 ## Components
 - `index.html`: setup wizard, capture UI, event/scoring engine, rotation/substitution, statistics and exports.

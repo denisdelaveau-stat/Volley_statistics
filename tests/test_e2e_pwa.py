@@ -21,7 +21,7 @@ def test_set_end_undo_and_exports(browser):
             b += 1; winner = "team2"
         seed.append(scoring_event(i + 1, winner, a, b))
     page, errors = open_match(browser, "basic", events=seed)
-    assert page.inner_text("#liveScore").replace("\n", "") == "24:24"
+    assert page.locator("#liveScore .digit-box").all_inner_texts() == ["24", "24"]
     page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
     wait_guard(page)
     page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
@@ -43,7 +43,7 @@ def test_set_end_undo_and_exports(browser):
 
 def test_pwa_cache_version_and_shell_assets():
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.6.2" in service_worker
+    assert "volley-live-capture-v1.6.3" in service_worker
     for asset in ("index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"):
         assert asset in service_worker
         assert (ROOT / asset).exists()

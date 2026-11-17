@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.2 — Automated Test Plan
+# Volley Live Capture v1.6.3 — Automated Test Plan
 
 ## Environment
 - Python 3, `pytest`, Playwright and Chromium.
@@ -12,6 +12,8 @@
 | UI-BAS-01 | Four Basic Error/Point semantics, icon, colour, placement and minimum target size |
 | UI-INT-01/02 | Focus selection, selected highlight, player attribution, automatic clear, TEAM fallback, ADVERSE direct entry when no Focus player is selected |
 | UI-INT-UI1 | SUBSTITUTION inside BENCH; selected player number/name in the tracked-team bar; ADVERSE faded, disabled and event-blocked until selection clears |
+| UI-BENCH-02 | Replacement-player and SUBSTITUTION controls are compact, side by side, centred and at least 44 CSS px high |
+| UI-HDR-01 | Score-only live header; external won-set badges; removed title/metadata/Player instruction; service underline follows service ownership |
 | UI-ADV-01/02/03 | Fixed action order, combined result entry, neutral Continue, unavailable Point cells |
 | UI-ADV-POS-01/02 | Position/action matrix for Setter, OH, OPP, MB and Libero; expected/rare/blocked styling; rare legal actions remain tappable; Libero Attack/Block/Service cannot create events |
 | UI-SUB-01 | Rally capture suspended while substitution mode is active |
@@ -21,7 +23,8 @@
 | Regression | Set win at 26–24, setup library, ROTATE +1, report generation, PWA cache version, no JavaScript errors |
 
 ## Manual iPhone checks
-1. Install/update from HTTPS and verify `v1.6.2` on Home.
-2. Confirm safe-area layout and all result targets in portrait and landscape.
-3. Confirm VoiceOver announces team/action plus Error, Point or Continue.
-4. Capture several rallies offline, close the Home-screen app, reopen, and verify persistence.
+1. Install/update from HTTPS and verify `v1.6.3` on Home.
+2. Confirm the compact score header and centred BENCH pair at 390 × 844 and in landscape.
+3. Confirm safe-area layout and all result targets in portrait and landscape.
+4. Confirm VoiceOver announces team/action plus Error, Point or Continue.
+5. Capture several rallies offline, close the Home-screen app, reopen, and verify persistence.

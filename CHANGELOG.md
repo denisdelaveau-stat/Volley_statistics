@@ -1,5 +1,17 @@
 # Changelog – Volley Live Capture
 
+## v1.6.3 – 2026-11-17
+### Changed
+- Made the BENCH replacement-player and SUBSTITUTION controls shorter, narrower and centred.
+- Replaced the crowded live header with the rally score only, flanked by won-set badges.
+- Added a service underline below the score of the team currently serving.
+- Removed the match/set title, set-format/mode metadata strip and primary Player instruction from the live capture header.
+- Updated the English Word UI specification while retaining all 11 original embedded source visuals.
+- Bumped the visible application version and PWA cache to v1.6.3.
+
+### Compatibility
+- Match and event JSON formats are unchanged; no migration is required.
+
 ## v1.6.2 – 2026-11-17
 ### Added
 - Added the approved player-position/action matrix to the Advanced capture model.

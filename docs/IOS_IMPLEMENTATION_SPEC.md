@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.2 — iOS Implementation Specification
+# Volley Live Capture v1.6.3 — iOS Implementation Specification
 
 ## Target
 - iPhone/iPad Safari and Add to Home Screen PWA.
@@ -10,7 +10,7 @@
 2. Open once in Safari while online.
 3. Share → Add to Home Screen.
 4. For an update, deploy `index.html` and `sw.js` together.
-5. Confirm cache ID `volley-live-capture-v1.6.2`, fully close the installed app, reopen and verify `v1.6.2` on Home.
+5. Confirm cache ID `volley-live-capture-v1.6.3`, fully close the installed app, reopen and verify `v1.6.3` on Home.
 
 ## Touch and accessibility
 - Capture controls use `touch-action: manipulation`.

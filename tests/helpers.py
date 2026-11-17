@@ -1,4 +1,4 @@
-"""Shared browser fixtures for Volley Live Capture v1.6.2 tests."""
+"""Shared browser fixtures for Volley Live Capture v1.6.3 tests."""
 from __future__ import annotations
 
 import json

@@ -252,6 +252,21 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
 .capture-head #captureTitle{order:1}.capture-head .sets-line{order:3;justify-content:center}
 .board .digit-box{background:#000;color:#ff2b2b;border-radius:6px;min-width:62px;padding:2px 10px;font-family:'Courier New',Menlo,monospace;font-size:40px;line-height:1.15;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(255,40,40,.75);box-shadow:inset 0 0 0 2px #262626,0 2px 4px rgba(0,0,0,.35)}
 .board .sep{color:#000;font-size:34px;font-weight:900}
+/* v1.6.3 compact live header: only score, set badges and service underline remain visible. */
+.capture-head{display:block}
+.capture-head #captureTitle,.capture-head .sets-line,#capturePanel [data-step="player"]>.step-title{display:none!important}
+.score-live.board{gap:7px;margin:0 auto}
+.board .score-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.board .service-line{display:block;width:72%;height:4px;border-radius:999px;background:#0ea5b7;visibility:hidden}
+.board .score-side.serving .service-line{visibility:visible}
+.board .set-badge{display:flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 8px;border-radius:7px;background:#000;color:#fff;font-size:20px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+/* v1.6.3 compact BENCH controls: narrower, shorter and centred as a pair. */
+.bench-row{grid-template-columns:minmax(82px,96px) minmax(150px,184px);justify-content:center;align-items:center;gap:12px}
+.bench-row .touch{height:56px;min-height:56px;max-height:56px;overflow:hidden;font-size:18px;line-height:1;padding:3px 8px}
+.bench-row .touch small{display:none}.bench-row .touch .rl{font-size:9px;margin-top:1px}.bench-row .touch .tag{display:none}
+.bench-row .sub-toggle{grid-column:auto;align-self:center;height:56px;min-height:56px;max-height:56px;width:100%;margin:0;padding:5px 10px;font-size:14px}
+@media(max-width:360px){.board .digit-box{min-width:54px;font-size:36px}.board .set-badge{min-width:32px;height:32px;font-size:18px}.bench-row{grid-template-columns:82px minmax(136px,1fr);gap:8px}}
+@media(max-height:480px) and (orientation:landscape){.bench-row .touch,.bench-row .sub-toggle{height:44px;min-height:44px;max-height:44px}}
 #homeInstall{font-size:13px;line-height:1.35;max-width:420px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.6);border-radius:12px;padding:10px 12px;color:#fde68a}
 #homeInstall[hidden]{display:none}
 #appVersion{font-size:11px;opacity:.55}
@@ -317,10 +332,10 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   <button type="button" class="home-btn home-open" id="homeOpen">OPEN MATCH .JSON</button><input type="file" id="homeFile" accept=".json,application/json" hidden>
   <div class="home-last" id="homeLast"></div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b> then <b>Add to Home Screen</b>, and always start the app from its icon (Safari and the installed app keep separate data).</div>
-  <div id="appVersion">v1.6.2</div>
+  <div id="appVersion">v1.6.3</div>
 </div>
 <section class="capture" id="capturePanel" aria-label="Live action capture">
-  <div class="capture-head"><h2 id="captureTitle">Live input</h2><div class="score-live board tie" id="liveScore"><span class="digit-box">0</span><span class="sep">:</span><span class="digit-box">0</span></div><div class="sets-line" id="setsLine"></div></div>
+  <div class="capture-head"><h2 id="captureTitle" hidden>Live input</h2><div class="score-live board tie" id="liveScore" role="status" aria-live="polite"><span class="set-badge set-badge-a" aria-label="Sets won by left team">0</span><span class="score-side side-a"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by right team">0</span></div><div class="sets-line" id="setsLine" hidden></div></div>
   <div class="set-over" id="setOver" hidden><h3 id="setOverTitle"></h3><p id="setOverText"></p><button type="button" id="nextSetBtn">START SET 2 →</button><button type="button" id="reportBtn2" class="report-btn2" hidden>MATCH REPORT .HTML</button></div>
   <div class="pick-chip" id="pickChip" hidden></div>
   <div class="steps">
@@ -435,6 +450,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   var LU=(m&&m.startingLineup)||{},roleOf={};
   [['oh1','oh'],['oh2','oh'],['mb1','mb'],['mb2','mb'],['setter','setter'],['opposite','opp'],['libero','libero']].forEach(function(x){if(LU[x[0]])roleOf[LU[x[0]]]=x[1]});
   var RL={setter:'SET',oh:'OH',mb:'MB',opp:'OPP',libero:'LIB'};
+  window.updateScoreService=function(side){var board=document.getElementById('liveScore');if(!board)return;board.setAttribute('data-serving',side||'');board.querySelectorAll('.score-side').forEach(function(x){x.classList.remove('serving')});var target=board.querySelector(side==='A'?'.side-a':side==='B'?'.side-b':'');if(target)target.classList.add('serving')};
   var g=document.querySelector('#capturePanel .touch-grid.players');
   function cell(n,zone,tag){var i=info[n];return (zone?'<span class="pz">'+zone.toUpperCase()+'</span>':'')+n+(i&&i.name?'<small>'+esc(i.name)+'</small>':'')+(roleOf[n]?'<span class="rl">'+RL[roleOf[n]]+'</span>':'')+(tag?'<small class="tag">'+esc(tag)+'</small>':'')}
   function pbtn(n,zone){return '<button type="button" class="touch" data-player="'+n+'">'+cell(n,zone)+'</button>'}
@@ -487,7 +503,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
     window.updateCourt=function(evs){   // Basic: serving side only (rally winner serves), no rotation
       var cs=m.currentSet||1,sv=(m.firstRally&&m.firstRally.antibesState==='reception')?'B':'A';if(cs%2===0)sv=(sv==='A')?'B':'A';
       (evs||[]).forEach(function(e){if((e.set||1)!==cs)return;if(e.winningTeam==='team1')sv='A';else if(e.winningTeam==='team2')sv='B'});
-      var el=document.getElementById('courtStatus');el.className='court-status '+(sv==='A'?'srv':'rcv');el.textContent=(sv==='A'?(m.team.name||'Team A'):(m.opponent.name||'Team B'))+' serves';
+      var el=document.getElementById('courtStatus');el.className='court-status '+(sv==='A'?'srv':'rcv');el.textContent=(sv==='A'?(m.team.name||'Team A'):(m.opponent.name||'Team B'))+' serves';if(window.updateScoreService)window.updateScoreService(sv);
     };
     window.updateCourt([]);
   }else if(ready){
@@ -516,6 +532,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
       var pb=document.getElementById('phaseBadge');if(pb){pb.className='phase-badge '+(st.serving==='A'?'srv':'rcv');pb.textContent=st.serving==='A'?'SERVICE':'RECEPTION'}
       if(st.serving==='A'){cs.className='court-status srv';cs.textContent=tn+' serves \u00B7 #'+c.p1.num+' (P1) \u00B7 rotation '+st.rotations}
       else{cs.className='court-status rcv';cs.textContent=tn+' receives \u00B7 '+(m.opponent.name||'Team B')+' serves \u00B7 rotation '+st.rotations}
+      if(window.updateScoreService)window.updateScoreService(st.serving);
     };
     // ---------- substitution mode ----------
     var POSROLE={setter:'setter',oh:'oh',mb:'mb',opp:'opp',libero:'libero'};
@@ -1014,11 +1031,7 @@ function renderErrorCharts(events){
     function renderSets(){
       var line=document.getElementById('setsLine'),box=document.getElementById('setOver'),panel=document.getElementById('capturePanel');
       if(!MATCH){line.innerHTML='';box.hidden=true;panel.classList.remove('locked');return}
-      var su=VS.summary(MATCH,EVENTS),h='<span class="sets-score">Sets '+su.wonA+' : '+su.wonB+'</span>';
-      su.sets.forEach(function(x){if(x.winner)h+='<span class="set-chip '+(x.winner==='team1'?'won':'lost')+'">S'+x.set+' '+x.a+'-'+x.b+'</span>'});
-      h+='<span>Best of '+(su.setsToWin*2-1)+' \u00B7 set '+curSet()+' to '+VS.target(MATCH,curSet())+'</span>';
-      h+='<span class="lvl-chip">'+LV.toUpperCase()+'</span>';
-      line.innerHTML=h;
+      var su=VS.summary(MATCH,EVENTS);line.innerHTML='';
       var c=su.current,t=document.getElementById('setOverTitle'),tx=document.getElementById('setOverText'),nb=document.getElementById('nextSetBtn');
       if(su.matchWinner){
         box.hidden=false;box.className='set-over match';
@@ -1038,7 +1051,7 @@ function renderErrorCharts(events){
     }
     function showStep(name){step=name;document.querySelectorAll('#capturePanel .step').forEach(function(x){x.classList.toggle('active',x.getAttribute('data-step')===name)});updateChip();}
     function render(){
-      var sc=lastScore();score.classList.remove('lead','trail','tie');score.classList.add(sc.a>sc.b?'lead':sc.a<sc.b?'trail':'tie');score.innerHTML='<span class="digit-box" aria-label="'+tn('team1')+'">'+sc.a+'</span><span class="sep">:</span><span class="digit-box" aria-label="'+tn('team2')+'">'+sc.b+'</span>';score.title=tn('team1')+' '+sc.a+' : '+sc.b+' '+tn('team2');hist.innerHTML='';renderSets();renderAttackers();
+      var sc=lastScore(),suHead=MATCH?VS.summary(MATCH,EVENTS):{wonA:0,wonB:0};score.classList.remove('lead','trail','tie');score.classList.add(sc.a>sc.b?'lead':sc.a<sc.b?'trail':'tie');score.innerHTML='<span class="set-badge set-badge-a" aria-label="Sets won by '+tn('team1')+'">'+suHead.wonA+'</span><span class="score-side side-a"><span class="digit-box" aria-label="'+tn('team1')+' score">'+sc.a+'</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box" aria-label="'+tn('team2')+' score">'+sc.b+'</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by '+tn('team2')+'">'+suHead.wonB+'</span>';score.title=tn('team1')+' '+sc.a+' : '+sc.b+' '+tn('team2')+' · Sets '+suHead.wonA+' : '+suHead.wonB;hist.innerHTML='';renderSets();renderAttackers();
       EVENTS.slice().reverse().forEach(function(e){var tr=document.createElement('tr');tr.innerHTML='<td>'+e.id+'</td><td>'+e.time+'</td><td>'+e.action+'</td><td>'+e.result+'</td><td>'+e.player+'</td><td>'+e.scoreA+' : '+e.scoreB+'</td>';hist.appendChild(tr)});
       status.innerHTML=EVENTS.length?'<span class="last-event">Last:</span> #'+EVENTS[EVENTS.length-1].player+' '+EVENTS[EVENTS.length-1].action+' / '+EVENTS[EVENTS.length-1].result:'Ready for a new action.';      updateOriginPies(EVENTS);
       renderErrorCharts(EVENTS);
@@ -1386,7 +1399,7 @@ html[data-level="intermediate"] #capturePanel .touch.adversary-btn,html[data-lev
 <!-- ===== end v1.4.0 ===== -->
 <!-- v1.4.1 global tap guard superseded by the v1.6.0 post-result guard. -->
 
-<!-- ===== v1.6.2 : normative capture UI, Intermediate adjustments and position-aware Advanced grid ===== -->
+<!-- ===== v1.6.3 : normative capture UI, Intermediate adjustments and position-aware Advanced grid ===== -->
 <style>
 /* Shared Error / team / Point grammar. Meaning never relies on colour alone. */
 .vlc-result-bar{display:grid;grid-template-columns:minmax(64px,1fr) minmax(120px,2.1fr) minmax(64px,1fr);gap:0;min-height:76px;margin:10px 0;border:2px solid #334155;border-radius:14px;overflow:hidden;background:#fff}
@@ -1436,7 +1449,7 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
 @media(max-height:480px) and (orientation:landscape){.vlc-result-bar{min-height:58px}.vlc-result-zone{min-height:58px}.vlc-action-row{grid-template-columns:minmax(96px,1.3fr) repeat(3,1fr)}.vlc-action-result,.vlc-action-na{min-height:48px}}
 </style>
 <script>
-/* v1.6.2 keeps the normative capture grammar, applies the Intermediate UI changes and
+/* v1.6.3 keeps the normative capture grammar, applies the Intermediate UI changes and
    makes the Advanced action grid position-aware without blocking rare legal actions.
    Persisted result values remain point / error / neutral; no data migration is required. */
 (function(){
@@ -1516,14 +1529,13 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
     var oldUpdate=window.updateCourt;
     g.innerHTML='<div class="court-status" id="courtStatus"></div><div class="phase-badge" id="phaseBadge" aria-live="polite"></div>'
       +resultBar('T',M.team.name||'Team A','TEAM','team')+'<div class="vlc-net">NET</div>'+resultBar('A',M.opponent.name||'Team B','ADVERSE','opp');
-    var title=playerStep.querySelector('.step-title');if(title)title.textContent='Team result · Error left / Point right';
+    var title=playerStep.querySelector('.step-title');if(title){title.textContent='';title.hidden=true}
     window.updateCourt=function(evs){if(oldUpdate)oldUpdate(evs);syncBasicPhase()};window.updateCourt((function(){try{return JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]')}catch(e){return []}})());
   }else{
     installCourtBars();
     var oldCourt=window.updateCourt;
     window.updateCourt=function(evs){if(oldCourt)oldCourt(evs);var tb=g.querySelector('[data-vlc-actor="T"]');if(tb&&LV==='advanced')tb.hidden=!g.querySelector('.nofocus');syncTeamLabel()};
-    if(LV==='intermediate'){var it=playerStep.querySelector('.step-title');if(it)it.textContent='Optional Focus player, then team result';}
-    else{var at=playerStep.querySelector('.step-title');if(at)at.textContent='1. Player · TEAM and ADVERSE remain one tap';}
+    var primaryTitle=playerStep.querySelector('.step-title');if(primaryTitle){primaryTitle.textContent='';primaryTitle.hidden=true}
   }
   document.addEventListener('click',function(e){
     var rb=e.target.closest&&e.target.closest('[data-vlc-result]');
@@ -1550,7 +1562,7 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
   primary();
 })();
 </script>
-<!-- ===== end v1.6.2 ===== -->
+<!-- ===== end v1.6.3 ===== -->
 
 
 </body></html>
