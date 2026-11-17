@@ -7,14 +7,39 @@ def test_intermediate_focus_then_result_and_direct_team_entry(browser):
     assert page.locator(".vlc-result-bar").count() == 2
     assert page.locator(".court-grid .nofocus").count() == 1
 
+    # Modification 1: SUBSTITUTION is inside BENCH, immediately to the right
+    # of the current libero / middle blocker replacement.
+    bench_box = page.locator("#benchBtn").bounding_box()
+    sub_box = page.locator("#subToggle").bounding_box()
+    assert sub_box["x"] > bench_box["x"] + bench_box["width"]
+    assert abs(sub_box["y"] - bench_box["y"]) < 2
+    assert page.locator(".bench-row > #subToggle").count() == 1
+
     focus = page.locator('.court-grid [data-zone="p2"]')  # player 3
     assert page.evaluate("e => getComputedStyle(e).backgroundImage", focus.element_handle()) == "none"
     focus.click()
     assert "selected" in focus.get_attribute("class")
-    assert "Selected: #3" in page.inner_text('[data-vlc-actor="T"] small')
+
+    # Modification 2: the selected player's number/name replace the team label,
+    # while ADVERSE is visibly locked and cannot record a result.
+    team_bar = page.locator('[data-vlc-actor="T"]')
+    opponent_bar = page.locator('[data-vlc-actor="A"]')
+    assert team_bar.locator(".vlc-result-label span").inner_text() == "3"
+    assert team_bar.locator(".vlc-result-label small").inner_text() == "Player 3"
+    assert "focus-selected" in team_bar.get_attribute("class")
+    assert "focus-locked" in opponent_bar.get_attribute("class")
+    assert opponent_bar.get_attribute("aria-disabled") == "true"
+    assert opponent_bar.locator(".vlc-result-zone:disabled").count() == 2
+    page.evaluate("""document.querySelector('[data-vlc-actor="A"] [data-vlc-result="point"]')
+        .dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true}))""")
+    assert len(events(page)) == 0
+
     page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
     assert (events(page)[-1]["player"], events(page)[-1]["action"], events(page)[-1]["result"]) == (3, "generic", "point")
     assert page.locator(".court-grid .selected").count() == 0
+    assert team_bar.locator(".vlc-result-label span").inner_text() == "Antibes"
+    assert opponent_bar.get_attribute("aria-disabled") == "false"
+    assert opponent_bar.locator(".vlc-result-zone:disabled").count() == 0
 
     wait_guard(page)
     page.click('[data-vlc-actor="T"] [data-vlc-result="error"]')

@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.0 — Functional Specification
+# Volley Live Capture v1.6.2 — Functional Specification
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
@@ -60,6 +60,19 @@ A selected player opens one fixed grid. One result tap completes the event and r
 
 Unavailable Point cells have no active hit target. Continue uses the circular dual-arrow SVG and persists `neutral`.
 
+### 6.3 Position/action guidance
+The six rows remain visible in the fixed order above for every selected player. Expected actions use full emphasis. Rare legal actions are attenuated but remain tappable. Only Libero Attack, Block and Service are blocked.
+
+| Position | Attack | Block | Reception | Defence | Service | Set |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| Setter | X | X |  | X | X | X |
+| OH | X | X | X | X | X |  |
+| OPP | X | X |  | X | X |  |
+| MB | X | X |  | X | X |  |
+| Libero | Blocked | Blocked | X | X | Blocked | X |
+
+`X` means expected for the position. An empty cell means rare but legal and therefore still selectable. `Blocked` is reserved for the three Libero prohibitions.
+
 ## 7. Scoring and match rules
 Normal sets finish at 25 or more with a two-point margin. The deciding set finishes at 15 or more with a two-point margin. A completed set locks normal rally capture until the next set starts; a completed match is marked completed.
 
@@ -80,4 +93,4 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 - Portable match JSON schema remains version 1.
 
 ## 9. Acceptance
-Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.0 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.2 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.

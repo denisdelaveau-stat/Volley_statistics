@@ -1,0 +1,28 @@
+Volley Live Capture v1.6.2 automated verification
+Date: 17 November 2026
+
+Command: python3 -m pytest -q tests
+Result: 9 passed in 24.85s
+Primary browser viewport: 390 x 844 CSS px, device scale factor 2
+Uncaught JavaScript errors in automated scenarios: 0
+
+v1.6.2 position/action coverage:
+- Fixed order verified: Attack, Block, Defence, Reception, Service, Set.
+- Approved matrix verified for Setter, OH, OPP, MB and Libero.
+- Rare legal actions verified as tappable and persisted (Setter Reception, OH Set).
+- Libero Attack, Block and Service verified disabled and unable to create an event, including a synthetic delegated click.
+- Prior Basic, Intermediate, Advanced, substitution, guard, library and PWA regression suite passed.
+
+Word specification verification:
+- Inline original visuals retained: 11 / 11.
+- Embedded media payloads preserved byte-for-byte from v1.6.1: 22 / 22.
+- Document control updated to version 1.2 and implementation traceability updated to application v1.6.2.
+
+Visual inspection:
+- Advanced OH and Libero grids rendered at 390 x 844 without horizontal overflow.
+- Expected, rare and blocked states remain legible; result controls keep the existing Error / Point / Continue grammar.
+
+Manual checks pending on target device:
+- iPhone Safari/Home-screen update and offline relaunch.
+- VoiceOver announcements and real-device touch behavior.
+- Portrait/landscape safe-area verification.

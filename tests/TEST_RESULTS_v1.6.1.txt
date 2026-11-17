@@ -1,0 +1,12 @@
+Volley Live Capture v1.6.1 automated verification
+Date: 2026-11-17
+Command: pytest -q tests
+Result: 7 passed in 28.72s
+
+Additional Intermediate UI verification at 390 x 844 CSS px:
+- SUBSTITUTION parent is .bench-row and is positioned to the right of #benchBtn.
+- Selected Focus player is rendered as number "3" and name "Player 3" in the tracked-team result bar.
+- ADVERSE bar receives focus-locked state, aria-disabled="true", and both result buttons are disabled.
+- Synthetic ADVERSE click dispatch while Focus is selected records no event.
+- ADVERSE is restored after the tracked-team result clears the selection.
+- No horizontal overflow detected.

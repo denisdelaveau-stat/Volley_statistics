@@ -1,4 +1,4 @@
-"""Non-regression checks for the v1.5 setup library retained in v1.6.0."""
+"""Non-regression checks for the v1.5 setup library retained in v1.6.2."""
 from helpers import APP_URI
 
 

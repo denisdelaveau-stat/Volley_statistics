@@ -131,9 +131,10 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
 .bench-label{margin:12px 0 6px;font-size:12px;font-weight:800;letter-spacing:.2em;color:#64748b;text-align:center;border-top:2px dashed #cbd5e1;padding-top:8px}
 .bench-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .bench-row .touch{min-height:72px;font-size:26px;background:#f8fafc;border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.bench-row .sub-toggle{grid-column:2 / 4;align-self:stretch;min-height:72px;margin-top:0}
 .court-adv{margin-top:12px}
 .court-adv .touch{width:100%;min-height:60px}
-@media(max-height:480px) and (orientation:landscape){.court-grid .touch{min-height:52px;font-size:22px}.bench-row .touch{min-height:48px}}
+@media(max-height:480px) and (orientation:landscape){.court-grid .touch{min-height:52px;font-size:22px}.bench-row .touch,.bench-row .sub-toggle{min-height:48px}}
 /* ---- live court: server / libero ---- */
 .court-status{margin:0 0 8px;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:800;background:#eef3f9;color:#1f3864}
 .court-status.srv{background:#dcfce7;color:#166534}.court-status.rcv{background:#fef3c7;color:#92400e}
@@ -316,7 +317,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   <button type="button" class="home-btn home-open" id="homeOpen">OPEN MATCH .JSON</button><input type="file" id="homeFile" accept=".json,application/json" hidden>
   <div class="home-last" id="homeLast"></div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b> then <b>Add to Home Screen</b>, and always start the app from its icon (Safari and the installed app keep separate data).</div>
-  <div id="appVersion">v1.6.0</div>
+  <div id="appVersion">v1.6.2</div>
 </div>
 <section class="capture" id="capturePanel" aria-label="Live action capture">
   <div class="capture-head"><h2 id="captureTitle">Live input</h2><div class="score-live board tie" id="liveScore"><span class="digit-box">0</span><span class="sep">:</span><span class="digit-box">0</span></div><div class="sets-line" id="setsLine"></div></div>
@@ -493,10 +494,9 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
     g.classList.add('court-mode');
     g.innerHTML='<div class="court-status" id="courtStatus"></div><div class="phase-badge" id="phaseBadge" aria-live="polite"></div><div class="court-net">NET</div><div class="court-grid">'
       +POS.map(function(k){return '<button type="button" class="touch" data-player="'+rot0[k]+'" data-zone="'+k+'"></button>'}).join('')+'</div>'
-      +'<div class="bench-label">BENCH</div><div class="bench-row"><button type="button" class="touch" id="benchBtn" data-player="'+lib0+'"></button></div>'
-      +'<div class="sub-log" id="subLog"></div>'
-      +'<div class="court-adv">'+teamBtn+advBtn+'</div>'
-      +'<button type="button" class="sub-toggle" id="subToggle">\u21C4 SUBSTITUTION</button><div class="sub-hint" id="subHint" hidden>Tap the player who leaves the court</div>';
+      +'<div class="bench-label">BENCH</div><div class="bench-row"><button type="button" class="touch" id="benchBtn" data-player="'+lib0+'"></button><button type="button" class="sub-toggle" id="subToggle">\u21C4 SUBSTITUTION</button></div>'
+      +'<div class="sub-hint" id="subHint" hidden>Tap the player who leaves the court</div><div class="sub-log" id="subLog"></div>'
+      +'<div class="court-adv">'+teamBtn+advBtn+'</div>';
     // Updates the existing buttons in place so their click handlers stay attached.
     window.updateCourt=function(evs){
       var set=(evs||[]).filter(function(e){return (e.set||1)===(m.currentSet||1)});
@@ -1386,7 +1386,7 @@ html[data-level="intermediate"] #capturePanel .touch.adversary-btn,html[data-lev
 <!-- ===== end v1.4.0 ===== -->
 <!-- v1.4.1 global tap guard superseded by the v1.6.0 post-result guard. -->
 
-<!-- ===== v1.6.0 : normative capture UI from the approved UI functional specification ===== -->
+<!-- ===== v1.6.2 : normative capture UI, Intermediate adjustments and position-aware Advanced grid ===== -->
 <style>
 /* Shared Error / team / Point grammar. Meaning never relies on colour alone. */
 .vlc-result-bar{display:grid;grid-template-columns:minmax(64px,1fr) minmax(120px,2.1fr) minmax(64px,1fr);gap:0;min-height:76px;margin:10px 0;border:2px solid #334155;border-radius:14px;overflow:hidden;background:#fff}
@@ -1396,6 +1396,10 @@ html[data-level="intermediate"] #capturePanel .touch.adversary-btn,html[data-lev
 .vlc-result-label{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;font-size:20px;font-weight:900;color:#17202a;line-height:1.1}
 .vlc-result-label small{display:block;margin-top:4px;font-size:11px;font-weight:700;color:#64748b}
 .vlc-result-bar.opp .vlc-result-label{background:#f1f5f9}
+.vlc-result-bar.focus-locked{opacity:.38;filter:grayscale(.35);pointer-events:none}
+.vlc-result-bar.focus-locked .vlc-result-zone{cursor:not-allowed}
+.vlc-result-bar.focus-selected .vlc-result-label span{font-size:22px}
+.vlc-result-bar.focus-selected .vlc-result-label small{font-size:14px;color:#17202a}
 .vlc-net{margin:12px 0;padding:8px;text-align:center;font-size:15px;font-weight:900;letter-spacing:.42em;color:#fff;background:repeating-linear-gradient(90deg,#1e2a4a 0 10px,#334155 10px 20px);border-radius:6px}
 .vlc-legacy-controls{display:none!important}
 .vlc-selected-note{color:#1d4ed8!important}
@@ -1418,12 +1422,22 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
 .vlc-action-na{display:flex;align-items:center;justify-content:center;min-height:62px;border:2px dashed #cbd5e1;border-radius:10px;color:#94a3b8;background:#f8fafc;font-weight:800}
 .vlc-action-head{display:grid;grid-template-columns:minmax(104px,1.4fr) repeat(3,minmax(58px,1fr));gap:6px;margin-bottom:4px;color:#64748b;font-size:11px;font-weight:900;text-align:center;text-transform:uppercase;letter-spacing:.04em}
 .vlc-action-head span:first-child{text-align:left;padding-left:10px}
+.vlc-action-row.is-expected{opacity:1}
+.vlc-action-row.is-rare{opacity:.50}
+.vlc-action-row.is-rare .vlc-action-result{filter:saturate(.72)}
+.vlc-action-row.is-rare .vlc-action-result:active{filter:brightness(.84) saturate(.72)}
+.vlc-action-row.is-blocked{opacity:.34;pointer-events:none}
+.vlc-action-row.is-blocked .vlc-action-name{background:#cbd5e1;color:#475569}
+.vlc-action-row.is-blocked .vlc-action-result{cursor:not-allowed;filter:grayscale(.55)}
+.vlc-action-name{flex-direction:column;align-items:flex-start;justify-content:center}
+.vlc-action-name small{display:block;margin-top:2px;font-size:9px;line-height:1.1;letter-spacing:.04em;text-transform:uppercase;color:#64748b}
 #capturePanel.result-guard .vlc-result-zone,#capturePanel.result-guard .vlc-action-result{opacity:.58;transition:opacity .05s}
 @media(max-width:430px){.vlc-result-bar{grid-template-columns:64px minmax(0,1fr) 64px}.vlc-result-label{font-size:17px}.vlc-action-row,.vlc-action-head{grid-template-columns:minmax(88px,1.25fr) repeat(3,minmax(50px,1fr));gap:4px}.vlc-action-name{font-size:15px;padding:8px}.vlc-action-result{min-height:60px;font-size:21px}.vlc-action-result.continue{font-size:0}.vlc-action-result.continue svg{width:30px!important;height:30px!important}}
 @media(max-height:480px) and (orientation:landscape){.vlc-result-bar{min-height:58px}.vlc-result-zone{min-height:58px}.vlc-action-row{grid-template-columns:minmax(96px,1.3fr) repeat(3,1fr)}.vlc-action-result,.vlc-action-na{min-height:48px}}
 </style>
 <script>
-/* v1.6.0 implements the normative Basic, Intermediate and Advanced capture grammar.
+/* v1.6.2 keeps the normative capture grammar, applies the Intermediate UI changes and
+   makes the Advanced action grid position-aware without blocking rare legal actions.
    Persisted result values remain point / error / neutral; no data migration is required. */
 (function(){
   var LV=window.VOLLEY_LEVEL||'advanced',M=window.VOLLEY_MATCH,H=window.__vlc;
@@ -1449,24 +1463,43 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
     +'<button type="button" class="vlc-result-zone point" data-vlc-result="point" aria-label="'+esc(label)+' Point">✓</button></div>'}
   function continueIcon(){return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M7 10a11 11 0 0 1 18-1" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/><path d="M25 5v6h-6" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 22a11 11 0 0 1-18 1" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/><path d="M7 27v-6h6" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
   var ACTIONS=[['attack','Attack',1],['block','Block',1],['defense','Defence',0],['reception','Reception',0],['service','Service',1],['set','Set',0]];
-  function advancedGrid(){
+  var ACTION_MATRIX={
+    setter:{attack:1,block:1,defense:1,reception:0,service:1,set:1},
+    oh:{attack:1,block:1,defense:1,reception:1,service:1,set:0},
+    opp:{attack:1,block:1,defense:1,reception:0,service:1,set:0},
+    mb:{attack:1,block:1,defense:1,reception:0,service:1,set:0},
+    libero:{attack:0,block:0,defense:1,reception:1,service:0,set:1}
+  };
+  var POSITION_LABEL={setter:'Setter',oh:'OH',opp:'OPP',mb:'MB',libero:'Libero'};
+  function normalizedPosition(p){p=String(p||'').toLowerCase();return p==='opposite'?'opp':p==='middle'?'mb':p==='outside'?'oh':p}
+  function actionState(position,action){
+    position=normalizedPosition(position);
+    if(position==='libero'&&(action==='attack'||action==='block'||action==='service'))return 'blocked';
+    return ACTION_MATRIX[position]&&ACTION_MATRIX[position][action]?'expected':'rare';
+  }
+  function advancedGrid(player){
+    var pp=playerParts(player),position=normalizedPosition(pp.position);
     var h='<div class="vlc-action-head"><span>Action</span><span>Error</span><span>Point</span><span>Continue</span></div>';
-    ACTIONS.forEach(function(a){h+='<div class="vlc-action-row" data-adv-row="'+a[0]+'"><div class="vlc-action-name">'+a[1]+'</div>'
-      +'<button type="button" class="vlc-action-result error" data-adv-action="'+a[0]+'" data-adv-result="error" aria-label="'+a[1]+' Error">✕</button>'
-      +(a[2]?'<button type="button" class="vlc-action-result point" data-adv-action="'+a[0]+'" data-adv-result="point" aria-label="'+a[1]+' Point">✓</button>':'<span class="vlc-action-na" data-adv-unavailable="point" aria-label="Point unavailable">—</span>')
-      +'<button type="button" class="vlc-action-result continue" data-adv-action="'+a[0]+'" data-adv-result="neutral" aria-label="'+a[1]+' Continue">'+continueIcon()+'<span>Continue</span></button></div>'});
+    ACTIONS.forEach(function(a){var state=actionState(position,a[0]),blocked=state==='blocked',dis=blocked?' disabled aria-disabled="true" tabindex="-1"':'';
+      var note=state==='blocked'?'Not available for Libero':(state==='rare'?'Rare for '+(POSITION_LABEL[position]||'this position'):'');
+      h+='<div class="vlc-action-row is-'+state+'" data-adv-row="'+a[0]+'" data-adv-state="'+state+'"'+(blocked?' aria-disabled="true"':'')+'><div class="vlc-action-name">'+a[1]+(note?'<small>'+esc(note)+'</small>':'')+'</div>'
+      +'<button type="button" class="vlc-action-result error" data-adv-action="'+a[0]+'" data-adv-result="error" aria-label="'+a[1]+' Error"'+dis+'>✕</button>'
+      +(a[2]?'<button type="button" class="vlc-action-result point" data-adv-action="'+a[0]+'" data-adv-result="point" aria-label="'+a[1]+' Point"'+dis+'>✓</button>':'<span class="vlc-action-na" data-adv-unavailable="point" aria-label="Point unavailable">—</span>')
+      +'<button type="button" class="vlc-action-result continue" data-adv-action="'+a[0]+'" data-adv-result="neutral" aria-label="'+a[1]+' Continue"'+dis+'>'+continueIcon()+'<span>Continue</span></button></div>'});
     return h;
   }
-  function playerName(n){var r=(M.team&&M.team.roster)||[];for(var i=0;i<r.length;i++)if(String(r[i].number)===String(n))return '#'+n+(r[i].name?' '+r[i].name:'');return '#'+n}
+  function playerParts(n){var r=(M.team&&M.team.roster)||[];for(var i=0;i<r.length;i++)if(String(r[i].number)===String(n))return {number:String(n),name:r[i].name||'',position:r[i].position||''};return {number:String(n),name:'',position:''}}
+  function playerName(n){var p=playerParts(n);return '#'+p.number+(p.name?' '+p.name:'')}
   function showAdvanced(player,button){
     clearSelected();selected=String(player);button.classList.add('selected');
-    document.getElementById('actionList').className='touch-grid vlc-advanced-grid';document.getElementById('actionList').innerHTML=advancedGrid();
+    var pp=playerParts(player),list=document.getElementById('actionList');list.className='touch-grid vlc-advanced-grid';list.setAttribute('data-player-position',normalizedPosition(pp.position));list.innerHTML=advancedGrid(player);
     playerStep.classList.remove('active');resultStep.classList.remove('active');actionStep.classList.add('active');
     actionStep.querySelector('.step-title').textContent='2. Action / Result';chip.innerHTML='<span>'+esc(playerName(player))+'</span><span class="arrow">→</span><span class="act">action / result</span>';chip.hidden=false;back.hidden=false;
   }
-  function syncTeamLabel(){var bar=g.querySelector('[data-vlc-actor="T"]');if(!bar)return;var s=bar.querySelector('.vlc-result-label small');if(!s)return;
-    if(LV==='intermediate'&&selected){s.textContent='Selected: '+playerName(selected);s.classList.add('vlc-selected-note')}
-    else{s.textContent=LV==='advanced'?'players without Focus':'no player selected = TEAM';s.classList.remove('vlc-selected-note')}}
+  function syncTeamLabel(){var bar=g.querySelector('[data-vlc-actor="T"]');if(!bar)return;var label=bar.querySelector('.vlc-result-label span'),s=bar.querySelector('.vlc-result-label small');if(!label||!s)return;
+    if(LV==='intermediate'&&selected){var p=playerParts(selected);label.textContent=p.number;s.textContent=p.name;bar.classList.add('focus-selected');s.classList.add('vlc-selected-note')}
+    else{label.textContent=M.team.name||'Team A';s.textContent=LV==='advanced'?'players without Focus':'no player selected = TEAM';bar.classList.remove('focus-selected');s.classList.remove('vlc-selected-note')}
+    var opp=g.querySelector('[data-vlc-actor="A"]'),locked=LV==='intermediate'&&!!selected;if(opp){opp.classList.toggle('focus-locked',locked);opp.setAttribute('aria-disabled',locked?'true':'false');opp.querySelectorAll('.vlc-result-zone').forEach(function(b){b.disabled=locked})}}
   function selectIntermediate(b){clearSelected();selected=b.getAttribute('data-player');b.classList.add('selected');syncTeamLabel()}
   function syncBasicPhase(){var cs=document.getElementById('courtStatus'),pb=document.getElementById('phaseBadge');if(!cs||!pb)return;var serving=cs.classList.contains('srv');pb.className='phase-badge '+(serving?'srv':'rcv');pb.textContent=serving?'SERVICE':'RECEPTION'}
   function installCourtBars(){
@@ -1498,11 +1531,12 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
       e.stopImmediatePropagation();e.preventDefault();
       if(panel.classList.contains('sub-mode')||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return}
       var actor=rb.closest('[data-vlc-actor]').getAttribute('data-vlc-actor'),result=rb.getAttribute('data-vlc-result');
+      if(actor==='A'&&LV==='intermediate'&&selected)return;
       var player=actor==='A'?'A':(LV==='intermediate'&&selected?selected:'T');var action=actor==='A'?'adverse':(LV==='basic'?'team':'generic');commit(player,action,result);return;
     }
     var ar=e.target.closest&&e.target.closest('[data-adv-action][data-adv-result]');
     if(ar&&panel.contains(ar)){
-      e.stopImmediatePropagation();e.preventDefault();if(!selected||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return}
+      e.stopImmediatePropagation();e.preventDefault();if(ar.disabled||ar.closest('[data-adv-state="blocked"]'))return;if(!selected||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return}
       commit(selected,ar.getAttribute('data-adv-action'),ar.getAttribute('data-adv-result'));return;
     }
     if(e.target.closest&&e.target.closest('#captureBack')&&panel.contains(e.target.closest('#captureBack'))){e.stopImmediatePropagation();e.preventDefault();primary();return}
@@ -1516,7 +1550,7 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
   primary();
 })();
 </script>
-<!-- ===== end v1.6.0 ===== -->
+<!-- ===== end v1.6.2 ===== -->
 
 
 </body></html>

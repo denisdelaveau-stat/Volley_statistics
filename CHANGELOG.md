@@ -1,5 +1,35 @@
 # Changelog – Volley Live Capture
 
+## v1.6.2 – 2026-11-17
+### Added
+- Added the approved player-position/action matrix to the Advanced capture model.
+- Added automated checks for Setter, OH, OPP, MB and Libero action guidance.
+
+### Changed
+- The Advanced grid always keeps the fixed order Attack, Block, Defence, Reception, Service, Set.
+- Expected actions for the selected position remain full emphasis; rare but legal actions are visually attenuated and remain tappable.
+- Libero Attack, Block and Service are disabled and cannot create an event, including through a synthetic click.
+- PWA cache, visible application version, specification and release documentation bumped to v1.6.2.
+
+### Compatibility
+- Match and event JSON formats are unchanged; no data migration is required.
+
+### Verification
+- Added position-matrix, rare-action and Libero-prohibition browser acceptance checks.
+
+## v1.6.1 – 2026-11-17
+### Changed
+- Moved the SUBSTITUTION control into the BENCH row, to the right of the current bench replacement.
+- Intermediate Focus selection now replaces the tracked-team label with the selected player's number and name.
+- While an Intermediate Focus player is selected, the ADVERSE result bar is visually greyed, semantically disabled and blocked from recording a rally.
+- PWA cache and visible application version bumped to v1.6.1.
+
+### Compatibility
+- Match and event JSON formats are unchanged; no data migration is required.
+
+### Verification
+- Added browser acceptance checks for BENCH placement, player identity rendering and ADVERSE lock/unlock behavior.
+
 ## v1.6.0 – 2026-11-16
 ### Added
 - Normative Basic, Intermediate and Advanced capture UI from the approved English functional specification.
