@@ -1,30 +1,24 @@
-# Volley Live Capture v1.6.6
+# Volley Live Capture v1.6.8
 
 Offline-capable volleyball match capture web app for iPhone and tablet.
 
-## v1.6.6 highlights
-- More compact BENCH, NET, phase banner and TEAM/ADVERSE rows.
-- Setup roster maximum extended to 30 players.
-- Rotation line now shows setter position, rotation configuration and cycle: `Rot. P5 | R3 | C2`.
-- RECEPTION is blue; Undo is light orange.
-- Advanced action labels use orange, green and blue semantic groups while rare legal actions stay lighter.
-- Live History shows only `#`, `Player`, `Action`, `Result`, `Score`; hidden time/rotation metadata remains in events.
-- English Word UI specification version 1.6 preserves all original images; the screenshot PDF reflects the current UI.
+## v1.6.8 highlights
+- Volleyball-net background is transparent, allowing the light grey page background to remain visible while retaining mesh, top tape, blue posts, red/white antennas and the same compact proportions.
+- Advanced action player silhouettes are removed.
+- Action-label colour families and lighter rare-action guidance are retained.
+- Full action names remain readable, including `Reception`.
+- Tests, English Word UI specification, screenshots, release notes and implementation report are updated together.
 
 ## Run locally
 ```bash
-python3 serve_local.py
+python serve_local.py
 ```
-Open the displayed local URL in a browser. For iPhone use, deploy the folder over HTTPS and add the app to the Home Screen.
+Open the printed URL from a browser on the same network.
 
-## Automated tests
+## Test
 ```bash
-python3 -m pytest -q tests
+pytest -q
 ```
-The suite validates the three capture modes, scoring, rotation persistence, compact layout, semantic colours, setup limits, history columns, documentation integrity and offline cache.
-
-## Data compatibility
-Portable match JSON remains format version 1. Existing events retain `time` and integer `rotation`; these values are still saved for reports/statistics but are hidden from live History.
 
 ## iPhone update
-Deploy the whole folder. The service-worker cache ID must contain `v1.6.6`. Open the hosted app online once, then fully close and reopen the Home-screen app. Verify `v1.6.6` on Home before courtside use.
+Deploy the whole folder. The service-worker cache ID must contain `v1.6.8`. Open the hosted app online once, then fully close and reopen the Home-screen app. Verify `v1.6.8` on Home before courtside use.

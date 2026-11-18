@@ -1,4 +1,4 @@
-"""v1.6.6 compact live header and BENCH acceptance tests."""
+"""v1.6.8 compact live header and BENCH acceptance tests."""
 from helpers import open_match, wait_guard
 
 

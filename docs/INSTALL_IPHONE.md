@@ -1,15 +1,15 @@
-# Install or update Volley Live Capture v1.6.6 on iPhone
+# Install or update Volley Live Capture v1.6.8 on iPhone
 
 ## First installation
 1. Publish the complete package through HTTPS.
 2. Open `index.html` in Safari while online.
 3. Tap Share → Add to Home Screen.
-4. Start from the Home-screen icon and verify `v1.6.6` on Home.
+4. Start from the Home-screen icon and verify `v1.6.8` on Home.
 5. Create a short test match, close the app, reopen it and confirm CONTINUE / VIEW MATCH restores it.
 
 ## Update from an older version
-1. Deploy all v1.6.6 files, including `sw.js`.
-2. Confirm the service-worker cache ID is `volley-live-capture-v1.6.6`.
+1. Deploy all v1.6.8 files, including `sw.js`.
+2. Confirm the service-worker cache ID is `volley-live-capture-v1.6.8`.
 3. Open the hosted app online once.
 4. Fully close Safari and the Home-screen app.
 5. Reopen the Home-screen app. If the old version remains, repeat the online open/close cycle once.

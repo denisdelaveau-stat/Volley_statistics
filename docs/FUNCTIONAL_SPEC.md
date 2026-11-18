@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.6 — Functional Specification
+# Volley Live Capture v1.6.8 — Functional Specification
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
@@ -112,4 +112,22 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 
 ## 11. Acceptance
 
-Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.6 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.8 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+
+
+## 12. v1.6.7 — UI Modification 6
+- `UNDO` replaces `UNDO LAST` and uses the same 122×36 CSS px footprint as `SUBSTITUTION`.
+- The transient `Saved: …` line is not displayed. History starts collapsed and opens on demand; Error, Point and Neutral use pale semantic badges.
+- Each team result bar is three separated rounded blocks: Error, a non-interactive team label, and Point. Error/Point blocks explicitly name the team receiving the point.
+- The compact court separator renders as a volleyball mesh with top tape, blue posts and red/white antennas.
+- Advanced Attack, Block, Defence, Reception, Service and Set labels include compact action-specific player silhouettes.
+- The supplied 1254×1254 icon artwork is used for Apple touch, favicon and manifest assets.
+- Match JSON remains format version 1 and no scoring rule changes.
+
+
+## 13. v1.6.8 — visual corrections
+- The volleyball-net field has no dark fill; the page background remains visible through grey mesh lines.
+- Top tape, lower edge, blue posts, red/white antennas and compact proportions are unchanged.
+- Advanced action labels contain no player-silhouette icons.
+- Orange, green and blue action-label families and lighter rare-action guidance remain unchanged.
+- Full action names remain visible without clipping or ellipsis, including `Reception`.

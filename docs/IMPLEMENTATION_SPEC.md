@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.6 — Implementation Specification
+# Volley Live Capture v1.6.8 — Implementation Specification
 
 ## Runtime and storage
 Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reusable setup data use browser localStorage. The service worker provides the offline shell over HTTPS/localhost.
@@ -43,10 +43,10 @@ Continue is a reusable inline SVG containing two circular arrows. The same gener
 No migration is required. Portable match JSON remains format version 1, and existing `point`, `error` and `neutral` events remain readable. Event `time` and integer `rotation` remain persisted but are hidden from live History. Saved team library entries may add optional `maxPlayers`; entries without it use the compatible default.
 
 ## Service worker
-`sw.js` uses `volley-live-capture-v1.6.6`. Increment the cache ID whenever shell content changes.
+`sw.js` uses `volley-live-capture-v1.6.8`. Increment the cache ID whenever shell content changes.
 
 
-## v1.6.6 rotation, setup and presentation changes
+## v1.6.8 rotation, setup and presentation changes
 - `#courtStatus` renders `Rot. Pn | Rn | Cn` with transparent background, black text, centred alignment and equal score/banner spacing.
 - The event is tagged with the integer rotation active before that rally; a side-out updates setter position, configuration and cycle for the next rally.
 - `#captureHistory` renders only `#`, `Player`, `Action`, `Result`, `Score` while event time/rotation metadata remains intact.
@@ -61,3 +61,14 @@ No migration is required. Portable match JSON remains format version 1, and exis
 - `#captureTitle`, `#setsLine` and the primary player-step title remain non-rendered; completion banners and match reports keep full match/set context.
 - `.bench-row` uses a centred flex pair; `#benchBtn` is 66 × 36 CSS px and `#subToggle` is 122 × 36 CSS px at the primary viewport.
 - `.vlc-result-bar` is 60 CSS px high at the primary viewport.
+
+
+## v1.6.8 UI Modification 6 implementation
+- `#captureUndo` is constrained with a high-specificity 122×36 rule so earlier legacy width rules cannot enlarge it.
+- `#historyPanel` uses the native `hidden` state and an ARIA-expanded toggle. History cells render semantic `.result-error`, `.result-point` and `.result-neutral` badges.
+- `.vlc-result-bar` uses a three-column grid with gaps and independent rounded child blocks; `.vlc-result-label` remains a `div` and has no click handler.
+- `.vlc-net` and `.su-net` share a CSS mesh/tape/post/antenna treatment and an accessible `Volleyball net` label.
+- Advanced action labels contain no player-silhouette SVG. `.vlc-action-copy` keeps the full action name visible, including `Reception`; semantic colour families and rare-row opacity remain unchanged.
+- `.vlc-net` and `.su-net` use a transparent background with grey mesh lines while retaining the same tape, posts, antennas and 28 px height.
+- The PNG icon pipeline resamples the supplied 1254×1254 RGB source to 32, 180, 192 and 512 px. Manifest icons declare `any maskable`.
+- The service-worker cache ID is `volley-live-capture-v1.6.8` and includes the favicon.

@@ -1,2 +1,6 @@
 docs/Volley_Live_Capture_Screens_v1.3.2.pdf
 docs/Volley_Live_Capture_Screens_v1.6.5.pdf
+docs/Volley_Live_Capture_Screens_v1.6.6.pdf
+docs/Volley_Live_Capture_Screens_v1.6.7.pdf
+docs/screens_v1.6.7/
+tests/test_ui_modification_v1_6_7.py

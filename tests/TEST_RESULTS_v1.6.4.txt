@@ -1,0 +1,31 @@
+Volley Live Capture v1.6.4 automated verification
+Date: 17 November 2026
+
+Command: python3 -m pytest -q tests
+Result: 13 passed in 35.81s
+Primary viewport: 390 x 844 CSS px, device scale factor 2
+Uncaught JavaScript errors in automated scenarios: 0
+
+v1.6.4 coverage:
+- BENCH replacement-player control verified at 82 x 44 CSS px.
+- BENCH SUBSTITUTION control verified at 146 x 44 CSS px.
+- BENCH pair verified centred and side by side.
+- Rotation indicator verified as centred black text on a transparent background.
+- Side-out behavior verified: live Rotation advances for the next rally.
+- Event.rotation verified as the pre-rally integer value.
+- History Rotation column and legacy-value fallback verified.
+- Advanced / Intermediate / Basic backgrounds verified as pale red / yellow / green.
+- Roster maximum verified at default 12 and configurable to 7-20.
+- Roster selection limit and disabled-number behavior verified.
+- Existing Basic, Intermediate, Advanced, matrix, substitution, Undo, score/set, report and PWA regressions passed.
+
+Static verification:
+- JavaScript syntax valid for 6 executable inline scripts and sw.js.
+- Visible application version: v1.6.4.
+- PWA cache ID: volley-live-capture-v1.6.4.
+
+Word specification verification:
+- Document control version: 1.4.
+- 186 paragraphs and 11 tables readable through python-docx.
+- 11 original inline images present.
+- 22/22 media package entries preserved byte-identically from v1.6.3.

@@ -1,4 +1,4 @@
-"""v1.6.6 rotation detail, hidden-history metadata and setup acceptance tests."""
+"""v1.6.8 rotation detail, hidden-history metadata and setup acceptance tests."""
 from helpers import APP_URI, events, open_match, wait_guard
 
 

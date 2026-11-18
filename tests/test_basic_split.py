@@ -1,10 +1,10 @@
-"""UI-BAS-01 and shared Basic acceptance checks for v1.6.6."""
+"""UI-BAS-01 and shared Basic acceptance checks for v1.6.8."""
 from helpers import events, open_match, wait_guard
 
 
 def test_basic_normative_result_bars(browser):
     page, errors = open_match(browser, "basic")
-    assert page.inner_text("#appVersion") == "v1.6.6"
+    assert page.inner_text("#appVersion") == "v1.6.8"
     assert page.locator(".vlc-result-bar").count() == 2
     assert page.inner_text("#phaseBadge") == "SERVICE"
     assert page.locator("#phaseBadge").evaluate("e => e.tagName") == "DIV"
@@ -13,8 +13,10 @@ def test_basic_normative_result_bars(browser):
         bar = page.locator(f'[data-vlc-actor="{actor}"]')
         error = bar.locator('[data-vlc-result="error"]')
         point = bar.locator('[data-vlc-result="point"]')
-        assert error.inner_text() == "✕"
-        assert point.inner_text() == "✓"
+        assert error.locator(".vlc-result-main").inner_text() == "✕ ERROR"
+        assert point.locator(".vlc-result-main").inner_text() == "✓ POINT"
+        assert "Point for" in error.inner_text()
+        assert "Point for" in point.inner_text()
         eb, pb = error.bounding_box(), point.bounding_box()
         assert eb["x"] < pb["x"]
         assert eb["height"] >= 44 and pb["height"] >= 44

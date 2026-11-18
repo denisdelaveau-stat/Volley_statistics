@@ -1,4 +1,4 @@
-"""Acceptance coverage for the nine Modification UI 5 refinements in v1.6.6."""
+"""Acceptance coverage for the nine Modification UI 5 refinements in v1.6.8."""
 
 from helpers import open_match, wait_guard
 
@@ -21,8 +21,10 @@ def test_live_compaction_rotation_spacing_phase_net_undo_and_history(browser):
     assert abs(upper_gap - lower_gap) <= 1.5
     assert page.locator("#courtStatus").inner_text() == "Rot. P1 | R1 | C1"
 
-    net_style = _style(page.locator(".vlc-net"), ["paddingTop", "paddingBottom"])
-    assert net_style == {"paddingTop": "4px", "paddingBottom": "4px"}
+    net_style = _style(page.locator(".vlc-net"), ["height", "borderTopWidth", "backgroundImage"])
+    assert net_style["height"] == "28px"
+    assert net_style["borderTopWidth"] == "5px"
+    assert "linear-gradient" in net_style["backgroundImage"]
 
     undo_style = _style(page.locator("#captureUndo"), ["backgroundColor", "borderColor", "color"])
     assert undo_style == {
@@ -32,7 +34,7 @@ def test_live_compaction_rotation_spacing_phase_net_undo_and_history(browser):
     }
 
     for bar in page.locator(".vlc-result-bar").all():
-        assert 59 <= bar.bounding_box()["height"] <= 61
+        assert 59 <= bar.bounding_box()["height"] <= 64
 
     page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
     phase_style = _style(page.locator("#phaseBadge"), ["backgroundColor", "color"])

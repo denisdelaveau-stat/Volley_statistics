@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.6 — Architecture
+# Volley Live Capture v1.6.8 — Architecture
 
 ## Components
 - `index.html`: setup wizard, capture UI, event/scoring engine, rotation/substitution, statistics and exports.
@@ -14,7 +14,7 @@
 NEW MATCH resets the active match without deleting reusable setup templates.
 
 ## Event-derived state
-Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally integer rotation is snapshotted onto each new event so later statistics do not need to infer historical state. v1.6.6 hides time and rotation from live History without removing either event field. The portable file stays at format version 1.
+Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally integer rotation is snapshotted onto each new event so later statistics do not need to infer historical state. v1.6.8 hides time and rotation from live History without removing either event field. The portable file stays at format version 1.
 
 ## Capture layers
 1. Court renderer owns player, Focus, service, rotation, libero and substitution state.
@@ -24,3 +24,7 @@ Score, set/match winner, service, rotation, charts and reports are rebuilt from 
 
 ## Dependency chain
 Team → Starting 7 → Rotation. Loaded downstream objects are validated against their upstream dependency; missing numbers are reported and never silently substituted.
+
+
+## v1.6.8 presentation assets
+UI Modification 6 remains inside the single-file capture shell. The realistic net is CSS-only and uses a transparent field so the page background remains visible. Advanced action labels contain text only; no player-silhouette assets are generated or loaded. PWA icon files are generated from the supplied 1254×1254 artwork and cached with the app shell.

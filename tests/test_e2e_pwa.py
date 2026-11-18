@@ -43,7 +43,7 @@ def test_set_end_undo_and_exports(browser):
 
 def test_pwa_cache_version_and_shell_assets():
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.6.6" in service_worker
+    assert "volley-live-capture-v1.6.8" in service_worker
     for asset in ("index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"):
         assert asset in service_worker
         assert (ROOT / asset).exists()

@@ -1,5 +1,36 @@
 # Changelog – Volley Live Capture
 
+## v1.6.8 – 2026-11-18
+### Changed
+- Removed the dark fill behind the compact volleyball net; the page background now remains visible through the mesh while top tape, blue posts, red/white antennas and proportions are retained.
+- Removed player silhouette icons from all six Advanced action labels.
+- Preserved the orange/green/blue label families and lighter rare-action treatment.
+- Ensured complete Advanced labels remain visible, including `Reception`.
+
+### Documentation and verification
+- Updated the English Word UI specification to document version 1.8 while preserving the 11 original inline images and 22 original media entries.
+- Updated automated tests, current screenshots, screenshot PDF and implementation report for v1.6.8.
+- Bumped the visible application version and PWA cache to v1.6.8.
+
+### Compatibility
+- No match JSON schema, scoring, rotation, substitution or saved-team migration is required.
+
+## v1.6.7 – 2026-11-18
+### Changed
+- Renamed `UNDO LAST` to `UNDO` and matched its 122×36 CSS px footprint to `SUBSTITUTION`.
+- Removed the transient `Saved: …` confirmation, collapsed History by default, and added pale Error/Point/Neutral result badges.
+- Rebuilt each team result control as three separate rounded blocks with explicit “Point for …” semantics and a non-interactive centre label.
+- Replaced the striped NET bar with a compact volleyball net including mesh, top tape, blue posts and red/white antennas.
+- Added compact action-specific player silhouettes to the six Advanced action rows.
+- Replaced the Apple touch icon, favicons and manifest icons with the supplied 1254×1254 `IMG_5596.PNG` artwork.
+
+### Documentation and verification
+- Updated the English Word UI specification, automated tests and current screenshot PDF for UI Modification 6.
+- Bumped the visible application version and PWA cache to v1.6.7.
+
+### Compatibility
+- Portable match JSON remains format version 1; scoring, rotation and existing saved matches are unchanged.
+
 ## v1.6.6 – 2026-11-17
 ### Changed
 - Reduced the BENCH replacement-player and SUBSTITUTION controls to compact readable 66×36 and 122×36 CSS px controls at the primary iPhone viewport.
