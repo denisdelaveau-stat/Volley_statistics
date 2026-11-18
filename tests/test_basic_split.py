@@ -1,29 +1,48 @@
-from playwright.sync_api import sync_playwright
-import copy
-exec(open('/home/claude/build/edge.py').read().split('with sync_playwright')[0])
-R=[]
-def ck(n,c):R.append(c);print(('PASS ' if c else 'FAIL ')+n)
-with sync_playwright() as p:
-  b=p.chromium.launch(executable_path='/opt/pw-browsers/chromium-1228/chrome-linux64/chrome')
-  mm=copy.deepcopy(m);mm['detailLevel']='basic'
-  pg=b.new_page(viewport={'width':390,'height':844},device_scale_factor=2);errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
-  pg.goto('file:///home/claude/v150/index.html')
-  pg.evaluate("m=>{localStorage.clear();localStorage.setItem('volleyCapture.match.v1',JSON.stringify(m));sessionStorage.setItem('volleyCapture.stage','capture')}",mm);pg.reload();pg.wait_for_timeout(400)
-  pg.screenshot(path='basic.png')
-  E=lambda:pg.evaluate("JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]')")
-  S=lambda:pg.inner_text('#liveScore').replace('\n','')
-  ck('2 boutons uniques',pg.locator('.bq-split').count()==2 and pg.locator('.bq-btn').count()==0)
-  ya=pg.locator('[data-q="T"]').bounding_box()['y'];yn=pg.locator('.bq-net').bounding_box()['y'];yb=pg.locator('[data-q="A"]').bounding_box()['y']
-  ck('Antibes en haut, NET au milieu, Nice en bas',ya<yn<yb)
-  def tap(q,f):
-    bb=pg.locator('[data-q="%s"]'%q).bounding_box();pg.mouse.click(bb['x']+bb['width']*f,bb['y']+bb['height']/2);pg.wait_for_timeout(450);return E()[-1]
-  e=tap('T',.85);ck('Antibes droite O -> T point (%s)'%S(),e['player']=='T' and e['result']=='point')
-  e=tap('T',.15);ck('Antibes gauche X -> T error (%s)'%S(),e['player']=='T' and e['result']=='error')
-  e=tap('A',.85);ck('Nice droite O -> A point (%s)'%S(),e['player']=='A' and e['result']=='point')
-  e=tap('A',.15);ck('Nice gauche X -> A error (%s)'%S(),e['player']=='A' and e['result']=='error')
-  n=len(E());bb=pg.locator('[data-q="T"]').bounding_box();x=bb['x']+bb['width']*.85;y=bb['y']+bb['height']/2
-  pg.mouse.click(x,y);pg.mouse.click(x,y);pg.wait_for_timeout(450);ck('double tap rapide -> 1 event',len(E())-n==1)
-  pg.locator('#captureUndo').click();pg.wait_for_timeout(450);ck('UNDO',len(E())==n)
-  ck('aucune erreur JS',not errs)
-  b.close()
-print(sum(R),'/',len(R))
+"""UI-BAS-01 and shared Basic acceptance checks for v1.6.9."""
+from helpers import events, open_match, wait_guard
+
+
+def test_basic_normative_result_bars(browser):
+    page, errors = open_match(browser, "basic")
+    assert page.inner_text("#appVersion") == "v1.6.10"
+    assert page.locator(".vlc-result-bar").count() == 2
+    assert page.inner_text("#phaseBadge") == "SERVICE"
+    assert page.locator("#phaseBadge").evaluate("e => e.tagName") == "DIV"
+
+    for actor in ("T", "A"):
+        bar = page.locator(f'[data-vlc-actor="{actor}"]')
+        error = bar.locator('[data-vlc-result="error"]')
+        point = bar.locator('[data-vlc-result="point"]')
+        assert error.locator(".vlc-result-main").inner_text() == "✕ ERROR"
+        assert point.locator(".vlc-result-main").inner_text() == "✓ POINT"
+        assert "Point for" in error.inner_text()
+        assert "Point for" in point.inner_text()
+        eb, pb = error.bounding_box(), point.bounding_box()
+        assert eb["x"] < pb["x"]
+        assert eb["height"] >= 44 and pb["height"] >= 44
+        assert page.evaluate("e => getComputedStyle(e).backgroundColor", error.element_handle()) == "rgb(220, 38, 38)"
+        assert page.evaluate("e => getComputedStyle(e).backgroundColor", point.element_handle()) == "rgb(22, 163, 74)"
+
+    cases = [
+        ("T", "error", "T", "team2", "opponent_error"),
+        ("T", "point", "T", "team1", "earned"),
+        ("A", "error", "A", "team1", "opponent_error"),
+        ("A", "point", "A", "team2", "earned"),
+    ]
+    for actor, result, player, winner, origin in cases:
+        page.click(f'[data-vlc-actor="{actor}"] [data-vlc-result="{result}"]')
+        event = events(page)[-1]
+        assert (event["player"], event["result"], event["winningTeam"], event["pointOrigin"]) == (
+            player,
+            result,
+            winner,
+            origin,
+        )
+        wait_guard(page)
+
+    assert page.inner_text("#phaseBadge") == "RECEPTION"  # last rally was won by Nice
+    before = len(events(page))
+    page.click("#captureUndo")
+    assert len(events(page)) == before - 1
+    assert not errors
+    page.close()

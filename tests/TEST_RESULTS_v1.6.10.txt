@@ -1,0 +1,34 @@
+Volley Live Capture v1.6.10 automated verification
+Date: 2026-11-18
+
+Automated suite
+- Command: pytest -q
+- Result: 25 passed
+- Browser: Playwright Chromium, reference viewport 390 × 844 CSS px, device scale factor 2
+- Uncaught JavaScript errors: none in browser acceptance tests
+
+v1.6.10 icon acceptance
+- Source: icons/IMG_5596.PNG, 1254 × 1254
+- Corrected master: icons/icon-master-v1.6.10.png, RGB, 1254 × 1254
+- Crop: 96 px on every source edge, followed by Lanczos regeneration
+- Generated RGB sizes: 32 × 32, 180 × 180, 192 × 192 and 512 × 512
+- Corner and edge checks: passed; no transparency, white corner or material pale outer band
+- Manifest purpose: any
+- PWA cache: volley-live-capture-v1.6.10
+
+Retained v1.6.9 acceptance
+- Equal 5 px score gaps and service underline: passed
+- 28 px net with contained posts/antennas in Basic, Intermediate and Advanced: passed
+- Intermediate/Advanced dashed BENCH/input divider and Basic exclusion: passed
+- Existing scoring, double-entry guard, rotation, setup, history and action-grid regression suites: passed
+
+Documents and evidence
+- Word specification version: 2.0
+- Word OOXML validation against the complete v1.6.9 source: passed
+- Original Word visuals retained: 11 inline shapes and 22 media files
+- Word render: 21 Letter pages
+- Screenshot PDF: 5 Letter pages
+- Icon comparison preview: docs/icon_preview_v1.6.10.png
+
+Visible application version: v1.6.10
+Portable match data format: 1 (unchanged)

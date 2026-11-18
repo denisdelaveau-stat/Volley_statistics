@@ -1,0 +1,27 @@
+Volley Live Capture v1.6.8 automated verification
+Date: 2026-11-18
+
+Automated suite
+- Command: pytest -q
+- Result: 19 passed in 40.31s
+- Browser: Playwright Chromium, headless
+- Primary viewport: 390 × 844 CSS px, device scale factor 2
+
+v1.6.8 UI acceptance
+- The volleyball-net background is transparent; the light page background remains visible through grey mesh lines.
+- Net height remains 28 CSS px; top tape, lower edge, blue posts and red/white antennas are retained.
+- Six Advanced action rows contain no `.vlc-action-icon` elements.
+- Attack/Block, Defence/Reception and Service/Set label colour families are retained.
+- Rare legal rows remain lighter, and blocked Libero actions remain disabled.
+- Full action labels are visible; `Reception` has no clipping or overflow at the reference viewport.
+
+Artifact verification
+- Word specification validates against OOXML schemas and renders successfully.
+- Word document version: 1.8; both footers show Version 1.8.
+- Original Word visuals: 11 inline shapes and 22 word/media entries retained; all 22 media payloads are byte-identical to v1.6.7.
+- Root and docs copies of the Word specification are byte-identical.
+- Screenshot evidence: 4 current PNG captures.
+- Screenshot PDF: 4 readable A4 pages covering Basic, Intermediate, Advanced and expanded History.
+- Visible application version: v1.6.8.
+- PWA cache ID: volley-live-capture-v1.6.8.
+- Portable match JSON schema remains version 1.

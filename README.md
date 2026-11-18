@@ -1,20 +1,21 @@
-# Volley Live Capture v1.5.0
+# Volley Live Capture v1.6.10
 
-Offline-capable volleyball match capture web app for iPhone/tablet.
+Offline-first volleyball match capture for Basic, Intermediate and Advanced workflows.
 
-## v1.5.0 highlights
-- Save/load/update/delete reusable teams (number, name, position, Focus).
-- Save/load/update/delete starting sevens.
-- Save/load/update/delete initial rotations.
-- ROTATE +1 on initial position screen; six rotations return to the original position.
-- Setup library stored independently from individual match data.
-- Existing Basic / Intermediate / Advanced capture, scoring, substitutions, statistics, JSON and self-contained HTML report retained.
+## v1.6.10 highlights
+- Rebuilt Apple touch, favicon and manifest icons from the supplied 1254 × 1254 `IMG_5596.PNG` source.
+- Removed the pre-rendered pale outer rim and white corners: the navy background now reaches every edge of each opaque square PNG.
+- Left corner rounding to iOS and other launchers; the files themselves contain no transparency or baked rounded mask.
+- Retained all v1.6.9 Modification UI 7 changes: compact equal score spacing, net-height posts and the BENCH/input dashed divider.
+- Updated automated tests, English Word specification, screenshot evidence, release notes and implementation report together.
 
 ## Run locally
-Serve this directory over HTTP/HTTPS (do not rely on opening `file://` for PWA/service-worker testing).
-
-## Tests
-See `tests/TEST_PLAN.md`. Browser automation requires Python, Playwright and Chromium.
+```bash
+python serve_local.py
+```
+Open the displayed local URL in a modern browser.
 
 ## iPhone update
-Use a service-worker cache ID containing `v1.5.0`. Open online once after deployment, then fully close and reopen the Home-screen app.
+Deploy the whole folder, including `sw.js` and `icons/`. Remove the old Home-screen shortcut if iOS still shows cached artwork, add the site to the Home Screen again, launch it online once, close it fully, and reopen it. Verify `v1.6.10` on Home.
+
+Portable match data remains format version 1.

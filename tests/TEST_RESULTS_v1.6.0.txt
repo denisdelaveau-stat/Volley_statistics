@@ -1,0 +1,11 @@
+Volley Live Capture v1.6.0 automated verification
+Date: 2026-11-16
+Command: pytest -q tests
+Result: 7 passed in 22.51s
+JavaScript syntax: 6 inline JavaScript blocks validated with node --check
+Browser: Chromium 149, headless
+Viewport: 390 x 844 CSS px, device scale factor 2
+Uncaught JavaScript errors: 0
+Horizontal overflow in Basic / Intermediate / Advanced: none (scrollWidth 390)
+Word specification embedded visuals retained: 11 / 11
+Manual iPhone / Safari / VoiceOver / offline relaunch: pending on target device

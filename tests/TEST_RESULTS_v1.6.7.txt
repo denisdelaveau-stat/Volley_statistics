@@ -1,0 +1,29 @@
+Volley Live Capture v1.6.7 automated verification
+Date: 2026-11-18
+
+Automated suite
+- Command: pytest -q tests
+- Result: 19 passed in 33.18 s
+
+Browser/static verification
+- JavaScript syntax: 7 inline script blocks and service worker valid.
+- Chromium: Basic, Intermediate and Advanced have no uncaught JavaScript errors.
+- 390×844 portrait: no horizontal overflow in Basic, Intermediate or Advanced.
+- 844×390 landscape: no horizontal overflow in Basic, Intermediate or Advanced.
+
+UI Modification 6 acceptance
+- UNDO label and 122×36 sizing match SUBSTITUTION.
+- Saved status line removed; History is collapsed by default and toggles on demand.
+- Error, Point and Neutral History badges use pale semantic colours.
+- Team controls are three separated rounded blocks with correct point-ownership text and a non-interactive centre label.
+- Volleyball net exposes mesh, top tape, blue posts and red/white antennas in compact proportions.
+- Six Advanced action rows expose compact, action-specific silhouette SVGs.
+- Apple touch, favicon, 192 px and 512 px assets are generated from the supplied high-resolution artwork and referenced by HTML/manifest/service worker.
+
+Artifacts
+- Word specification: document version 1.7; validation passed.
+- Original Word visuals: 11 inline shapes and all 22 word/media entries retained; all 22 media payloads are byte-identical to v1.6.6.
+- Screenshot PDF: 4 readable A4 pages covering Basic, Intermediate, Advanced and expanded History.
+- Visible application version: v1.6.7.
+- PWA cache ID: volley-live-capture-v1.6.7.
+- Portable match JSON schema remains version 1.
