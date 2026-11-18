@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.8 — Architecture
+# Volley Live Capture v1.6.10 — Architecture
 
 ## Components
 - `index.html`: setup wizard, capture UI, event/scoring engine, rotation/substitution, statistics and exports.
@@ -28,3 +28,6 @@ Team → Starting 7 → Rotation. Loaded downstream objects are validated agains
 
 ## v1.6.8 presentation assets
 UI Modification 6 remains inside the single-file capture shell. The realistic net is CSS-only and uses a transparent field so the page background remains visible. Advanced action labels contain text only; no player-silhouette assets are generated or loaded. PWA icon files are generated from the supplied 1254×1254 artwork and cached with the app shell.
+
+## v1.6.10 icon pipeline
+The supplied 1254 × 1254 artwork is converted to an opaque RGB master. The complete pre-rendered 96 px rounded-corner/rim region is cropped away before Lanczos regeneration of the 180, 32, 192 and 512 px outputs. Operating systems apply launcher masks.

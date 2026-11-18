@@ -1,10 +1,10 @@
-"""UI-BAS-01 and shared Basic acceptance checks for v1.6.8."""
+"""UI-BAS-01 and shared Basic acceptance checks for v1.6.9."""
 from helpers import events, open_match, wait_guard
 
 
 def test_basic_normative_result_bars(browser):
     page, errors = open_match(browser, "basic")
-    assert page.inner_text("#appVersion") == "v1.6.8"
+    assert page.inner_text("#appVersion") == "v1.6.10"
     assert page.locator(".vlc-result-bar").count() == 2
     assert page.inner_text("#phaseBadge") == "SERVICE"
     assert page.locator("#phaseBadge").evaluate("e => e.tagName") == "DIV"

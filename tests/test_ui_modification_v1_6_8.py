@@ -76,7 +76,7 @@ def test_net_uses_page_background_and_action_labels_have_no_silhouettes(browser)
             "(e, p) => ({height:getComputedStyle(e,p).height, background:getComputedStyle(e,p).backgroundImage})",
             pseudo,
         )
-        assert pstyle["height"] == "43px"
+        assert pstyle["height"] == "28px"
         assert "linear-gradient" in pstyle["background"]
 
     page.click('.court-grid [data-zone="p2"]')
@@ -108,4 +108,4 @@ def test_supplied_artwork_drives_all_pwa_icons():
     assert 'href="icons/favicon-32.png"' in html
     manifest = json.loads((ROOT / "manifest.webmanifest").read_text(encoding="utf-8"))
     assert [icon["sizes"] for icon in manifest["icons"]] == ["192x192", "512x512"]
-    assert all(icon["purpose"] == "any maskable" for icon in manifest["icons"])
+    assert all(icon["purpose"] == "any" for icon in manifest["icons"])

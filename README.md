@@ -1,24 +1,21 @@
-# Volley Live Capture v1.6.8
+# Volley Live Capture v1.6.10
 
-Offline-capable volleyball match capture web app for iPhone and tablet.
+Offline-first volleyball match capture for Basic, Intermediate and Advanced workflows.
 
-## v1.6.8 highlights
-- Volleyball-net background is transparent, allowing the light grey page background to remain visible while retaining mesh, top tape, blue posts, red/white antennas and the same compact proportions.
-- Advanced action player silhouettes are removed.
-- Action-label colour families and lighter rare-action guidance are retained.
-- Full action names remain readable, including `Reception`.
-- Tests, English Word UI specification, screenshots, release notes and implementation report are updated together.
+## v1.6.10 highlights
+- Rebuilt Apple touch, favicon and manifest icons from the supplied 1254 × 1254 `IMG_5596.PNG` source.
+- Removed the pre-rendered pale outer rim and white corners: the navy background now reaches every edge of each opaque square PNG.
+- Left corner rounding to iOS and other launchers; the files themselves contain no transparency or baked rounded mask.
+- Retained all v1.6.9 Modification UI 7 changes: compact equal score spacing, net-height posts and the BENCH/input dashed divider.
+- Updated automated tests, English Word specification, screenshot evidence, release notes and implementation report together.
 
 ## Run locally
 ```bash
 python serve_local.py
 ```
-Open the printed URL from a browser on the same network.
-
-## Test
-```bash
-pytest -q
-```
+Open the displayed local URL in a modern browser.
 
 ## iPhone update
-Deploy the whole folder. The service-worker cache ID must contain `v1.6.8`. Open the hosted app online once, then fully close and reopen the Home-screen app. Verify `v1.6.8` on Home before courtside use.
+Deploy the whole folder, including `sw.js` and `icons/`. Remove the old Home-screen shortcut if iOS still shows cached artwork, add the site to the Home Screen again, launch it online once, close it fully, and reopen it. Verify `v1.6.10` on Home.
+
+Portable match data remains format version 1.

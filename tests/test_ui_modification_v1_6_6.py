@@ -33,8 +33,8 @@ def test_live_compaction_rotation_spacing_phase_net_undo_and_history(browser):
         "color": "rgb(154, 52, 18)",
     }
 
-    for bar in page.locator(".vlc-result-bar").all():
-        assert 59 <= bar.bounding_box()["height"] <= 64
+    assert 70 <= page.locator(".vlc-result-bar.team").bounding_box()["height"] <= 73
+    assert 59 <= page.locator(".vlc-result-bar.opp").bounding_box()["height"] <= 64
 
     page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
     phase_style = _style(page.locator("#phaseBadge"), ["backgroundColor", "color"])

@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.8 — Functional Specification
+# Volley Live Capture v1.6.10 — Functional Specification
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.
@@ -112,7 +112,7 @@ Normal sets finish at 25 or more with a two-point margin. The deciding set finis
 
 ## 11. Acceptance
 
-Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.8 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
+Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.10 acceptance requires all listed pytest/Playwright tests to pass with no uncaught JavaScript errors, plus manual iPhone layout, VoiceOver and offline-persistence checks.
 
 
 ## 12. v1.6.7 — UI Modification 6
@@ -131,3 +131,11 @@ Automated coverage is defined in `tests/TEST_PLAN.md`. v1.6.8 acceptance require
 - Advanced action labels contain no player-silhouette icons.
 - Orange, green and blue action-label families and lighter rare-action guidance remain unchanged.
 - Full action names remain visible without clipping or ellipsis, including `Reception`.
+
+## 14. v1.6.9 — Modification UI 7
+- The live score uses one equal 5 px gap between all five blocks and smaller set/score blocks for a tighter cluster. The active `.service-line` remains visible directly below the serving score.
+- Each CSS net pseudo-element has the same 28 px height as the rendered net and is aligned to its outer top edge; no post or antenna extends above or below the net.
+- Intermediate and Advanced tracked-team result bars use a 2 px dashed top divider, 8 px top padding and 8 px top margin to separate BENCH/substitution controls from rally input.
+
+## 15. v1.6.10 — borderless application artwork
+Apple touch, favicon and manifest PNGs shall be regenerated from `IMG_5596.PNG` as square, fully opaque images. The navy field shall reach all four edges and corners, with no pale perimeter, white corner or pre-rendered rounded mask. The icon content and gold/white/blue volleyball artwork remain unchanged.

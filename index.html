@@ -337,7 +337,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   <button type="button" class="home-btn home-open" id="homeOpen">OPEN MATCH .JSON</button><input type="file" id="homeFile" accept=".json,application/json" hidden>
   <div class="home-last" id="homeLast"></div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b> then <b>Add to Home Screen</b>, and always start the app from its icon (Safari and the installed app keep separate data).</div>
-  <div id="appVersion">v1.6.8</div>
+  <div id="appVersion">v1.6.10</div>
 </div>
 <section class="capture" id="capturePanel" aria-label="Live action capture">
   <div class="capture-head"><h2 id="captureTitle" hidden>Live input</h2><div class="score-live board tie" id="liveScore" role="status" aria-live="polite"><span class="set-badge set-badge-a" aria-label="Sets won by left team">0</span><span class="score-side side-a"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by right team">0</span></div><div class="sets-line" id="setsLine" hidden></div></div>
@@ -1509,9 +1509,18 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
 .vlc-net::before,.vlc-net::after,.su-net::before,.su-net::after{content:"";position:absolute;z-index:2;top:-13px;width:7px;height:43px;border-radius:4px;background:linear-gradient(to bottom,#dc2626 0 5px,#fff 5px 10px,#dc2626 10px 15px,#fff 15px 20px,#1d4ed8 20px 100%);box-shadow:0 1px 2px rgba(15,23,42,.35)}
 .vlc-net::before,.su-net::before{left:-8px}.vlc-net::after,.su-net::after{right:-8px}
 @media(max-width:430px){.vlc-result-bar{grid-template-columns:minmax(88px,1.25fr) minmax(100px,.9fr) minmax(88px,1.25fr);gap:5px}.vlc-result-zone{padding:4px}.vlc-result-main{font-size:13px}.vlc-result-zone small{font-size:8px}.vlc-action-name{padding:6px 8px}.vlc-action-copy{font-size:14px}}
+/* v1.6.9 / Modification UI 7: tighter equal score spacing, net-height posts and BENCH/input divider. */
+.score-live.board{gap:5px}
+.board .digit-box{min-width:58px;padding:2px 8px;font-size:38px}
+.board .set-badge{min-width:32px;height:32px;padding:0 6px;font-size:18px}
+.board .sep{font-size:30px}
+.board .score-side{gap:2px}
+.vlc-net::before,.vlc-net::after,.su-net::before,.su-net::after{top:-5px;height:28px}
+html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"] .vlc-result-bar.team{border-top:2px dashed #cbd5e1;padding-top:8px;margin-top:8px}
+@media(max-width:360px){.score-live.board{gap:4px}.board .digit-box{min-width:54px;padding-left:7px;padding-right:7px;font-size:36px}.board .set-badge{min-width:30px;height:30px;padding:0 5px;font-size:17px}}
 </style>
 <script>
-/* v1.6.8 keeps the normative capture grammar, applies the Intermediate UI changes and
+/* v1.6.9 keeps the normative capture grammar, applies the Intermediate UI changes and
    makes the Advanced action grid position-aware without blocking rare legal actions.
    Persisted result values remain point / error / neutral; no data migration is required. */
 (function(){

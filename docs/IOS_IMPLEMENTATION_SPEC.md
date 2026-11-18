@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.8 — iOS Implementation Specification
+# Volley Live Capture v1.6.10 — iOS Implementation Specification
 
 ## Target
 - iPhone/iPad Safari and Add to Home Screen PWA.
@@ -10,7 +10,7 @@
 2. Open once in Safari while online.
 3. Share → Add to Home Screen.
 4. For an update, deploy `index.html` and `sw.js` together.
-5. Confirm cache ID `volley-live-capture-v1.6.8`, fully close the installed app, reopen and verify `v1.6.8` on Home.
+5. Confirm cache ID `volley-live-capture-v1.6.10`, fully close the installed app, reopen and verify `v1.6.10` on Home.
 
 ## Touch and accessibility
 - Capture controls use `touch-action: manipulation`.
@@ -28,5 +28,8 @@ Safari and the installed Home-screen PWA may use distinct storage contexts. Crea
 After one successful online load and service-worker activation, enable Airplane Mode, relaunch the Home-screen app, record and undo events, then confirm persistence after a second relaunch.
 
 
-## v1.6.8 Home-screen artwork
+## v1.6.9 Home-screen artwork
 Deploy `apple-touch-icon.png`, `favicon-32.png`, `icon-192.png` and `icon-512.png` with `index.html`, `manifest.webmanifest` and `sw.js`. Existing installations may retain the previous Home-screen artwork until the icon is removed and the app is added to the Home Screen again.
+
+## v1.6.10 borderless icon assets
+The touch and manifest files are full-square opaque RGB PNGs. Their navy field reaches the image boundary; no pale rim, transparent corner or baked rounded mask is permitted. If iOS displays stale artwork, remove and recreate the Home-screen shortcut.

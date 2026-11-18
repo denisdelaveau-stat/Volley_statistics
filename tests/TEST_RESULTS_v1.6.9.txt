@@ -1,0 +1,35 @@
+Volley Live Capture v1.6.9 automated verification
+Date: 2026-11-18
+Reference viewport: 390 x 844 CSS px, device scale factor 2
+
+Automated suite
+---------------
+Command: pytest -q
+Final packaged-copy run: 22 passed in 54.55s
+Browser console/page errors: none in acceptance scenarios
+
+Modification UI 7 acceptance
+----------------------------
+- Score cluster contains five blocks with four equal 5 px gaps.
+- Score-cluster content width is 210 CSS px at the reference viewport (previous v1.6.8 measurement: approximately 235.33 CSS px).
+- Serving underline remains visible and directly below the active score; the receiving underline remains hidden.
+- Basic, Intermediate and Advanced nets render at 28 CSS px high.
+- Both post/antenna pseudo-elements render at 28 CSS px high with top -5 px, aligning them to the net outer bounds.
+- Transparent net field and page-grey background remain unchanged.
+- Intermediate and Advanced tracked-team rows use a 2 px dashed top divider with 8 px margin and padding after BENCH/substitution.
+- Basic mode has no BENCH divider.
+
+Documentation and artifacts
+---------------------------
+- Word specification validation: PASSED against the complete v1.6.8 source document.
+- Word document version: 1.9; status: Volley Live Capture v1.6.9.
+- Original Word visuals retained: 11 inline images and 22 word/media files.
+- Word render: 21 Letter pages; Modification UI 7 section and acceptance rows visually inspected.
+- Screenshot evidence: 4 current PNG captures.
+- Screenshot PDF: 4 Letter pages; metadata and rendered pages verified.
+- Visible application version: v1.6.9.
+- PWA cache ID: volley-live-capture-v1.6.9.
+
+Compatibility
+-------------
+Portable match JSON format remains version 1. Scoring, rotation, substitution, saved-team and PWA icon data are unchanged.

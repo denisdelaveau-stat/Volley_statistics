@@ -1,4 +1,4 @@
-# Volley Live Capture v1.6.8 — Implementation Specification
+# Volley Live Capture v1.6.10 — Implementation Specification
 
 ## Runtime and storage
 Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reusable setup data use browser localStorage. The service worker provides the offline shell over HTTPS/localhost.
@@ -43,7 +43,7 @@ Continue is a reusable inline SVG containing two circular arrows. The same gener
 No migration is required. Portable match JSON remains format version 1, and existing `point`, `error` and `neutral` events remain readable. Event `time` and integer `rotation` remain persisted but are hidden from live History. Saved team library entries may add optional `maxPlayers`; entries without it use the compatible default.
 
 ## Service worker
-`sw.js` uses `volley-live-capture-v1.6.8`. Increment the cache ID whenever shell content changes.
+`sw.js` uses `volley-live-capture-v1.6.10`. Increment the cache ID whenever shell content changes.
 
 
 ## v1.6.8 rotation, setup and presentation changes
@@ -72,3 +72,12 @@ No migration is required. Portable match JSON remains format version 1, and exis
 - `.vlc-net` and `.su-net` use a transparent background with grey mesh lines while retaining the same tape, posts, antennas and 28 px height.
 - The PNG icon pipeline resamples the supplied 1254×1254 RGB source to 32, 180, 192 and 512 px. Manifest icons declare `any maskable`.
 - The service-worker cache ID is `volley-live-capture-v1.6.8` and includes the favicon.
+
+## v1.6.9 Modification UI 7 implementation
+- `.score-live.board` uses a single 5 px flex gap for every adjacent score block. Set badges are 32 px high, score panels have a 58 px minimum width, and the service line remains inside each `.score-side`.
+- `.vlc-net::before`, `.vlc-net::after`, `.su-net::before` and `.su-net::after` are 28 px high and start at `top: -5px`, aligning their outer bounds with the net's 5 px top tape and 28 px border-box.
+- Intermediate and Advanced `.vlc-result-bar.team` rows receive a 2 px dashed top border plus 8 px spacing; Basic mode is excluded.
+- The service-worker cache ID is `volley-live-capture-v1.6.9`.
+
+## v1.6.10 icon correction
+Use the 1254 × 1254 supplied source. Crop the complete 96 px pre-rendered outer rounded/rim area, then resize the clean navy-to-edge square with Lanczos. Save all deliverables as opaque RGB PNG. Assert exact dimensions, alpha-free output, dark non-neutral corners and zero near-white pixels in the outer edge band.

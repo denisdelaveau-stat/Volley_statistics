@@ -1,4 +1,28 @@
+# Changelog
+
+## v1.6.10 – 2026-11-18
+- Rebuilt Apple touch, favicon, 192 px and 512 px manifest icons from the supplied 1254 × 1254 `IMG_5596.PNG` source.
+- Removed the pale pre-rendered perimeter and white corner area; every icon is a full-square, fully opaque PNG with navy pixels extending to all edges.
+- Removed baked corner rounding and changed manifest icon purpose to `any`, leaving launcher masking to the operating system.
+- Added pixel-level icon acceptance tests, a reference comparison preview and an icon-evidence page in the screenshot PDF.
+- Preserved all v1.6.9 Modification UI 7 layout and behaviour without change.
+- Advanced the visible application version and PWA cache to v1.6.10.
+
 # Changelog – Volley Live Capture
+
+## v1.6.9 – 2026-11-18
+### Changed
+- Tightened the live score cluster and applied one consistent gap between the left set badge, left score, colon, right score and right set badge; the service underline remains directly below the serving team score.
+- Limited both volleyball-net posts/antennas to the net's 28 px rendered height so they no longer protrude above or below the mesh.
+- Added a dashed separator between the BENCH replacement/SUBSTITUTION controls and the tracked-team Error/Team/Point input row in Intermediate and Advanced capture.
+
+### Documentation and verification
+- Advanced the English Word UI specification to document version 1.9 while preserving its original images and added Modification UI 7 requirements and acceptance cases.
+- Added automated geometry/style coverage, current screenshots, an updated screenshot PDF and an implementation report for v1.6.9.
+- Bumped the visible application version and PWA cache to v1.6.9.
+
+### Compatibility
+- No match JSON schema, scoring, rotation, substitution or saved-team migration is required.
 
 ## v1.6.8 – 2026-11-18
 ### Changed
