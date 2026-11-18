@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.7.0 – 2026-11-18
+- Applied the supplied `Font_app_ref.jpg` as the Home reference artwork and rebuilt the Home overlay.
+- Moved current-match information inside Continue/View Match and renamed Open Match to Open Archives.
+- Added Teams and Settings navigation and removed the Statistics control.
+- Replaced team setup with a single reusable team editor, Add Player rows, jersey numbers 1–40 and role colors; removed Focus from reusable teams.
+- Replaced the old New Match wizard with saved-team selection, Present/Focus confirmation, setter-position-driven role rotation, compatible-player assignment and Service/Reception libero preview.
+- Added persistent Settings for match format and detail level.
+- Preserved live capture and portable match format version 1; advanced the visible version and PWA cache to v1.7.0.
+- Added v1.7 acceptance tests and visual QA; full result: 26 passed.
+
 ## v1.6.10 – 2026-11-18
 - Rebuilt Apple touch, favicon, 192 px and 512 px manifest icons from the supplied 1254 × 1254 `IMG_5596.PNG` source.
 - Removed the pale pre-rendered perimeter and white corner area; every icon is a full-square, fully opaque PNG with navy pixels extending to all edges.
