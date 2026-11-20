@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.10.0 — Guided New Match interfaces
+
+- Added a dedicated team/opponent/match-name page before roster confirmation.
+- Rebuilt roster confirmation as a role-coloured player-circle court with Present and Focus controls and sorting by number, position or name.
+- Rebuilt initial rotation from the Coach View visual language with P1–P6 tabs, an orange court, direct role-compatible player picking and explicit Reception/Service selection.
+- The Start Match action now appears only after the first-rally role is selected.
+- Preserved the COACH VIEW and ADVANCED STATISTICS Home actions and the unified v2.1 analysis interfaces.
+- Bumped the offline cache to `volley-live-capture-v1.10.0`.
+
 ## v1.9.1 — Unified JSON v2.1 for Coach and Advanced Statistics
 - Kept both Home entry points: `COACH VIEW` and `ADVANCED STATISTICS`.
 - Made `volley-live` schema 2.1 the authoritative data contract for both interfaces.

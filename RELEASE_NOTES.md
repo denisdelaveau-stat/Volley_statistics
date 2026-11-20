@@ -1,4 +1,12 @@
-# Volley Live Capture v1.9.1 — Release Notes
+# Volley Live Capture v1.10.0 — Release Notes
+
+## New Match interface redesign
+
+- A first page now asks the user to select a configured team, enter the opponent and validate an automatically generated/editable match name.
+- Roster confirmation uses role-coloured circles on a volleyball court and retains independent Present and Focus controls for every player. The roster can be sorted by shirt number, position or name.
+- Initial rotation now mirrors Coach View with P1–P6 tabs, Organisation actuelle, a Rotation badge, an orange court and direct compatible-player selection from each position.
+- Empty rotation circles are grey; the empty setter position alone uses the setter colour. Player names appear only after selection.
+- Reception and Service are explicit choices. **START MATCH** appears only after one is chosen.
 
 ## One Home, two analysis interfaces
 
@@ -15,7 +23,7 @@ The canonical fixture exposes 2 sets, 93 rallies and 365 source events. Technica
 
 ## Offline behavior
 
-The service worker cache is `volley-live-capture-v1.9.1`. It includes both interfaces, the shared adapter, the canonical JSON file and an equivalent generated JavaScript copy used when a normal fetch is unavailable.
+The service worker cache is `volley-live-capture-v1.10.0`. It includes both interfaces, the shared adapter, the canonical JSON file and an equivalent generated JavaScript copy used when a normal fetch is unavailable.
 
 ## Compatibility
 

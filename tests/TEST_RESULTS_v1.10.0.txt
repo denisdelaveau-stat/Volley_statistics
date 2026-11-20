@@ -1,0 +1,15 @@
+Volley Live Capture v1.10.0 — validation result
+Date: 2026-11-20
+
+PASS — 37 automated tests
+
+Validated:
+- dedicated team/opponent/match-name page and VALIDE transition;
+- SELECT TEAM court layout, role colours, Present/Focus controls and sorting;
+- Initial rotation P1–P6 layout, grey empty circles, setter highlight and compatible-player selection;
+- Reception/Service selection and conditional START MATCH action;
+- persisted starting lineup, starting rotation and first-rally phase;
+- COACH VIEW and ADVANCED STATISTICS Home actions;
+- JavaScript syntax, unique HTML identifiers and JSON reference loading;
+- offline cache version volley-live-capture-v1.10.0;
+- retained scoring, capture, statistics, unified v2.1, icon and PWA regression suite.

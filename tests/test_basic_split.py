@@ -4,7 +4,7 @@ from helpers import events, open_match, wait_guard
 
 def test_basic_normative_result_bars(browser):
     page, errors = open_match(browser, "basic")
-    assert page.inner_text("#appVersion") == "v1.9.1"
+    assert page.inner_text("#appVersion") == "v1.10.0"
     assert page.locator(".vlc-result-bar").count() == 2
     assert page.inner_text("#phaseBadge") == "SERVICE"
     assert page.locator("#phaseBadge").evaluate("e => e.tagName") == "DIV"

@@ -1,4 +1,15 @@
-# Volley Live Capture v1.9.1 — Automated Test Plan
+# Volley Live Capture v1.10.0 — Automated Test Plan
+
+## v1.10.0 New Match acceptance
+
+| Scenario | Acceptance |
+|---|---|
+| SETUP10-01 | New Match opens a dedicated configured-team selector; opponent reveals and updates an editable match name |
+| SETUP10-02 | VALIDE advances to SELECT TEAM with role colours, Present/Focus controls and three sort modes |
+| SETUP10-03 | Initial rotation exposes P1–P6, six grey/role circles, compatible player selection and a Libero control |
+| SETUP10-04 | Empty setter alone uses the setter colour; START MATCH appears after Reception/Service is selected |
+| HOME10-01 | Home continues to expose COACH VIEW and ADVANCED STATISTICS |
+| PWA10-01 | Cache `volley-live-capture-v1.10.0` precaches all analysis assets |
 
 ## v1.9.1 unified-data acceptance
 
