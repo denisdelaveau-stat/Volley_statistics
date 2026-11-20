@@ -1,4 +1,21 @@
-# Volley Live Capture v1.11.0 — Automated Test Plan
+# Volley Live Capture v1.12.0 — Automated Test Plan
+
+## v1.12.0 result-first and substitution acceptance
+
+| Scenario | Acceptance |
+|---|---|
+| CAP120-01 | Result controls are active before actor selection; HOME/AWAY remain hidden until a result is selected |
+| CAP120-02 | HOME/AWAY replaces Continue in the reserved middle cell and commits the pending result |
+| CAP120-03 | Action/result/player bounding boxes do not change across neutral, player, action and result-first states at 390 × 844 |
+| CAP120-04 | FREE BALL is above ✓ / ✕ / ○; action buttons occupy the specified surrounding cells |
+| CAP120-05 | On-court players render in two court-shaped rows and rotation/service/status lines are not visible |
+| CAP120-06 | Capture Statistics is hidden while Home ADVANCED STATISTICS remains available |
+| ROT120-01 | Compact libero bench is centred, 64 × 64 px, contains the 50 px circle and has no `BANC LIBÉRO` label |
+| SUB120-01 | SET, OH, MB, OPP and LIB pickers return only same-position, present, off-court candidates |
+| SUB120-02 | Empty position list shows `Aucun remplaçant disponible à ce poste` |
+| SUB120-03 | Accepted replacement persists a SUBSTITUTION event and Undo removes the event and match substitution |
+| HOME120-01 | COACH VIEW and ADVANCED STATISTICS remain on Home |
+| PWA120-01 | Cache `volley-live-capture-v1.12.0` precaches the complete application |
 
 ## v1.11.0 quick-capture acceptance
 

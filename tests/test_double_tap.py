@@ -1,4 +1,4 @@
-"""v1.11: the 450 ms result guard begins only after an accepted result."""
+"""v1.12: the 450 ms result guard begins only after an accepted result."""
 from helpers import events, open_match
 
 
@@ -9,8 +9,8 @@ def rapid_double_click(page, selector):
 
 def test_result_guard_in_all_three_input_paths(browser):
     page, errors = open_match(browser, "advanced", focus_off=())
-    page.click('[data-quick-side="T"]')
-    rapid_double_click(page, '[data-quick-result="point"]')
+    page.click('[data-quick-result="point"]')
+    rapid_double_click(page, '[data-quick-side="T"]')
     assert len(events(page)) == 1
     assert page.evaluate("window.VLCQuickCapture.commit('point')") is False
     assert page.evaluate("window.VLC_TAPS_BLOCKED") >= 1
@@ -22,6 +22,6 @@ def test_result_guard_in_all_three_input_paths(browser):
     page.click('.court-grid [data-zone="p2"]'); page.click('[data-quick-action="attack"]')
     rapid_double_click(page, '[data-quick-result="point"]')
     assert len(events(page)) == 3 and (events(page)[-1]["action"],events(page)[-1]["result"]) == ("attack","point")
-    page.click("#statsToggle"); assert page.get_attribute("#statsToggle","aria-expanded") == "true"
+    assert page.locator("#statsToggle").is_hidden()
     assert not errors
     page.close()

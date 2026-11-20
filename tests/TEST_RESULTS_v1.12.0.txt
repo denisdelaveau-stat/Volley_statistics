@@ -1,0 +1,26 @@
+Volley Live Capture v1.12.0 — validation result
+Date: 2026-11-20
+Result: 48 automated tests passed
+Duration: 73.99 s
+
+Validated:
+- result-first POINT / ERROR / CONTINUE with conditional HOME/AWAY in the Continue slot;
+- fixed action, result and player bounding boxes across all capture states at 390 × 844;
+- FREE BALL / action / result placement and two-row court player layout;
+- removal of visible rotation, service, selected-player text, last-event status and Capture statistics;
+- compact centred libero bench, circle containment and direct libero selection;
+- same-position substitution filtering for SET, OH, MB, OPP and LIB;
+- present/off-court candidate requirements and empty-position message;
+- persisted SUBSTITUTION event fields and Undo rollback;
+- 450 ms duplicate-result protection;
+- score, set completion, history, reports and JSON export;
+- New Match, roster and initial-rotation workflow;
+- COACH VIEW and ADVANCED STATISTICS Home actions;
+- pastel role palette and Coach interface;
+- unified v2.1 fixture and analysis interfaces;
+- PWA shell and cache version volley-live-capture-v1.12.0.
+
+Additional checks:
+- all inline and external JavaScript passed node --check;
+- 390 × 844 evidence screenshots rendered without browser errors;
+- final ZIP integrity and SHA-256 verification are recorded in the release artifact checksum file.

@@ -2,24 +2,20 @@
 from helpers import APP_URI, events, open_match, wait_guard
 
 
-def test_rotation_is_plain_centred_and_persisted_per_event(browser):
+def test_rotation_is_hidden_but_persisted_per_event(browser):
     page, errors = open_match(browser, "advanced", focus_off=(4,))
     status = page.locator("#courtStatus")
-    assert status.inner_text() == "Rot. P1 | R1 | C1"
-    style = status.evaluate(
-        "e => ({background:getComputedStyle(e).backgroundColor, color:getComputedStyle(e).color, align:getComputedStyle(e).textAlign})"
-    )
-    assert style == {"background": "rgba(0, 0, 0, 0)", "color": "rgb(0, 0, 0)", "align": "center"}
-    score_box = page.locator("#liveScore").bounding_box()
-    rotation_box = status.bounding_box()
-    assert abs((score_box["x"] + score_box["width"] / 2) - (rotation_box["x"] + rotation_box["width"] / 2)) < 2
+    assert status.is_hidden()
+    assert page.locator("#phaseBadge").is_hidden()
 
-    page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
+    page.click('[data-quick-result="point"]')
+    page.click('[data-quick-side="A"]')
     wait_guard(page)
-    page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
-    assert status.inner_text() == "Rot. P6 | R2 | C1"
+    page.click('[data-quick-result="point"]')
+    page.click('[data-quick-side="T"]')
     wait_guard(page)
-    page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
+    page.click('[data-quick-result="point"]')
+    page.click('[data-quick-side="A"]')
 
     saved = events(page)
     assert [event["rotation"] for event in saved] == [0, 0, 1]
@@ -47,6 +43,32 @@ def _seed_team(page):
         }}
       }}));
     }""")
+
+
+def test_initial_rotation_has_default_grey_libero_circle_on_centred_bench(browser):
+    page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(APP_URI)
+    _seed_team(page)
+    page.reload()
+    page.click("#homeNew")
+    page.select_option("#suTeamSelect", "Antibes U18")
+    page.fill("#suOpp", "Nice")
+    page.click("#suNext")
+    page.click("#suNext")
+
+    circle = page.locator(".libero-circle")
+    bench = page.locator(".libero-setup")
+    assert circle.inner_text() == "L"
+    assert page.locator(".libero-seat-name").inner_text() == "SÉLECTIONNER LE LIBÉRO"
+    assert circle.evaluate("e => getComputedStyle(e).backgroundColor") == "rgb(199, 206, 216)"
+    box = bench.bounding_box()
+    assert abs((box["x"] + box["width"] / 2) - 195) < 2
+    page.click('[data-rotation-role="libero"]')
+    assert page.locator('[data-lineup-player="2"]').is_visible()
+    assert not errors
+    page.close()
 
 
 def test_settings_and_new_match_sequence(browser):

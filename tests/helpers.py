@@ -76,4 +76,4 @@ def events(page):
 
 
 def wait_guard(page):
-    page.wait_for_timeout(420)
+    page.wait_for_timeout(470)

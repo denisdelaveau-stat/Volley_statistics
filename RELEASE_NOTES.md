@@ -1,25 +1,27 @@
-# Release notes — v1.11.0
+# Release notes — v1.12.0
 
-## Live capture redesign
+## Result-first live capture
 
-- The score remains at the top, followed by explicit **HOME** and **AWAY** shortcuts.
-- The centre quick-entry panel combines seven actions with colour-coded **POINT**, **CONTINUE** and **ERROR** results.
-- The same screen supports Complete, Player-only and Side-only input paths.
-- Position guidance still marks actions as probable or rare; libero Attack, Block and Serve remain unavailable.
-- The six current court players are shown as pastel role circles on a blue tray. **SUBSTITUTE** and **UNDO** remain immediately available.
+- **POINT**, **ERROR** and **CONTINUE** are active by default. A result chosen without a player reveals **HOME** and **AWAY** exactly in the Continue slot; the second tap records the team result.
+- FREE BALL is above the central ✓ / ✕ / ○ results, Attack/Block are on the left, Serve/Reception on the right and Set/Defence below.
+- Capture controls keep identical positions and sizes in every state. Position guidance remains visual, without probability text or an inserted player/action information line.
+- The six current court players are arranged in two rows of three matching the court. Rotation, service and inline Capture statistics/status lines are no longer displayed.
+- **SUBSTITUTE**, **UNDO**, **HISTORY**, scoring and the 450 ms duplicate guard remain available.
 - A 450 ms lock starts only after an accepted result to stop accidental double entries.
 
-## Initial rotation
+## Initial rotation and substitutions
 
-The libero is now represented by a grey player circle even before selection. The circle sits on a centred grey libero bench beneath the orange court and opens the compatible libero picker.
+The grey libero circle sits on a compact 64 × 64 px centred grey seat beneath the orange court. The `BANC LIBÉRO` label is removed; the selectable circle and `SÉLECTIONNER LE LIBÉRO` control remain.
+
+Substitute now lists only present, off-court players whose roster position matches the outgoing player (SET, OH, MB, OPP or LIB). An unavailable position shows `Aucun remplaçant disponible à ce poste`. Each accepted replacement is persisted as a `SUBSTITUTION` event with the two players, position, set and rally, and Undo removes the latest replacement and event together.
 
 ## Preserved functionality
 
-**COACH VIEW**, **ADVANCED STATISTICS**, the pastel position palette, scoring, rotation, history, unified v2.1 analysis data and offline operation are retained. The service worker cache is `volley-live-capture-v1.11.0`.
+**COACH VIEW**, **ADVANCED STATISTICS**, the pastel position palette, scoring, rotation logic, history, unified v2.1 analysis data and offline operation are retained. The Capture-page Statistics panel is removed. The service worker cache is `volley-live-capture-v1.12.0`.
 
-## Previous release — v1.10.1
+## Previous release — v1.11.0
 
-This update applies the pastel position palette and Coach View blue setup background requested for New Match. Functionality and saved-data compatibility are unchanged.
+This release introduced the unified quick-capture panel, FREE BALL and the initial centred libero bench.
 
 # Volley Live Capture v1.10.0 — Release Notes
 

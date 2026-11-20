@@ -384,7 +384,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   </div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
   <nav class="home-nav" aria-label="Application sections"><button type="button" id="homeTeams"><span class="nav-icon">♟</span>TEAMS</button><button type="button" id="homeSettings"><span class="nav-icon">⚙</span>SETTINGS</button></nav>
-  <div class="home-version" id="appVersion">v1.11.0</div>
+  <div class="home-version" id="appVersion">v1.12.0</div>
 </div>
 <div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
   <div class="coach-shell">
@@ -421,8 +421,8 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   <button type="button" id="historyToggle" class="stats-toggle history-toggle" aria-expanded="false" aria-controls="historyPanel">HISTORY <span id="historyArrow">▼</span></button>
   <div id="historyPanel" class="history-panel" hidden><div class="history-wrap"><table class="history"><thead><tr><th>#</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div></div>
 </section>
-<button type="button" id="statsToggle" class="stats-toggle" aria-expanded="false" aria-controls="statsPanel">STATISTICS <span id="statsArrow">▼</span></button>
-<div id="statsPanel" class="stats-panel" hidden>
+<button type="button" id="statsToggle" class="stats-toggle" aria-expanded="false" aria-controls="statsPanel" hidden aria-hidden="true" tabindex="-1">STATISTICS <span id="statsArrow">▼</span></button>
+<div id="statsPanel" class="stats-panel" hidden aria-hidden="true">
 <section class="att-section" id="attSection"><div class="att-head"><h3>Attackers</h3><div class="att-scope"><button type="button" data-scope="set" class="on">CURRENT SET</button><button type="button" data-scope="match">MATCH</button></div></div><div class="att-note">One chart per OH / MB / OPP with entries in the log, after each of the player's actions.</div><div class="att-grid" id="attGrid"></div></section>
 <div class="point-origin-charts" aria-label="Point origin statistics for current set">
   <div class="pie-card"><h3>Team A</h3><div class="pie-sub">Current set - point origin</div><div id="teamAPie" class="pie-chart"></div><div id="teamAPieLegend" class="pie-legend"></div></div>
@@ -604,17 +604,19 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
       if(window.updateScoreService)window.updateScoreService(st.serving);
     };
     // ---------- substitution mode ----------
-    var POSROLE={setter:'setter',oh:'oh',mb:'mb',opp:'opp',libero:'libero'};
+    var POSROLE={setter:'setter',set:'setter',oh:'oh',outside:'oh',mb:'mb',middle:'mb',opp:'opp',opposite:'opp',libero:'libero',lib:'libero'};
     (m.subs||[]).forEach(function(x){if(!roleOf[x['in']])roleOf[x['in']]=(info[x['in']]&&POSROLE[info[x['in']].position])||roleOf[x.out]});
     var panel=document.getElementById('capturePanel'),tg=document.getElementById('subToggle'),hint=document.getElementById('subHint');
     var sheet=document.createElement('div');sheet.className='sub-sheet';sheet.hidden=true;document.body.appendChild(sheet);
     function setMode(on){panel.classList.toggle('sub-mode',on);tg.classList.toggle('on',on);tg.textContent=on?'\u2715 CANCEL SUBSTITUTION':'\u21C4 SUBSTITUTION';hint.hidden=!on;}
     tg.addEventListener('click',function(){setMode(!panel.classList.contains('sub-mode'))});
+    function positionOf(n){var p=String(info[n]&&info[n].position||'').toLowerCase();return POSROLE[p]||p}
     function openPicker(outNum,isLib){
-      var k=window.__court,onCourt=[];POS.forEach(function(z){onCourt.push(k.st.rot[z])});
-      var avail=nums.filter(function(n){return onCourt.indexOf(n)<0&&n!==k.st.lib});
-      var oi=info[outNum],h='<div class="sub-card"><h3>'+(isLib?'Change libero':'Substitution')+' \u00B7 #'+outNum+(oi&&oi.name?' '+esc(oi.name):'')+' out</h3><div class="sub-sub">Choose the player who comes in</div>';
+      var k=window.__court,onCourt=[];POS.forEach(function(z){onCourt.push(k.c[z].num)});
+      var outPosition=positionOf(outNum),avail=nums.filter(function(n){return n!==outNum&&onCourt.indexOf(n)<0&&info[n]&&info[n].present!==false&&positionOf(n)===outPosition});
+      var oi=info[outNum],h='<div class="sub-card"><h3>'+(isLib?'Change libero':'Substitution')+' \u00B7 #'+outNum+(oi&&oi.name?' '+esc(oi.name):'')+' out</h3><div class="sub-sub">Choose an available '+(RL[outPosition]||outPosition.toUpperCase())+' player</div>';
       h+=avail.length?'<div class="sub-grid">'+avail.map(function(n){var i=info[n];return '<button type="button" data-in="'+n+'">'+n+'<small>'+esc((i&&i.name)||'')+(i&&i.position?' \u00B7 '+(RL[POSROLE[i.position]]||''):'')+'</small></button>'}).join('')+'</div>':'<div class="sub-empty">No player available on the bench (roster only has '+nums.length+' players).</div>';
+      if(!avail.length)h=h.replace('No player available on the bench (roster only has '+nums.length+' players).','Aucun remplaçant disponible à ce poste');
       h+='<button type="button" class="sub-cancel">CANCEL</button></div>';
       sheet.innerHTML=h;sheet.hidden=false;
       sheet.querySelector('.sub-cancel').onclick=function(){sheet.hidden=true};
@@ -625,10 +627,12 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
       if(n>=6&&!confirm('6 substitutions already used in this set. Record anyway?'))return;
       var evs=[];try{evs=JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]')}catch(e){}
       var at=evs.filter(function(e){return (e.set||1)===cs}).length;
-      m.subs=m.subs||[];m.subs.push({set:cs,at:at,out:outNum,'in':inNum,ts:new Date().toISOString()});
+      var rally=evs.filter(function(e){return (e.set||1)===cs&&!!e.winningTeam}).length+1,position=positionOf(outNum),now=new Date(),sc=window.VolleySets.score(evs,cs);
+      var subEvent={id:evs.length+1,type:'SUBSTITUTION',eventType:'SUBSTITUTION',set:cs,rally:rally,timestamp:now.toISOString(),time:now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}),action:'substitution',result:'neutral',player:inNum,playerOut:outNum,playerIn:inNum,position:position,winningTeam:null,pointOrigin:null,rotation:replay(m,evs.filter(function(e){return (e.set||1)===cs})).rotations,scoreA:sc.a,scoreB:sc.b};
+      m.subs=m.subs||[];m.subs.push({set:cs,at:at,rally:rally,out:outNum,'in':inNum,position:position,eventId:subEvent.id,ts:subEvent.timestamp});
       if(!roleOf[inNum])roleOf[inNum]=(info[inNum]&&POSROLE[info[inNum].position])||roleOf[outNum];
       localStorage.setItem('volleyCapture.match.v1',JSON.stringify(m));
-      sheet.hidden=true;setMode(false);window.updateCourt(evs);
+      sheet.hidden=true;setMode(false);if(window.VLCLogSubstitution)window.VLCLogSubstitution(subEvent);else{evs.push(subEvent);localStorage.setItem('volleyCapture.events.v1',JSON.stringify(evs));window.updateCourt(evs)}
       var stt=document.getElementById('captureStatus');if(stt)stt.textContent='Substitution: #'+inNum+' in for #'+outNum;
     }
     // capture phase: intercepts court taps before the normal input flow
@@ -639,9 +643,9 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
       var num=+b.getAttribute('data-player'),k=window.__court,isLib=(num===k.st.lib);
       openPicker(num,isLib);
     },true);
-    window.undoLastSub=function(evs){   // removes the last substitution if it was done after the last event
-      var cs=m.currentSet||1,at=evs.filter(function(e){return (e.set||1)===cs}).length,sb=m.subs||[];
-      for(var i=sb.length-1;i>=0;i--){if(sb[i].set===cs){if(sb[i].at===at){var r=sb.splice(i,1)[0];localStorage.setItem('volleyCapture.match.v1',JSON.stringify(m));window.updateCourt(evs);return r}break}}
+    window.undoLastSub=function(evs){   // removes a substitution only when it is the latest logged event
+      var cs=m.currentSet||1,sb=m.subs||[],last=evs.length?evs[evs.length-1]:null;
+      for(var i=sb.length-1;i>=0;i--){if(sb[i].set===cs){var same=last&&last.type==='SUBSTITUTION'&&last.playerOut===sb[i].out&&last.playerIn===sb[i]['in'];if(same){var r=sb.splice(i,1)[0];evs.pop();localStorage.setItem('volleyCapture.match.v1',JSON.stringify(m));localStorage.setItem('volleyCapture.events.v1',JSON.stringify(evs));window.updateCourt(evs);return r}break}}
       return null;
     };
     window.updateCourt([]);
@@ -1138,6 +1142,7 @@ function renderErrorCharts(events){
       drawProgression();
     }
     function persist(msg){localStorage.setItem(STORAGE_DATA,JSON.stringify(DATA));localStorage.setItem(STORAGE_EVENTS,JSON.stringify(EVENTS));if(msg)status.textContent=msg;}
+    window.VLCLogSubstitution=function(ev){EVENTS.push(ev);persist();render()};
     function currentRotationNumber(){if(!MATCH||!MATCH.startingRotation||!window.VolleyRotation)return null;var cs=(MATCH.currentSet||1),setEvents=EVENTS.filter(function(e){return (e.set||1)===cs});return window.VolleyRotation.replay(MATCH,setEvents).rotations}
     function commit(player){
       if(MATCH){var su0=VS.summary(MATCH,EVENTS);if(su0.matchWinner||(su0.current&&su0.current.winner)){renderSets();return}}
@@ -1162,7 +1167,7 @@ function renderErrorCharts(events){
     document.querySelectorAll('[data-result]').forEach(function(b){b.addEventListener('click',function(){if(choice.player===null||!choice.action)return;choice.result=b.getAttribute('data-result');commit(choice.player)})});
     backBtn.addEventListener('click',function(){if(step==='result'&&LV!=='advanced'){choice={player:null,action:null,result:null};showStep('player')}else if(step==='result'){choice.action=null;showStep('action')}else if(step==='action'){choice={player:null,action:null,result:null};showStep('player')}});
     document.getElementById('captureUndo').addEventListener('click',function(){
-      if(window.undoLastSub){var us=window.undoLastSub(EVENTS);if(us){status.textContent='Substitution cancelled: #'+us.out+' back on court';return}}
+      if(window.undoLastSub){var us=window.undoLastSub(EVENTS);if(us){persist();render();status.textContent='Substitution cancelled: #'+us.out+' back on court';return}}
       if(MATCH&&curSet()>1&&!EVENTS.some(function(x){return (x.set||1)===curSet()})){
         MATCH.currentSet=curSet()-1;saveMatch();rebuildData();persist();
         sessionStorage.setItem('volleyCapture.stage','capture');location.reload();return;
@@ -1272,7 +1277,7 @@ function renderErrorCharts(events){
     h+='</div><div class="rotation-board"><div class="rotation-board-head"><strong>Organisation actuelle</strong><span class="rotation-badge">Rotation '+rotationNumber+'</span></div><div class="setup-orange-court"><div class="setup-rotation-grid">';
     COURT.forEach(function(zone){h+=rotationSlot(zone,rr.roles[zone],rr.numbers[zone])});h+='</div></div>';
     if(S.pickerRole&&S.pickerRole!=='libero')h+=playerPicker(S.pickerRole);
-    var liberoPlayer=player(S.assign.libero),liberoName=liberoPlayer&&liberoPlayer.name||'';h+='<div class="libero-setup"><div class="libero-bench-label">BANC LIBÉRO</div><button type="button" class="libero-picker-button libero-seat role-libero'+(S.assign.libero?' selected':' empty')+'" data-rotation-role="libero" aria-label="'+(S.assign.libero?'Modifier le libéro':'Sélectionner le libéro')+'"><span class="libero-circle">'+(S.assign.libero?S.assign.libero:'L')+'</span><span class="libero-seat-name">'+(S.assign.libero?esc(liberoName):'SÉLECTIONNER LE LIBÉRO')+'</span><small>LIBÉRO</small></button></div>';
+    var liberoPlayer=player(S.assign.libero),liberoName=liberoPlayer&&liberoPlayer.name||'';h+='<div class="libero-setup"><button type="button" class="libero-picker-button libero-seat role-libero'+(S.assign.libero?' selected':' empty')+'" data-rotation-role="libero" aria-label="'+(S.assign.libero?'Modifier le libéro':'Sélectionner le libéro')+'"><span class="libero-bench"><span class="libero-circle">'+(S.assign.libero?S.assign.libero:'L')+'</span></span><span class="libero-seat-name">'+(S.assign.libero?esc(liberoName):'SÉLECTIONNER LE LIBÉRO')+'</span><small>LIBÉRO</small></button></div>';
     if(S.pickerRole==='libero')h+=playerPicker('libero');
     h+='</div><div class="su-card first-rally-card"><label class="field-label">Premier rôle du match</label><div class="su-grid su-slots"><button type="button" class="su-btn'+(S.first==='reception'?' sel':'')+'" data-first="reception">RÉCEPTION</button><button type="button" class="su-btn'+(S.first==='service'?' sel':'')+'" data-first="service">SERVICE</button></div></div></section>';
     body.innerHTML=h;next.textContent='START MATCH';next.hidden=!S.first;var le=lineupError();next.disabled=!!le;if(le)msg.textContent=le;
@@ -1478,64 +1483,74 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
 .vlc-net::before,.vlc-net::after,.su-net::before,.su-net::after{top:-5px;height:28px}
 html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"] .vlc-result-bar.team{border-top:2px dashed #cbd5e1;padding-top:8px;margin-top:8px}
 @media(max-width:360px){.score-live.board{gap:4px}.board .digit-box{min-width:54px;padding-left:7px;padding-right:7px;font-size:36px}.board .set-badge{min-width:30px;height:30px;padding:0 5px;font-size:17px}}
-/* v1.11.0 · unified quick capture */
+/* v1.12.0 · result-first quick capture */
 #capturePanel{max-width:760px;margin:0 auto 14px;padding:12px;background:linear-gradient(180deg,#071f3b 0%,#0b3156 100%);border-color:#1c5f91;color:#fff;box-shadow:0 12px 30px rgba(2,15,32,.24)}
 #capturePanel .capture-head{justify-content:center;margin-bottom:8px}
 #capturePanel .score-live{color:#fff}
+#capturePanel .service-line{display:none!important}
 #capturePanel .steps{display:flex!important;flex-direction:column;gap:9px;margin:0}
 #capturePanel .step{display:block!important}
 #capturePanel [data-step="result"]{display:none!important}
 #capturePanel [data-step="action"]{order:1}
 #capturePanel [data-step="player"]{order:2}
-.quick-side-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 9px}
-.quick-side{min-height:50px;border:2px solid #3f7199;border-radius:12px;background:#123b60;color:#dbeafe;font-size:15px;font-weight:900;line-height:1.05;touch-action:manipulation}
-.quick-side small{display:block;margin-top:4px;font-size:10px;font-weight:700;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quick-side-selector{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:100%;height:100%}
+.quick-side-selector[hidden]{display:none!important}
+.quick-side{min-width:0;min-height:50px;padding:3px 1px;border:2px solid #3f7199;border-radius:10px;background:#123b60;color:#dbeafe;font-size:9px;font-weight:1000;line-height:1;touch-action:manipulation}
 .quick-side.selected{background:#0ea5e9;border-color:#7dd3fc;color:#03182c;box-shadow:0 0 0 3px rgba(125,211,252,.25)}
 .quick-side.away.selected{background:#f59e0b;border-color:#fde68a;color:#2b1700}
 .quick-entry{border:1px solid #2f78aa;border-radius:14px;background:rgba(4,24,47,.72);padding:9px}
-.quick-entry-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
-.quick-entry-head strong{font-size:12px;letter-spacing:.12em;color:#7dd3fc}
-.quick-mode{min-width:0;text-align:right;font-size:11px;font-weight:800;color:#dbeafe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.quick-pad{display:grid;grid-template-columns:minmax(0,1fr) 74px minmax(0,1fr);gap:7px;align-items:stretch}
-.quick-actions{display:grid;gap:7px;align-content:start}
+.quick-pad{display:grid;grid-template-columns:minmax(0,1fr) 106px minmax(0,1fr);grid-template-rows:repeat(4,50px);gap:7px;align-items:stretch}
 .quick-action{position:relative;min-height:50px;border:2px solid #1596c4;border-radius:10px;background:#0a456c;color:#fff;font-size:12px;font-weight:900;letter-spacing:.02em;touch-action:manipulation}
 .quick-action[data-family="offence"]{border-color:#f59e0b;background:#713815}
 .quick-action[data-family="defence"]{border-color:#22c55e;background:#14532d}
 .quick-action[data-family="control"]{border-color:#38bdf8;background:#0c4a6e}
-.quick-action small{display:block;font-size:8px;opacity:.82;margin-top:2px}
+.quick-action[data-quick-action="freeball"]{grid-column:2;grid-row:1}
+.quick-action[data-quick-action="attack"]{grid-column:1;grid-row:2}
+.quick-action[data-quick-action="service"]{grid-column:3;grid-row:2}
+.quick-action[data-quick-action="block"]{grid-column:1;grid-row:3}
+.quick-action[data-quick-action="reception"]{grid-column:3;grid-row:3}
+.quick-action[data-quick-action="set"]{grid-column:1;grid-row:4}
+.quick-action[data-quick-action="defense"]{grid-column:3;grid-row:4}
+.quick-action small{display:none!important}
 .quick-action.is-expected{opacity:1}.quick-action.is-rare{opacity:.48}.quick-action.is-blocked{opacity:.25;pointer-events:none}
-.quick-action.selected{opacity:1;box-shadow:0 0 0 3px #f8fafc,0 0 0 6px #22d3ee;transform:scale(.98)}
+.quick-action.is-expected{box-shadow:inset 0 0 0 1px rgba(255,255,255,.42),0 0 10px rgba(34,211,238,.32)}
+.quick-action.selected{opacity:1;box-shadow:0 0 0 3px #f8fafc,0 0 0 6px #22d3ee}
 .quick-action:disabled{cursor:not-allowed}
-.quick-results{display:grid;grid-template-rows:repeat(3,1fr);gap:7px}
 .quick-result{min-height:50px;border:2px solid transparent;border-radius:10px;color:#fff;font-size:24px;font-weight:1000;touch-action:manipulation}
+.quick-result[data-quick-result="point"]{grid-column:2;grid-row:2}
+.quick-result[data-quick-result="error"]{grid-column:2;grid-row:3}
+.quick-middle{position:relative;grid-column:2;grid-row:4;min-width:0;min-height:50px}
+.quick-middle>.quick-result,.quick-middle>.quick-side-selector{position:absolute;inset:0;width:100%;height:100%}
+.quick-middle.awaiting-side>.quick-result{visibility:hidden}
 .quick-result small{display:block;font-size:8px;line-height:1;text-transform:uppercase;letter-spacing:.04em}
 .quick-result.point{background:#16a34a;border-color:#4ade80}.quick-result.error{background:#dc2626;border-color:#f87171}.quick-result.neutral{background:#2563eb;border-color:#60a5fa}
-.quick-result:disabled{opacity:.32;filter:grayscale(.5)}
+.quick-result:disabled{opacity:.5;filter:grayscale(.3)}
+.quick-result.pending{box-shadow:0 0 0 3px #fff,0 0 0 6px #22d3ee}
 #capturePanel.result-guard .quick-result{opacity:.5;pointer-events:none}
 .quick-player-tray{display:block!important;background:#0a294a;border:1px solid #2f78aa;border-radius:14px;padding:8px!important}
-.quick-player-tray #courtStatus{color:#fff!important;font-size:12px;margin:0 0 3px}
-.quick-player-tray #phaseBadge{display:inline-block;font-size:11px;margin:0 auto 7px;min-width:100px}
+.quick-player-tray #courtStatus,.quick-player-tray #phaseBadge{display:none!important}
 .quick-player-tray .court-net,.quick-player-tray .court-adv,.quick-player-tray .bench-label{display:none!important}
-.quick-player-tray .court-grid{display:grid!important;grid-template-columns:repeat(6,minmax(46px,1fr))!important;gap:5px!important;background:transparent!important;border:0!important;padding:3px 0 6px!important}
-.quick-player-tray .court-grid .touch{aspect-ratio:1/1;min-height:0!important;width:100%!important;max-width:66px;margin:auto;border-radius:50%!important;padding:2px!important;font-size:16px;overflow:hidden}
+.quick-player-tray .court-grid{display:grid!important;grid-template-columns:repeat(3,minmax(64px,1fr))!important;grid-template-rows:repeat(2,auto)!important;gap:8px 12px!important;background:transparent!important;border:0!important;padding:3px 0 8px!important}
+.quick-player-tray .court-grid .touch{aspect-ratio:1/1;min-height:64px!important;width:100%!important;max-width:74px;margin:auto;border-radius:50%!important;padding:3px!important;font-size:18px;overflow:hidden}
 .quick-player-tray .court-grid .touch .pz{font-size:8px}.quick-player-tray .court-grid .touch .pn{font-size:16px}.quick-player-tray .court-grid .touch small{display:none!important}.quick-player-tray .court-grid .touch .nm{display:none}.quick-player-tray .court-grid .touch .rl{font-size:7px}.quick-player-tray .court-grid .touch.is-srv::after{display:none!important}
-.quick-player-tray .court-grid .touch.quick-selected{box-shadow:0 0 0 3px #fff,0 0 0 6px #22d3ee!important;transform:translateY(-2px)}
+.quick-player-tray .court-grid .touch.quick-selected{box-shadow:0 0 0 3px #fff,0 0 0 6px #22d3ee!important}
 .quick-player-tray .bench-row{display:flex;justify-content:center;align-items:center;gap:8px;padding-top:7px;border-top:1px dashed #4b7192}
 .quick-player-tray .bench-row #benchBtn{border-radius:999px!important}
 .quick-player-tray .bench-row .sub-toggle{height:38px;min-height:38px;max-height:38px;width:132px;flex-basis:132px;border:2px solid #c084fc;background:#4c1d95;color:#fff;font-size:10px}
 #capturePanel .capture-tools{display:flex;margin-top:8px}
 #capturePanel .capture-tools #captureUndo{background:#fed7aa!important;border-color:#fb923c!important;color:#9a3412!important}
-#capturePanel .capture-status{color:#dbeafe}
+#capturePanel .capture-status{display:none!important}
 #capturePanel .history-toggle{background:#0e3b63;border-color:#4b86b4;color:#fff}
 #capturePanel .history-panel{background:#fff;color:#17202a;border-radius:10px;padding:4px}
-@media(max-width:360px){.quick-pad{grid-template-columns:minmax(0,1fr) 66px minmax(0,1fr);gap:5px}.quick-action,.quick-result{min-height:46px}.quick-player-tray .court-grid{gap:3px!important}.quick-player-tray .court-grid .touch{max-width:58px}.quick-player-tray{padding:6px!important}}
-/* Initial rotation: libero sits as a grey player circle on a centred grey bench. */
-.libero-setup{margin:10px auto 0;max-width:230px;padding:7px 10px 9px;border:2px solid #94a3b8;border-radius:12px;background:linear-gradient(180deg,#cbd5e1,#94a3b8);text-align:center}
-.libero-bench-label{margin-bottom:4px;color:#334155;font-size:9px;font-weight:900;letter-spacing:.16em}
-.libero-picker-button.libero-seat{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-height:82px;border:0!important;background:transparent!important;color:var(--role-libero-text)!important}
+@media(max-width:360px){.quick-pad{grid-template-columns:minmax(0,1fr) 96px minmax(0,1fr);grid-template-rows:repeat(4,46px);gap:5px}.quick-action,.quick-result{min-height:46px}.quick-side{min-height:46px;font-size:8px}.quick-player-tray .court-grid{gap:6px 8px!important}.quick-player-tray .court-grid .touch{max-width:68px}.quick-player-tray{padding:6px!important}}
+#statsToggle,#statsPanel{display:none!important}
+/* Initial rotation: compact centred grey bench fitted to the libero circle. */
+.libero-setup{margin:10px auto 0;max-width:240px;text-align:center}
+.libero-picker-button.libero-seat{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;min-height:94px;padding:0;border:0!important;background:transparent!important;color:var(--role-libero-text)!important}
+.libero-bench{display:grid;place-items:center;width:64px;height:64px;padding:5px;border:2px solid #94a3b8;border-radius:12px;background:linear-gradient(180deg,#cbd5e1,#94a3b8);overflow:hidden}
 .libero-circle{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border:3px solid #fff;border-radius:50%;background:var(--role-libero);color:var(--role-libero-text);box-shadow:0 3px 8px rgba(15,23,42,.28);font-size:19px;font-weight:1000}
-.libero-seat-name{max-width:100%;font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.libero-seat small{font-size:8px;letter-spacing:.08em}
+.libero-seat-name{max-width:100%;color:#f8fafc;font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libero-seat small{color:#cbd5e1;font-size:8px;letter-spacing:.08em}
 
 </style>
 <script>
@@ -1547,12 +1562,12 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
   if(!M||!H)return;
   var panel=document.getElementById('capturePanel'),playerStep=panel.querySelector('[data-step="player"]'),actionStep=panel.querySelector('[data-step="action"]'),resultStep=panel.querySelector('[data-step="result"]');
   var g=playerStep.querySelector('.touch-grid.players'),head=panel.querySelector('.capture-head'),chip=document.getElementById('pickChip'),back=document.getElementById('captureBack');
-  var actor=null,action=null,guardUntil=0,guardTimer=null,LOCK_MS=450;
+  var actor=null,action=null,pendingResult=null,guardUntil=0,guardTimer=null,LOCK_MS=450;
   window.VLC_TAP_LOCK_MS=LOCK_MS;window.VLC_TAPS_BLOCKED=window.VLC_TAPS_BLOCKED||0;
   function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
   function eventCount(){try{var x=JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]');return Array.isArray(x)?x.length:0}catch(e){return 0}}
   function isGuarded(){return Date.now()<guardUntil}
-  function armGuard(){guardUntil=Date.now()+LOCK_MS;panel.classList.add('result-guard');clearTimeout(guardTimer);guardTimer=setTimeout(function(){panel.classList.remove('result-guard')},LOCK_MS)}
+  function armGuard(){guardUntil=Date.now()+LOCK_MS;panel.classList.add('result-guard');clearTimeout(guardTimer);guardTimer=setTimeout(function(){panel.classList.remove('result-guard');refresh()},LOCK_MS)}
   function normalizedPosition(p){p=String(p||'').toLowerCase();return p==='opposite'?'opp':p==='middle'?'mb':p==='outside'?'oh':p}
   function playerParts(n){var r=M.team&&M.team.roster||[];for(var i=0;i<r.length;i++)if(String(r[i].number)===String(n))return {number:String(n),name:r[i].name||'',position:normalizedPosition(r[i].position)};return {number:String(n),name:'',position:''}}
   var ACTIONS=[
@@ -1572,45 +1587,47 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
     libero:{attack:0,block:0,defense:1,reception:1,service:0,set:1,freeball:1}
   };
   function actionState(pos,id){if(pos==='libero'&&(id==='attack'||id==='block'||id==='service'))return 'blocked';return MATRIX[pos]&&MATRIX[pos][id]?'expected':'rare'}
-  var side=document.createElement('div');side.className='quick-side-selector';side.setAttribute('aria-label','Choisir le camp sans joueur');
-  side.innerHTML='<button type="button" class="quick-side home" data-quick-side="T" data-vlc-actor="T">HOME<small>'+esc(M.team.name||'Home')+'</small></button><button type="button" class="quick-side away" data-quick-side="A" data-vlc-actor="A">AWAY<small>'+esc(M.opponent.name||'Away')+'</small></button>';
-  head.insertAdjacentElement('afterend',side);
-  function actionButton(a){return '<button type="button" class="quick-action" data-quick-action="'+a.id+'" data-adv-row="'+a.id+'" data-family="'+a.family+'">'+a.label+'<small></small></button>'}
-  actionStep.innerHTML='<div class="quick-entry"><div class="quick-entry-head"><strong>SAISIE RAPIDE</strong><span class="quick-mode" id="quickMode">Choisis HOME, AWAY ou un joueur</span></div><div class="quick-pad"><div class="quick-actions quick-left">'+ACTIONS.filter(function(a){return a.side==='left'}).map(actionButton).join('')+'</div><div class="quick-results"><button type="button" class="quick-result point" data-quick-result="point" data-vlc-result="point" aria-label="Point">✓<small>POINT</small></button><button type="button" class="quick-result neutral" data-quick-result="neutral" data-vlc-result="neutral" aria-label="Continue">○<small>CONTINUE</small></button><button type="button" class="quick-result error" data-quick-result="error" data-vlc-result="error" aria-label="Error">✕<small>ERROR</small></button></div><div class="quick-actions quick-right">'+ACTIONS.filter(function(a){return a.side==='right'}).map(actionButton).join('')+'</div></div></div>';
+  function actionButton(a){return '<button type="button" class="quick-action" data-quick-action="'+a.id+'" data-adv-row="'+a.id+'" data-family="'+a.family+'" aria-label="'+a.label+'">'+a.label+'</button>'}
+  function actionById(id){for(var i=0;i<ACTIONS.length;i++)if(ACTIONS[i].id===id)return ACTIONS[i]}
+  actionStep.innerHTML='<div class="quick-entry"><div class="quick-pad">'
+    +actionButton(actionById('freeball'))
+    +actionButton(actionById('attack'))+'<button type="button" class="quick-result point" data-quick-result="point" data-vlc-result="point" aria-label="Point">✓<small>POINT</small></button>'+actionButton(actionById('service'))
+    +actionButton(actionById('block'))+'<button type="button" class="quick-result error" data-quick-result="error" data-vlc-result="error" aria-label="Error">✕<small>ERROR</small></button>'+actionButton(actionById('reception'))
+    +actionButton(actionById('set'))+'<div class="quick-middle"><button type="button" class="quick-result neutral" data-quick-result="neutral" data-vlc-result="neutral" aria-label="Continue">○<small>CONTINUE</small></button><div class="quick-side-selector" aria-label="Choisir HOME ou AWAY" hidden><button type="button" class="quick-side home" data-quick-side="T" data-vlc-actor="T" aria-label="HOME · '+esc(M.team.name||'Home')+'">HOME</button><button type="button" class="quick-side away" data-quick-side="A" data-vlc-actor="A" aria-label="AWAY · '+esc(M.opponent.name||'Away')+'">AWAY</button></div></div>'+actionButton(actionById('defense'))
+    +'</div></div>';
+  var side=actionStep.querySelector('.quick-side-selector'),middle=actionStep.querySelector('.quick-middle');
   g.classList.add('quick-player-tray');
   var title=playerStep.querySelector('.step-title');if(title){title.textContent='JOUEURS SUR LE TERRAIN';title.hidden=true}
   resultStep.classList.remove('active');playerStep.classList.add('active');actionStep.classList.add('active');
   if(chip)chip.hidden=true;if(back)back.hidden=true;
   var sub=document.getElementById('subToggle');if(sub)sub.textContent='⇄ SUBSTITUTE';
-  function actorLabel(){if(actor==='T')return 'HOME · résultat direct';if(actor==='A')return 'AWAY · résultat direct';if(actor!==null){var p=playerParts(actor);return '#'+p.number+(p.name?' '+p.name:'')+(action?' · '+action.toUpperCase():' · résultat direct ou action complète')}return 'Choisis HOME, AWAY ou un joueur'}
   function refresh(){
-    side.querySelectorAll('[data-quick-side]').forEach(function(b){b.classList.toggle('selected',b.getAttribute('data-quick-side')===String(actor))});
+    var awaiting=actor===null&&pendingResult!==null;side.hidden=!awaiting;middle.classList.toggle('awaiting-side',awaiting);
     g.querySelectorAll('.court-grid [data-player]').forEach(function(b){b.classList.toggle('quick-selected',actor!==null&&String(actor)===b.getAttribute('data-player'))});
     var numeric=actor!==null&&actor!=='T'&&actor!=='A',pos=numeric?playerParts(actor).position:'';
-    actionStep.querySelectorAll('[data-quick-action]').forEach(function(b){var id=b.getAttribute('data-quick-action'),state=numeric?actionState(pos,id):'rare';b.classList.remove('is-expected','is-rare','is-blocked','selected');b.classList.add('is-'+state);b.setAttribute('data-adv-state',state);b.setAttribute('aria-disabled',state==='blocked'?'true':'false');b.disabled=!numeric||state==='blocked';b.classList.toggle('selected',numeric&&action===id);var sm=b.querySelector('small');if(sm)sm.textContent=numeric?(state==='expected'?'PROBABLE':state==='blocked'?'INDISPONIBLE':'RARE'):''});
-    actionStep.querySelectorAll('[data-quick-result]').forEach(function(b){b.disabled=actor===null||isGuarded()});
-    var mode=document.getElementById('quickMode');if(mode)mode.textContent=actorLabel();
+    actionStep.querySelectorAll('[data-quick-action]').forEach(function(b){var id=b.getAttribute('data-quick-action'),state=numeric?actionState(pos,id):'rare';b.classList.remove('is-expected','is-rare','is-blocked','selected');b.classList.add('is-'+state);b.setAttribute('data-adv-state',state);b.setAttribute('aria-disabled',state==='blocked'?'true':'false');b.disabled=!numeric||state==='blocked';b.classList.toggle('selected',numeric&&action===id)});
+    actionStep.querySelectorAll('[data-quick-result]').forEach(function(b){var selected=pendingResult===b.getAttribute('data-quick-result');b.disabled=isGuarded()||panel.classList.contains('locked')||panel.classList.contains('sub-mode');b.classList.toggle('pending',selected);b.setAttribute('aria-pressed',selected?'true':'false')});
   }
-  function clearSelection(){actor=null;action=null;refresh()}
+  function clearSelection(){actor=null;action=null;pendingResult=null;refresh()}
   function commit(result){
     if(actor===null||panel.classList.contains('locked')||panel.classList.contains('sub-mode')||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return false}
     var a=action||(actor==='A'?'adverse':'generic'),before=eventCount();H.commit(actor,a,result);var accepted=eventCount()>before;
-    actor=null;action=null;playerStep.classList.add('active');actionStep.classList.add('active');resultStep.classList.remove('active');if(chip)chip.hidden=true;if(back)back.hidden=true;
+    actor=null;action=null;pendingResult=null;playerStep.classList.add('active');actionStep.classList.add('active');resultStep.classList.remove('active');if(chip)chip.hidden=true;if(back)back.hidden=true;
     if(accepted)armGuard();refresh();return accepted;
   }
   document.addEventListener('click',function(e){
     var target=e.target.closest&&e.target.closest('#capturePanel *');if(!target)return;
-    var sideButton=e.target.closest('[data-quick-side]');if(sideButton&&panel.contains(sideButton)){e.stopImmediatePropagation();e.preventDefault();if(isGuarded()){window.VLC_TAPS_BLOCKED++;return}actor=sideButton.getAttribute('data-quick-side');action=null;refresh();return}
-    var result=e.target.closest('[data-quick-result]');if(result&&panel.contains(result)){e.stopImmediatePropagation();e.preventDefault();commit(result.getAttribute('data-quick-result'));return}
+    var sideButton=e.target.closest('[data-quick-side]');if(sideButton&&panel.contains(sideButton)){e.stopImmediatePropagation();e.preventDefault();if(isGuarded()){window.VLC_TAPS_BLOCKED++;return}if(!pendingResult)return;var directResult=pendingResult;actor=sideButton.getAttribute('data-quick-side');action=null;pendingResult=null;commit(directResult);return}
+    var result=e.target.closest('[data-quick-result]');if(result&&panel.contains(result)){e.stopImmediatePropagation();e.preventDefault();if(isGuarded()){window.VLC_TAPS_BLOCKED++;return}var chosen=result.getAttribute('data-quick-result');if(actor===null){pendingResult=pendingResult===chosen?null:chosen;refresh()}else commit(chosen);return}
     var actionButtonNode=e.target.closest('[data-quick-action]');if(actionButtonNode&&panel.contains(actionButtonNode)){e.stopImmediatePropagation();e.preventDefault();if(actionButtonNode.disabled||actor===null||actor==='T'||actor==='A')return;action=action===actionButtonNode.getAttribute('data-quick-action')?null:actionButtonNode.getAttribute('data-quick-action');refresh();return}
     var playerButton=e.target.closest('.court-grid [data-player]');if(playerButton&&g.contains(playerButton)){
       if(panel.classList.contains('sub-mode'))return;e.stopImmediatePropagation();e.preventDefault();if(playerButton.classList.contains('nofocus'))return;
-      actor=playerButton.getAttribute('data-player');action=null;refresh();return;
+      actor=playerButton.getAttribute('data-player');action=null;pendingResult=null;refresh();return;
     }
     if(e.target.closest('#captureBack')&&panel.contains(e.target.closest('#captureBack'))){e.stopImmediatePropagation();e.preventDefault();clearSelection()}
   },true);
   var oldUpdate=window.updateCourt;if(oldUpdate){window.updateCourt=function(evs){oldUpdate(evs);refresh()}}
-  window.VLCQuickCapture={select:function(a){actor=String(a);action=null;refresh()},commit:commit,getState:function(){return {actor:actor,action:action,guarded:isGuarded()}}};
+  window.VLCQuickCapture={select:function(a){actor=String(a);action=null;pendingResult=null;refresh()},commit:commit,getState:function(){return {actor:actor,action:action,pendingResult:pendingResult,guarded:isGuarded()}}};
   refresh();
 })();
 </script>
