@@ -65,19 +65,41 @@ def test_settings_and_new_match_sequence(browser):
     page.click("#settingsBack")
 
     page.click("#homeNew")
-    assert page.locator("#suS1").inner_text() == "1 SELECT TEAM"
-    assert page.locator(".confirm-player").count() == 8
+    assert page.locator("#suTitle").inner_text() == "Sélectionne ton équipe"
+    assert page.locator(".su-steps").is_hidden()
+    page.select_option("#suTeamSelect", "Antibes U18")
+    page.fill("#suOpp", "Nice")
+    assert "Antibes U18_vs_Nice" in page.locator("#suName").input_value()
+    assert page.locator("#suNext").inner_text() == "VALIDE"
+    page.click("#suNext")
+
+    assert page.locator("#suS1").inner_text() == "2 SELECT TEAM"
+    assert page.locator("#suS1").get_attribute("class") == "on"
+    assert page.locator(".roster-player").count() == 8
     assert page.locator("[data-present]").count() == 8
     assert page.locator("[data-focus]").count() == 8
-    page.fill("#suOpp", "Nice")
+    page.select_option("#rosterSort", "name")
+    assert page.locator(".roster-player-name").first.inner_text() == "Libero"
     page.uncheck('[data-focus="7"]')
     page.click("#suNext")
 
-    assert page.locator("#setterZone").input_value() == "p1"
-    assert page.locator(".rotation-card").count() == 6
-    assert page.locator(".rotation-card .role").all_inner_texts() == ["OPP", "MB1", "OH1", "OH2", "MB2", "SET"]
+    assert page.locator('[data-setter-zone="p1"]').get_attribute("class") == "active"
+    assert page.locator(".rotation-slot").count() == 6
+    assert page.locator(".rotation-slot-role").all_inner_texts() == ["OPP", "MB 1", "OH 1", "OH 2", "MB 2", "SETTER"]
+    assert page.locator(".rotation-slot.filled").count() == 0
+    assert page.locator(".rotation-slot.setter-empty").count() == 1
+
+    for role, number in (
+        ("setter", 1), ("oh1", 3), ("mb1", 4), ("opp", 7),
+        ("oh2", 5), ("mb2", 6), ("libero", 2),
+    ):
+        page.click(f'[data-rotation-role="{role}"]')
+        page.click(f'[data-lineup-player="{number}"]')
+
+    assert page.locator("#suNext").is_hidden()
     page.click('[data-first="reception"]')
-    assert page.locator(".rotation-card .lib-note").count() == 1
+    assert page.locator("#suNext").is_visible()
+    assert page.locator("#suNext").inner_text() == "START MATCH"
     page.click("#suNext")
 
     match = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1'))")

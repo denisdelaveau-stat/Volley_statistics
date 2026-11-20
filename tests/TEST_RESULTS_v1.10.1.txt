@@ -1,0 +1,14 @@
+Volley Live Capture v1.10.1 — validation result
+Date: 2026-11-20
+
+Result: 40 automated tests passed.
+
+Validated:
+- Coach View blue treatment on team selection, player-presence validation and initial rotation;
+- all previously white structural cards, panels, fields and headers are blue in the setup flow;
+- orange roster and initial-rotation courts preserved;
+- shared pastel role palette: OPP blue, SET yellow, OH red, MB green, LIB grey;
+- Coach overview and rotation-analysis courts derive role colours from roster positions;
+- role text contrast ratios all exceed WCAG AA 4.5:1;
+- JavaScript syntax, HTML identifiers, unified v2.1 fixture and PWA regression suite;
+- cache version volley-live-capture-v1.10.1.

@@ -1,4 +1,16 @@
-# Volley Live Capture v1.10.0 — Automated Test Plan
+# Volley Live Capture v1.10.1 — Automated Test Plan
+
+
+## v1.10.1 visual-theme acceptance
+
+| Scenario | Acceptance |
+|---|---|
+| THEME101-01 | Team selection, roster validation and initial rotation replace white structural surfaces with Coach View blue |
+| THEME101-02 | Roster and rotation courts remain orange |
+| ROLE101-01 | OPP blue, SET yellow, OH red, MB green and LIB grey are defined once as shared CSS variables |
+| COACH101-01 | Overview and rotation-analysis courts derive each pastel circle from the roster position in the active JSON |
+| A11Y101-01 | Role number/text combinations meet WCAG AA contrast |
+| PWA101-01 | Cache `volley-live-capture-v1.10.1` precaches all analysis assets |
 
 ## v1.10.0 New Match acceptance
 

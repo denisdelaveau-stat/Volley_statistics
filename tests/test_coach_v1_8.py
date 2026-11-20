@@ -69,3 +69,46 @@ def test_coach_reference_v2_state_and_accessible_cta(browser):
     assert cta.is_visible()
     assert "Voir le détail du joueur numéro" in cta.get_attribute("aria-label")
     page.close()
+
+
+def test_coach_courts_use_shared_pastel_role_palette(browser):
+    page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(APP_URI)
+    match = base_match("advanced", focus_off=())
+    match["currentSet"] = 1
+    # Put all five roster roles on the six-player court for palette validation.
+    match["startingRotation"] = {"p1": 1, "p2": 7, "p3": 4, "p4": 3, "p5": 2, "p6": 5}
+    events = [{"id": 1, "set": 1, "player": 3, "action": "attack", "result": "point", "winningTeam": "team1", "scoreA": 1, "scoreB": 0}]
+    page.evaluate(
+        """payload => {
+          localStorage.clear();
+          localStorage.setItem('volleyCapture.match.v1', JSON.stringify(payload.match));
+          localStorage.setItem('volleyCapture.events.v1', JSON.stringify(payload.events));
+          localStorage.setItem('volleyCapture.chartData.v1', '[]');
+        }""",
+        {"match": match, "events": events},
+    )
+    page.reload()
+    page.locator("#homeCoach").click()
+    expected = {
+        "opp": ("rgb(143, 200, 248)", "rgb(11, 53, 88)"),
+        "setter": ("rgb(247, 215, 116)", "rgb(90, 67, 0)"),
+        "oh": ("rgb(244, 166, 166)", "rgb(91, 32, 32)"),
+        "mb": ("rgb(159, 216, 181)", "rgb(22, 69, 43)"),
+        "libero": ("rgb(199, 206, 216)", "rgb(37, 49, 66)"),
+    }
+    for role, (background, foreground) in expected.items():
+        dot = page.locator(f'.coach-player-dot[data-player-role="{role}"]').first
+        assert dot.count() == 1
+        number = dot.locator('.number')
+        assert number.evaluate("e => getComputedStyle(e).backgroundColor") == background
+        assert number.evaluate("e => getComputedStyle(e).color") == foreground
+        assert dot.locator('.name').evaluate("e => getComputedStyle(e).color") == "rgb(6, 27, 48)"
+    # Rotation analysis reuses the exact same court renderer and palette.
+    page.locator('[data-coach-tab="rotations"]').click()
+    assert page.locator('.coach-player-dot[data-player-role]').count() == 6
+    assert page.locator('.coach-court').evaluate("e => getComputedStyle(e).backgroundImage").find('rgb(255, 156, 85)') >= 0
+    assert not errors
+    page.close()
