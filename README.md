@@ -1,17 +1,15 @@
-# Volley Live Capture v1.12.0
+# Volley Live Capture v1.12.1
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
-## v1.12.0 highlights
+## v1.12.1 highlights
 
-- Removes the permanent HOME/AWAY row. Result buttons are active immediately; choosing a result first reveals HOME and AWAY in the fixed Continue slot for a two-tap team result.
-- Fixes the action geometry around the central ✓ / ✕ / ○ column: FREE BALL above, Attack/Block left, Serve/Reception right, Set/Defence below.
-- Keeps every capture control at the same coordinates and size in all states. Position guidance is visual only; no selection text is inserted.
-- Displays the six on-court players in two court-shaped rows of three and removes visible rotation, service and inline statistics/status information from Capture.
-- Removes the Capture-page Statistics section while preserving **ADVANCED STATISTICS** on Home.
-- Makes the Initial rotation libero bench a compact centred grey seat fitted to the grey libero circle, without the `BANC LIBÉRO` label.
-- Filters substitutes to present, off-court players at the same roster position and logs every substitution as a `SUBSTITUTION` event with set, rally, position, incoming and outgoing player data.
-- Keeps the 450 ms post-result lock, role pastel colours, **COACH VIEW**, **ADVANCED STATISTICS** and Undo.
+- Matches the supplied action-entry reference on a night-blue panel: Set and Defence at the top, Attack/Block left, Serve/Reception right, POSITIF/ERREUR/NEUTRE in the central green/red/blue column, and RELANCE at the bottom.
+- Compresses the six on-court players into one role-coloured row and reduces the Bench/Substitute controls, keeping the action area dominant on a 390 × 844 display.
+- Removes the visible **SAVE .JSON**, **REPORT .HTML** and end-of-match report/export controls from Capture; match state still auto-saves locally.
+- Keeps every capture control at fixed coordinates across player, action and result-first states. HOME/AWAY still replaces the reserved NEUTRE cell without moving the grid.
+- Preserves the compact Initial rotation libero bench, same-position substitution filtering, the 450 ms post-result lock, Undo, scoring and History.
+- Preserves the pastel position palette plus **COACH VIEW** and **ADVANCED STATISTICS** on Home.
 
 ## v1.10.1 baseline retained
 
@@ -35,7 +33,7 @@ Offline-first volleyball match capture and analysis for Basic, Intermediate and 
 - Reads explicit set, rally, score, serve/reception phase, setter rotation, lineup snapshot, on-court players, substitution, action and provenance data.
 - Includes `docs/VolleyLive_Unified_JSON_Format_Specification.md` and `docs/volley-live.match.schema.v2.1.json`.
 - Keeps Capture-v1 local stores only as a labelled migration path for an in-progress match; v1 is no longer the reference fixture.
-- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.0`.
+- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.1`.
 
 ## Reference data caveat
 
@@ -51,7 +49,7 @@ Open the displayed local URL in a modern browser. Opening HTML directly with `fi
 
 ## Deploy or update
 
-Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.0` on Home.
+Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.1` on Home.
 
 ## Verification
 
@@ -59,4 +57,4 @@ Publish the **complete folder contents** at the site root. Keep `index.html`, `c
 pytest -q
 ```
 
-The v1.12.0 tests verify result-first team capture, fixed control geometry at 390 × 844, two-row court positioning, the compact libero bench, same-position substitution filtering and logging, Undo, FREE BALL, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.
+The v1.12.1 tests verify the reference action geometry, fixed controls at 390 × 844, the one-row compact player strip, removed export buttons, compatible RELANCE/freeball semantics, the compact libero bench, same-position substitution filtering and logging, Undo, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.

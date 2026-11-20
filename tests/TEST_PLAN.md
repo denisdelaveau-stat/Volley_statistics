@@ -1,4 +1,16 @@
-# Volley Live Capture v1.12.0 — Automated Test Plan
+# Volley Live Capture v1.12.1 — Automated Test Plan
+
+## v1.12.1 reference-layout acceptance
+
+| Scenario | Acceptance |
+|---|---|
+| CAP121-01 | Set/Defence are at the top; Attack/Block left; Serve/Reception right; POSITIF/ERREUR/NEUTRE form the central column; RELANCE is at the bottom |
+| CAP121-02 | The six role-coloured court players share one horizontal row at 390 × 844 and the player tray is less than 120 px high |
+| CAP121-03 | SAVE .JSON, REPORT .HTML and end-of-match report/export buttons are absent from Capture |
+| CAP121-04 | RELANCE still persists `action: freeball`; POSITIF/ERREUR/NEUTRE retain compatible result values |
+| HOME121-01 | COACH VIEW and ADVANCED STATISTICS remain on Home |
+| ROLE121-01 | OPP blue, SET yellow, OH red, MB green and LIB grey remain visible in the compact player row |
+| PWA121-01 | Home shows v1.12.1 and cache `volley-live-capture-v1.12.1` precaches the complete application |
 
 ## v1.12.0 result-first and substitution acceptance
 

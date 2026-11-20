@@ -13,16 +13,16 @@ def test_score_sides_quick_pad_player_tray_undo_and_history(browser):
     assert page.locator(".quick-side-selector").is_hidden()
     assert page.locator("[data-quick-side]").count()==2 and page.locator("[data-quick-result]").count()==3 and page.locator("[data-quick-action]").count()==7
     assert page.locator(".court-grid [data-player]").count()==6
-    assert page.locator(".court-grid").evaluate("e=>getComputedStyle(e).gridTemplateColumns.split(' ').length")==3
+    assert page.locator(".court-grid").evaluate("e=>getComputedStyle(e).gridTemplateColumns.split(' ').length")==6
     assert page.inner_text("#captureUndo")=="UNDO" and page.inner_text("#historyToggle").startswith("HISTORY")
     assert not errors; page.close()
 
 
-def test_action_families_and_likely_state_are_distinct(browser):
+def test_reference_actions_share_blue_style_and_likely_state_is_distinct(browser):
     page, errors=open_match(browser,"advanced",focus_off=())
     page.click('.court-grid [data-player="3"]')
-    expected={"attack":"rgb(113, 56, 21)","reception":"rgb(20, 83, 45)","service":"rgb(12, 74, 110)"}
-    for action,color in expected.items(): assert style(page.locator(f'[data-quick-action="{action}"]'),["backgroundColor"])["backgroundColor"]==color
+    for action in ("attack","reception","service"):
+        assert style(page.locator(f'[data-quick-action="{action}"]'),["backgroundColor"])["backgroundColor"]=="rgb(18, 59, 96)"
     assert style(page.locator('[data-quick-action="set"]'),["opacity"])["opacity"]=="0.48"
     assert style(page.locator('[data-quick-action="attack"]'),["opacity"])["opacity"]=="1"
     assert not errors; page.close()

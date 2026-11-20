@@ -11,7 +11,7 @@ def _png_size(path):
 
 def test_undo_history_and_three_result_blocks(browser):
     page, errors=open_match(browser,"advanced",focus_off=())
-    assert page.locator("[data-quick-result]").all_inner_texts()==["✓\nPOINT","✕\nERROR","○\nCONTINUE"]
+    assert page.locator("[data-quick-result]").all_inner_texts()==["□\nPOSITIF","×\nERREUR","○\nNEUTRE"]
     colours={"point":"rgb(22, 163, 74)","neutral":"rgb(37, 99, 235)","error":"rgb(220, 38, 38)"}
     for result,color in colours.items(): assert _style(page.locator(f'[data-quick-result="{result}"]'),["backgroundColor"])["backgroundColor"]==color
     page.click('.court-grid [data-zone="p2"]'); page.click('[data-quick-action="attack"]'); page.click('[data-quick-result="neutral"]')

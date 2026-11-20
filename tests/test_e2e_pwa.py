@@ -48,7 +48,7 @@ def test_set_end_undo_and_exports(browser):
 
 def test_pwa_cache_version_and_shell_assets():
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.12.0" in service_worker
+    assert "volley-live-capture-v1.12.1" in service_worker
     assert "coach.css" in service_worker
     assert "coach.js" in service_worker
     assert "As_cannes_vs_Frejus_2026-11-15.fixture.v2.json" in service_worker

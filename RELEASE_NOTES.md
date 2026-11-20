@@ -1,3 +1,21 @@
+# Release notes — v1.12.1
+
+## Action-entry screen
+
+The capture pad now follows the supplied reference image on a night-blue background. **Set** and **Defence** are at the top; **Attack** and **Block** are on the left; **Serve** and **Reception** are on the right; **POSITIF**, **ERREUR** and **NEUTRE** form the green/red/blue centre column; **RELANCE** is centred at the bottom.
+
+The result-first workflow remains compatible with v1.12.0: choosing a result before a player reveals **HOME** and **AWAY** in the reserved NEUTRE cell, without moving any other control. Persisted event values remain `point`, `error`, `neutral` and `freeball`.
+
+## Compact players and removed exports
+
+The six on-court players now use one compact horizontal row while retaining their pastel position colours. The Bench/Substitute row is shorter as well. The visible **SAVE .JSON**, **REPORT .HTML** and end-of-match export controls have been removed from Capture; automatic local persistence remains active.
+
+## Preserved functionality
+
+**COACH VIEW**, **ADVANCED STATISTICS**, the shared pastel position palette, scoring, rotation logic, History, Undo, the compact libero bench, same-position substitutions, unified v2.1 analysis and offline operation are retained. The service worker cache is `volley-live-capture-v1.12.1`.
+
+## Previous release — v1.12.0
+
 # Release notes — v1.12.0
 
 ## Result-first live capture

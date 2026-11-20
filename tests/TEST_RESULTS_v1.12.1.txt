@@ -1,0 +1,22 @@
+Volley Live Capture v1.12.1 — validation result
+Date: 2026-11-20
+Result: 50 automated tests passed
+Command: python3 -m pytest -q
+Duration: 80.75 s
+
+Validated:
+- Reference action geometry: Set/Defence top, Attack/Block left, Serve/Reception right, POSITIF/ERREUR/NEUTRE centre and RELANCE bottom.
+- Fixed control positions through player, action and result-first HOME/AWAY states.
+- One-row compact role-coloured player strip and reduced Bench/Substitute controls.
+- SAVE .JSON, REPORT .HTML and end-of-match export controls absent from Capture.
+- Compatible persisted values for point, error, neutral and freeball.
+- Scoring, rotation, History, Undo, 450 ms duplicate guard and same-position substitutions.
+- Compact Initial rotation libero bench.
+- COACH VIEW and ADVANCED STATISTICS retained on Home.
+- Unified v2.1 Coach/Advanced Statistics data path and PWA assets.
+- Home version v1.12.1 and cache volley-live-capture-v1.12.1.
+
+Responsive browser checks:
+- 320 × 844: no page errors, no horizontal overflow, player tray 102 px.
+- 390 × 844: no page errors, no horizontal overflow, player tray 114 px.
+- 768 × 844: no page errors, no horizontal overflow, player tray 114 px.
