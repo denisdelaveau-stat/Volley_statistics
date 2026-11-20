@@ -1,3 +1,7 @@
+# Release notes — v1.10.1
+
+This update applies the pastel position palette and Coach View blue setup background requested for New Match. Functionality and saved-data compatibility are unchanged.
+
 # Volley Live Capture v1.10.0 — Release Notes
 
 ## New Match interface redesign

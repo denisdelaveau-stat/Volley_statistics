@@ -1,8 +1,12 @@
-# Volley Live Capture v1.10.0
+# Volley Live Capture v1.10.1
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
-## v1.10.0 highlights
+## v1.10.1 highlights
+
+- Pastel role palette shared by setup and Coach courts: OPP blue, SET yellow, OH red, MB green, LIB grey.
+- Coach View blue surfaces replace the remaining white setup page, card, panel and header backgrounds.
+- Roster and initial-rotation courts remain orange.
 
 - Adds a dedicated **Sélectionne ton équipe** page with configured-team selection, opponent entry, an automatically generated/editable match name and **VALIDE**.
 - Rebuilds **SELECT TEAM** on a volleyball court with role-coloured player circles, Present/Focus controls and sorting by shirt number, position or name.
@@ -20,7 +24,7 @@ Offline-first volleyball match capture and analysis for Basic, Intermediate and 
 - Reads explicit set, rally, score, serve/reception phase, setter rotation, lineup snapshot, on-court players, substitution, action and provenance data.
 - Includes `docs/VolleyLive_Unified_JSON_Format_Specification.md` and `docs/volley-live.match.schema.v2.1.json`.
 - Keeps Capture-v1 local stores only as a labelled migration path for an in-progress match; v1 is no longer the reference fixture.
-- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.10.0`.
+- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.10.1`.
 
 ## Reference data caveat
 
@@ -44,4 +48,4 @@ Publish the **complete folder contents** at the site root. Keep `index.html`, `c
 pytest -q
 ```
 
-The v1.10.0 tests verify the three-stage New Match flow, the unified fixture contract and both Home-to-interface paths in addition to the retained regression suite.
+The v1.10.1 tests verify the three-stage New Match flow, the unified fixture contract and both Home-to-interface paths in addition to the retained regression suite.

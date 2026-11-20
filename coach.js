@@ -1,4 +1,4 @@
-/* Volley Live Coach UI v1.9.1 — unified volley-live v2.1 data source */
+/* Volley Live Coach UI v1.10.1 — unified v2.1 data and shared pastel role palette */
 (function(){
   'use strict';
   var KM='volleyCapture.match.v1',KE='volleyCapture.events.v1';
@@ -80,8 +80,9 @@
   function periodButtons(){return '<div class="coach-period" aria-label="Période">'+[['set','SET '+(C.data.match.currentSet||1)],['match','MATCH'],['last10','10 DERNIERS']].map(function(x){return '<button type="button" data-period="'+x[0]+'" class="'+(C.period===x[0]?'active':'')+'">'+x[1]+'</button>'}).join('')+'</div>'}
   function footer(ref){var source=C.data.demo?'Données de démonstration.':C.data.explicitContext?'Référence officielle · volley-live v2.1':'Match courant · migration v1';return '<footer class="coach-footer"><span class="demo">'+source+'</span><span>'+ref+' · VOLLEY LIVE</span></footer>'}
   function kpi(title,value,sample,cls){return '<article class="coach-card coach-kpi '+cls+'"><span class="status" aria-hidden="true"></span><h3>'+title+'</h3><div class="value">'+value+'</div><div class="sample">'+sample+'</div></article>'}
-  function roleClass(p){return p.position==='libero'?'libero':p.position==='setter'?'setter':''}
-  function courtHTML(rot,title){var m=C.data.match;return '<section class="coach-card coach-court-card"><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">'+esc(title)+'</span></div><div class="coach-court" role="img" aria-label="Organisation des joueurs sur le terrain"><div class="coach-net"></div><div class="coach-court-grid">'+POS.map(function(z){var p=playerInfo(m,rot[z]);return '<div class="coach-player-dot '+roleClass(p)+'"><span class="number">'+esc(p.number)+'</span><span class="name">'+esc(p.name||'Joueur')+'</span><small>Poste '+z.slice(1)+'</small></div>'}).join('')+'</div></div><p class="coach-court-legend">P : Passeuse &nbsp; · &nbsp; L : Libéro</p></section>'}
+  function normalizedRole(value){var v=String(value||'').toLowerCase();return {set:'setter',setter:'setter',lib:'libero',libero:'libero',opposite:'opp',opp:'opp',oh:'oh',mb:'mb'}[v]||v}
+  function roleClass(p){var role=normalizedRole(p&&p.position);return role?'role-'+role:'role-libero'}
+  function courtHTML(rot,title){var m=C.data.match;return '<section class="coach-card coach-court-card"><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">'+esc(title)+'</span></div><div class="coach-court" role="img" aria-label="Organisation des joueurs sur le terrain"><div class="coach-net"></div><div class="coach-court-grid">'+POS.map(function(z){var p=playerInfo(m,rot[z]);return '<div class="coach-player-dot '+roleClass(p)+'" data-player-role="'+normalizedRole(p.position)+'"><span class="number">'+esc(p.number)+'</span><span class="name">'+esc(p.name||'Joueur')+'</span><small>Poste '+z.slice(1)+'</small></div>'}).join('')+'</div></div><p class="coach-court-legend">P : Passeuse &nbsp; · &nbsp; L : Libéro</p></section>'}
   function sharedHeading(title,sub,select){return '<div class="coach-heading-row"><div><h1 class="coach-title" tabindex="-1">'+title+'<span class="dot">.</span></h1>'+(sub?'<p class="coach-subtitle">'+sub+'</p>':'')+'</div>'+(select||'')+'</div>'}
 
   function renderOverview(){

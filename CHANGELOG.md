@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.10.1 — Pastel role palette and Coach View setup theme
+
+- Applied the requested pastel role colours: OPP blue, SET yellow, OH red, MB green and LIB grey.
+- Reused the single shared palette on every Coach View court, including rotation analysis, from each player’s roster position.
+- Applied the Coach View dark-blue background to team selection, roster validation and initial rotation.
+- Added contrast-aware text colours for role chips, player circles and selected role controls.
+- Updated the PWA cache to `volley-live-capture-v1.10.1`.
+
 ## v1.10.0 — Guided New Match interfaces
 
 - Added a dedicated team/opponent/match-name page before roster confirmation.

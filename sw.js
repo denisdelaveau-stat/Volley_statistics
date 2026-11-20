@@ -1,6 +1,6 @@
 /* Volley Live Capture - offline service worker.
    Bump CACHE when any file changes so installed phones pick up the new version. */
-var CACHE = 'volley-live-capture-v1.10.0';
+var CACHE = 'volley-live-capture-v1.10.1';
 var ASSETS = ['./', 'index.html', 'manifest.webmanifest',
   'Font_app_ref.jpg', 'coach.css', 'coach.js',
   'statistics/index.html', 'statistics/adapter.js',
