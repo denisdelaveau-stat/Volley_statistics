@@ -1,4 +1,4 @@
-/* Volley Live Coach UI v1.8.0 */
+/* Volley Live Coach UI v1.9.1 — unified volley-live v2.1 data source */
 (function(){
   'use strict';
   var KM='volleyCapture.match.v1',KE='volleyCapture.events.v1';
@@ -40,7 +40,15 @@
     return {match:match,events:events,demo:true};
   }
 
-  function load(){var m=read(KM,null),e=read(KE,[]);if(!m)return demoData();return {match:m,events:Array.isArray(e)?e:[],demo:false}}
+  function load(){
+    try{
+      if(window.VolleyStatsAdapter){
+        var raw=window.VolleyStatsAdapter.fromLocalStorage(localStorage)||window.VolleyReferenceFixture;
+        if(raw)return window.VolleyStatsAdapter.toCoachData(raw);
+      }
+    }catch(error){console.error('Coach data adapter:',error)}
+    var m=read(KM,null),e=read(KE,[]);if(!m)return demoData();return {match:m,events:Array.isArray(e)?e:[],demo:false,explicitContext:false,sourceFormat:'volley-live-capture v1'}
+  }
   function buildRallies(match,events){
     var sets={},ordered=[];
     events.forEach(function(e){var s=+e.set||1;(sets[s]||(sets[s]=[])).push(e)});
@@ -50,8 +58,11 @@
     });
     return ordered;
   }
-  function currentState(match,rallies,setNo){var serving=initialServing(match,setNo),rot=clone(match.startingRotation||{});rallies.filter(function(r){return r.set===setNo}).forEach(function(r){if(r.winner==='team1'){if(serving==='B')rot=rotate(rot);serving='A'}else if(r.winner==='team2')serving='B'});return {serving:serving,rot:rot,rotation:setterZone(match,rot)}}
-  function setSummary(match,rallies){if(match.demoSetWins)return {a:match.demoSetWins.a,b:match.demoSetWins.b};var wonA=0,wonB=0,current=+match.currentSet||1;for(var s=1;s<current;s++){var rr=rallies.filter(function(r){return r.set===s}),last=rr[rr.length-1];if(last){if(last.scoreA>last.scoreB)wonA++;else if(last.scoreB>last.scoreA)wonB++}}return {a:wonA,b:wonB}}
+  function currentState(match,rallies,setNo){
+    if(C.data&&C.data.explicitContext){var explicit=rallies.filter(function(r){return r.set===setNo}),last=explicit[explicit.length-1],rot=last&&last.lineup?clone(last.lineup):clone(match.startingRotation||{}),serving=last?(last.winner==='team1'?'A':'B'):initialServing(match,setNo);if(last&&last.phase==='receive'&&last.winner==='team1')rot=rotate(rot);return {serving:serving,rot:rot,rotation:setterZone(match,rot)}}
+    var serving=initialServing(match,setNo),rot=clone(match.startingRotation||{});rallies.filter(function(r){return r.set===setNo}).forEach(function(r){if(r.winner==='team1'){if(serving==='B')rot=rotate(rot);serving='A'}else if(r.winner==='team2')serving='B'});return {serving:serving,rot:rot,rotation:setterZone(match,rot)}
+  }
+  function setSummary(match,rallies){if(match.demoSetWins)return {a:match.demoSetWins.a,b:match.demoSetWins.b};var wonA=0,wonB=0,current=+match.currentSet||1,max=C.data&&C.data.explicitContext?Math.max.apply(null,rallies.map(function(r){return r.set}).concat([current])):current-1;for(var s=1;s<=max;s++){var rr=rallies.filter(function(r){return r.set===s}),last=rr[rr.length-1];if(last){if(last.scoreA>last.scoreB)wonA++;else if(last.scoreB>last.scoreA)wonB++}}return {a:wonA,b:wonB}}
   function selectedRallies(){var all=C.data.rallies,m=C.data.match,cur=+m.currentSet||1;if(C.period==='match')return all;if(C.period==='last10')return all.slice(-10);return all.filter(function(r){return r.set===cur})}
   function selectedEvents(){var a=[];selectedRallies().forEach(function(r){a=a.concat(r.actions)});return a}
   function ownEvent(e){return e.player!=='A'&&e.player!=='T'}
@@ -67,7 +78,7 @@
   function periodLabel(){return C.period==='match'?'Match':C.period==='last10'?'10 derniers':'Set '+(C.data.match.currentSet||1)}
   function scoreNow(){var rr=C.data.rallies.filter(function(r){return r.set===(+C.data.match.currentSet||1)}),last=rr[rr.length-1];return last?{a:last.scoreA,b:last.scoreB}:{a:0,b:0}}
   function periodButtons(){return '<div class="coach-period" aria-label="Période">'+[['set','SET '+(C.data.match.currentSet||1)],['match','MATCH'],['last10','10 DERNIERS']].map(function(x){return '<button type="button" data-period="'+x[0]+'" class="'+(C.period===x[0]?'active':'')+'">'+x[1]+'</button>'}).join('')+'</div>'}
-  function footer(ref){return '<footer class="coach-footer"><span class="demo"'+(C.data.demo?'':' hidden')+'>Données de démonstration.</span><span>'+ref+' · VOLLEY LIVE</span></footer>'}
+  function footer(ref){var source=C.data.demo?'Données de démonstration.':C.data.explicitContext?'Référence officielle · volley-live v2.1':'Match courant · migration v1';return '<footer class="coach-footer"><span class="demo">'+source+'</span><span>'+ref+' · VOLLEY LIVE</span></footer>'}
   function kpi(title,value,sample,cls){return '<article class="coach-card coach-kpi '+cls+'"><span class="status" aria-hidden="true"></span><h3>'+title+'</h3><div class="value">'+value+'</div><div class="sample">'+sample+'</div></article>'}
   function roleClass(p){return p.position==='libero'?'libero':p.position==='setter'?'setter':''}
   function courtHTML(rot,title){var m=C.data.match;return '<section class="coach-card coach-court-card"><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">'+esc(title)+'</span></div><div class="coach-court" role="img" aria-label="Organisation des joueurs sur le terrain"><div class="coach-net"></div><div class="coach-court-grid">'+POS.map(function(z){var p=playerInfo(m,rot[z]);return '<div class="coach-player-dot '+roleClass(p)+'"><span class="number">'+esc(p.number)+'</span><span class="name">'+esc(p.name||'Joueur')+'</span><small>Poste '+z.slice(1)+'</small></div>'}).join('')+'</div></div><p class="coach-court-legend">P : Passeuse &nbsp; · &nbsp; L : Libéro</p></section>'}
@@ -123,7 +134,7 @@
     h+='<div class="coach-filter-row" aria-label="Présence"><button data-player-scope="court" class="'+(C.playerScope==='court'?'active':'')+'">SUR LE TERRAIN</button><button data-player-scope="all" class="'+(C.playerScope==='all'?'active':'')+'">TOUS</button></div><div class="coach-filter-row" aria-label="Poste">'+[['all','TOUS'],['oh','OH'],['mb','MB'],['opp','OPP'],['setter','S'],['libero','L']].map(function(x){return '<button data-role="'+x[0]+'" class="'+(C.role===x[0]?'active':'')+'">'+x[1]+'</button>'}).join('')+'</div>';
     if(!list.length){content.innerHTML=h+'<div class="coach-empty">Aucun joueur ne correspond aux filtres actifs.</div>'+footer('Référence 03');return}
     h+='<div class="players-layout"><section class="coach-card"><div class="coach-card-head"><h2>Joueurs</h2><span class="coach-chip">'+list.length+' affiché'+(list.length>1?'s':'')+'</span></div><table class="players-table"><thead><tr><th class="rank">#</th><th>Joueur</th><th>Poste</th><th style="text-align:right">Delta</th></tr></thead><tbody>'+list.map(function(x,i){return '<tr data-player="'+x.player.number+'" tabindex="0" class="'+(String(x.player.number)===String(C.player)?'selected':'')+'"><td class="rank">'+(i+1)+'</td><td class="player-name">'+esc(x.player.name||'Joueur')+' <span class="coach-muted">#'+x.player.number+'</span></td><td>'+esc(ROLE_SHORT[x.player.position]||'—')+'</td><td class="metric">'+(x.delta>0?'+':'')+x.delta+'</td></tr>'}).join('')+'</tbody></table><p class="coach-note">Classement explicable : le delta correspond uniquement aux points enregistrés moins les erreurs enregistrées.</p></section>';
-    h+='<section class="coach-card"><h2 class="player-summary-title">'+esc(s.player.name||'Joueur')+' · #'+s.player.number+' <span>· '+esc(ROLE[s.player.position]||s.player.position||'')+'</span></h2>'+summaryCards(s)+'<section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi"><div class="value">'+s.rallies+'</div><div class="sample">Rallyes avec action</div></div><div class="coach-kpi"><div class="value">'+s.attempts+'</div><div class="sample">Actions enregistrées</div></div></div></article><article class="coach-card"><h3>Contribution</h3>'+contributionBars(s)+'</article></section><button type="button" class="player-detail-cta" id="playerDetailCta" aria-label="Voir le détail du joueur numéro '+s.player.number+', '+esc(s.player.name||'Joueur')+'"><span class="silhouette" aria-hidden="true">♟</span><span>Voir le détail joueur</span><span class="chev" aria-hidden="true">›</span></button><div class="coach-footer"><span class="demo"'+(C.data.demo?'':' hidden')+'>Données de démonstration.</span><span>Référence 03 · VOLLEY LIVE</span></div></section></div>';content.innerHTML=h;
+    h+='<section class="coach-card"><h2 class="player-summary-title">'+esc(s.player.name||'Joueur')+' · #'+s.player.number+' <span>· '+esc(ROLE[s.player.position]||s.player.position||'')+'</span></h2>'+summaryCards(s)+'<section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi"><div class="value">'+s.rallies+'</div><div class="sample">Rallyes avec action</div></div><div class="coach-kpi"><div class="value">'+s.attempts+'</div><div class="sample">Actions enregistrées</div></div></div></article><article class="coach-card"><h3>Contribution</h3>'+contributionBars(s)+'</article></section><button type="button" class="player-detail-cta" id="playerDetailCta" aria-label="Voir le détail du joueur numéro '+s.player.number+', '+esc(s.player.name||'Joueur')+'"><span class="silhouette" aria-hidden="true">♟</span><span>Voir le détail joueur</span><span class="chev" aria-hidden="true">›</span></button><div class="coach-footer"><span class="demo">'+(C.data.demo?'Données de démonstration.':C.data.explicitContext?'Référence officielle · volley-live v2.1':'Match courant · migration v1')+'</span><span>Référence 03 · VOLLEY LIVE</span></div></section></div>';content.innerHTML=h;
   }
 
   function currentPlayerStats(){var p=playerInfo(C.data.match,C.player);return playerStats(p,selectedEvents(),selectedRallies())}
@@ -139,10 +150,10 @@
     h+='<button type="button" class="detail-full-actions" data-all-actions>☷ &nbsp; Voir toutes les actions &nbsp; ›</button>'+footer('Détail joueur');content.innerHTML=h;
   }
 
-  function updateShell(){screen.querySelectorAll('[data-coach-tab]').forEach(function(b){var active=b.dataset.coachTab===C.view||(C.view==='detail'&&b.dataset.coachTab==='players');b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});var lb=document.getElementById('coachLiveLabel');if(lb)lb.textContent=C.data.demo?'DÉMO':'EN DIRECT'}
-  function render(){C.data=load();C.data.rallies=buildRallies(C.data.match,C.data.events);updateShell();if(C.view==='overview')renderOverview();else if(C.view==='rotations')renderRotations();else if(C.view==='players')renderPlayers();else renderDetail()}
+  function updateShell(){screen.querySelectorAll('[data-coach-tab]').forEach(function(b){var active=b.dataset.coachTab===C.view||(C.view==='detail'&&b.dataset.coachTab==='players');b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});var lb=document.getElementById('coachLiveLabel');if(lb)lb.textContent=C.data.demo?'DÉMO':C.data.explicitContext?'V2.1 RÉF':'EN DIRECT'}
+  function render(){C.data=load();if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);updateShell();if(C.view==='overview')renderOverview();else if(C.view==='rotations')renderRotations();else if(C.view==='players')renderPlayers();else renderDetail()}
   function focusHeading(){setTimeout(function(){var h=content.querySelector('.coach-title');if(h)h.focus()},0)}
-  function openCoach(){C.data=load();C.data.rallies=buildRallies(C.data.match,C.data.events);document.getElementById('homeScreen').hidden=true;screen.hidden=false;C.view='overview';render();screen.scrollTop=0;focusHeading()}
+  function openCoach(){C.data=load();if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);document.getElementById('homeScreen').hidden=true;screen.hidden=false;C.view='overview';render();screen.scrollTop=0;focusHeading()}
   function closeCoach(){screen.hidden=true;document.getElementById('homeScreen').hidden=false;document.getElementById('homeCoach').focus()}
   document.getElementById('homeCoach').addEventListener('click',openCoach);document.getElementById('coachHome').addEventListener('click',closeCoach);
   screen.querySelector('.coach-nav').addEventListener('click',function(e){var b=e.target.closest('[data-coach-tab]');if(!b)return;C.view=b.dataset.coachTab;render();screen.scrollTop=0;focusHeading()});

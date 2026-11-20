@@ -1,0 +1,30 @@
+Volley Live Capture v1.8.0 automated verification
+Date: 20 November 2026
+
+Commands
+- node --check coach.js
+- pytest -q
+
+Result
+- JavaScript syntax: passed
+- Automated tests: 28 passed
+- Failures: 0
+
+Coach acceptance coverage
+- Home Coach View entry point: passed
+- Demonstration state without a saved match: passed
+- Live match/event data binding: passed
+- Overview with six KPIs and period context: passed
+- P1–P6 rotation navigation: passed
+- Phase filter and rotation court: passed
+- Players filters and explainable delta ranking: passed
+- Exact "Voir le détail joueur" CTA: passed
+- Player Detail navigation and context-preserving Back path: passed
+- 320 CSS px CTA accessibility check: passed
+
+Regression coverage
+- Basic, Intermediate and Advanced capture workflows: passed
+- Scoring, undo, rotation, substitution and set handling: passed
+- Teams, Settings and New Match: passed
+- Portable JSON and report export: passed
+- PWA cache and icons: passed

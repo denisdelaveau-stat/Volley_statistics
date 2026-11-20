@@ -1,0 +1,13 @@
+Volley Live Capture v1.9.0 validation
+=====================================
+
+Result: 30 passed
+
+Checks included:
+- complete existing browser regression suite;
+- ADVANCED STATISTICS Home navigation;
+- bundled reference JSON rendering (2 sets, 93 rallies/actions);
+- current Capture local-store rendering;
+- JavaScript syntax checks for the main page, statistics page and adapter;
+- HTML duplicate-ID validation;
+- Capture v1 reference JSON adapter validation.

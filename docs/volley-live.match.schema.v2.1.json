@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://volley-live.example/schema/volley-live.match.schema.v2.1.json",
+  "title": "VolleyLive unified match document v2.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["format", "schemaVersion", "documentType", "match", "teams", "players", "sets", "rallies", "events"],
+  "properties": {
+    "format": {"const": "volley-live"},
+    "schemaVersion": {"type": "string", "pattern": "^2\\."},
+    "documentType": {"const": "match"},
+    "generatedAt": {"$ref": "#/$defs/dateTime"},
+    "match": {
+      "type": "object",
+      "required": ["matchId", "name", "status", "ourTeamId", "opponentTeamId", "currentSetNumber", "rules"],
+      "properties": {
+        "matchId": {"$ref": "#/$defs/id"},
+        "name": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "minLength": 1},
+        "lifecycleStatus": {"enum": ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "ABANDONED"]},
+        "ourTeamId": {"$ref": "#/$defs/id"},
+        "opponentTeamId": {"$ref": "#/$defs/id"},
+        "currentSetNumber": {"type": "integer", "minimum": 1},
+        "rules": {
+          "type": "object",
+          "required": ["setsToWin", "setPoints", "decidingSetPoints"],
+          "properties": {
+            "setsToWin": {"type": "integer", "minimum": 1},
+            "setPoints": {"type": "integer", "minimum": 1},
+            "decidingSetPoints": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "teams": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/team"}},
+    "players": {"type": "array", "items": {"$ref": "#/$defs/player"}},
+    "sets": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/set"}},
+    "lineups": {"type": "array", "items": {"$ref": "#/$defs/lineup"}},
+    "rallies": {"type": "array", "items": {"$ref": "#/$defs/rally"}},
+    "events": {"type": "array", "items": {"$ref": "#/$defs/event"}},
+    "live": {"type": "object"},
+    "dataQuality": {"type": "object"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1},
+    "dateTime": {"type": ["string", "null"], "format": "date-time"},
+    "score": {
+      "type": "object",
+      "required": ["our", "opponent"],
+      "properties": {
+        "our": {"type": "integer", "minimum": 0},
+        "opponent": {"type": "integer", "minimum": 0}
+      }
+    },
+    "zones": {
+      "type": "object",
+      "required": ["p1", "p2", "p3", "p4", "p5", "p6"],
+      "properties": {
+        "p1": {"$ref": "#/$defs/id"}, "p2": {"$ref": "#/$defs/id"},
+        "p3": {"$ref": "#/$defs/id"}, "p4": {"$ref": "#/$defs/id"},
+        "p5": {"$ref": "#/$defs/id"}, "p6": {"$ref": "#/$defs/id"}
+      }
+    },
+    "team": {
+      "type": "object",
+      "required": ["teamId", "side", "name"],
+      "properties": {
+        "teamId": {"$ref": "#/$defs/id"},
+        "side": {"enum": ["OUR", "OPPONENT"]},
+        "name": {"type": "string", "minLength": 1}
+      }
+    },
+    "player": {
+      "type": "object",
+      "required": ["playerId", "teamId", "number", "name", "role", "active"],
+      "properties": {
+        "playerId": {"$ref": "#/$defs/id"},
+        "teamId": {"$ref": "#/$defs/id"},
+        "number": {"type": ["integer", "string"]},
+        "name": {"type": "string", "minLength": 1},
+        "role": {"enum": ["SET", "OPP", "OH", "MB", "LIB"]},
+        "active": {"type": "boolean"}
+      }
+    },
+    "set": {
+      "type": "object",
+      "required": ["setId", "setNumber", "status", "initialServingTeamId", "startingLineup", "setterPlayerId", "liberoPlayerId", "lineupVerified"],
+      "properties": {
+        "setId": {"$ref": "#/$defs/id"},
+        "setNumber": {"type": "integer", "minimum": 1},
+        "status": {"type": "string"},
+        "initialServingTeamId": {"$ref": "#/$defs/id"},
+        "startingLineup": {"$ref": "#/$defs/zones"},
+        "setterPlayerId": {"$ref": "#/$defs/id"},
+        "liberoPlayerId": {"$ref": "#/$defs/id"},
+        "lineupVerified": {"type": "boolean"},
+        "finalScore": {"$ref": "#/$defs/score"}
+      }
+    },
+    "lineup": {
+      "type": "object",
+      "required": ["lineupVersionId", "setId", "rallyId", "teamId", "zones", "onCourtPlayerIds", "source", "verified"],
+      "properties": {
+        "lineupVersionId": {"$ref": "#/$defs/id"},
+        "setId": {"$ref": "#/$defs/id"},
+        "rallyId": {"$ref": "#/$defs/id"},
+        "teamId": {"$ref": "#/$defs/id"},
+        "zones": {"$ref": "#/$defs/zones"},
+        "onCourtPlayerIds": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "source": {"enum": ["CAPTURED", "COACH_CONFIRMED", "INFERRED"]},
+        "verified": {"type": "boolean"}
+      }
+    },
+    "rally": {
+      "type": "object",
+      "required": ["rallyId", "setId", "setNumber", "rallyNumber", "status", "servingTeamId", "receivingTeamId", "phaseAtStart", "setterRotationAtStart", "lineupVersionId", "onCourtPlayerIds", "scoreBefore", "scoreAfter", "winnerTeamId", "terminalEventId"],
+      "properties": {
+        "rallyId": {"$ref": "#/$defs/id"},
+        "setId": {"$ref": "#/$defs/id"},
+        "setNumber": {"type": "integer", "minimum": 1},
+        "rallyNumber": {"type": "integer", "minimum": 1},
+        "status": {"enum": ["OPEN", "CLOSED", "VOIDED"]},
+        "servingTeamId": {"$ref": "#/$defs/id"},
+        "receivingTeamId": {"$ref": "#/$defs/id"},
+        "phaseAtStart": {"enum": ["SERVE", "RECEPTION"]},
+        "setterRotationAtStart": {"enum": ["P1", "P2", "P3", "P4", "P5", "P6"]},
+        "lineupVersionId": {"$ref": "#/$defs/id"},
+        "onCourtPlayerIds": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "scoreBefore": {"$ref": "#/$defs/score"},
+        "scoreAfter": {"$ref": "#/$defs/score"},
+        "winnerTeamId": {"$ref": "#/$defs/id"},
+        "terminalEventId": {"$ref": "#/$defs/id"}
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["eventId", "eventType", "matchId", "sequenceNumber", "recordedAt", "status", "provenance"],
+      "properties": {
+        "eventId": {"$ref": "#/$defs/id"},
+        "eventType": {"enum": ["ACTION", "SUBSTITUTION", "TIMEOUT", "CORRECTION", "MATCH_STATE"]},
+        "matchId": {"$ref": "#/$defs/id"},
+        "sequenceNumber": {"type": "integer", "minimum": 1},
+        "recordedAt": {"$ref": "#/$defs/dateTime"},
+        "status": {"enum": ["ACTIVE", "CORRECTED", "VOIDED"]},
+        "provenance": {"enum": ["CAPTURED", "SYNTHETIC", "IMPORTED", "CORRECTED"]},
+        "evaluation": {"enum": ["NEUTRAL", "POINT", "ERROR"]},
+        "actionType": {"enum": ["SERVICE", "RECEPTION", "SET", "ATTACK", "BLOCK", "DEFENSE", "FREEBALL", "OPPONENT_ACTION"]},
+        "scoreBefore": {"$ref": "#/$defs/score"},
+        "scoreAfter": {"$ref": "#/$defs/score"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"eventType": {"const": "ACTION"}}},
+          "then": {"required": ["setId", "setNumber", "rallyId", "actionOrder", "teamId", "actionType", "evaluation", "scoreBefore", "scoreAfter", "lineupVersionId"]}
+        },
+        {
+          "if": {"properties": {"eventType": {"const": "SUBSTITUTION"}}},
+          "then": {"required": ["setId", "setNumber", "teamId", "playerOutId", "playerInId"]}
+        }
+      ]
+    }
+  }
+}

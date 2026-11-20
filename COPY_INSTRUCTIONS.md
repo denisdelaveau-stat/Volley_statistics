@@ -1,3 +1,15 @@
-# Copy instructions — v1.9.0
+# Copy instructions — v1.9.1
 
-Deploy the complete `Volley_statistics_v1.9.0` folder contents at the application root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together so offline caching, data loading and navigation remain aligned. On iPhone, open the site online once, fully close the installed PWA, and reopen it. If an older cache remains, remove and re-add the Home-screen shortcut.
+Deploy the complete `Volley_statistics_v1.9.1` folder contents at the application root.
+
+Keep these paths together:
+
+- `index.html`, `coach.css`, `coach.js`;
+- `statistics/index.html` and `statistics/adapter.js`;
+- `statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json`;
+- `statistics/data/reference-fixture.js`;
+- `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/`.
+
+Delete the obsolete `statistics/data/As_cannes_vs_Frejus_2026-11-15.json` Capture-v1 reference if it remains from v1.9.0.
+
+Do not publish only `index.html`: both analysis interfaces depend on shared files and the service worker precache list. On iPhone, open the deployed site online once, fully close the installed PWA, then reopen it. If an older cache remains, remove and re-add the Home-screen shortcut. Confirm `v1.9.1` on Home.

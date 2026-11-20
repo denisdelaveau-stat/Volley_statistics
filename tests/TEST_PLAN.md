@@ -1,4 +1,18 @@
-# Volley Live Capture v1.6.10 — Automated Test Plan
+# Volley Live Capture v1.9.1 — Automated Test Plan
+
+## v1.9.1 unified-data acceptance
+
+| Scenario | Acceptance |
+|---|---|
+| JSON21-01 | Canonical fixture validates as `volley-live` schema `2.1.0`, document type `match` |
+| JSON21-02 | Fixture has 2 sets, 93 rallies, 365 unique ordered events, 94 captured and 271 synthetic |
+| JSON21-03 | Synthetic events are neutral, never change score and never close a rally |
+| JSON21-04 | Rally scores, terminal actions, winners, P1–P6 context and lineup snapshots remain coherent |
+| JSON21-05 | Libero/server/front-row role constraints hold |
+| HOME21-01 | Home displays both `COACH VIEW` and `ADVANCED STATISTICS` |
+| COACH21-01 | Coach opens the bundled v2.1 fixture and exposes Overview, rotations, players and detail |
+| STATS21-01 | Advanced Statistics opens the same fixture and renders 364 action rows from 365 source events |
+| PWA21-01 | Cache `volley-live-capture-v1.9.1` precaches both interfaces, adapter and v2.1 reference assets |
 
 ## Environment
 - Python + pytest + Playwright/Chromium.

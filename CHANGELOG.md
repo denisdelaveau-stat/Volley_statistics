@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.9.1 — Unified JSON v2.1 for Coach and Advanced Statistics
+- Kept both Home entry points: `COACH VIEW` and `ADVANCED STATISTICS`.
+- Made `volley-live` schema 2.1 the authoritative data contract for both interfaces.
+- Bundled `As_cannes_vs_Frejus_2026-11-15.fixture.v2.json` as the shared reference: 2 sets, 93 rallies and 365 events.
+- Added one shared adapter for explicit rally phase, P1–P6 setter rotation, lineup snapshots, on-court presence, substitutions, scores, players and provenance.
+- Retained Capture v1 only as a labelled in-memory migration path for a live local match.
+- Added the official unified-format specification and JSON Schema.
+- Added an offline fixture module and bumped the PWA cache to `volley-live-capture-v1.9.1`.
+- Added browser and structural acceptance coverage for both Home buttons and both v2.1-backed interfaces.
+
 ## v1.9.0 — Advanced Statistics integration
 - Added the `ADVANCED STATISTICS` Home entry point.
 - Integrated Set Timeline, Rotation Metrics, Roster Ranking and Playing Time.

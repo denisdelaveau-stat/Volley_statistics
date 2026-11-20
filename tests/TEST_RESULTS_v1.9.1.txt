@@ -1,0 +1,22 @@
+Volley Live Capture v1.9.1 — validation result
+Date: 2026-11-20
+
+Command:
+  pytest -q
+
+Result:
+  37 passed in 65.97s
+
+Validated scope:
+- official volley-live v2.1 root contract and JSON Schema;
+- canonical fixture counts: 2 sets, 93 rallies, 365 events;
+- provenance: 94 CAPTURED and 271 SYNTHETIC;
+- synthetic neutrality and no score/rally closure by synthetic events;
+- unique event IDs and sequence numbers;
+- rally score continuity, one-point transitions, winners and terminal events;
+- standard p1-p6 rotation context, server position and front-row block constraints;
+- no libero service, attack or block;
+- COACH VIEW present and functional from Home with v2.1 fixture;
+- ADVANCED STATISTICS present and functional from Home with v2.1 fixture;
+- 364 action timeline rows plus one source substitution event;
+- complete retained regression suite, PWA cache v1.9.1 and offline assets.

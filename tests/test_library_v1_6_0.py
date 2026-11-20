@@ -1,8 +1,8 @@
-"""Non-regression checks for the v1.5 setup library retained in v1.6.2."""
+"""Acceptance tests for the v1.7 single-screen Teams library."""
 from helpers import APP_URI
 
 
-def test_saved_team_library_and_rotate_plus_one(browser):
+def test_single_screen_team_editor_saves_reusable_team(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -10,31 +10,23 @@ def test_saved_team_library_and_rotate_plus_one(browser):
     page.goto(APP_URI)
     page.evaluate("localStorage.clear()")
     page.reload()
-    page.click("#homeNew")
-    page.fill("#suTeam", "Antibes")
-    page.fill("#suOpp", "Nice")
-    for number in range(1, 9):
-        page.click(f'[data-n="{number}"]')
-        page.fill(f'[data-iname="{number}"]', f'Player {number}')
-    page.fill('[data-libname="team"]', "Antibes U18")
-    page.click('[data-libsave="team"]')
+    page.click("#homeTeams")
+    assert page.locator("#teamsScreen").is_visible()
+    assert page.locator("#suTeam, #suOpp, #suName, #suLevel").count() == 0
+    for _ in range(7):
+        page.click("#teamAdd")
+    roles = ("setter", "libero", "oh", "mb", "oh", "mb", "opp")
+    for index, role in enumerate(roles):
+        page.fill(f'[data-team-name="{index}"]', f"Player {index + 1}")
+        page.click(f'[data-team-role="{index}:{role}"]')
+    page.fill("#teamName", "Antibes U18")
+    page.click("#teamsSave")
     library = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.library.v1'))")
-    assert library["team"]["Antibes U18"]["roster"] == list(range(1, 9))
-
-    page.click("#suNext")
-    assignments = {"oh1": 3, "oh2": 5, "mb1": 4, "mb2": 6, "setter": 1, "opp": 7, "libero": 2}
-    for slot, number in assignments.items():
-        page.click(f'[data-slot="{slot}"]')
-        page.click(f'[data-pick="{number}"]')
-    page.click("#suNext")
-    rotation = {"p1": 1, "p2": 3, "p3": 4, "p4": 7, "p5": 5, "p6": 6}
-    for position, number in rotation.items():
-        page.click(f'[data-pos="{position}"]')
-        page.click(f'[data-rpick="{number}"]')
-    page.click("#suRotate")
-    assert page.evaluate("window.__S.rot") == {"p1": 3, "p2": 4, "p3": 7, "p4": 5, "p5": 6, "p6": 1}
-    for _ in range(5):
-        page.click("#suRotate")
-    assert page.evaluate("window.__S.rot") == rotation
+    saved = library["team"]["Antibes U18"]
+    assert saved["roster"] == list(range(1, 8))
+    assert saved["info"]["1"]["pos"] == "setter"
+    assert saved["info"]["7"]["pos"] == "opp"
+    assert "focus" not in saved["info"]["1"]
+    assert page.locator("[data-ifocus]").count() == 0
     assert not errors
     page.close()
