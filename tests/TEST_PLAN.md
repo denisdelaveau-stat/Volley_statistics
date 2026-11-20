@@ -1,4 +1,20 @@
-# Volley Live Capture v1.10.1 — Automated Test Plan
+# Volley Live Capture v1.11.0 — Automated Test Plan
+
+## v1.11.0 quick-capture acceptance
+
+| Scenario | Acceptance |
+|---|---|
+| CAP110-01 | Score, HOME/AWAY, quick actions/results and blue player tray render in that vertical order |
+| CAP110-02 | Complete path records player + action + result |
+| CAP110-03 | Player path records player + generic result |
+| CAP110-04 | HOME/AWAY path records a direct side result without player or technical action |
+| CAP110-05 | Seven actions include FREE BALL and position guidance marks probable, rare and blocked states |
+| CAP110-06 | Libero Attack, Block and Serve are disabled |
+| CAP110-07 | A 450 ms lock prevents a second accepted result while navigation remains available |
+| CAP110-08 | Substitute, Undo, score, rotation and history continue to work |
+| ROT110-01 | Empty Initial rotation shows a grey libero circle on a centred grey bench |
+| HOME110-01 | COACH VIEW and ADVANCED STATISTICS remain on Home |
+| PWA110-01 | Cache `volley-live-capture-v1.11.0` precaches the complete application |
 
 
 ## v1.10.1 visual-theme acceptance

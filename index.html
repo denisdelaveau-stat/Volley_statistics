@@ -384,7 +384,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   </div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
   <nav class="home-nav" aria-label="Application sections"><button type="button" id="homeTeams"><span class="nav-icon">♟</span>TEAMS</button><button type="button" id="homeSettings"><span class="nav-icon">⚙</span>SETTINGS</button></nav>
-  <div class="home-version" id="appVersion">v1.10.1</div>
+  <div class="home-version" id="appVersion">v1.11.0</div>
 </div>
 <div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
   <div class="coach-shell">
@@ -459,7 +459,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   var LVL=(m&&m.detailLevel)||'advanced';window.VOLLEY_LEVEL=LVL;document.documentElement.setAttribute('data-level',LVL);
   // ---- set & match rules (derived from events only) ----
   window.VolleyStats=(function(){
-    var ACTS=['attack','block','service','reception','defense','set'],ALL=['attack','block','service','reception','defense','set','generic'],ALAB={generic:'No action detail',attack:'Attack',block:'Block',service:'Service',reception:'Reception',defense:'Defense',set:'Set'};
+    var ACTS=['attack','block','service','reception','defense','set','freeball'],ALL=['attack','block','service','reception','defense','set','freeball','generic'],ALAB={generic:'No action detail',attack:'Attack',block:'Block',service:'Service',reception:'Reception',defense:'Defense',set:'Set',freeball:'Free ball'};
     var RN={setter:'Setter',oh:'OH',mb:'MB',opp:'OPP',libero:'Libero'};
     function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
     function info(mm,n){var r=(mm&&mm.team&&mm.team.roster)||[];for(var i=0;i<r.length;i++)if(r[i].number===n)return r[i];return null}
@@ -1272,7 +1272,7 @@ function renderErrorCharts(events){
     h+='</div><div class="rotation-board"><div class="rotation-board-head"><strong>Organisation actuelle</strong><span class="rotation-badge">Rotation '+rotationNumber+'</span></div><div class="setup-orange-court"><div class="setup-rotation-grid">';
     COURT.forEach(function(zone){h+=rotationSlot(zone,rr.roles[zone],rr.numbers[zone])});h+='</div></div>';
     if(S.pickerRole&&S.pickerRole!=='libero')h+=playerPicker(S.pickerRole);
-    h+='<div class="libero-setup"><button type="button" class="libero-picker-button role-libero'+(S.assign.libero?' selected':'')+'" data-rotation-role="libero">'+(S.assign.libero?'#'+S.assign.libero+' '+esc((player(S.assign.libero)||{}).name||''):'SÉLECTIONNER LE LIBÉRO')+'<small>LIBÉRO</small></button></div>';
+    var liberoPlayer=player(S.assign.libero),liberoName=liberoPlayer&&liberoPlayer.name||'';h+='<div class="libero-setup"><div class="libero-bench-label">BANC LIBÉRO</div><button type="button" class="libero-picker-button libero-seat role-libero'+(S.assign.libero?' selected':' empty')+'" data-rotation-role="libero" aria-label="'+(S.assign.libero?'Modifier le libéro':'Sélectionner le libéro')+'"><span class="libero-circle">'+(S.assign.libero?S.assign.libero:'L')+'</span><span class="libero-seat-name">'+(S.assign.libero?esc(liberoName):'SÉLECTIONNER LE LIBÉRO')+'</span><small>LIBÉRO</small></button></div>';
     if(S.pickerRole==='libero')h+=playerPicker('libero');
     h+='</div><div class="su-card first-rally-card"><label class="field-label">Premier rôle du match</label><div class="su-grid su-slots"><button type="button" class="su-btn'+(S.first==='reception'?' sel':'')+'" data-first="reception">RÉCEPTION</button><button type="button" class="su-btn'+(S.first==='service'?' sel':'')+'" data-first="service">SERVICE</button></div></div></section>';
     body.innerHTML=h;next.textContent='START MATCH';next.hidden=!S.first;var le=lineupError();next.disabled=!!le;if(le)msg.textContent=le;
@@ -1478,6 +1478,65 @@ html[data-level="intermediate"] #capturePanel .touch-grid.players .touch.selecte
 .vlc-net::before,.vlc-net::after,.su-net::before,.su-net::after{top:-5px;height:28px}
 html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"] .vlc-result-bar.team{border-top:2px dashed #cbd5e1;padding-top:8px;margin-top:8px}
 @media(max-width:360px){.score-live.board{gap:4px}.board .digit-box{min-width:54px;padding-left:7px;padding-right:7px;font-size:36px}.board .set-badge{min-width:30px;height:30px;padding:0 5px;font-size:17px}}
+/* v1.11.0 · unified quick capture */
+#capturePanel{max-width:760px;margin:0 auto 14px;padding:12px;background:linear-gradient(180deg,#071f3b 0%,#0b3156 100%);border-color:#1c5f91;color:#fff;box-shadow:0 12px 30px rgba(2,15,32,.24)}
+#capturePanel .capture-head{justify-content:center;margin-bottom:8px}
+#capturePanel .score-live{color:#fff}
+#capturePanel .steps{display:flex!important;flex-direction:column;gap:9px;margin:0}
+#capturePanel .step{display:block!important}
+#capturePanel [data-step="result"]{display:none!important}
+#capturePanel [data-step="action"]{order:1}
+#capturePanel [data-step="player"]{order:2}
+.quick-side-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 9px}
+.quick-side{min-height:50px;border:2px solid #3f7199;border-radius:12px;background:#123b60;color:#dbeafe;font-size:15px;font-weight:900;line-height:1.05;touch-action:manipulation}
+.quick-side small{display:block;margin-top:4px;font-size:10px;font-weight:700;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quick-side.selected{background:#0ea5e9;border-color:#7dd3fc;color:#03182c;box-shadow:0 0 0 3px rgba(125,211,252,.25)}
+.quick-side.away.selected{background:#f59e0b;border-color:#fde68a;color:#2b1700}
+.quick-entry{border:1px solid #2f78aa;border-radius:14px;background:rgba(4,24,47,.72);padding:9px}
+.quick-entry-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+.quick-entry-head strong{font-size:12px;letter-spacing:.12em;color:#7dd3fc}
+.quick-mode{min-width:0;text-align:right;font-size:11px;font-weight:800;color:#dbeafe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.quick-pad{display:grid;grid-template-columns:minmax(0,1fr) 74px minmax(0,1fr);gap:7px;align-items:stretch}
+.quick-actions{display:grid;gap:7px;align-content:start}
+.quick-action{position:relative;min-height:50px;border:2px solid #1596c4;border-radius:10px;background:#0a456c;color:#fff;font-size:12px;font-weight:900;letter-spacing:.02em;touch-action:manipulation}
+.quick-action[data-family="offence"]{border-color:#f59e0b;background:#713815}
+.quick-action[data-family="defence"]{border-color:#22c55e;background:#14532d}
+.quick-action[data-family="control"]{border-color:#38bdf8;background:#0c4a6e}
+.quick-action small{display:block;font-size:8px;opacity:.82;margin-top:2px}
+.quick-action.is-expected{opacity:1}.quick-action.is-rare{opacity:.48}.quick-action.is-blocked{opacity:.25;pointer-events:none}
+.quick-action.selected{opacity:1;box-shadow:0 0 0 3px #f8fafc,0 0 0 6px #22d3ee;transform:scale(.98)}
+.quick-action:disabled{cursor:not-allowed}
+.quick-results{display:grid;grid-template-rows:repeat(3,1fr);gap:7px}
+.quick-result{min-height:50px;border:2px solid transparent;border-radius:10px;color:#fff;font-size:24px;font-weight:1000;touch-action:manipulation}
+.quick-result small{display:block;font-size:8px;line-height:1;text-transform:uppercase;letter-spacing:.04em}
+.quick-result.point{background:#16a34a;border-color:#4ade80}.quick-result.error{background:#dc2626;border-color:#f87171}.quick-result.neutral{background:#2563eb;border-color:#60a5fa}
+.quick-result:disabled{opacity:.32;filter:grayscale(.5)}
+#capturePanel.result-guard .quick-result{opacity:.5;pointer-events:none}
+.quick-player-tray{display:block!important;background:#0a294a;border:1px solid #2f78aa;border-radius:14px;padding:8px!important}
+.quick-player-tray #courtStatus{color:#fff!important;font-size:12px;margin:0 0 3px}
+.quick-player-tray #phaseBadge{display:inline-block;font-size:11px;margin:0 auto 7px;min-width:100px}
+.quick-player-tray .court-net,.quick-player-tray .court-adv,.quick-player-tray .bench-label{display:none!important}
+.quick-player-tray .court-grid{display:grid!important;grid-template-columns:repeat(6,minmax(46px,1fr))!important;gap:5px!important;background:transparent!important;border:0!important;padding:3px 0 6px!important}
+.quick-player-tray .court-grid .touch{aspect-ratio:1/1;min-height:0!important;width:100%!important;max-width:66px;margin:auto;border-radius:50%!important;padding:2px!important;font-size:16px;overflow:hidden}
+.quick-player-tray .court-grid .touch .pz{font-size:8px}.quick-player-tray .court-grid .touch .pn{font-size:16px}.quick-player-tray .court-grid .touch small{display:none!important}.quick-player-tray .court-grid .touch .nm{display:none}.quick-player-tray .court-grid .touch .rl{font-size:7px}.quick-player-tray .court-grid .touch.is-srv::after{display:none!important}
+.quick-player-tray .court-grid .touch.quick-selected{box-shadow:0 0 0 3px #fff,0 0 0 6px #22d3ee!important;transform:translateY(-2px)}
+.quick-player-tray .bench-row{display:flex;justify-content:center;align-items:center;gap:8px;padding-top:7px;border-top:1px dashed #4b7192}
+.quick-player-tray .bench-row #benchBtn{border-radius:999px!important}
+.quick-player-tray .bench-row .sub-toggle{height:38px;min-height:38px;max-height:38px;width:132px;flex-basis:132px;border:2px solid #c084fc;background:#4c1d95;color:#fff;font-size:10px}
+#capturePanel .capture-tools{display:flex;margin-top:8px}
+#capturePanel .capture-tools #captureUndo{background:#fed7aa!important;border-color:#fb923c!important;color:#9a3412!important}
+#capturePanel .capture-status{color:#dbeafe}
+#capturePanel .history-toggle{background:#0e3b63;border-color:#4b86b4;color:#fff}
+#capturePanel .history-panel{background:#fff;color:#17202a;border-radius:10px;padding:4px}
+@media(max-width:360px){.quick-pad{grid-template-columns:minmax(0,1fr) 66px minmax(0,1fr);gap:5px}.quick-action,.quick-result{min-height:46px}.quick-player-tray .court-grid{gap:3px!important}.quick-player-tray .court-grid .touch{max-width:58px}.quick-player-tray{padding:6px!important}}
+/* Initial rotation: libero sits as a grey player circle on a centred grey bench. */
+.libero-setup{margin:10px auto 0;max-width:230px;padding:7px 10px 9px;border:2px solid #94a3b8;border-radius:12px;background:linear-gradient(180deg,#cbd5e1,#94a3b8);text-align:center}
+.libero-bench-label{margin-bottom:4px;color:#334155;font-size:9px;font-weight:900;letter-spacing:.16em}
+.libero-picker-button.libero-seat{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-height:82px;border:0!important;background:transparent!important;color:var(--role-libero-text)!important}
+.libero-circle{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border:3px solid #fff;border-radius:50%;background:var(--role-libero);color:var(--role-libero-text);box-shadow:0 3px 8px rgba(15,23,42,.28);font-size:19px;font-weight:1000}
+.libero-seat-name{max-width:100%;font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libero-seat small{font-size:8px;letter-spacing:.08em}
+
 </style>
 <script>
 /* v1.6.9 keeps the normative capture grammar, applies the Intermediate UI changes and
@@ -1486,111 +1545,73 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
 (function(){
   var LV=window.VOLLEY_LEVEL||'advanced',M=window.VOLLEY_MATCH,H=window.__vlc;
   if(!M||!H)return;
-  var panel=document.getElementById('capturePanel'),g=panel.querySelector('.touch-grid.players');
-  var playerStep=panel.querySelector('[data-step="player"]'),actionStep=panel.querySelector('[data-step="action"]'),resultStep=panel.querySelector('[data-step="result"]');
-  var chip=document.getElementById('pickChip'),back=document.getElementById('captureBack'),selected=null,guardUntil=0,guardTimer=null;
-  var LOCK_MS=400;window.VLC_TAP_LOCK_MS=LOCK_MS;window.VLC_TAPS_BLOCKED=window.VLC_TAPS_BLOCKED||0;
+  var panel=document.getElementById('capturePanel'),playerStep=panel.querySelector('[data-step="player"]'),actionStep=panel.querySelector('[data-step="action"]'),resultStep=panel.querySelector('[data-step="result"]');
+  var g=playerStep.querySelector('.touch-grid.players'),head=panel.querySelector('.capture-head'),chip=document.getElementById('pickChip'),back=document.getElementById('captureBack');
+  var actor=null,action=null,guardUntil=0,guardTimer=null,LOCK_MS=450;
+  window.VLC_TAP_LOCK_MS=LOCK_MS;window.VLC_TAPS_BLOCKED=window.VLC_TAPS_BLOCKED||0;
   function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
   function eventCount(){try{var x=JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]');return Array.isArray(x)?x.length:0}catch(e){return 0}}
   function isGuarded(){return Date.now()<guardUntil}
   function armGuard(){guardUntil=Date.now()+LOCK_MS;panel.classList.add('result-guard');clearTimeout(guardTimer);guardTimer=setTimeout(function(){panel.classList.remove('result-guard')},LOCK_MS)}
-  function clearSelected(){selected=null;g.querySelectorAll('.touch.selected').forEach(function(x){x.classList.remove('selected')});syncTeamLabel()}
-  function primary(){playerStep.classList.add('active');actionStep.classList.remove('active');resultStep.classList.remove('active');chip.hidden=true;back.hidden=true;clearSelected()}
-  function commit(player,action,result){
-    if(panel.classList.contains('locked')||panel.classList.contains('sub-mode')||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return false}
-    var before=eventCount();H.commit(player,action,result);var accepted=eventCount()>before;
-    primary();if(accepted)armGuard();return accepted;
-  }
-  function resultBar(actor,label,sub,extra){var team=M.team.name||'Team A',opponent=M.opponent.name||'Opponent',errorFor=actor==='A'?team:opponent,pointFor=actor==='A'?opponent:team;return '<div class="vlc-result-bar '+(extra||'')+'" data-vlc-actor="'+actor+'">'
-    +'<button type="button" class="vlc-result-zone error" data-vlc-result="error" aria-label="'+esc(label)+' Error, point for '+esc(errorFor)+'"><span class="vlc-result-main">✕ ERROR</span><small>Point for '+esc(errorFor)+'</small></button>'
-    +'<div class="vlc-result-label"><span>'+esc(label)+'</span><small>'+esc(sub||'')+'</small></div>'
-    +'<button type="button" class="vlc-result-zone point" data-vlc-result="point" aria-label="'+esc(label)+' Point, point for '+esc(pointFor)+'"><span class="vlc-result-main">✓ POINT</span><small>Point for '+esc(pointFor)+'</small></button></div>'}
-  function continueIcon(){return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M7 10a11 11 0 0 1 18-1" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/><path d="M25 5v6h-6" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 22a11 11 0 0 1-18 1" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"/><path d="M7 27v-6h6" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'}
-  var ACTIONS=[['attack','Attack',1],['block','Block',1],['defense','Defence',0],['reception','Reception',0],['service','Service',1],['set','Set',0]];
-  var ACTION_MATRIX={
-    setter:{attack:1,block:1,defense:1,reception:0,service:1,set:1},
-    oh:{attack:1,block:1,defense:1,reception:1,service:1,set:0},
-    opp:{attack:1,block:1,defense:1,reception:0,service:1,set:0},
-    mb:{attack:1,block:1,defense:1,reception:0,service:1,set:0},
-    libero:{attack:0,block:0,defense:1,reception:1,service:0,set:1}
-  };
-  var POSITION_LABEL={setter:'Setter',oh:'OH',opp:'OPP',mb:'MB',libero:'Libero'};
   function normalizedPosition(p){p=String(p||'').toLowerCase();return p==='opposite'?'opp':p==='middle'?'mb':p==='outside'?'oh':p}
-  function actionState(position,action){
-    position=normalizedPosition(position);
-    if(position==='libero'&&(action==='attack'||action==='block'||action==='service'))return 'blocked';
-    return ACTION_MATRIX[position]&&ACTION_MATRIX[position][action]?'expected':'rare';
+  function playerParts(n){var r=M.team&&M.team.roster||[];for(var i=0;i<r.length;i++)if(String(r[i].number)===String(n))return {number:String(n),name:r[i].name||'',position:normalizedPosition(r[i].position)};return {number:String(n),name:'',position:''}}
+  var ACTIONS=[
+    {id:'attack',label:'ATTACK',family:'offence',side:'left'},
+    {id:'block',label:'BLOCK',family:'offence',side:'left'},
+    {id:'set',label:'SET',family:'control',side:'left'},
+    {id:'freeball',label:'FREE BALL',family:'control',side:'left'},
+    {id:'service',label:'SERVE',family:'control',side:'right'},
+    {id:'reception',label:'RECEPTION',family:'defence',side:'right'},
+    {id:'defense',label:'DEFENCE',family:'defence',side:'right'}
+  ];
+  var MATRIX={
+    setter:{attack:1,block:1,defense:1,reception:0,service:1,set:1,freeball:1},
+    oh:{attack:1,block:1,defense:1,reception:1,service:1,set:0,freeball:1},
+    opp:{attack:1,block:1,defense:1,reception:0,service:1,set:0,freeball:1},
+    mb:{attack:1,block:1,defense:1,reception:0,service:1,set:0,freeball:1},
+    libero:{attack:0,block:0,defense:1,reception:1,service:0,set:1,freeball:1}
+  };
+  function actionState(pos,id){if(pos==='libero'&&(id==='attack'||id==='block'||id==='service'))return 'blocked';return MATRIX[pos]&&MATRIX[pos][id]?'expected':'rare'}
+  var side=document.createElement('div');side.className='quick-side-selector';side.setAttribute('aria-label','Choisir le camp sans joueur');
+  side.innerHTML='<button type="button" class="quick-side home" data-quick-side="T" data-vlc-actor="T">HOME<small>'+esc(M.team.name||'Home')+'</small></button><button type="button" class="quick-side away" data-quick-side="A" data-vlc-actor="A">AWAY<small>'+esc(M.opponent.name||'Away')+'</small></button>';
+  head.insertAdjacentElement('afterend',side);
+  function actionButton(a){return '<button type="button" class="quick-action" data-quick-action="'+a.id+'" data-adv-row="'+a.id+'" data-family="'+a.family+'">'+a.label+'<small></small></button>'}
+  actionStep.innerHTML='<div class="quick-entry"><div class="quick-entry-head"><strong>SAISIE RAPIDE</strong><span class="quick-mode" id="quickMode">Choisis HOME, AWAY ou un joueur</span></div><div class="quick-pad"><div class="quick-actions quick-left">'+ACTIONS.filter(function(a){return a.side==='left'}).map(actionButton).join('')+'</div><div class="quick-results"><button type="button" class="quick-result point" data-quick-result="point" data-vlc-result="point" aria-label="Point">✓<small>POINT</small></button><button type="button" class="quick-result neutral" data-quick-result="neutral" data-vlc-result="neutral" aria-label="Continue">○<small>CONTINUE</small></button><button type="button" class="quick-result error" data-quick-result="error" data-vlc-result="error" aria-label="Error">✕<small>ERROR</small></button></div><div class="quick-actions quick-right">'+ACTIONS.filter(function(a){return a.side==='right'}).map(actionButton).join('')+'</div></div></div>';
+  g.classList.add('quick-player-tray');
+  var title=playerStep.querySelector('.step-title');if(title){title.textContent='JOUEURS SUR LE TERRAIN';title.hidden=true}
+  resultStep.classList.remove('active');playerStep.classList.add('active');actionStep.classList.add('active');
+  if(chip)chip.hidden=true;if(back)back.hidden=true;
+  var sub=document.getElementById('subToggle');if(sub)sub.textContent='⇄ SUBSTITUTE';
+  function actorLabel(){if(actor==='T')return 'HOME · résultat direct';if(actor==='A')return 'AWAY · résultat direct';if(actor!==null){var p=playerParts(actor);return '#'+p.number+(p.name?' '+p.name:'')+(action?' · '+action.toUpperCase():' · résultat direct ou action complète')}return 'Choisis HOME, AWAY ou un joueur'}
+  function refresh(){
+    side.querySelectorAll('[data-quick-side]').forEach(function(b){b.classList.toggle('selected',b.getAttribute('data-quick-side')===String(actor))});
+    g.querySelectorAll('.court-grid [data-player]').forEach(function(b){b.classList.toggle('quick-selected',actor!==null&&String(actor)===b.getAttribute('data-player'))});
+    var numeric=actor!==null&&actor!=='T'&&actor!=='A',pos=numeric?playerParts(actor).position:'';
+    actionStep.querySelectorAll('[data-quick-action]').forEach(function(b){var id=b.getAttribute('data-quick-action'),state=numeric?actionState(pos,id):'rare';b.classList.remove('is-expected','is-rare','is-blocked','selected');b.classList.add('is-'+state);b.setAttribute('data-adv-state',state);b.setAttribute('aria-disabled',state==='blocked'?'true':'false');b.disabled=!numeric||state==='blocked';b.classList.toggle('selected',numeric&&action===id);var sm=b.querySelector('small');if(sm)sm.textContent=numeric?(state==='expected'?'PROBABLE':state==='blocked'?'INDISPONIBLE':'RARE'):''});
+    actionStep.querySelectorAll('[data-quick-result]').forEach(function(b){b.disabled=actor===null||isGuarded()});
+    var mode=document.getElementById('quickMode');if(mode)mode.textContent=actorLabel();
   }
-  function advancedGrid(player){
-    var pp=playerParts(player),position=normalizedPosition(pp.position);
-    var h='<div class="vlc-action-head"><span>Action</span><span>Error</span><span>Point</span><span>Continue</span></div>';
-    ACTIONS.forEach(function(a){var state=actionState(position,a[0]),blocked=state==='blocked',dis=blocked?' disabled aria-disabled="true" tabindex="-1"':'';
-      var note=state==='blocked'?'Not available for Libero':(state==='rare'?'Rare for '+(POSITION_LABEL[position]||'this position'):'');
-      h+='<div class="vlc-action-row is-'+state+'" data-adv-row="'+a[0]+'" data-adv-state="'+state+'"'+(blocked?' aria-disabled="true"':'')+'><div class="vlc-action-name"><span class="vlc-action-copy">'+a[1]+(note?'<small>'+esc(note)+'</small>':'')+'</span></div>'
-      +'<button type="button" class="vlc-action-result error" data-adv-action="'+a[0]+'" data-adv-result="error" aria-label="'+a[1]+' Error"'+dis+'>✕</button>'
-      +(a[2]?'<button type="button" class="vlc-action-result point" data-adv-action="'+a[0]+'" data-adv-result="point" aria-label="'+a[1]+' Point"'+dis+'>✓</button>':'<span class="vlc-action-na" data-adv-unavailable="point" aria-label="Point unavailable">—</span>')
-      +'<button type="button" class="vlc-action-result continue" data-adv-action="'+a[0]+'" data-adv-result="neutral" aria-label="'+a[1]+' Continue"'+dis+'>'+continueIcon()+'<span>Continue</span></button></div>'});
-    return h;
-  }
-  function playerParts(n){var r=(M.team&&M.team.roster)||[];for(var i=0;i<r.length;i++)if(String(r[i].number)===String(n))return {number:String(n),name:r[i].name||'',position:r[i].position||''};return {number:String(n),name:'',position:''}}
-  function playerName(n){var p=playerParts(n);return '#'+p.number+(p.name?' '+p.name:'')}
-  function showAdvanced(player,button){
-    clearSelected();selected=String(player);button.classList.add('selected');
-    var pp=playerParts(player),list=document.getElementById('actionList');list.className='touch-grid vlc-advanced-grid';list.setAttribute('data-player-position',normalizedPosition(pp.position));list.innerHTML=advancedGrid(player);
-    playerStep.classList.remove('active');resultStep.classList.remove('active');actionStep.classList.add('active');
-    actionStep.querySelector('.step-title').textContent='2. Action / Result';chip.innerHTML='<span>'+esc(playerName(player))+'</span><span class="arrow">→</span><span class="act">action / result</span>';chip.hidden=false;back.hidden=false;
-  }
-  function syncTeamLabel(){var bar=g.querySelector('[data-vlc-actor="T"]');if(!bar)return;var label=bar.querySelector('.vlc-result-label span'),s=bar.querySelector('.vlc-result-label small');if(!label||!s)return;
-    if(LV==='intermediate'&&selected){var p=playerParts(selected);label.textContent=p.number;s.textContent=p.name;bar.classList.add('focus-selected');s.classList.add('vlc-selected-note')}
-    else{label.textContent=M.team.name||'Team A';s.textContent=LV==='advanced'?'players without Focus':'no player selected = TEAM';bar.classList.remove('focus-selected');s.classList.remove('vlc-selected-note')}
-    var opp=g.querySelector('[data-vlc-actor="A"]'),locked=LV==='intermediate'&&!!selected;if(opp){opp.classList.toggle('focus-locked',locked);opp.setAttribute('aria-disabled',locked?'true':'false');opp.querySelectorAll('.vlc-result-zone').forEach(function(b){b.disabled=locked})}}
-  function selectIntermediate(b){clearSelected();selected=b.getAttribute('data-player');b.classList.add('selected');syncTeamLabel()}
-  function syncBasicPhase(){var cs=document.getElementById('courtStatus'),pb=document.getElementById('phaseBadge');if(!cs||!pb)return;var serving=cs.classList.contains('srv');pb.className='phase-badge '+(serving?'srv':'rcv');pb.textContent=serving?'SERVICE':'RECEPTION'}
-  function installCourtBars(){
-    var legacy=g.querySelector('.court-adv');if(legacy)legacy.classList.add('vlc-legacy-controls');
-    var net=g.querySelector('.court-net'),anchor=g.querySelector('#subLog')||legacy||g.querySelector('#subToggle');
-    var team=document.createElement('div');team.innerHTML=resultBar('T',M.team.name||'Team A',LV==='advanced'?'players without Focus':'no player selected = TEAM','team');team=team.firstChild;
-    var opp=document.createElement('div');opp.innerHTML=resultBar('A',M.opponent.name||'ADVERSE','ADVERSE','opp');opp=opp.firstChild;
-    if(LV==='intermediate'||g.querySelector('.nofocus'))g.insertBefore(team,anchor);
-    else{team.hidden=true;g.insertBefore(team,anchor)}
-    if(net){net.className='vlc-net';net.textContent='';net.setAttribute('role','img');net.setAttribute('aria-label','Volleyball net');g.insertBefore(net,anchor)}
-    g.insertBefore(opp,anchor);syncTeamLabel();
-  }
-  if(LV==='basic'){
-    var oldUpdate=window.updateCourt;
-    g.innerHTML='<div class="court-status" id="courtStatus"></div><div class="phase-badge" id="phaseBadge" aria-live="polite"></div>'
-      +resultBar('T',M.team.name||'Team A','TEAM','team')+'<div class="vlc-net" role="img" aria-label="Volleyball net"></div>'+resultBar('A',M.opponent.name||'Team B','ADVERSE','opp');
-    var title=playerStep.querySelector('.step-title');if(title){title.textContent='';title.hidden=true}
-    window.updateCourt=function(evs){if(oldUpdate)oldUpdate(evs);syncBasicPhase()};window.updateCourt((function(){try{return JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]')}catch(e){return []}})());
-  }else{
-    installCourtBars();
-    var oldCourt=window.updateCourt;
-    window.updateCourt=function(evs){if(oldCourt)oldCourt(evs);var tb=g.querySelector('[data-vlc-actor="T"]');if(tb&&LV==='advanced')tb.hidden=!g.querySelector('.nofocus');syncTeamLabel()};
-    var primaryTitle=playerStep.querySelector('.step-title');if(primaryTitle){primaryTitle.textContent='';primaryTitle.hidden=true}
+  function clearSelection(){actor=null;action=null;refresh()}
+  function commit(result){
+    if(actor===null||panel.classList.contains('locked')||panel.classList.contains('sub-mode')||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return false}
+    var a=action||(actor==='A'?'adverse':'generic'),before=eventCount();H.commit(actor,a,result);var accepted=eventCount()>before;
+    actor=null;action=null;playerStep.classList.add('active');actionStep.classList.add('active');resultStep.classList.remove('active');if(chip)chip.hidden=true;if(back)back.hidden=true;
+    if(accepted)armGuard();refresh();return accepted;
   }
   document.addEventListener('click',function(e){
-    var rb=e.target.closest&&e.target.closest('[data-vlc-result]');
-    if(rb&&panel.contains(rb)){
-      e.stopImmediatePropagation();e.preventDefault();
-      if(panel.classList.contains('sub-mode')||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return}
-      var actor=rb.closest('[data-vlc-actor]').getAttribute('data-vlc-actor'),result=rb.getAttribute('data-vlc-result');
-      if(actor==='A'&&LV==='intermediate'&&selected)return;
-      var player=actor==='A'?'A':(LV==='intermediate'&&selected?selected:'T');var action=actor==='A'?'adverse':(LV==='basic'?'team':'generic');commit(player,action,result);return;
+    var target=e.target.closest&&e.target.closest('#capturePanel *');if(!target)return;
+    var sideButton=e.target.closest('[data-quick-side]');if(sideButton&&panel.contains(sideButton)){e.stopImmediatePropagation();e.preventDefault();if(isGuarded()){window.VLC_TAPS_BLOCKED++;return}actor=sideButton.getAttribute('data-quick-side');action=null;refresh();return}
+    var result=e.target.closest('[data-quick-result]');if(result&&panel.contains(result)){e.stopImmediatePropagation();e.preventDefault();commit(result.getAttribute('data-quick-result'));return}
+    var actionButtonNode=e.target.closest('[data-quick-action]');if(actionButtonNode&&panel.contains(actionButtonNode)){e.stopImmediatePropagation();e.preventDefault();if(actionButtonNode.disabled||actor===null||actor==='T'||actor==='A')return;action=action===actionButtonNode.getAttribute('data-quick-action')?null:actionButtonNode.getAttribute('data-quick-action');refresh();return}
+    var playerButton=e.target.closest('.court-grid [data-player]');if(playerButton&&g.contains(playerButton)){
+      if(panel.classList.contains('sub-mode'))return;e.stopImmediatePropagation();e.preventDefault();if(playerButton.classList.contains('nofocus'))return;
+      actor=playerButton.getAttribute('data-player');action=null;refresh();return;
     }
-    var ar=e.target.closest&&e.target.closest('[data-adv-action][data-adv-result]');
-    if(ar&&panel.contains(ar)){
-      e.stopImmediatePropagation();e.preventDefault();if(ar.disabled||ar.closest('[data-adv-state="blocked"]'))return;if(!selected||isGuarded()){if(isGuarded())window.VLC_TAPS_BLOCKED++;return}
-      commit(selected,ar.getAttribute('data-adv-action'),ar.getAttribute('data-adv-result'));return;
-    }
-    if(e.target.closest&&e.target.closest('#captureBack')&&panel.contains(e.target.closest('#captureBack'))){e.stopImmediatePropagation();e.preventDefault();primary();return}
-    var pb=e.target.closest&&e.target.closest('.court-grid [data-player],.bench-row [data-player]');
-    if(pb&&g.contains(pb)&&LV!=='basic'){
-      if(panel.classList.contains('sub-mode'))return;
-      e.stopImmediatePropagation();e.preventDefault();if(pb.classList.contains('nofocus'))return;
-      if(LV==='intermediate')selectIntermediate(pb);else showAdvanced(pb.getAttribute('data-player'),pb);return;
-    }
+    if(e.target.closest('#captureBack')&&panel.contains(e.target.closest('#captureBack'))){e.stopImmediatePropagation();e.preventDefault();clearSelection()}
   },true);
-  primary();
+  var oldUpdate=window.updateCourt;if(oldUpdate){window.updateCourt=function(evs){oldUpdate(evs);refresh()}}
+  window.VLCQuickCapture={select:function(a){actor=String(a);action=null;refresh()},commit:commit,getState:function(){return {actor:actor,action:action,guarded:isGuarded()}}};
+  refresh();
 })();
 </script>
 <!-- ===== end v1.6.4 ===== -->

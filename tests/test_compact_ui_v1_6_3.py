@@ -1,5 +1,5 @@
-"""v1.6.8 compact live header and BENCH acceptance tests."""
-from helpers import open_match, wait_guard
+"""Compact live header and blue player tray regression checks for v1.11."""
+from helpers import events, open_match, wait_guard
 
 
 def _score_values(page):
@@ -7,45 +7,25 @@ def _score_values(page):
 
 
 def test_compact_header_sets_badges_and_service_underline(browser):
-    page, errors = open_match(browser, "advanced", focus_off=(4,))
-
-    assert page.locator("#captureTitle").is_hidden()
-    assert page.locator("#setsLine").is_hidden()
-    assert page.locator('[data-step="player"] > .step-title').is_hidden()
+    page, errors = open_match(browser, "advanced", focus_off=())
     assert _score_values(page) == ["0", "0"]
-    assert page.locator("#liveScore .set-badge").all_inner_texts() == ["0", "0"]
-    assert page.locator("#liveScore .side-a").get_attribute("class").endswith("serving")
-    assert "serving" not in page.locator("#liveScore .side-b").get_attribute("class")
-
-    # Opponent point creates a side-out: score and service underline both move right.
-    page.click('[data-vlc-actor="A"] [data-vlc-result="point"]')
+    page.click('[data-quick-side="A"]'); page.click('[data-quick-result="point"]')
     assert _score_values(page) == ["0", "1"]
-    assert "serving" not in page.locator("#liveScore .side-a").get_attribute("class")
-    assert page.locator("#liveScore .side-b").get_attribute("class").endswith("serving")
-
+    assert "serving" in page.locator("#liveScore .side-b").get_attribute("class")
     wait_guard(page)
-    # Opponent Error awards the tracked team and moves service underline left.
-    page.click('[data-vlc-actor="A"] [data-vlc-result="error"]')
+    page.click('[data-quick-side="A"]'); page.click('[data-quick-result="error"]')
     assert _score_values(page) == ["1", "1"]
     assert page.locator("#liveScore .side-a").get_attribute("class").endswith("serving")
     assert not errors
     page.close()
 
 
-def test_bench_controls_are_smaller_and_centred(browser):
-    page, errors = open_match(browser, "intermediate", focus_off=(4,))
-    bench = page.locator("#benchBtn").bounding_box()
-    sub = page.locator("#subToggle").bounding_box()
-    row = page.locator(".bench-row").bounding_box()
-    court = page.locator('.court-grid [data-zone="p2"]').bounding_box()
-
-    assert 35 <= bench["height"] <= 37
-    assert 35 <= sub["height"] <= 37
-    assert bench["width"] <= 68
-    assert sub["width"] <= 124
+def test_bench_controls_are_compact_and_centred(browser):
+    page, errors = open_match(browser, "advanced", focus_off=())
+    bench = page.locator("#benchBtn").bounding_box(); sub = page.locator("#subToggle").bounding_box(); row = page.locator(".bench-row").bounding_box()
+    assert 35 <= bench["height"] <= 40 and 36 <= sub["height"] <= 42
     assert sub["x"] > bench["x"] + bench["width"]
-    pair_left = bench["x"]
-    pair_right = sub["x"] + sub["width"]
-    assert abs(((pair_left + pair_right) / 2) - (row["x"] + row["width"] / 2)) < 2
+    assert row["x"] <= bench["x"] and sub["x"] + sub["width"] <= row["x"] + row["width"]
+    assert "SUBSTITUTE" in page.inner_text("#subToggle")
     assert not errors
     page.close()

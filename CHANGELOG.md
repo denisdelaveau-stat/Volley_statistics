@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.11.0 — Quick action entry and libero bench
+
+- Rebuilt live capture around a mobile-first quick-entry panel with score, HOME/AWAY side selectors, central Point/Continue/Error controls, role-aware actions and a blue on-court player tray.
+- Added three input paths: player + action + result, player + result, and HOME/AWAY + result.
+- Added FREE BALL while preserving likely/rare action guidance and libero restrictions.
+- Retained the post-result double-tap guard, substitution workflow, Undo, scoring, rotation and history.
+- Replaced the Initial rotation libero button with a default grey libero circle seated on a centred grey bench.
+- Preserved COACH VIEW, ADVANCED STATISTICS, orange setup courts and pastel role colours.
+- Updated the PWA cache to `volley-live-capture-v1.11.0`.
+
 ## v1.10.1 — Pastel role palette and Coach View setup theme
 
 - Applied the requested pastel role colours: OPP blue, SET yellow, OH red, MB green and LIB grey.

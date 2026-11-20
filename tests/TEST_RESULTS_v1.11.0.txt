@@ -1,0 +1,24 @@
+Volley Live Capture v1.11.0 — validation result
+Date: 2026-11-20
+Result: 40 automated tests passed
+
+Validated:
+- default grey libero circle on a centred grey Initial rotation bench;
+- HOME and AWAY shortcuts directly below the score;
+- seven quick actions including FREE BALL;
+- central Point / Continue / Error controls;
+- Complete, Player-only and HOME/AWAY input paths;
+- likely/rare action guidance and libero action restrictions;
+- six on-court players on the blue pastel-role tray;
+- 450 ms post-result double-entry lock;
+- Substitute, Undo, score, service, rotation, history, set completion and report generation;
+- COACH VIEW and ADVANCED STATISTICS Home actions;
+- unified v2.1 fixture and both analysis interfaces;
+- cache version volley-live-capture-v1.11.0.
+
+Command:
+pytest -q
+
+Output:
+........................................                                 [100%]
+40 passed in 58.82s

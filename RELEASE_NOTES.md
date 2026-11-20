@@ -1,4 +1,23 @@
-# Release notes — v1.10.1
+# Release notes — v1.11.0
+
+## Live capture redesign
+
+- The score remains at the top, followed by explicit **HOME** and **AWAY** shortcuts.
+- The centre quick-entry panel combines seven actions with colour-coded **POINT**, **CONTINUE** and **ERROR** results.
+- The same screen supports Complete, Player-only and Side-only input paths.
+- Position guidance still marks actions as probable or rare; libero Attack, Block and Serve remain unavailable.
+- The six current court players are shown as pastel role circles on a blue tray. **SUBSTITUTE** and **UNDO** remain immediately available.
+- A 450 ms lock starts only after an accepted result to stop accidental double entries.
+
+## Initial rotation
+
+The libero is now represented by a grey player circle even before selection. The circle sits on a centred grey libero bench beneath the orange court and opens the compatible libero picker.
+
+## Preserved functionality
+
+**COACH VIEW**, **ADVANCED STATISTICS**, the pastel position palette, scoring, rotation, history, unified v2.1 analysis data and offline operation are retained. The service worker cache is `volley-live-capture-v1.11.0`.
+
+## Previous release — v1.10.1
 
 This update applies the pastel position palette and Coach View blue setup background requested for New Match. Functionality and saved-data compatibility are unchanged.
 

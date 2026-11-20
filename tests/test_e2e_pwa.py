@@ -22,13 +22,18 @@ def test_set_end_undo_and_exports(browser):
         seed.append(scoring_event(i + 1, winner, a, b))
     page, errors = open_match(browser, "basic", events=seed)
     assert page.locator("#liveScore .digit-box").all_inner_texts() == ["24", "24"]
-    page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
+    page.click('[data-quick-side="T"]')
+    page.click('[data-quick-result="point"]')
     wait_guard(page)
-    page.click('[data-vlc-actor="T"] [data-vlc-result="point"]')
+    page.click('[data-quick-side="T"]')
+    page.click('[data-quick-result="point"]')
     assert "locked" in page.get_attribute("#capturePanel", "class")
     assert "SET 1 FINISHED" in page.inner_text("#setOverTitle")
     count = len(events(page))
-    page.evaluate("document.querySelector('[data-vlc-actor=\"A\"] [data-vlc-result=\"point\"]').click()")
+    page.evaluate("""() => {
+      document.querySelector('[data-quick-side="A"]').click();
+      document.querySelector('[data-quick-result="point"]').click();
+    }""")
     assert len(events(page)) == count
 
     page.click("#captureUndo")
@@ -43,7 +48,7 @@ def test_set_end_undo_and_exports(browser):
 
 def test_pwa_cache_version_and_shell_assets():
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.10.1" in service_worker
+    assert "volley-live-capture-v1.11.0" in service_worker
     assert "coach.css" in service_worker
     assert "coach.js" in service_worker
     assert "As_cannes_vs_Frejus_2026-11-15.fixture.v2.json" in service_worker
