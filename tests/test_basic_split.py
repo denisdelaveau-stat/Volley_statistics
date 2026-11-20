@@ -4,7 +4,7 @@ from helpers import events, open_match, wait_guard
 
 def test_basic_normative_result_bars(browser):
     page, errors = open_match(browser, "basic")
-    assert page.inner_text("#appVersion") == "v1.12.1"
+    assert page.inner_text("#appVersion") == "v1.12.2"
     assert page.locator(".quick-side-selector").is_hidden()
     assert page.locator("[data-quick-side]").all_inner_texts() == ["HOME", "AWAY"]
     assert page.locator("[data-quick-result]").count() == 3

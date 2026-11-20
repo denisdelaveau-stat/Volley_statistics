@@ -1,4 +1,4 @@
-"""v1.12.1 reference action layout and compact player tray acceptance tests."""
+"""v1.12.2 reference action layout and compact player tray acceptance tests."""
 from __future__ import annotations
 
 from helpers import events, open_match, wait_guard
@@ -70,7 +70,7 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
 
     assert "COACH VIEW" in page.locator("#homeCoach").inner_text()
     assert "ADVANCED STATISTICS" in page.locator("#homeStatistics").inner_text()
-    assert page.locator("#appVersion").inner_text() == "v1.12.1"
+    assert page.locator("#appVersion").inner_text() == "v1.12.2"
     assert not errors
     page.close()
 

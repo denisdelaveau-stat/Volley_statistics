@@ -1,5 +1,38 @@
 # Changelog
 
+## v1.12.2 — JSON provenance audit
+
+- Audited every Advanced Statistics and Coach View indicator against JSON records.
+- Added explicit provenance metadata in the shared adapter.
+- Marks inferred Capture v1 phase, rotation and lineup indicators in red.
+- Marks non-JSON thresholds in red without altering the record-derived numeric value.
+- Replaced the hard-coded Coach player-presence label with the computed current lineup state.
+- Added exact-reference and browser acceptance tests.
+- Updated Home and offline cache to v1.12.2.
+
+## v1.12.1 — Reference capture layout and compact player strip
+
+- Rebuilt the action pad to match the supplied reference: Set/Defence at the top, Attack/Block on the left, Serve/Reception on the right, POSITIF/ERREUR/NEUTRE in the central result column and RELANCE at the bottom.
+- Kept underlying persisted values compatible: `point`, `error`, `neutral` and `freeball` are unchanged.
+- Reduced the on-court player area from two rows to one compact row of six role-coloured circles and shortened the Bench/Substitute row.
+- Removed visible SAVE .JSON, REPORT .HTML and end-of-match export controls from Capture; automatic local persistence remains active.
+- Preserved fixed control geometry, result-first HOME/AWAY entry, role guidance, scoring, rotation, History, Undo and same-position substitutions.
+- Preserved COACH VIEW, ADVANCED STATISTICS and the shared pastel role palette.
+- Updated the Home version and offline cache to `v1.12.1` / `volley-live-capture-v1.12.1`.
+
+## v1.12.0 — Result-first fixed capture and position-safe substitutions
+
+- Removed the permanent HOME/AWAY row; result-first entry now reveals both side choices in the fixed Continue slot.
+- Repositioned the seven action buttons around the central ✓ / ✕ / ○ column, with FREE BALL at the top.
+- Locked all capture button coordinates and dimensions across neutral, player, action-guidance and result-first states at 390 × 844.
+- Replaced probable/rare text with visual-only emphasis and removed the quick-entry/player information line.
+- Changed the on-court player tray to two rows of three and removed visible rotation, service, event-status and Capture statistics information.
+- Reduced the Initial rotation libero bench to a centred 64 × 64 px seat around the 50 px circle and removed `BANC LIBÉRO`.
+- Filtered substitution choices to present, off-court players with the same normalized roster position.
+- Added persisted `SUBSTITUTION` log events containing outgoing/incoming player, position, set, rally, score and rotation; Undo removes the latest substitution event and roster change together.
+- Preserved COACH VIEW, ADVANCED STATISTICS, pastel role colours and the unified v2.1 analysis interfaces.
+- Updated the PWA cache to `volley-live-capture-v1.12.0`.
+
 ## v1.11.0 — Quick action entry and libero bench
 
 - Rebuilt live capture around a mobile-first quick-entry panel with score, HOME/AWAY side selectors, central Point/Continue/Error controls, role-aware actions and a blue on-court player tray.

@@ -1,4 +1,16 @@
-# Volley Live Capture v1.12.1 — Automated Test Plan
+# Volley Live Capture v1.12.2 — Automated Test Plan
+
+## v1.12.2 JSON-provenance acceptance
+
+| ID | Acceptance |
+|---|---|
+| JSON122-01 | Unified v2.1 provenance marks actions, scores, rallies, phase, rotation and lineup as explicit records |
+| JSON122-02 | Capture v1 provenance marks actions/scores/rallies as records and phase/rotation/lineup as inferred |
+| JSON122-03 | Coach View shows inferred Capture v1 phase, rotation and court indicators in red |
+| JSON122-04 | Advanced Statistics shows inferred Capture v1 rotation, phase, side-out and court indicators in red |
+| JSON122-05 | App-defined qualitative thresholds carry a red non-JSON marker |
+| JSON122-06 | Unified v2.1 record-backed values are not marked as unbacked |
+| JSON122-07 | Player detail presence is computed from lineup state, not hard-coded |
 
 ## v1.12.1 reference-layout acceptance
 

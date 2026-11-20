@@ -1,6 +1,17 @@
-# Volley Live Capture v1.12.1
+# Volley Live Capture v1.12.2
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
+
+
+## v1.12.2 highlights
+
+- Complete JSON-provenance audit for **Advanced Statistics** and **Coach View**.
+- Every value based on explicit JSON records remains in the normal theme.
+- Indicators that depend on inferred Capture v1 context (phase, rotation, or on-court lineup) are visibly red.
+- Application-defined interpretation thresholds are marked with a red **SEUIL HORS JSON** badge or red dotted underline.
+- The exact `As_cannes_vs_Frejus_2026-11-15.json` reference export is covered by automated tests.
+- Coach player presence is now computed instead of always displaying “Sur le terrain”.
+- PWA cache bumped to `volley-live-capture-v1.12.2`.
 
 ## v1.12.1 highlights
 
@@ -33,7 +44,7 @@ Offline-first volleyball match capture and analysis for Basic, Intermediate and 
 - Reads explicit set, rally, score, serve/reception phase, setter rotation, lineup snapshot, on-court players, substitution, action and provenance data.
 - Includes `docs/VolleyLive_Unified_JSON_Format_Specification.md` and `docs/volley-live.match.schema.v2.1.json`.
 - Keeps Capture-v1 local stores only as a labelled migration path for an in-progress match; v1 is no longer the reference fixture.
-- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.1`.
+- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.2`.
 
 ## Reference data caveat
 
@@ -49,7 +60,7 @@ Open the displayed local URL in a modern browser. Opening HTML directly with `fi
 
 ## Deploy or update
 
-Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.1` on Home.
+Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.2` on Home.
 
 ## Verification
 
@@ -57,4 +68,4 @@ Publish the **complete folder contents** at the site root. Keep `index.html`, `c
 pytest -q
 ```
 
-The v1.12.1 tests verify the reference action geometry, fixed controls at 390 × 844, the one-row compact player strip, removed export buttons, compatible RELANCE/freeball semantics, the compact libero bench, same-position substitution filtering and logging, Undo, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.
+The v1.12.2 test suite verifies the reference action geometry, fixed controls at 390 × 844, the one-row compact player strip, removed export buttons, compatible RELANCE/freeball semantics, the compact libero bench, same-position substitution filtering and logging, Undo, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.

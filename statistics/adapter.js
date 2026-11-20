@@ -178,7 +178,11 @@
         matchName:text(raw.match.name,'Match'), teamName:text(team.our.name,'Notre équipe'), opponentName:text(team.opponent.name,'Adversaire'),
         savedAt:raw.match.savedAt || raw.generatedAt || null, sourceFormat:'volley-live v'+raw.schemaVersion,
         events:(raw.events || []).length, actions:cols.length, rallies:(raw.rallies || []).length, sets:(raw.sets || []).length,
-        warnings:warnings, fixture:!!(raw.dataQuality && raw.dataQuality.fixture)
+        warnings:warnings, fixture:!!(raw.dataQuality && raw.dataQuality.fixture),
+        provenance:{
+          actions:true, scores:true, rallies:true, phase:true, rotation:true, lineup:true,
+          thresholds:false, source:'explicit-unified-v2-records'
+        }
       }
     };
   }
@@ -235,7 +239,7 @@
       }); if(setNumber>1)warnings.push('La phase initiale du set '+setNumber+' est déduite par alternance : migrez ce match vers v2.1 pour un contexte explicite.');
     });
     if(terminalOnly)warnings.unshift('Entrée Capture v1 de migration : une seule action terminale par rally. Utilisez volley-live v2.1 pour les métriques complètes.');
-    return {cols:cols,players:players,analyticsPlayers:ownPlayers,roles:roles,meta:{matchName:text(raw.match.name,'Match'),teamName:text(raw.match.team&&raw.match.team.name,'Notre équipe'),opponentName:text(raw.match.opponent&&raw.match.opponent.name,'Adversaire'),savedAt:raw.savedAt||null,sourceFormat:'volley-live-capture v1 (migration)',events:raw.events.length,actions:cols.length,rallies:totalRallies,sets:Object.keys(groups).length,warnings:warnings,fixture:false}};
+    return {cols:cols,players:players,analyticsPlayers:ownPlayers,roles:roles,meta:{matchName:text(raw.match.name,'Match'),teamName:text(raw.match.team&&raw.match.team.name,'Notre équipe'),opponentName:text(raw.match.opponent&&raw.match.opponent.name,'Adversaire'),savedAt:raw.savedAt||null,sourceFormat:'volley-live-capture v1 (migration)',events:raw.events.length,actions:cols.length,rallies:totalRallies,sets:Object.keys(groups).length,warnings:warnings,fixture:false,provenance:{actions:true,scores:true,rallies:true,phase:false,rotation:false,lineup:false,thresholds:false,source:'capture-v1-inferred-context'}}};
   }
 
   function toReportData(raw) {
@@ -268,12 +272,12 @@
     var eventByRally={};events.forEach(function(e){(eventByRally[e._rallyId]||(eventByRally[e._rallyId]=[])).push(e);});
     var rallies=(raw.rallies||[]).slice().sort(function(a,b){return number(a.setNumber,0)-number(b.setNumber,0)||number(a.rallyNumber,0)-number(b.rallyNumber,0);}).map(function(r){var acts=eventByRally[r.rallyId]||[],lineup=(lineupById[r.lineupVersionId]||{}).zones||{},normalized={};ZONES.forEach(function(z){normalized[z]=idToNumber(lineup[z]);});return{set:number(r.setNumber,1),number:number(r.rallyNumber,1),rallyId:r.rallyId,actions:acts,winner:r.winnerTeamId===team.ourId?'team1':'team2',scoreA:number((r.scoreAfter||{}).our,0),scoreB:number((r.scoreAfter||{}).opponent,0),serving:r.servingTeamId===team.ourId?'A':'B',phase:upper(r.phaseAtStart)==='SERVE'?'serve':'receive',rotation:String(r.setterRotationAtStart||'P?').toLowerCase(),rotationLabel:String(r.setterRotationAtStart||'P?').toUpperCase(),lineup:normalized,onCourt:(r.onCourtPlayerIds||[]).map(idToNumber)};});
     var warnings=(validation.warnings||[]).slice();if(raw.dataQuality&&raw.dataQuality.syntheticEvents)warnings.unshift(raw.dataQuality.syntheticEvents+' actions neutres synthétiques sont signalées par provenance et utilisées uniquement pour la validation des métriques.');
-    return {match:match,events:events,rallies:rallies,demo:false,explicitContext:true,sourceFormat:'volley-live v'+raw.schemaVersion,warnings:warnings,raw:raw};
+    return {match:match,events:events,rallies:rallies,demo:false,explicitContext:true,sourceFormat:'volley-live v'+raw.schemaVersion,warnings:warnings,raw:raw,provenance:{actions:true,scores:true,rallies:true,phase:true,rotation:true,lineup:true,thresholds:false,source:'explicit-unified-v2-records'}};
   }
 
   function toCoachData(raw) {
     if(detectFormat(raw)==='unified-v2')return toCoachDataV2(raw);
-    if(detectFormat(raw)==='capture-v1'){var v=validateCaptureV1(raw);if(!v.valid)throw new Error(v.errors.join(' '));return{match:clone(raw.match),events:clone(raw.events),demo:false,explicitContext:false,sourceFormat:'volley-live-capture v1 (migration)',warnings:['Match local v1 migré en mémoire; exportez-le en volley-live v2.1.']};}
+    if(detectFormat(raw)==='capture-v1'){var v=validateCaptureV1(raw);if(!v.valid)throw new Error(v.errors.join(' '));return{match:clone(raw.match),events:clone(raw.events),demo:false,explicitContext:false,sourceFormat:'volley-live-capture v1 (migration)',warnings:['Match local v1 migré en mémoire; phase, rotation et présence terrain sont reconstruites et ne proviennent pas de records explicites du JSON.'],provenance:{actions:true,scores:true,rallies:true,phase:false,rotation:false,lineup:false,thresholds:false,source:'capture-v1-inferred-context'}};}
     throw new Error(validate(raw).errors.join(' '));
   }
 
