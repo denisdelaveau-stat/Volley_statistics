@@ -1,5 +1,35 @@
 # Changelog
 
+## v1.9.0 — Advanced Statistics integration
+- Added the `ADVANCED STATISTICS` Home entry point.
+- Integrated Set Timeline, Rotation Metrics, Roster Ranking and Playing Time.
+- Replaced hard-coded report data with a Capture v1 JSON adapter.
+- Bundled and validated `As_cannes_vs_Frejus_2026-11-15.json`.
+- Added live-store, imported-file and offline-reference loading paths.
+- Added explicit coverage warnings for terminal-only Capture v1 logs.
+- Updated PWA cache to `volley-live-capture-v1.9.0`.
+
+
+## v1.8.0 – 2026-11-20
+- Added a Home `COACH VIEW` entry point.
+- Implemented the Coach Overview, Rotation Analysis, Player Performance and Player Detail interfaces from the supplied v1.1 specification and visual references.
+- Bound the Coach UI to the existing match/event stores with a labelled demonstration fallback.
+- Added period, phase, P1–P6, on-court and role filters with context persistence.
+- Added six sample-qualified Overview KPIs and transparent rotation/player calculations.
+- Implemented the exact `Voir le détail joueur` CTA with loading, focus, accessible naming and Back restoration.
+- Added responsive 320 px layouts, reduced-motion handling and offline caching for `coach.css` and `coach.js`.
+- Advanced the visible version and PWA cache to v1.8.0; full result: 28 passed.
+
+## v1.7.0 – 2026-11-18
+- Applied the supplied `Font_app_ref.jpg` as the Home reference artwork and rebuilt the Home overlay.
+- Moved current-match information inside Continue/View Match and renamed Open Match to Open Archives.
+- Added Teams and Settings navigation and removed the Statistics control.
+- Replaced team setup with a single reusable team editor, Add Player rows, jersey numbers 1–40 and role colors; removed Focus from reusable teams.
+- Replaced the old New Match wizard with saved-team selection, Present/Focus confirmation, setter-position-driven role rotation, compatible-player assignment and Service/Reception libero preview.
+- Added persistent Settings for match format and detail level.
+- Preserved live capture and portable match format version 1; advanced the visible version and PWA cache to v1.7.0.
+- Added v1.7 acceptance tests and visual QA; full result: 26 passed.
+
 ## v1.6.10 – 2026-11-18
 - Rebuilt Apple touch, favicon, 192 px and 512 px manifest icons from the supplied 1254 × 1254 `IMG_5596.PNG` source.
 - Removed the pale pre-rendered perimeter and white corner area; every icon is a full-square, fully opaque PNG with navy pixels extending to all edges.

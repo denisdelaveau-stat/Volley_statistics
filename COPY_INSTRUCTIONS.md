@@ -1,3 +1,3 @@
-# Copy instructions — v1.6.10 modified files
+# Copy instructions — v1.9.0
 
-Apply the archive at the application root and preserve its relative paths. Replace all listed files together so the icon assets, manifest, cache version, tests and documentation remain aligned. On iPhone, remove and re-add the Home-screen shortcut to clear launcher icon caching.
+Deploy the complete `Volley_statistics_v1.9.0` folder contents at the application root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together so offline caching, data loading and navigation remain aligned. On iPhone, open the site online once, fully close the installed PWA, and reopen it. If an older cache remains, remove and re-add the Home-screen shortcut.

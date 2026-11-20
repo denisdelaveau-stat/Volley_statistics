@@ -1,13 +1,30 @@
-# Volley Live Capture v1.6.10
+# Volley Live Capture v1.9.0
 
-Offline-first volleyball match capture for Basic, Intermediate and Advanced workflows.
+Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
-## v1.6.10 highlights
-- Rebuilt Apple touch, favicon and manifest icons from the supplied 1254 × 1254 `IMG_5596.PNG` source.
-- Removed the pre-rendered pale outer rim and white corners: the navy background now reaches every edge of each opaque square PNG.
-- Left corner rounding to iOS and other launchers; the files themselves contain no transparency or baked rounded mask.
-- Retained all v1.6.9 Modification UI 7 changes: compact equal score spacing, net-height posts and the BENCH/input dashed divider.
-- Updated automated tests, English Word specification, screenshot evidence, release notes and implementation report together.
+## v1.9.0 highlights
+- Adds `ADVANCED STATISTICS` on Home and integrates the complete Set Timeline, Rotation Metrics, Roster Ranking and Playing-Time interface.
+- Reads the live Capture stores, imported Capture v1 JSON files, or the supplied `As_cannes_vs_Frejus_2026-11-15.json` reference fixture.
+- Replaces hard-coded report data and player roles with a validated adapter derived from the match roster, event log, rotations, substitutions and standard libero rule.
+- Supports all sets, real player names/numbers, opponent-event separation, explicit data-coverage warnings and offline loading.
+- Caches the statistics page, adapter and reference fixture for the installed PWA.
+
+## v1.8.0 retained highlights
+- Adds `COACH VIEW` on Home.
+- Implements responsive Coach Overview, Rotation Analysis, Player Performance and Player Detail screens from the supplied v1.1 UI specification and four reference visuals.
+- Uses live match and event data when available and a clearly labelled demonstration state otherwise.
+- Preserves period, rotation, phase, player and skill context across Coach navigation.
+- Adds accessible loading, focus and Back behaviour for the exact `Voir le détail joueur` control.
+- Retains every v1.7.0 capture, setup, report and portable-match feature.
+
+## v1.7.0 retained functionality
+- Uses the supplied `Font_app_ref.jpg` as the full-screen Home artwork.
+- Rebuilds Home around New Match, Continue/View Match, Open Archives, Teams and Settings; Statistics is removed.
+- Moves the current-match summary into the Continue button.
+- Adds a single-screen reusable Teams editor with 1–40 jersey selection and position colors.
+- Adds the New Match flow: saved-team selection, Present/Focus confirmation, setter-position-driven rotation, compatible-player selection, and Service/Reception preview with libero handling.
+- Adds persistent Settings for match format and capture detail level.
+- Retains live capture, scoring, rotation, substitutions, reports and portable match format version 1.
 
 ## Run locally
 ```bash
@@ -16,6 +33,10 @@ python serve_local.py
 Open the displayed local URL in a modern browser.
 
 ## iPhone update
-Deploy the whole folder, including `sw.js` and `icons/`. Remove the old Home-screen shortcut if iOS still shows cached artwork, add the site to the Home Screen again, launch it online once, close it fully, and reopen it. Verify `v1.6.10` on Home.
+Deploy the whole folder, including `Font_app_ref.jpg`, `coach.css`, `coach.js`, `statistics/`, `sw.js` and `icons/`. Launch it online once so cache `volley-live-capture-v1.9.0` is installed, then close and reopen the app. Verify `v1.9.0` on Home.
 
-Portable match data remains format version 1.
+## Verification
+```bash
+pytest -q
+```
+Expected result: `30 passed`.
