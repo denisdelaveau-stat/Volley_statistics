@@ -2,7 +2,7 @@
 from helpers import APP_URI, base_match
 
 
-def test_home_button_opens_reference_statistics(browser):
+def test_home_button_opens_empty_statistics_without_automatic_fixture(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -16,13 +16,11 @@ def test_home_button_opens_reference_statistics(browser):
     button.click()
     page.wait_for_selector("#statsLoader", state="hidden")
 
-    assert "As cannes" in page.locator("#statsMatchTitle").inner_text()
-    assert "Référence v2.1" in page.locator("#dataStatusTitle").inner_text()
-    assert "volley-live v2.1.0" in page.locator("#dataStatusSummary").inner_text()
-    assert page.locator("#set option").count() == 3
-    assert page.locator("#rmPlayer option").count() == 11
-    assert page.locator("#view .vertical-table tbody tr").count() == 364
-    assert page.locator("#individualPlayers option").filter(has_text="#20 Zak").count() == 1
+    assert "Aucun match chargé" in page.locator("#statsMatchTitle").inner_text()
+    assert "As cannes" not in page.locator("body").inner_text()
+    assert page.locator("html.stats-empty-state").count() == 1
+    assert page.locator("#mc").inner_text() == "0"
+    assert page.locator("#mr").inner_text() == "0"
     assert not errors
     page.close()
 
@@ -50,7 +48,7 @@ def test_statistics_reads_current_capture_store(browser):
     page.goto(APP_URI.replace("index.html", "statistics/index.html"))
     page.wait_for_selector("#statsLoader", state="hidden")
 
-    assert page.locator("#dataStatusTitle").inner_text() == "Source : Match courant de Volley Live Capture"
+    assert page.locator("#dataStatusTitle").inner_text() == "Source : Match live de Volley Live Capture"
     assert "Antibes vs Nice" in page.locator("#statsMatchTitle").inner_text()
     assert page.locator("#view .vertical-table tbody tr").count() == 3
     assert page.locator("#mc").inner_text() == "3"

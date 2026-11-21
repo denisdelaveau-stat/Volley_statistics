@@ -56,18 +56,21 @@ def test_coach_navigation_live_data_and_player_detail(browser):
     page.close()
 
 
-def test_coach_reference_v2_state_and_accessible_cta(browser):
+def test_coach_empty_state_and_accessible_detail(browser):
     page = browser.new_page(viewport={"width": 320, "height": 760})
     page.goto(APP_URI)
-    page.evaluate("localStorage.clear()")
+    page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
     page.locator("#homeCoach").click()
-    assert page.locator("#coachLiveLabel").inner_text() == "DÉMO · SANS VALEUR RÉELLE"
-    assert "as cannes" in page.locator("#coachContent .coach-score").inner_text().lower()
+    assert page.locator("#coachLiveLabel").inner_text() == "AUCUN MATCH"
+    assert "Aucun match chargé" in page.locator("#coachContent").inner_text()
+    assert "as cannes" not in page.locator("#coachContent").inner_text().lower()
     page.locator('[data-coach-tab="players"]').click()
-    cta = page.locator("#playerDetailCta")
+    cta = page.locator("[data-empty-detail]")
     assert cta.is_visible()
-    assert "Voir le détail du joueur numéro" in cta.get_attribute("aria-label")
+    cta.click()
+    assert page.locator("#coachContent .coach-title").inner_text().startswith("Détail joueur")
+    assert "NA" in page.locator("#coachContent").inner_text()
     page.close()
 
 

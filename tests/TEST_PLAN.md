@@ -1,4 +1,41 @@
-# Volley Live Capture v1.12.3 — Automated Test Plan
+# Volley Live Capture v1.12.6 — Automated Test Plan
+
+## v1.12.6 Update8 capture acceptance
+
+| ID | Acceptance |
+|---|---|
+| UI126-01 | Set/Defence, side actions, three results and Relance have equal width and height |
+| UI126-02 | Attack/Block and Serve/Reception are vertically centred around POSITIF/ERREUR/NEUTRE |
+| COURT126-01 | Capture shows only six on-court players on an orange court in two rows of three |
+| COURT126-02 | The court keeps its net and pastel role colours while the bench player is hidden |
+| SUB126-01 | Changer de joueur appears below the court with the circular-change icon and same-position filtering remains functional |
+| UNDO126-01 | Undo is beside the score and no Undo control remains at the bottom |
+| HOME126-01 | COACH VIEW and ADVANCED STATISTICS remain on Home |
+| PWA126-01 | Home and cache use v1.12.6 |
+
+## v1.12.5 empty analysis acceptance
+
+| ID | Acceptance |
+|---|---|
+| EMPTY125-01 | No match shows only grey 0/NA values in every Coach screen |
+| EMPTY125-02 | No match shows only grey 0/NA values in every Advanced Statistics screen |
+| REPLAY125-01 | The reference fixture is never automatic and only appears after explicit JSON loading |
+| RESET125-01 | Empty → replay/live → unload returns to a clean empty state without stale values |
+| SAFE125-01 | Empty state produces no NaN, Infinity or division by zero |
+| HOME125-01 | COACH VIEW and ADVANCED STATISTICS remain on Home |
+| PWA125-01 | Home and cache use v1.12.5 |
+| COURT125-01 | Coach court has no P/L legend below it and ends 4–18 px below the lower player row |
+| COURT125-02 | Compact court keeps six role circles, net, dashed line and setter badge without overflow at 390 px and 1024 px |
+
+## v1.12.4 red-marker removal acceptance
+
+| ID | Acceptance |
+|---|---|
+| MARK124-01 | Coach View emits no demo-only red class or badge for the bundled fixture |
+| MARK124-02 | Advanced Statistics emits no demo-only red class or badge for the bundled fixture |
+| MARK124-03 | Neutral source/provenance labels remain visible and diagnostic provenance is retained |
+| HOME124-01 | COACH VIEW and ADVANCED STATISTICS remain on Home |
+| PWA124-01 | Home shows v1.12.4 and cache `volley-live-capture-v1.12.4` precaches the complete application |
 
 ## v1.12.3 demo-only highlighting acceptance
 

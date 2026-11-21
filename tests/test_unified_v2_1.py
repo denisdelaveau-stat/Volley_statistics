@@ -98,12 +98,12 @@ def test_home_keeps_both_required_buttons_and_v2_assets():
     assert 'class="home-main">COACH VIEW<' in home
     assert 'id="homeStatistics"' in home
     assert 'class="home-main">ADVANCED STATISTICS<' in home
-    assert 'statistics/data/reference-fixture.js' in home
+    assert 'statistics/data/reference-fixture.js' not in home
     assert 'statistics/adapter.js' in home
     assert FIXTURE.exists()
 
 
-def test_both_home_buttons_open_v2_backed_interfaces(browser):
+def test_both_home_buttons_open_neutral_empty_interfaces(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -113,16 +113,17 @@ def test_both_home_buttons_open_v2_backed_interfaces(browser):
 
     page.locator("#homeCoach").click()
     assert page.locator("#coachScreen").is_visible()
-    assert page.locator("#coachLiveLabel").inner_text() == "DÉMO · SANS VALEUR RÉELLE"
-    assert "as cannes" in page.locator("#coachContent .coach-score").inner_text().lower()
+    assert page.locator("#coachLiveLabel").inner_text() == "AUCUN MATCH"
+    assert "as cannes" not in page.locator("#coachContent").inner_text().lower()
+    assert "Aucun match chargé" in page.locator("#coachContent").inner_text()
     page.locator("#coachHome").click()
 
     page.locator("#homeStatistics").click()
     page.wait_for_url("**/statistics/index.html")
     page.wait_for_selector("#statsLoader", state="attached")
     page.wait_for_selector("#statsLoader", state="hidden")
-    assert "Référence v2.1" in page.locator("#dataStatusTitle").inner_text()
-    assert "volley-live v2.1.0" in page.locator("#dataStatusSummary").inner_text()
-    assert page.locator("#view .vertical-table tbody tr").count() == 364
+    assert "Aucun match chargé" in page.locator("#dataStatusTitle").inner_text()
+    assert page.locator("#mc").inner_text() == "0"
+    assert page.locator("#mr").inner_text() == "0"
     assert not errors
     page.close()

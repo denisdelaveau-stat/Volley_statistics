@@ -1,0 +1,29 @@
+Volley Live Capture v1.12.6 — validation result
+================================================
+
+Automated suite
+---------------
+Command: pytest -q
+Result: 54 passed in 84.89 s
+
+Update8 acceptance
+------------------
+PASS — all 10 action/result controls share one width and one height.
+PASS — Set and Defence are centred above the matrix.
+PASS — Attack/Block and Serve/Reception are equally distributed and vertically centred around POSITIF/ERREUR/NEUTRE.
+PASS — RELANCE is centred under the result column and records the existing freeball value.
+PASS — the six active players are displayed on an orange court in two rows of three.
+PASS — the court net and dashed separator are visible; pastel position colours are preserved.
+PASS — the bench player is hidden from Capture.
+PASS — the control below the court reads “⟳ Changer de joueur”.
+PASS — same-position replacement filtering, substitution logging and substitution Undo remain functional.
+PASS — Undo is beside the score and no Undo button remains at the bottom.
+PASS — COACH VIEW and ADVANCED STATISTICS remain on Home.
+PASS — Home shows v1.12.6 and the service-worker cache is volley-live-capture-v1.12.6.
+
+Responsive browser checks
+-------------------------
+Chromium screenshots and geometry checked at 320 × 844, 390 × 844 and 768 × 844.
+No page errors and no horizontal overflow at any checked width.
+At each width all 10 action/result controls had equal dimensions.
+Screenshots: docs/screens_v1.12.6/capture_update8_320.png, capture_update8_390.png, capture_update8_768.png.

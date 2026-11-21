@@ -288,7 +288,7 @@
       var v2Keys=['volleyLive.document.v2','volleyLive.match.v2','volleyCapture.match.v2'];
       for(var i=0;i<v2Keys.length;i++){var candidate=JSON.parse(storage.getItem(v2Keys[i])||'null');if(candidate&&detectFormat(candidate)==='unified-v2')return candidate;}
       var match=JSON.parse(storage.getItem('volleyCapture.match.v1')||'null'),events=JSON.parse(storage.getItem('volleyCapture.events.v1')||'[]'),chartData=JSON.parse(storage.getItem('volleyCapture.chartData.v1')||'[]');
-      if(!match||!Array.isArray(events)||!events.length)return null;var last=chartData.length?chartData[chartData.length-1]:null;
+      if(!match||!Array.isArray(events))return null;var last=chartData.length?chartData[chartData.length-1]:null;
       return{format:'volley-live-capture',version:1,savedAt:new Date().toISOString(),match:match,score:{team1:last?number(last.a,0):0,team2:last?number(last.b,0):0},events:events,chartData:chartData};
     } catch(error){return null;}
   }

@@ -11,9 +11,10 @@ def test_quick_pad_and_player_tray_fit_mobile_width_in_all_levels(browser):
         assert not errors; page.close()
 
 
-def test_player_tray_has_dashed_bench_divider_and_no_legacy_net(browser):
+def test_player_court_has_visible_net_and_no_visible_bench_player(browser):
     page, errors=open_match(browser,"advanced",focus_off=())
     style=page.locator(".bench-row").evaluate("e=>({top:getComputedStyle(e).borderTopStyle,width:getComputedStyle(e).borderTopWidth})")
-    assert style=={"top":"dashed","width":"1px"}
-    assert page.locator(".court-net").is_hidden()
+    assert style=={"top":"none","width":"0px"}
+    assert page.locator(".court-net").is_visible()
+    assert page.locator("#benchBtn").is_hidden()
     assert not errors; page.close()

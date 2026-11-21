@@ -1,7 +1,35 @@
-# Volley Live Capture v1.12.3
+# Volley Live Capture v1.12.6
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
+
+## v1.12.6 highlights
+
+- Implements the Update8 capture reference: every action/result button now has the same dimensions.
+- Keeps Set and Defence centred above the action matrix; Attack/Block and Serve/Reception are evenly distributed around POSITIF/ERREUR/NEUTRE; RELANCE is centred below.
+- Replaces the one-row player strip with a compact orange court, a visible net and two rows of three on-court player circles.
+- Removes the visible bench player from Capture while retaining same-position replacement filtering.
+- Renames the substitution control to **Changer de joueur** with the circular-change icon below the court.
+- Moves Undo beside the score as a compact circular arrow control.
+- Preserves the pastel position palette and both **COACH VIEW** and **ADVANCED STATISTICS** Home actions.
+- PWA cache bumped to `volley-live-capture-v1.12.6`.
+
+## v1.12.5 highlights
+
+- Neutral grey empty state across all Coach View and Advanced Statistics screens when no match is loaded.
+- Counters use `0`; ratios and non-calculable values use `NA`, with no NaN/Infinity.
+- No default demo/fixture rendering. The reference JSON is used only after explicit file loading.
+- Explicit live, replay and unload controls reset the analysis state cleanly.
+- Coach court compacted below the lower player row; the P/L legend below the court is removed while the net, dashed separation, role colours and setter badge are retained.
+- PWA cache bumped to `volley-live-capture-v1.12.5`.
+
+## v1.12.4 highlights
+
+- Removes the red demo-only markers from **Coach View** and **Advanced Statistics** after user validation.
+- Keeps demo/reference source identification and provenance metadata for diagnostics, but displays all indicators with the normal interface theme.
+- Preserves normal tactical colours for real errors, critical statuses and player roles; only the special demo-marker treatment is removed.
+- Preserves the **COACH VIEW** and **ADVANCED STATISTICS** buttons on Home.
+- PWA cache bumped to `volley-live-capture-v1.12.4`.
 
 ## v1.12.3 highlights
 
@@ -53,7 +81,7 @@ Offline-first volleyball match capture and analysis for Basic, Intermediate and 
 - Reads explicit set, rally, score, serve/reception phase, setter rotation, lineup snapshot, on-court players, substitution, action and provenance data.
 - Includes `docs/VolleyLive_Unified_JSON_Format_Specification.md` and `docs/volley-live.match.schema.v2.1.json`.
 - Keeps Capture-v1 local stores only as a labelled migration path for an in-progress match; v1 is no longer the reference fixture.
-- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.3`.
+- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.6`.
 
 ## Reference data caveat
 
@@ -69,7 +97,7 @@ Open the displayed local URL in a modern browser. Opening HTML directly with `fi
 
 ## Deploy or update
 
-Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.3` on Home.
+Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.6` on Home.
 
 ## Verification
 
@@ -77,4 +105,4 @@ Publish the **complete folder contents** at the site root. Keep `index.html`, `c
 pytest -q
 ```
 
-The v1.12.3 test suite verifies the reference action geometry, fixed controls at 390 × 844, the one-row compact player strip, removed export buttons, compatible RELANCE/freeball semantics, the compact libero bench, same-position substitution filtering and logging, Undo, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.
+The v1.12.6 test suite verifies equal action/result geometry, balanced side controls, the orange two-row on-court player layout, the hidden bench player, **Changer de joueur**, header Undo, fixed controls at 390 × 844, removed export buttons, RELANCE/freeball semantics, same-position replacement filtering and logging, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.

@@ -1,4 +1,4 @@
-"""v1.12.3 reference action layout and compact player tray acceptance tests."""
+"""v1.12.6 Update8 action layout, orange court and header Undo acceptance tests."""
 from __future__ import annotations
 
 from helpers import events, open_match, wait_guard
@@ -12,6 +12,10 @@ def _box(page, selector):
 
 def _same_row(a, b, tolerance=1):
     return abs(a["y"] - b["y"]) <= tolerance and abs(a["height"] - b["height"]) <= tolerance
+
+
+def _close(a, b, tolerance=1):
+    return abs(a - b) <= tolerance
 
 
 def test_reference_action_geometry_compact_players_and_removed_exports(browser):
@@ -43,24 +47,42 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
     neutral = _box(page, '[data-quick-result="neutral"]')
     relance = _box(page, '[data-quick-action="freeball"]')
 
+    all_buttons = [set_box, defence, attack, block, serve, reception, positive, error, neutral, relance]
+    assert max(box["width"] for box in all_buttons) - min(box["width"] for box in all_buttons) < 0.05
+    assert max(box["height"] for box in all_buttons) - min(box["height"] for box in all_buttons) < 0.05
+
     assert _same_row(set_box, defence)
     assert set_box["x"] < defence["x"]
-    assert _same_row(attack, positive) and _same_row(positive, serve)
-    assert _same_row(block, error) and _same_row(error, reception)
+    assert _close((set_box["x"] + defence["x"] + defence["width"]) / 2, 195, 2)
     assert attack["x"] < positive["x"] < serve["x"]
     assert block["x"] < error["x"] < reception["x"]
-    assert positive["x"] == error["x"] == neutral["x"]
-    assert positive["width"] == error["width"] == neutral["width"]
+    assert _close(attack["x"], block["x"])
+    assert _close(serve["x"], reception["x"])
+    assert _close(positive["x"], error["x"]) and _close(error["x"], neutral["x"])
+
+    left_mid = (attack["y"] + block["y"] + block["height"]) / 2
+    result_mid = (positive["y"] + neutral["y"] + neutral["height"]) / 2
+    right_mid = (serve["y"] + reception["y"] + reception["height"]) / 2
+    assert _close(left_mid, result_mid) and _close(result_mid, right_mid)
     assert relance["y"] > neutral["y"]
-    assert relance["x"] < neutral["x"]
-    assert relance["x"] + relance["width"] > neutral["x"] + neutral["width"]
+    assert _close(relance["x"], neutral["x"])
 
     player_tray = _box(page, ".quick-player-tray")
     action_entry = _box(page, ".quick-entry")
-    assert player_tray["height"] < 120
-    assert player_tray["height"] < action_entry["height"] / 2
+    assert player_tray["height"] < action_entry["height"]
     player_boxes = [_box(page, f'.court-grid [data-zone="{zone}"]') for zone in ("p4", "p3", "p2", "p5", "p6", "p1")]
-    assert max(box["y"] for box in player_boxes) - min(box["y"] for box in player_boxes) <= 1
+    assert max(box["y"] for box in player_boxes[:3]) - min(box["y"] for box in player_boxes[:3]) <= 1
+    assert max(box["y"] for box in player_boxes[3:]) - min(box["y"] for box in player_boxes[3:]) <= 1
+    assert player_boxes[3]["y"] > player_boxes[0]["y"]
+    assert page.locator(".quick-player-tray .court-net").is_visible()
+    assert page.locator("#benchBtn").is_hidden()
+    assert page.locator("#subToggle").inner_text() == "⟳ Changer de joueur"
+
+    score = _box(page, "#liveScore")
+    undo = _box(page, "#captureUndo")
+    assert undo["x"] > score["x"] + score["width"]
+    assert undo["y"] >= score["y"] and undo["y"] + undo["height"] <= score["y"] + score["height"]
+    assert page.locator("#captureUndo").get_attribute("aria-label") == "Undo last action"
 
     assert page.locator("#captureSaveJson").count() == 0
     assert page.locator("#captureReport").count() == 0
@@ -70,7 +92,7 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
 
     assert "COACH VIEW" in page.locator("#homeCoach").inner_text()
     assert "ADVANCED STATISTICS" in page.locator("#homeStatistics").inner_text()
-    assert page.locator("#appVersion").inner_text() == "v1.12.3"
+    assert page.locator("#appVersion").inner_text() == "v1.12.6"
     assert not errors
     page.close()
 

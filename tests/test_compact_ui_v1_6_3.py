@@ -20,12 +20,12 @@ def test_compact_header_sets_badges_without_service_indicator(browser):
     page.close()
 
 
-def test_bench_controls_are_compact_and_centred(browser):
+def test_bench_player_is_hidden_and_change_control_is_centred(browser):
     page, errors = open_match(browser, "advanced", focus_off=())
-    bench = page.locator("#benchBtn").bounding_box(); sub = page.locator("#subToggle").bounding_box(); row = page.locator(".bench-row").bounding_box()
-    assert 35 <= bench["height"] <= 40 and 36 <= sub["height"] <= 42
-    assert sub["x"] > bench["x"] + bench["width"]
-    assert row["x"] <= bench["x"] and sub["x"] + sub["width"] <= row["x"] + row["width"]
-    assert "SUBSTITUTE" in page.inner_text("#subToggle")
+    assert page.locator("#benchBtn").is_hidden()
+    sub = page.locator("#subToggle").bounding_box(); row = page.locator(".bench-row").bounding_box()
+    assert 32 <= sub["height"] <= 36
+    assert abs((sub["x"] + sub["width"] / 2) - (row["x"] + row["width"] / 2)) < 1
+    assert page.inner_text("#subToggle") == "⟳ Changer de joueur"
     assert not errors
     page.close()

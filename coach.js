@@ -1,10 +1,10 @@
-/* Volley Live Coach UI v1.12.3 — demo-only highlighting and shared pastel role palette */
+/* Volley Live Coach UI v1.12.6 — explicit empty state, replay/live loading and shared pastel role palette */
 (function(){
   'use strict';
-  var KM='volleyCapture.match.v1',KE='volleyCapture.events.v1';
+  var KM='volleyCapture.match.v1',KE='volleyCapture.events.v1',KR='volleyAnalysis.replay.v1',KRS='volleyAnalysis.replay.source.v1',KU='volleyAnalysis.unloaded.v1';
   var screen=document.getElementById('coachScreen'),content=document.getElementById('coachContent');
   if(!screen||!content)return;
-  var C={view:'overview',period:'set',phase:'all',rotation:null,playerScope:'court',role:'all',player:null,skill:'summary',detailHistory:false,data:null};
+  var C={view:'overview',period:'set',phase:'all',rotation:null,playerScope:'court',role:'all',player:null,skill:'summary',detailHistory:false,data:null,sourceToken:null};
   var POS=['p4','p3','p2','p5','p6','p1'];
   var NEXT={p2:'p1',p1:'p6',p6:'p5',p5:'p4',p4:'p3',p3:'p2'};
   var ROLE={setter:'Passeur',oh:'Réceptionneuse-attaquante',mb:'Centrale',opp:'Pointue',libero:'Libéro'};
@@ -13,7 +13,7 @@
   function read(k,fallback){try{var x=JSON.parse(localStorage.getItem(k)||'null');return x==null?fallback:x}catch(e){return fallback}}
   function clone(x){return JSON.parse(JSON.stringify(x))}
   function pct(n,d){return d?Math.round(n*100/d):null}
-  function pctText(n,d,sign){var v=pct(n,d);return v==null?'—':(sign&&v>0?'+':'')+v+'%'}
+  function pctText(n,d,sign){var v=pct(n,d);return v==null?'NA':(sign&&v>0?'+':'')+v+'%'}
   function num(v){return v==null?'—':String(v)}
   function playerInfo(match,n){var r=match&&match.team&&match.team.roster||[];for(var i=0;i<r.length;i++)if(String(r[i].number)===String(n))return r[i];return {number:n,name:'Joueur '+n,position:''}}
   function teamPlayers(match){return (match&&match.team&&match.team.roster||[]).filter(function(p){return p.present!==false})}
@@ -23,31 +23,21 @@
   function rotationTo(match,target){var r=clone(match.startingRotation||{}),guard=0;while(setterZone(match,r)!==target&&guard++<6)r=rotate(r);return r}
   function initialServing(match,setNo){var s=(match.firstRally&&match.firstRally.antibesState==='reception')?'B':'A';if(setNo%2===0)s=s==='A'?'B':'A';return s}
 
-  function demoData(){
-    var match={id:'demo_coach',name:'Match de démonstration',status:'in_progress',detailLevel:'advanced',currentSet:3,demoSetWins:{a:1,b:1},team:{name:'Nous',roster:[
-      {number:12,name:'Emma',position:'oh',present:true},{number:8,name:'Léa',position:'mb',present:true},{number:7,name:'Chloé',position:'opp',present:true},{number:3,name:'Sarah',position:'libero',present:true},{number:9,name:'Jade',position:'oh',present:true},{number:4,name:'Alice',position:'setter',present:true},{number:2,name:'Nora',position:'mb',present:true}
-    ]},opponent:{name:'Adversaire'},startingLineup:{oh1:12,oh2:9,mb1:8,mb2:2,setter:4,opposite:7,libero:3},startingRotation:{p1:4,p2:7,p3:8,p4:12,p5:3,p6:9},firstRally:{antibesState:'reception'},format:{setsToWin:3,setPoints:25,decidingSetPoints:15},subs:[]};
-    var winners=['team1','team2','team1','team1','team2','team1','team2','team1','team1','team2','team2','team1','team1','team2','team1','team2','team1','team1','team2','team1','team1','team2','team1','team1','team2','team2','team1','team2','team1','team1','team2','team1','team2','team1','team1','team2','team1','team2','team1','team1'];
-    var own=[12,8,7,3,9,4],actions=['attack','reception','service','block','defense','set'],events=[],a=0,b=0,id=1;
-    winners.forEach(function(w,i){
-      var p=own[i%own.length],secondary=own[(i+3)%own.length],act=actions[i%actions.length];
-      if(i%3===0)events.push({id:id++,set:3,player:secondary,action:i%2?'defense':'reception',result:'neutral',winningTeam:null,scoreA:a,scoreB:b,timestamp:new Date(2026,10,20,8,0,i*20).toISOString()});
-      if(i%4===0)events.push({id:id++,set:3,player:4,action:'set',result:'neutral',winningTeam:null,scoreA:a,scoreB:b,timestamp:new Date(2026,10,20,8,0,i*20+5).toISOString()});
-      if(w==='team1')a++;else b++;
-      var isOwn=w==='team1',result=isOwn?'point':(i%2?'error':'point'),player=isOwn?p:(result==='error'?p:'A'),action=isOwn?act:(result==='error'?act:'adverse');
-      events.push({id:id++,set:3,player:player,action:action,result:result,winningTeam:w,pointOrigin:isOwn?'earned':(result==='error'?'opponent_error':'earned'),scoreA:a,scoreB:b,timestamp:new Date(2026,10,20,8,0,i*20+10).toISOString()});
-    });
-    return {match:match,events:events,demo:true,explicitContext:false,sourceFormat:'hard-coded demo',warnings:['Aucun JSON valide n’est chargé : toutes les valeurs affichées proviennent du jeu de démonstration intégré.'],provenance:{actions:false,scores:false,rallies:false,phase:false,rotation:false,lineup:false,thresholds:false,source:'hard-coded-demo'}};
+  function emptyData(){
+    return {empty:true,match:{id:'',name:'',status:'empty',currentSet:1,team:{name:'Équipe',roster:[]},opponent:{name:'Adversaire'},startingLineup:{},startingRotation:{},firstRally:{}},events:[],rallies:[],demo:false,replay:false,explicitContext:false,sourceFormat:'empty',warnings:[],provenance:{actions:false,scores:false,rallies:false,phase:false,rotation:false,lineup:false,thresholds:false,source:'empty'}};
   }
-
+  function replayRaw(){try{return JSON.parse(sessionStorage.getItem(KR)||'null')}catch(error){return null}}
+  function liveRaw(){try{return window.VolleyStatsAdapter&&window.VolleyStatsAdapter.fromLocalStorage(localStorage)}catch(error){return null}}
+  function hasLive(){return !!liveRaw()}
   function load(){
+    if(sessionStorage.getItem(KU)==='1')return emptyData();
     try{
       if(window.VolleyStatsAdapter){
-        var raw=window.VolleyStatsAdapter.fromLocalStorage(localStorage)||window.VolleyReferenceFixture;
-        if(raw)return window.VolleyStatsAdapter.toCoachData(raw);
+        var replay=replayRaw(),raw=replay||liveRaw();
+        if(raw){var data=window.VolleyStatsAdapter.toCoachData(raw);data.empty=false;data.replay=!!replay;return data}
       }
     }catch(error){console.error('Coach data adapter:',error)}
-    var m=read(KM,null),e=read(KE,[]);if(!m)return demoData();return {match:m,events:Array.isArray(e)?e:[],demo:false,explicitContext:false,sourceFormat:'volley-live-capture v1',warnings:['Phase, rotation et présence terrain sont reconstruites et ne proviennent pas de records explicites du JSON.'],provenance:{actions:true,scores:true,rallies:true,phase:false,rotation:false,lineup:false,thresholds:false,source:'capture-v1-inferred-context'}}
+    var m=read(KM,null),e=read(KE,[]);if(!m)return emptyData();return {empty:false,match:m,events:Array.isArray(e)?e:[],demo:false,replay:false,explicitContext:false,sourceFormat:'volley-live-capture v1',warnings:['Phase, rotation et présence terrain sont reconstruites depuis l’historique du match.'],provenance:{actions:true,scores:true,rallies:true,phase:false,rotation:false,lineup:false,thresholds:false,source:'capture-v1-inferred-context'}}
   }
   function buildRallies(match,events){
     var sets={},ordered=[];
@@ -78,19 +68,27 @@
   function periodLabel(){return C.period==='match'?'Match':C.period==='last10'?'10 derniers':'Set '+(C.data.match.currentSet||1)}
   function scoreNow(){var rr=C.data.rallies.filter(function(r){return r.set===(+C.data.match.currentSet||1)}),last=rr[rr.length-1];return last?{a:last.scoreA,b:last.scoreB}:{a:0,b:0}}
   function periodButtons(){return '<div class="coach-period" aria-label="Période">'+[['set','SET '+(C.data.match.currentSet||1)],['match','MATCH'],['last10','10 DERNIERS']].map(function(x){return '<button type="button" data-period="'+x[0]+'" class="'+(C.period===x[0]?'active':'')+'">'+x[1]+'</button>'}).join('')+'</div>'}
-  function footer(ref){var source=C.data.demo?'Données de démonstration.':C.data.explicitContext?'Référence officielle · volley-live v2.1':'Match courant · migration v1';return '<footer class="coach-footer"><span class="demo">'+source+'</span><span>'+ref+' · VOLLEY LIVE</span></footer>'}
+  function footer(ref){var source=C.data.empty?'Aucun match chargé.':C.data.replay?'Match rejoué · fichier JSON':C.data.explicitContext?'Match chargé · volley-live v2.1':'Match live · Capture';return '<footer class="coach-footer"><span>'+source+'</span><span>'+ref+' · VOLLEY LIVE</span></footer>'}
   function provenance(kind){return !!(C.data&&C.data.provenance&&C.data.provenance[kind]===true)}
-  function auditBadge(text){return '<span class="json-audit-badge">'+text+'</span>'}
+  function auditBadge(){return ''}
   function demoOnly(){return !!(C.data&&C.data.demo)}
-  function auditClass(){return demoOnly()?' demo-only-indicator':''}
+  function auditClass(){return ''}
   function auditAttr(kind){return ' data-json-backed="'+(provenance(kind)?'true':'false')+'" data-demo-only="'+(demoOnly()?'true':'false')+'"'}
-  function provenanceBanner(){var warning=(C.data.warnings||[]).join(' '),demo=demoOnly();return '<aside class="coach-provenance '+(demo?'has-demo':'real-data')+'"><strong>Origine des données</strong><span>Rouge = valeur de démonstration sans valeur réelle. Les valeurs extraites du match ou calculées depuis son historique restent affichées normalement.</span>'+(warning?'<small>'+esc(warning)+'</small>':'')+'</aside>'}
+  function provenanceBanner(){var warning=(C.data.warnings||[]).join(' '),live=hasLive();return '<aside class="coach-provenance"><strong>Origine des données</strong><span>'+(C.data.replay?'Replay JSON chargé.':C.data.explicitContext?'Match JSON chargé.':'Match live chargé.')+'</span>'+(warning?'<small>'+esc(warning)+'</small>':'')+'<span class="analysis-source-actions"><button type="button" data-coach-load-file>Charger JSON</button>'+(C.data.replay&&live?'<button type="button" data-coach-live>Match live</button>':'')+'<button type="button" data-coach-unload>Décharger</button></span></aside>'}
   function kpi(title,value,sample,cls,kind){kind=kind||'actions';return '<article class="coach-card coach-kpi '+cls+auditClass()+'"'+auditAttr(kind)+'><span class="status" aria-hidden="true"></span><h3>'+title+'</h3><div class="value">'+value+'</div><div class="sample">'+sample+'</div>'+(demoOnly()?auditBadge('DÉMO'):'')+'</article>'}
   function normalizedRole(value){var v=String(value||'').toLowerCase();return {set:'setter',setter:'setter',lib:'libero',libero:'libero',opposite:'opp',opp:'opp',oh:'oh',mb:'mb'}[v]||v}
   function roleClass(p){var role=normalizedRole(p&&p.position);return role?'role-'+role:'role-libero'}
-  function courtHTML(rot,title){var m=C.data.match,kind='lineup';return '<section class="coach-card coach-court-card'+auditClass(kind)+'"'+auditAttr(kind)+'><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">'+esc(title)+'</span></div>'+(demoOnly()?auditBadge('POSITION DE DÉMONSTRATION'):'')+'<div class="coach-court" role="img" aria-label="Organisation des joueurs sur le terrain"><div class="coach-net"></div><div class="coach-court-grid">'+POS.map(function(z){var p=playerInfo(m,rot[z]);return '<div class="coach-player-dot '+roleClass(p)+'" data-player-role="'+normalizedRole(p.position)+'"><span class="number">'+esc(p.number)+'</span><span class="name">'+esc(p.name||'Joueur')+'</span><small>Poste '+z.slice(1)+'</small></div>'}).join('')+'</div></div><p class="coach-court-legend">P : Passeuse &nbsp; · &nbsp; L : Libéro</p></section>'}
+  function courtHTML(rot,title){var m=C.data.match,kind='lineup';return '<section class="coach-card coach-court-card'+auditClass(kind)+'"'+auditAttr(kind)+'><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">'+esc(title)+'</span></div>'+(demoOnly()?auditBadge('POSITION DE DÉMONSTRATION'):'')+'<div class="coach-court" role="img" aria-label="Organisation des joueurs sur le terrain"><div class="coach-net"></div><div class="coach-court-grid">'+POS.map(function(z){var p=playerInfo(m,rot[z]);return '<div class="coach-player-dot '+roleClass(p)+'" data-player-role="'+normalizedRole(p.position)+'"><span class="number">'+esc(p.number)+'</span><span class="name">'+esc(p.name||'Joueur')+'</span><small>Poste '+z.slice(1)+'</small></div>'}).join('')+'</div></div></section>'}
   function sharedHeading(title,sub,select){return '<div class="coach-heading-row"><div><h1 class="coach-title" tabindex="-1">'+title+'<span class="dot">.</span></h1>'+(sub?'<p class="coach-subtitle">'+sub+'</p>':'')+'</div>'+(select||'')+'</div>'}
 
+  function emptyActions(){var live=hasLive();return '<section class="analysis-empty-message" role="status"><strong>Aucun match chargé</strong><span>Chargez un match live issu de Capture ou un fichier JSON pour afficher les statistiques.</span><div class="analysis-empty-actions"><button type="button" data-coach-live '+(live?'':'disabled')+'>MATCH LIVE</button><button type="button" data-coach-load-file>CHARGER JSON</button></div></section>'}
+  function emptyKpi(title,value,label){return '<article class="coach-card coach-kpi empty-indicator"><h3>'+title+'</h3><div class="value">'+value+'</div><div class="sample">'+label+'</div></article>'}
+  function emptyCourt(){return '<section class="coach-card coach-court-card empty-panel"><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">NA</span></div><div class="coach-court empty-court"><div class="coach-net"></div><div class="coach-court-grid">'+POS.map(function(z){return '<div class="coach-player-dot empty-player"><span class="number">NA</span><span class="name">NA</span><small>'+z.toUpperCase()+'</small></div>'}).join('')+'</div></div></section>'}
+  function renderEmptyOverview(){var h=sharedHeading('Vue coach','Aucun match actif')+emptyActions();h+='<section class="coach-score empty-panel"><div class="coach-team">Équipe<strong class="empty-indicator">0</strong></div><div class="coach-dash">–</div><div class="coach-team away">Adversaire<strong class="empty-indicator">0</strong></div><div class="coach-match-meta">SET 0 · SETS 0–0</div><div class="coach-phase empty-indicator">NA</div></section>';h+='<section class="coach-grid coach-kpis">'+emptyKpi('Side-out','NA','0 réception')+emptyKpi('Break point','NA','0 service')+emptyKpi('Efficacité attaque','NA','0 action')+emptyKpi('Réception +','NA','0 réception')+emptyKpi('Service','0','0 service')+emptyKpi('Bloc','0','0 action')+'</section>'+emptyCourt();h+='<section class="coach-grid coach-two"><article class="coach-card coach-insight empty-indicator"><span class="icon">△</span><div><h3>À surveiller</h3><strong>NA</strong><span class="coach-muted">0 rallye</span></div></article><article class="coach-card coach-insight empty-indicator"><span class="icon">▥</span><div><h3>Point fort</h3><strong>NA</strong><span class="coach-muted">0 action</span></div></article></section><section class="coach-card coach-momentum empty-panel"><div><h3>Dynamique · 10 derniers points</h3><div class="empty-indicator">NA</div></div><div class="coach-run-score"><span>Équipe<strong class="empty-indicator">0</strong></span><b>·</b><span>Adversaire<strong class="empty-indicator">0</strong></span></div></section>'+footer('État vide');content.innerHTML=h}
+  function renderEmptyRotations(){var h=sharedHeading('Analyse des rotations','Aucun match actif')+emptyActions();h+='<div class="rotation-tabs">'+[1,2,3,4,5,6].map(function(n){return '<button type="button" disabled>P'+n+'</button>'}).join('')+'</div>'+emptyCourt();h+='<section class="coach-grid rotation-kpis">'+emptyKpi('Side-out','NA','0 rallye')+emptyKpi('Break point','NA','0 rallye')+emptyKpi('Attaque','NA','0 action')+emptyKpi('Réception +','NA','0 réception')+'</section><section class="coach-card rotation-chart empty-panel"><h2>Comparaison des rotations</h2>'+[1,2,3,4,5,6].map(function(n){return '<div class="rotation-bar"><span>P'+n+'</span><div class="rotation-track"><div class="rotation-fill empty-fill" style="width:0%"></div></div><strong class="empty-indicator">0</strong></div>'}).join('')+'</section><section class="coach-grid rotation-summary"><article class="coach-card rotation-award empty-indicator"><span class="big">NA</span><div>Meilleure rotation<small>0 rallye</small></div></article><article class="coach-card rotation-award empty-indicator"><span class="big">NA</span><div>À surveiller<small>0 rallye</small></div></article></section>'+footer('Équipe · état vide');content.innerHTML=h}
+  function renderEmptyPlayers(){var h=sharedHeading('Performance joueurs','Aucun match actif')+emptyActions();h+='<div class="players-layout"><section class="coach-card empty-panel"><div class="coach-card-head"><h2>Joueurs</h2><span class="coach-chip empty-indicator">0</span></div><div class="coach-empty">0 joueur chargé.</div></section><section class="coach-card empty-panel"><h2 class="player-summary-title">NA</h2><section class="coach-grid player-summary-kpis">'+emptyKpi('Attaque','NA','0 action')+emptyKpi('Réception','NA','0 action')+emptyKpi('Service','0','0 service')+'</section><section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Rallyes</div></div><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Actions</div></div></div></article><article class="coach-card empty-indicator"><h3>Contribution</h3><strong>NA</strong></article></section><button type="button" class="player-detail-cta empty-detail-cta" data-empty-detail>Voir le détail joueur vide <span>›</span></button></section></div>'+footer('Joueurs · état vide');content.innerHTML=h}
+  function renderEmptyDetail(){var h='<button type="button" class="detail-back" data-empty-players>‹ Retour aux joueurs</button>'+sharedHeading('Détail joueur','Aucun match actif')+emptyActions();h+='<section class="coach-card detail-hero empty-panel"><div class="detail-number empty-indicator">NA</div><div><div class="detail-name">NA<small>NA</small></div><span class="detail-status empty-indicator">NA</span></div><div class="detail-net">Delta<strong class="empty-indicator">0</strong><small>0 point · 0 erreur</small></div></section><section class="coach-grid player-summary-kpis">'+emptyKpi('Attaque','NA','0 action')+emptyKpi('Réception','NA','0 action')+emptyKpi('Service','0','0 service')+'</section><section class="coach-grid detail-grid"><article class="coach-card empty-indicator"><h2>Participation</h2><strong>0</strong><small> rallye</small></article><article class="coach-card empty-indicator"><h2>Points directs</h2><strong>0</strong></article><article class="coach-card empty-indicator"><h2>Performance par set</h2><strong>NA</strong></article><article class="coach-card empty-indicator"><h2>Dernières actions</h2><strong>0</strong></article></section>'+footer('Détail joueur · état vide');content.innerHTML=h}
+  function renderEmpty(){if(C.view==='overview')renderEmptyOverview();else if(C.view==='rotations')renderEmptyRotations();else if(C.view==='players')renderEmptyPlayers();else renderEmptyDetail()}
   function renderOverview(){
     var m=C.data.match,r=selectedRallies(),e=selectedEvents(),mt=metrics(r,e),sc=scoreNow(),ss=setSummary(m,C.data.rallies),cur=currentState(m,C.data.rallies,+m.currentSet||1),rot=cur.rot;
     var sov=pct(mt.so.n,mt.so.d),bpv=pct(mt.bp.n,mt.bp.d),aev=mt.att.d?Math.round(mt.att.n*100/mt.att.d):null,recv=pct(mt.rec.n,mt.rec.d);
@@ -158,15 +156,22 @@
     h+='<button type="button" class="detail-full-actions" data-all-actions>☷ &nbsp; Voir toutes les actions &nbsp; ›</button>'+footer('Détail joueur');content.innerHTML=h;
   }
 
-  function updateShell(){screen.classList.toggle('coach-demo-only',!!C.data.demo);screen.querySelectorAll('[data-coach-tab]').forEach(function(b){var active=b.dataset.coachTab===C.view||(C.view==='detail'&&b.dataset.coachTab==='players');b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});var lb=document.getElementById('coachLiveLabel');if(lb)lb.textContent=C.data.demo?'DÉMO · SANS VALEUR RÉELLE':C.data.explicitContext?'V2.1 · MATCH':'V1 · HISTORIQUE CALCULÉ'}
-  function render(){C.data=load();if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);updateShell();if(C.view==='overview')renderOverview();else if(C.view==='rotations')renderRotations();else if(C.view==='players')renderPlayers();else renderDetail()}
+  function updateShell(){screen.classList.toggle('coach-empty-state',!!C.data.empty);screen.querySelectorAll('[data-coach-tab]').forEach(function(b){var active=b.dataset.coachTab===C.view||(C.view==='detail'&&b.dataset.coachTab==='players');b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});var lb=document.getElementById('coachLiveLabel');if(lb)lb.textContent=C.data.empty?'AUCUN MATCH':C.data.replay?'REPLAY · MATCH':C.data.explicitContext?'V2.1 · MATCH':'LIVE · MATCH'}
+  function render(){C.data=load();var token=C.data.empty?'empty':C.data.replay?'replay':C.data.sourceFormat;if(C.sourceToken!==token){C.sourceToken=token;C.period='set';C.phase='all';C.rotation=null;C.playerScope='court';C.role='all';C.player=null;C.skill='summary'}if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);updateShell();if(C.data.empty){renderEmpty();return}if(C.view==='overview')renderOverview();else if(C.view==='rotations')renderRotations();else if(C.view==='players')renderPlayers();else renderDetail()}
   function focusHeading(){setTimeout(function(){var h=content.querySelector('.coach-title');if(h)h.focus()},0)}
   function openCoach(){C.data=load();if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);document.getElementById('homeScreen').hidden=true;screen.hidden=false;C.view='overview';render();screen.scrollTop=0;focusHeading()}
   function closeCoach(){screen.hidden=true;document.getElementById('homeScreen').hidden=false;document.getElementById('homeCoach').focus()}
+  var coachFileInput=document.createElement('input');coachFileInput.type='file';coachFileInput.accept='.json,application/json';coachFileInput.hidden=true;coachFileInput.id='coachFileInput';document.body.appendChild(coachFileInput);
+  coachFileInput.addEventListener('change',function(){var file=this.files&&this.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(){try{var raw=JSON.parse(reader.result),check=window.VolleyStatsAdapter.validate(raw);if(!check.valid)throw new Error(check.errors.join(' '));sessionStorage.setItem(KR,JSON.stringify(raw));sessionStorage.setItem(KRS,file.name);sessionStorage.removeItem(KU);C.view='overview';C.sourceToken=null;render()}catch(error){alert('Fichier invalide : '+error.message)}};reader.readAsText(file)});
   document.getElementById('homeCoach').addEventListener('click',openCoach);document.getElementById('coachHome').addEventListener('click',closeCoach);
   screen.querySelector('.coach-nav').addEventListener('click',function(e){var b=e.target.closest('[data-coach-tab]');if(!b)return;C.view=b.dataset.coachTab;render();screen.scrollTop=0;focusHeading()});
   content.addEventListener('click',function(e){
     var b=e.target.closest('button,[data-player]');if(!b)return;
+    if(b.dataset.coachLoadFile!==undefined){coachFileInput.value='';coachFileInput.click();return}
+    if(b.dataset.coachLive!==undefined&&!b.disabled){sessionStorage.removeItem(KR);sessionStorage.removeItem(KRS);sessionStorage.removeItem(KU);C.view='overview';C.sourceToken=null;render();return}
+    if(b.dataset.coachUnload!==undefined){sessionStorage.removeItem(KR);sessionStorage.removeItem(KRS);sessionStorage.setItem(KU,'1');C.view='overview';C.sourceToken=null;render();return}
+    if(b.dataset.emptyDetail!==undefined){C.view='detail';render();return}
+    if(b.dataset.emptyPlayers!==undefined){C.view='players';render();return}
     if(b.dataset.period){C.period=b.dataset.period;render();return}
     if(b.dataset.coachGo){C.view=b.dataset.coachGo;render();screen.scrollTop=0;focusHeading();return}
     if(b.dataset.phase){C.phase=b.dataset.phase;render();return}

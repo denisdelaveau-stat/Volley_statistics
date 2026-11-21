@@ -1,0 +1,34 @@
+Volley Live Capture v1.12.5 — validation result
+================================================
+
+Automated regression suite
+- Command: pytest -q
+- Result: 54 passed in 79.34 s
+
+Focused empty-state and transition validation
+- No match: Coach View shows only neutral grey 0/NA indicators PASS
+- No match: Advanced Statistics shows only neutral grey 0/NA indicators PASS
+- No automatic Cannes–Fréjus fixture or hard-coded demo values PASS
+- No NaN or Infinity in empty-state UI PASS
+- Explicit JSON replay restores real calculated values PASS
+- Explicit live Capture selection restores live values PASS
+- Unload returns both interfaces to a clean empty state PASS
+- Coach screens covered: overview, team/rotations, players, player detail PASS
+- Statistics screens covered: timeline, rotation metrics, roster, playing time, charts/rankings PASS
+- No red demo/provenance marker PASS
+
+Coach court validation
+- Under-court “P : Passeuse · L : Libéro” legend absent PASS
+- Orange court ends 4–18 px below the lower player row PASS
+- Six role-coloured player circles retained PASS
+- Net, dashed front/back line and setter-position badge retained PASS
+- 390 × 844 viewport: no overflow or overlap PASS
+- 1024 × 900 viewport: no overflow or overlap PASS
+
+Syntax and packaging
+- JavaScript syntax: statistics/adapter.js PASS
+- JavaScript syntax: coach.js PASS
+- Inline Advanced Statistics JavaScript PASS
+- Home COACH VIEW and ADVANCED STATISTICS retained PASS
+- Home: v1.12.5
+- Service-worker cache: volley-live-capture-v1.12.5

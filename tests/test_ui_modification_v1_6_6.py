@@ -13,8 +13,10 @@ def test_score_sides_quick_pad_player_tray_undo_and_history(browser):
     assert page.locator(".quick-side-selector").is_hidden()
     assert page.locator("[data-quick-side]").count()==2 and page.locator("[data-quick-result]").count()==3 and page.locator("[data-quick-action]").count()==7
     assert page.locator(".court-grid [data-player]").count()==6
-    assert page.locator(".court-grid").evaluate("e=>getComputedStyle(e).gridTemplateColumns.split(' ').length")==6
-    assert page.inner_text("#captureUndo")=="UNDO" and page.inner_text("#historyToggle").startswith("HISTORY")
+    assert page.locator(".court-grid").evaluate("e=>getComputedStyle(e).gridTemplateColumns.split(' ').length")==3
+    undo=page.locator("#captureUndo").bounding_box()
+    assert page.inner_text("#captureUndo")=="↶" and undo["x"]>score["x"]+score["width"]
+    assert page.inner_text("#historyToggle").startswith("HISTORY")
     assert not errors; page.close()
 
 

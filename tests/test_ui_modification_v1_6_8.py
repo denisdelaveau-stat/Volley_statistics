@@ -20,9 +20,10 @@ def test_undo_history_and_three_result_blocks(browser):
     assert not errors; page.close()
 
 
-def test_blue_player_tray_and_round_pastel_players(browser):
+def test_orange_player_court_and_round_pastel_players(browser):
     page, errors=open_match(browser,"advanced",focus_off=())
-    tray=_style(page.locator(".quick-player-tray"),["backgroundColor","borderRadius"]); assert tray["backgroundColor"]=="rgb(10, 41, 74)"
+    tray=_style(page.locator(".quick-player-tray"),["backgroundImage","borderRadius"])
+    assert "rgb(255, 155, 87)" in tray["backgroundImage"] and tray["borderRadius"]=="22px"
     for player in page.locator(".court-grid [data-player]").all():
         box=player.bounding_box(); assert abs(box["width"]-box["height"])<1.5; assert _style(player,["borderRadius"])["borderRadius"]=="50%"
     assert not errors; page.close()

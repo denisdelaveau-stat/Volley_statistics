@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.12.6 — Update8 capture interface
+
+- Standardized every action and result control to the same size.
+- Centred the two side-action pairs around the three result controls.
+- Rebuilt player input as an orange court with a net and two rows of three on-court players.
+- Removed the visible bench player and renamed the substitution control to Changer de joueur.
+- Moved Undo from the bottom of Capture to the right of the score.
+- Preserved pastel role colours, Coach View, Advanced Statistics and capture semantics.
+- Updated Home and offline cache to v1.12.6.
+
+## v1.12.5 — Explicit empty analysis state
+
+- Replaced all default demo values with a grey zero/NA state when no match is loaded.
+- Removed automatic loading of the bundled Cannes–Fréjus fixture.
+- Added explicit live, JSON replay and unload transitions without stale values.
+- Added full Coach and Advanced Statistics empty-state browser tests.
+- Removed the under-court P/L legend and compacted the Coach court at phone and tablet widths.
+- Updated Home and offline cache to v1.12.5.
+
+## v1.12.4 — Demo red markers removed
+
+- Removed demo-only red outlines, text overrides and badges from Coach View and Advanced Statistics.
+- Retained source labels and provenance metadata in a neutral visual treatment.
+- Preserved normal error, tactical and role colours.
+- Preserved COACH VIEW and ADVANCED STATISTICS on Home.
+- Updated Home and offline cache to v1.12.4.
+
 ## v1.12.3 — Demo-only red highlighting
 
 - Red now identifies only values supplied by a bundled or hard-coded demonstration data source.
