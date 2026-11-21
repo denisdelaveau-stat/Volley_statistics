@@ -48,10 +48,11 @@ def test_coach_navigation_live_data_and_player_detail(browser):
     page.locator('[data-coach-tab="players"]').click()
     assert page.locator("#coachContent .coach-title").inner_text().startswith("Performance joueurs")
     assert "Voir le détail joueur" in page.locator("#playerDetailCta").inner_text()
+    page.set_viewport_size({"width": 844, "height": 390})
     page.locator("#playerDetailCta").click()
     page.wait_for_timeout(130)
-    assert page.locator("#coachContent .coach-title").inner_text().startswith("Détail joueur")
-    assert page.locator('[data-detail-back]').count() == 1
+    assert page.locator("#coachContent .player-focus-view").is_visible()
+    assert page.locator('[data-focus-court]').count() == 1
     assert not errors
     page.close()
 
@@ -68,8 +69,9 @@ def test_coach_empty_state_and_accessible_detail(browser):
     page.locator('[data-coach-tab="players"]').click()
     cta = page.locator("[data-empty-detail]")
     assert cta.is_visible()
+    page.set_viewport_size({"width": 844, "height": 390})
     cta.click()
-    assert page.locator("#coachContent .coach-title").inner_text().startswith("Détail joueur")
+    assert page.locator("#coachContent .player-focus-view").is_visible()
     assert "NA" in page.locator("#coachContent").inner_text()
     page.close()
 

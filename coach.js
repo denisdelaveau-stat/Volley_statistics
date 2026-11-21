@@ -1,10 +1,10 @@
-/* Volley Live Coach UI v1.12.6 — explicit empty state, replay/live loading and shared pastel role palette */
+/* Volley Live Coach UI v1.13.0 — LIVE COURT, PLAYER FOCUS and shared pastel role palette */
 (function(){
   'use strict';
   var KM='volleyCapture.match.v1',KE='volleyCapture.events.v1',KR='volleyAnalysis.replay.v1',KRS='volleyAnalysis.replay.source.v1',KU='volleyAnalysis.unloaded.v1';
   var screen=document.getElementById('coachScreen'),content=document.getElementById('coachContent');
   if(!screen||!content)return;
-  var C={view:'overview',period:'set',phase:'all',rotation:null,playerScope:'court',role:'all',player:null,skill:'summary',detailHistory:false,data:null,sourceToken:null};
+  var C={view:'overview',period:'set',phase:'all',rotation:null,playerScope:'court',role:'all',player:null,skill:'summary',detailHistory:false,focusOrigin:'live-court',data:null,sourceToken:null};
   var POS=['p4','p3','p2','p5','p6','p1'];
   var NEXT={p2:'p1',p1:'p6',p6:'p5',p5:'p4',p4:'p3',p3:'p2'};
   var ROLE={setter:'Passeur',oh:'Réceptionneuse-attaquante',mb:'Centrale',opp:'Pointue',libero:'Libéro'};
@@ -21,6 +21,8 @@
   function setterNumber(match){return match&&match.startingLineup&&match.startingLineup.setter||((teamPlayers(match).filter(function(p){return p.position==='setter'})[0]||{}).number)}
   function setterZone(match,rot){var s=setterNumber(match),z='';POS.some(function(k){if(String(rot[k])===String(s)){z=k;return true}return false});return z||'p1'}
   function rotationTo(match,target){var r=clone(match.startingRotation||{}),guard=0;while(setterZone(match,r)!==target&&guard++<6)r=rotate(r);return r}
+  function applySubstitution(rot,sub){var zone='';POS.some(function(k){if(String(rot[k])===String(sub.out)){zone=k;return true}return false});if(zone)rot[zone]=sub.in;return rot}
+  function applySubsThrough(match,rot,setNo,eventCount){(match.subs||[]).filter(function(s){return (+s.set||1)===setNo&&(+s.at||0)<=eventCount}).sort(function(a,b){return (+a.at||0)-(+b.at||0)}).forEach(function(s){applySubstitution(rot,s)});return rot}
   function initialServing(match,setNo){var s=(match.firstRally&&match.firstRally.antibesState==='reception')?'B':'A';if(setNo%2===0)s=s==='A'?'B':'A';return s}
 
   function emptyData(){
@@ -43,14 +45,23 @@
     var sets={},ordered=[];
     events.forEach(function(e){var s=+e.set||1;(sets[s]||(sets[s]=[])).push(e)});
     Object.keys(sets).map(Number).sort(function(a,b){return a-b}).forEach(function(setNo){
-      var serving=initialServing(match,setNo),rot=clone(match.startingRotation||{}),pending=[];
-      sets[setNo].forEach(function(e){pending.push(e);if(!e.winningTeam)return;var z=setterZone(match,rot),r={set:setNo,actions:pending.slice(),winner:e.winningTeam,scoreA:+e.scoreA||0,scoreB:+e.scoreB||0,serving:serving,phase:serving==='A'?'serve':'receive',rotation:z,rotationLabel:z.toUpperCase()};ordered.push(r);pending=[];if(e.winningTeam==='team1'){if(serving==='B')rot=rotate(rot);serving='A'}else if(e.winningTeam==='team2')serving='B'});
+      var serving=initialServing(match,setNo),rot=clone(match.startingRotation||{}),pending=[],rallyLineup=null;
+      var subs=(match.subs||[]).filter(function(s){return (+s.set||1)===setNo}).sort(function(a,b){return (+a.at||0)-(+b.at||0)}),subIndex=0;
+      sets[setNo].forEach(function(e,eventIndex){
+        while(subIndex<subs.length&&(+subs[subIndex].at||0)===eventIndex){applySubstitution(rot,subs[subIndex]);subIndex++}
+        if(!pending.length)rallyLineup=clone(rot);
+        pending.push(e);if(!e.winningTeam)return;
+        var z=setterZone(match,rot),r={set:setNo,actions:pending.slice(),winner:e.winningTeam,scoreA:+e.scoreA||0,scoreB:+e.scoreB||0,serving:serving,phase:serving==='A'?'serve':'receive',rotation:z,rotationLabel:z.toUpperCase(),lineup:clone(rallyLineup||rot),onCourt:POS.map(function(k){return (rallyLineup||rot)[k]})};
+        ordered.push(r);pending=[];rallyLineup=null;
+        if(e.winningTeam==='team1'){if(serving==='B')rot=rotate(rot);serving='A'}else if(e.winningTeam==='team2')serving='B'
+      });
     });
     return ordered;
   }
   function currentState(match,rallies,setNo){
     if(C.data&&C.data.explicitContext){var explicit=rallies.filter(function(r){return r.set===setNo}),last=explicit[explicit.length-1],rot=last&&last.lineup?clone(last.lineup):clone(match.startingRotation||{}),serving=last?(last.winner==='team1'?'A':'B'):initialServing(match,setNo);if(last&&last.phase==='receive'&&last.winner==='team1')rot=rotate(rot);return {serving:serving,rot:rot,rotation:setterZone(match,rot)}}
-    var serving=initialServing(match,setNo),rot=clone(match.startingRotation||{});rallies.filter(function(r){return r.set===setNo}).forEach(function(r){if(r.winner==='team1'){if(serving==='B')rot=rotate(rot);serving='A'}else if(r.winner==='team2')serving='B'});return {serving:serving,rot:rot,rotation:setterZone(match,rot)}
+    var serving=initialServing(match,setNo),rot=clone(match.startingRotation||{}),setEvents=(C.data.events||[]).filter(function(e){return (+e.set||1)===setNo}),eventIndex=0,subs=(match.subs||[]).filter(function(s){return (+s.set||1)===setNo}).sort(function(a,b){return (+a.at||0)-(+b.at||0)}),subIndex=0;
+    setEvents.forEach(function(e){while(subIndex<subs.length&&(+subs[subIndex].at||0)===eventIndex){applySubstitution(rot,subs[subIndex]);subIndex++}eventIndex++;if(e.winningTeam==='team1'){if(serving==='B')rot=rotate(rot);serving='A'}else if(e.winningTeam==='team2')serving='B'});while(subIndex<subs.length&&(+subs[subIndex].at||0)<=eventIndex){applySubstitution(rot,subs[subIndex]);subIndex++}return {serving:serving,rot:rot,rotation:setterZone(match,rot)}
   }
   function setSummary(match,rallies){if(match.demoSetWins)return {a:match.demoSetWins.a,b:match.demoSetWins.b};var wonA=0,wonB=0,current=+match.currentSet||1,max=C.data&&C.data.explicitContext?Math.max.apply(null,rallies.map(function(r){return r.set}).concat([current])):current-1;for(var s=1;s<=max;s++){var rr=rallies.filter(function(r){return r.set===s}),last=rr[rr.length-1];if(last){if(last.scoreA>last.scoreB)wonA++;else if(last.scoreB>last.scoreA)wonB++}}return {a:wonA,b:wonB}}
   function selectedRallies(){var all=C.data.rallies,m=C.data.match,cur=+m.currentSet||1;if(C.period==='match')return all;if(C.period==='last10')return all.slice(-10);return all.filter(function(r){return r.set===cur})}
@@ -89,6 +100,103 @@
   function renderEmptyPlayers(){var h=sharedHeading('Performance joueurs','Aucun match actif')+emptyActions();h+='<div class="players-layout"><section class="coach-card empty-panel"><div class="coach-card-head"><h2>Joueurs</h2><span class="coach-chip empty-indicator">0</span></div><div class="coach-empty">0 joueur chargé.</div></section><section class="coach-card empty-panel"><h2 class="player-summary-title">NA</h2><section class="coach-grid player-summary-kpis">'+emptyKpi('Attaque','NA','0 action')+emptyKpi('Réception','NA','0 action')+emptyKpi('Service','0','0 service')+'</section><section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Rallyes</div></div><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Actions</div></div></div></article><article class="coach-card empty-indicator"><h3>Contribution</h3><strong>NA</strong></article></section><button type="button" class="player-detail-cta empty-detail-cta" data-empty-detail>Voir le détail joueur vide <span>›</span></button></section></div>'+footer('Joueurs · état vide');content.innerHTML=h}
   function renderEmptyDetail(){var h='<button type="button" class="detail-back" data-empty-players>‹ Retour aux joueurs</button>'+sharedHeading('Détail joueur','Aucun match actif')+emptyActions();h+='<section class="coach-card detail-hero empty-panel"><div class="detail-number empty-indicator">NA</div><div><div class="detail-name">NA<small>NA</small></div><span class="detail-status empty-indicator">NA</span></div><div class="detail-net">Delta<strong class="empty-indicator">0</strong><small>0 point · 0 erreur</small></div></section><section class="coach-grid player-summary-kpis">'+emptyKpi('Attaque','NA','0 action')+emptyKpi('Réception','NA','0 action')+emptyKpi('Service','0','0 service')+'</section><section class="coach-grid detail-grid"><article class="coach-card empty-indicator"><h2>Participation</h2><strong>0</strong><small> rallye</small></article><article class="coach-card empty-indicator"><h2>Points directs</h2><strong>0</strong></article><article class="coach-card empty-indicator"><h2>Performance par set</h2><strong>NA</strong></article><article class="coach-card empty-indicator"><h2>Dernières actions</h2><strong>0</strong></article></section>'+footer('Détail joueur · état vide');content.innerHTML=h}
   function renderEmpty(){if(C.view==='overview')renderEmptyOverview();else if(C.view==='rotations')renderEmptyRotations();else if(C.view==='players')renderEmptyPlayers();else renderEmptyDetail()}
+  /* --- v1.13.0 LIVE COURT / PLAYER FOCUS --- */
+  var LIVE_CFG=window.VolleyCoachConfig||{};
+  function cfg(){return LIVE_CFG}
+  function outcome(e){var key=String(e&&e.result||'').toLowerCase();return (cfg().outcome||{})[key]||'neutral'}
+  function liveSkillEvents(playerNumber,skill,events){return (events||[]).filter(function(e){return String(e.player)===String(playerNumber)&&e.action===skill})}
+  function qualityValue(e){return String(e&&e.quality||e&&e.grade||'').toLowerCase()}
+  function positiveQuality(e){return ['positive','perfect','good','excellent','3','4'].indexOf(qualityValue(e))>-1}
+  function blockedAttack(e){var v=String(e&&e.attackOutcome||e&&e.detail||e&&e.quality||'').toLowerCase();return v==='blocked'||v==='block'||v==='stuffed'}
+  function canGrade(events,skill){return events.some(function(e){if(skill==='reception')return ['positive','perfect','good','excellent','3','4','poor','negative','0','1','2'].indexOf(qualityValue(e))>-1;if(skill==='defense')return qualityValue(e)!=='';return false})}
+  function hasIntermediateContacts(events){return C.data.explicitContext||events.some(function(e){return outcome(e)==='neutral'})}
+  function skillEfficiency(skill,events){
+    if(!events.length)return null;
+    var pos=events.filter(function(e){return outcome(e)==='positive'}).length,neg=events.filter(function(e){return outcome(e)==='negative'}).length;
+    if(skill==='attack')return Math.round((pos-neg)*100/events.length);
+    if(skill==='block'){if(!hasIntermediateContacts(events))return null;return Math.round((pos-neg)*100/events.length)}
+    if(skill==='reception'||skill==='defense')return Math.round(events.filter(function(e){return outcome(e)!=='negative'}).length*100/events.length)
+    if(skill==='set')return Math.round(events.filter(function(e){return outcome(e)!=='negative'}).length*100/events.length);
+    return Math.round((pos-neg)*100/events.length)
+  }
+  function mainSkillFor(p,events){var role=normalizedRole(p.position);if(role==='setter')return 'set';if(role==='libero')return liveSkillEvents(p.number,'reception',events).length?'reception':'defense';return 'attack'}
+  function livePlayerStats(p,events,rallies){
+    var pe=(events||[]).filter(function(e){return String(e.player)===String(p.number)}),skills={};
+    ['attack','block','reception','defense','service','set','freeball'].forEach(function(skill){skills[skill]=liveSkillEvents(p.number,skill,pe)});
+    var pointEvents=pe.filter(function(e){return outcome(e)==='positive'&&['attack','block','service'].indexOf(e.action)>-1}),errorEvents=pe.filter(function(e){return outcome(e)==='negative'}),main=mainSkillFor(p,pe),mainEvents=skills[main]||[],eff=skillEfficiency(main,mainEvents);
+    var windowSize=cfg().rollingWindow||5,rolling=mainEvents.slice(-windowSize),rollingEff=skillEfficiency(main,rolling),errorStreak=0;
+    for(var i=mainEvents.length-1;i>=0&&outcome(mainEvents[i])==='negative';i--)errorStreak++;
+    var lastTwoPositive=mainEvents.slice(-2).length===2&&mainEvents.slice(-2).every(function(e){return outcome(e)==='positive'}),drop=eff==null||rollingEff==null?0:eff-rollingEff;
+    var d=(cfg().status||{}).difficulty||{},w=(cfg().status||{}).watch||{},minimum=cfg().minimumSample||3,statusName='good';
+    if(mainEvents.length>=minimum){
+      if(errorStreak>=(d.errorStreak||3)||(mainEvents.length>=(d.efficiencyMinimumAttempts||6)&&eff!=null&&eff<(d.efficiencyBelow||15))||(errorEvents.length>=(d.errors||4)&&eff!=null&&eff<(d.errorsEfficiencyBelow||25))||drop>=(d.rollingDrop||30))statusName='difficulty';
+      else if(errorStreak>=(w.errorStreak||2)||(mainEvents.length>=(w.efficiencyMinimumAttempts||5)&&eff!=null&&eff<(w.efficiencyBelow||30))||(main==='reception'&&rolling.length&&Math.round(rolling.filter(function(e){return outcome(e)==='negative'}).length*100/rolling.length)>=(w.receptionPoorRate||40))||drop>=(w.rollingDrop||15))statusName='watch';
+    }
+    if(statusName!=='good'&&lastTwoPositive&&rollingEff!=null&&rollingEff>=(w.efficiencyBelow||30))statusName='good';
+    var previous=mainEvents.slice(-(windowSize*2),-windowSize),previousEff=skillEfficiency(main,previous),trend='stable',delta=rollingEff==null||previousEff==null?0:rollingEff-previousEff,trendLimit=((cfg().status||{}).trendDelta||10);if(delta>=trendLimit)trend='up';else if(delta<=-trendLimit)trend='down';
+    var alert='';
+    if(errorStreak>=3)alert=errorStreak+' errors in a row';
+    else if(main==='set'&&rolling.filter(function(e){return outcome(e)==='negative'}).length>=2)alert=rolling.filter(function(e){return outcome(e)==='negative'}).length+' setting errors';
+    else if(main==='reception'&&statusName!=='good')alert='Reception unstable';
+    else if(main==='attack'&&eff!=null&&statusName!=='good')alert='Attack efficiency '+eff+'%';
+    else if(skills.service.slice(-2).length===2&&skills.service.slice(-2).every(function(e){return outcome(e)==='negative'}))alert='2 serve errors';
+    return {player:p,events:pe,skills:skills,points:pointEvents.length,errors:errorEvents.length,eff:eff,rollingEff:rollingEff,status:statusName,trend:trend,alert:alert,mainSkill:main,rallies:(rallies||[]).filter(function(r){return r.actions.some(function(e){return String(e.player)===String(p.number)})}).length};
+  }
+  function liveStatusLabel(s){return s==='difficulty'?'Difficulty':s==='watch'?'Watch':'Good'}
+  function trendSymbol(t){return t==='up'?'↑':t==='down'?'↓':'→'}
+  function roleChip(p){var r=normalizedRole(p.position);return '<span class="live-role role-'+r+'" data-player-role="'+r+'">'+esc(ROLE_SHORT[r]||String(r||'—').toUpperCase())+'</span>'}
+  function formatEff(v){return v==null?'<span class="metric-na">NA</span>':(v>0?'+':'')+v+'%'}
+  function playerEffText(s){return s.eff==null?formatEff(null):(['reception','defense'].indexOf(s.mainSkill)>-1?'≈':'')+formatEff(s.eff)}
+  function liveSetDots(match){var count=Math.max(3,Math.min(5,+((match.format||{}).setsToWin)||3)),current=Math.max(1,Math.min(count,+match.currentSet||1));return '<span class="live-set-dots">'+Array.from({length:count},function(_,i){return '<i class="'+(i+1===current?'current':i+1<current?'done':'')+'"></i>'}).join('')+'</span>'}
+  function liveHeader(includeMetrics){
+    var m=C.data.match,empty=!!C.data.empty,rr=C.data.rallies.filter(function(r){return r.set===(+m.currentSet||1)}),mt=metrics(rr,[].concat.apply([],rr.map(function(r){return r.actions}))),sc=empty?{a:0,b:0}:scoreNow(),cur=empty?{rotation:'na',serving:null}:currentState(m,C.data.rallies,+m.currentSet||1),so=empty?null:pct(mt.so.n,mt.so.d),bp=empty?null:pct(mt.bp.n,mt.bp.d),phase=empty?'NA':cur.serving==='B'?'RECEPTION':'SERVE';
+    return '<header class="live-insight-header '+(empty?'live-header-empty':'')+'"><div class="live-insight-brand"><span class="live-logo">◉</span><b>VolleyLive <em>Insight</em></b></div><button type="button" class="live-mode-pill" data-coach-go="overview">COACH VIEW'+(C.view==='player-focus'?' &gt; PLAYER':'')+'</button><div class="live-scoreboard"><span>HOME</span><strong class="'+(empty?'metric-na':'')+'">'+sc.a+'</strong><div class="live-set"><b class="'+(empty?'metric-na':'')+'">Set '+(empty?'0':(+m.currentSet||1))+'</b>'+(empty?'<span class="live-set-dots"><i></i><i></i><i></i></span>':liveSetDots(m))+'</div><strong class="'+(empty?'metric-na':'')+'">'+sc.b+'</strong><span>AWAY</span></div><div class="live-header-badge"><strong class="'+(empty?'metric-na':'')+'">'+(empty?'NA':esc(cur.rotation.toUpperCase()))+'</strong><small>Rotation</small></div><div class="live-phase '+(empty?'empty':cur.serving==='B'?'receive':'serve')+'"><strong>'+phase+'</strong><small>Phase</small></div>'+(includeMetrics?'<div class="live-rates"><span>SO<strong>'+formatEff(so)+'</strong></span><span>BP<strong>'+formatEff(bp)+'</strong></span></div>':'')+'</header>';
+  }
+  function liveEmptyCard(position){return '<article class="live-player-card status-neutral" data-position="'+position+'"><span class="live-position">'+position+'</span><div class="live-card-main"><strong class="live-number metric-na">NA</strong><b class="metric-na">NA</b><span class="live-role empty-role">NA</span><span class="live-trend">→</span><div class="live-mini"><span>PTS<b class="metric-na">0</b></span><span>ERR<b class="metric-na">0</b></span><span>EFF<b class="metric-na">NA</b></span></div></div></article>'}
+  function livePlayerCard(position,p,s){return '<button type="button" class="live-player-card status-'+s.status+'" data-live-player="'+esc(p.number)+'" data-position="'+position+'" aria-label="Ouvrir Player Focus pour '+esc(p.name)+'"><span class="live-position">'+position+'</span><div class="live-card-main"><strong class="live-number">#'+esc(String(p.number).padStart(2,'0'))+'</strong><b>'+esc(String(p.name||'Joueur').toUpperCase())+'</b>'+roleChip(p)+'<span class="live-trend">'+trendSymbol(s.trend)+'</span><div class="live-mini"><span>PTS<b>'+s.points+'</b></span><span>ERR<b>'+s.errors+'</b></span><span>EFF<b title="'+(['reception','defense'].indexOf(s.mainSkill)>-1?'≈ dérivé des événements':'')+'">'+playerEffText(s)+'</b></span></div>'+(s.status!=='good'?'<div class="live-alert-strip"><span>⚠</span>'+esc(s.alert||liveStatusLabel(s.status))+'</div>':'')+'</div></button>'}
+  function rallyTimeline(rallies){var last=rallies.slice(-(cfg().timelineLength||12));return '<section class="live-timeline"><h2>LAST 12 RALLIES</h2><div class="live-rally-track">'+(last.length?last.map(function(r,i){var win=r.winner==='team1',now=i===last.length-1;return '<span class="live-rally '+(win?'win':'loss')+' '+(now?'now':'')+'">'+(now?'<em>Now</em>':'')+'<b>'+(win?'W':'L')+'</b><small>'+esc(r.number||i+1)+'</small></span>'}).join(''):'<span class="live-empty-rallies metric-na">0 rally</span>')+'</div></section>'}
+  function renderLiveCourt(){
+    if(innerWidth<innerHeight){content.innerHTML='<div class="live-landscape-gate"><span>↻</span><strong>Tournez l’appareil</strong><p>LIVE COURT est optimisé pour le mode paysage.</p><button type="button" data-coach-go="overview">Retour à Vue coach</button></div>';return}
+    var h='<div class="live-court-view">'+liveHeader(true),m=C.data.match;
+    h+='<section class="live-court-panel"><div class="live-section-head"><h1>ON COURT</h1><div class="live-status-legend"><span class="good">● Good</span><span class="watch">● Watch</span><span class="difficulty">● Difficulty</span></div></div><div class="live-half-court"><div class="live-net"><span>NET</span></div><div class="live-court-grid">';
+    if(C.data.empty){[4,3,2,5,6,1].forEach(function(pos){h+=liveEmptyCard(pos)})}
+    else{var setNo=+m.currentSet||1,cur=currentState(m,C.data.rallies,setNo),setEvents=C.data.events.filter(function(e){return (+e.set||1)===setNo});[4,3,2,5,6,1].forEach(function(pos){var p=playerInfo(m,cur.rot['p'+pos]),s=livePlayerStats(p,setEvents,C.data.rallies.filter(function(r){return r.set===setNo}));h+=livePlayerCard(pos,p,s)})}
+    h+='</div></div></section>'+rallyTimeline(C.data.empty?[]:C.data.rallies.filter(function(r){return r.set===(+m.currentSet||1)}))+'<p class="live-threshold-note">Seuils Good / Watch / Difficulty configurables — valeurs par défaut à valider avec le coach.</p></div>';content.innerHTML=h
+  }
+  function focusPlayers(){var court=currentCourtNumbers().map(String),all=teamPlayers(C.data.match);var list=all.filter(function(p){return court.indexOf(String(p.number))>-1});return list.length?list:all}
+  function focusNavigate(step){var list=focusPlayers(),idx=list.findIndex(function(p){return String(p.number)===String(C.player)});if(idx<0)idx=0;idx=(idx+step+list.length)%list.length;C.player=list[idx].number;render()}
+  function focusSkillModel(s,skill){
+    var events=s.skills[skill]||[],positive=events.filter(function(e){return outcome(e)==='positive'}).length,negative=events.filter(function(e){return outcome(e)==='negative'}).length,neutral=events.filter(function(e){return outcome(e)==='neutral'}).length,eff=skillEfficiency(skill,events),intermediate=hasIntermediateContacts(C.data.events||[]),nonError=events.filter(function(e){return outcome(e)!=='negative'}).length,stats=[];
+    if(skill==='attack')stats=[['ATT',events.length],['KILL',positive],['ERR',negative],['BLK','NA']];
+    if(skill==='block')stats=[['PTS',positive],['TOUCH',intermediate?neutral:'NA'],['ERR',negative]];
+    if(skill==='reception')stats=[['REC',events.length],['POS','≈'+nonError],['ERR',negative]];
+    if(skill==='defense')stats=[['DIG',events.length],['GOOD','≈'+nonError],['ERR',negative]];
+    return {skill:skill,events:events,positive:positive,negative:negative,neutral:neutral,eff:eff,stats:stats,derived:skill==='reception'||skill==='defense',derivable:!(eff==null&&(events.length>0))}
+  }
+  function lastFiveHTML(events){var list=events.slice(-5);while(list.length<5)list.unshift(null);return '<div class="focus-last-five" aria-label="5 dernières actions, de la plus ancienne à la plus récente">'+list.map(function(e){if(!e)return '<span class="na" title="Aucune action">NA</span>';var o=outcome(e);return '<span class="'+o+'" title="'+esc(actionLabel(e))+'">'+(o==='positive'?'✓':o==='negative'?'×':'−')+'</span>'}).join('')+'</div>'}
+  function curvePoints(playerNumber,skill,rallies){
+    var relevant=rallies.filter(function(r){return r.actions.some(function(e){return String(e.player)===String(playerNumber)&&e.action===skill})}),start=Math.max(0,relevant.length-12),selected=relevant.slice(start),seen=[],points=[];
+    relevant.slice(0,start).forEach(function(r){r.actions.forEach(function(e){if(String(e.player)===String(playerNumber)&&e.action===skill)seen.push(e)})});
+    selected.forEach(function(r,i){r.actions.forEach(function(e){if(String(e.player)===String(playerNumber)&&e.action===skill)seen.push(e)});var v=skillEfficiency(skill,seen);points.push({x:i+1,v:v,rally:r.number||start+i+1})});return points
+  }
+  function efficiencyCurve(playerNumber,skill,rallies){
+    if(!C.data.explicitContext&&!hasIntermediateContacts(C.data.events||[]))return '<div class="focus-curve focus-curve-na"><span class="metric-na">NA</span><small>Contacts intermédiaires absents de cet export Capture v1</small></div>';
+    var pts=curvePoints(playerNumber,skill,rallies),valid=pts.filter(function(p){return p.v!=null});
+    if(!valid.length)return '<div class="focus-curve focus-curve-na"><span class="metric-na">NA</span><small>Aucun contact disponible dans le JSON</small></div>';
+    var W=420,H=118,padL=34,padR=12,padT=10,padB=24,maxX=Math.max(1,pts.length-1),baseY=H-padB;
+    var coords=valid.map(function(p){return {x:padL+((p.x-1)/maxX)*(W-padL-padR),y:padT+(100-Math.max(0,Math.min(100,p.v)))/100*(H-padT-padB),v:p.v,rally:p.rally}}),path=coords.map(function(p,i){return (i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)}).join(' '),last=coords[coords.length-1],area='M'+coords[0].x.toFixed(1)+','+baseY+' '+coords.map(function(p){return 'L'+p.x.toFixed(1)+','+p.y.toFixed(1)}).join(' ')+' L'+last.x.toFixed(1)+','+baseY+' Z';
+    return '<svg class="focus-curve" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Courbe d’efficacité '+skill+' dérivée des événements réels"><line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+padT+'" y2="'+padT+'"/><line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+(padT+(H-padT-padB)/2)+'" y2="'+(padT+(H-padT-padB)/2)+'" class="mid"/><line x1="'+padL+'" x2="'+(W-padR)+'" y1="'+baseY+'" y2="'+baseY+'"/><text x="2" y="14">100%</text><text x="8" y="'+(padT+(H-padT-padB)/2+4)+'">50%</text><text x="17" y="'+(baseY+4)+'">0%</text><path class="area" d="'+area+'"/><path class="line" d="'+path+'"/>'+coords.map(function(p){return '<circle cx="'+p.x+'" cy="'+p.y+'" r="3"/>'}).join('')+'<circle class="last" cx="'+last.x+'" cy="'+last.y+'" r="6"/><text class="rally-axis" x="'+last.x+'" y="'+(H-5)+'" text-anchor="middle">R'+esc(last.rally)+'</text></svg>'
+  }
+  function skillTitle(skill){return {attack:'ATTACK',block:'BLOCK',reception:'RECEPTION',defense:'DEFENSE'}[skill]}
+  function focusPanel(s,skill,rallies){var m=focusSkillModel(s,skill),trend=s.trend,icon={attack:'⚡',block:'♜',reception:'◉',defense:'◆'}[skill];return '<article class="focus-skill-panel focus-'+skill+'"><header><span>'+icon+'</span><h2>'+skillTitle(skill)+'</h2><b>›</b></header><div class="focus-skill-summary"><strong class="'+(m.eff==null?'metric-na':'')+'" '+(m.derived?'title="≈ dérivé des événements : contacts non ERROR / total"':'')+'>'+(m.eff==null?'NA':(m.derived?'≈':'')+m.eff+'%')+'</strong><span class="focus-eff-trend '+trend+'" title="Tendance dérivée des '+(cfg().rollingWindow||5)+' derniers contacts comparés aux '+(cfg().rollingWindow||5)+' précédents">'+trendSymbol(trend)+'</span><div class="focus-stat-grid">'+m.stats.map(function(x){return '<span>'+x[0]+'<b class="'+(x[1]==='NA'?'metric-na':'')+'" '+(String(x[1]).charAt(0)==='≈'?'title="≈ dérivé des événements : contacts non ERROR"':'')+'>'+x[1]+'</b></span>'}).join('')+'</div></div><div class="focus-last-title">LAST 5 <small>(oldest → newest)</small></div>'+lastFiveHTML(m.events)+'<div class="focus-curve-title">EFFICIENCY '+(m.derived?'<span title="≈ dérivé des événements">≈</span>':'')+'</div>'+efficiencyCurve(s.player.number,skill,rallies)+'</article>'}
+  function miniCourt(position,status){return '<article class="focus-position-card"><h2>COURT POSITION</h2><div class="focus-mini-court"><div class="focus-mini-net"></div>'+[4,3,2,5,6,1].map(function(p){return '<span class="'+(p===position?'active status-'+status:'')+'">'+p+'</span>'}).join('')+'</div><p>Front Row (4-3-2)<br>Back Row (5-6-1)</p></article>'}
+  function renderEmptyPlayerFocus(){if(innerWidth<innerHeight){renderLiveCourt();return}var fake={number:'NA',name:'NA',position:''},s={player:fake,points:0,errors:0,eff:null,status:'neutral',trend:'stable',alert:'',skills:{attack:[],block:[],reception:[],defense:[]}};content.innerHTML='<div class="player-focus-view">'+liveHeader(false)+'<div class="focus-navigation"><button data-focus-court>← Court</button><div><button disabled>‹</button><strong class="metric-na">NA</strong><button disabled>›</button></div></div><div class="focus-body"><aside><article class="focus-player-card status-neutral"><strong class="metric-na">NA</strong><b class="metric-na">NA</b><span class="live-role empty-role">NA</span><div class="focus-status metric-na">NA</div><div class="focus-player-mini"><span>PTS<b class="metric-na">0</b></span><span>ERR<b class="metric-na">0</b></span><span>EFF<b class="metric-na">NA</b></span></div></article>'+miniCourt(0,'neutral')+'</aside><section class="focus-skills">'+['attack','block','reception','defense'].map(function(skill){return focusPanel(s,skill,[])}).join('')+'</section></div></div>'}
+  function renderPlayerFocus(){
+    if(C.data.empty){renderEmptyPlayerFocus();return}if(innerWidth<innerHeight){renderLiveCourt();return}
+    var list=focusPlayers();if(!C.player||!list.some(function(p){return String(p.number)===String(C.player)}))C.player=(list[0]||{}).number;var p=playerInfo(C.data.match,C.player),setNo=+C.data.match.currentSet||1,rallies=C.data.rallies.filter(function(r){return r.set===setNo}),events=C.data.events.filter(function(e){return (+e.set||1)===setNo}),s=livePlayerStats(p,events,rallies),cur=currentState(C.data.match,C.data.rallies,setNo),position=0;POS.some(function(z){if(String(cur.rot[z])===String(p.number)){position=+z.slice(1);return true}return false});
+    var h='<div class="player-focus-view">'+liveHeader(false)+'<div class="focus-navigation"><button type="button" data-focus-court>← Court</button><div><button type="button" data-focus-prev aria-label="Joueur précédent">‹</button><strong>#'+esc(String(p.number).padStart(2,'0'))+' '+esc(String(p.name||'Joueur').toUpperCase())+'</strong><button type="button" data-focus-next aria-label="Joueur suivant">›</button></div></div><div class="focus-body"><aside><article class="focus-player-card status-'+s.status+'"><span class="focus-trend">'+trendSymbol(s.trend)+'</span><strong>#'+esc(String(p.number).padStart(2,'0'))+'</strong><b>'+esc(String(p.name||'Joueur').toUpperCase())+'</b><div>'+roleChip(p)+' <span>Position '+(position||'NA')+'</span></div><div class="focus-status">'+liveStatusLabel(s.status)+'</div>'+(s.alert?'<div class="focus-alert">⚠ <span>'+esc(s.alert)+'</span></div>':'')+'<div class="focus-player-mini"><span>PTS<b>'+s.points+'</b></span><span>ERR<b>'+s.errors+'</b></span><span>EFF<b title="'+(['reception','defense'].indexOf(s.mainSkill)>-1?'≈ dérivé des événements':'')+'">'+playerEffText(s)+'</b></span></div></article>'+miniCourt(position,s.status)+'</aside><section class="focus-skills">'+['attack','block','reception','defense'].map(function(skill){return focusPanel(s,skill,rallies)}).join('')+'</section></div><div class="focus-legend"><span class="good">● Good</span><span class="neutral">● Neutral</span><span class="error">● Error</span></div></div>';content.innerHTML=h
+  }
+
   function renderOverview(){
     var m=C.data.match,r=selectedRallies(),e=selectedEvents(),mt=metrics(r,e),sc=scoreNow(),ss=setSummary(m,C.data.rallies),cur=currentState(m,C.data.rallies,+m.currentSet||1),rot=cur.rot;
     var sov=pct(mt.so.n,mt.so.d),bpv=pct(mt.bp.n,mt.bp.d),aev=mt.att.d?Math.round(mt.att.n*100/mt.att.d):null,recv=pct(mt.rec.n,mt.rec.d);
@@ -156,8 +264,8 @@
     h+='<button type="button" class="detail-full-actions" data-all-actions>☷ &nbsp; Voir toutes les actions &nbsp; ›</button>'+footer('Détail joueur');content.innerHTML=h;
   }
 
-  function updateShell(){screen.classList.toggle('coach-empty-state',!!C.data.empty);screen.querySelectorAll('[data-coach-tab]').forEach(function(b){var active=b.dataset.coachTab===C.view||(C.view==='detail'&&b.dataset.coachTab==='players');b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});var lb=document.getElementById('coachLiveLabel');if(lb)lb.textContent=C.data.empty?'AUCUN MATCH':C.data.replay?'REPLAY · MATCH':C.data.explicitContext?'V2.1 · MATCH':'LIVE · MATCH'}
-  function render(){C.data=load();var token=C.data.empty?'empty':C.data.replay?'replay':C.data.sourceFormat;if(C.sourceToken!==token){C.sourceToken=token;C.period='set';C.phase='all';C.rotation=null;C.playerScope='court';C.role='all';C.player=null;C.skill='summary'}if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);updateShell();if(C.data.empty){renderEmpty();return}if(C.view==='overview')renderOverview();else if(C.view==='rotations')renderRotations();else if(C.view==='players')renderPlayers();else renderDetail()}
+  function updateShell(){var immersive=C.view==='live-court'||C.view==='player-focus';screen.classList.toggle('coach-empty-state',!!C.data.empty);screen.classList.toggle('coach-live-mode',immersive);screen.querySelectorAll('[data-coach-tab]').forEach(function(b){if(b.dataset.coachTab==='player-focus')b.hidden=C.view!=='player-focus';var active=b.dataset.coachTab===C.view||(C.view==='detail'&&b.dataset.coachTab==='players');b.classList.toggle('active',active);b.setAttribute('aria-selected',active?'true':'false')});var lb=document.getElementById('coachLiveLabel');if(lb)lb.textContent=C.data.empty?'AUCUN MATCH':C.data.replay?'REPLAY · MATCH':C.data.explicitContext?'V2.1 · MATCH':'LIVE · MATCH'}
+  function render(){C.data=load();var token=C.data.empty?'empty':C.data.replay?'replay':C.data.sourceFormat;if(C.sourceToken!==token){C.sourceToken=token;C.period='set';C.phase='all';C.rotation=null;C.playerScope='court';C.role='all';C.player=null;C.skill='summary'}if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);updateShell();if(C.data.empty){if(C.view==='live-court')renderLiveCourt();else if(C.view==='player-focus')renderEmptyPlayerFocus();else renderEmpty();return}if(C.view==='overview')renderOverview();else if(C.view==='live-court')renderLiveCourt();else if(C.view==='rotations')renderRotations();else if(C.view==='players')renderPlayers();else if(C.view==='player-focus')renderPlayerFocus();else renderDetail()}
   function focusHeading(){setTimeout(function(){var h=content.querySelector('.coach-title');if(h)h.focus()},0)}
   function openCoach(){C.data=load();if(!C.data.rallies)C.data.rallies=buildRallies(C.data.match,C.data.events);document.getElementById('homeScreen').hidden=true;screen.hidden=false;C.view='overview';render();screen.scrollTop=0;focusHeading()}
   function closeCoach(){screen.hidden=true;document.getElementById('homeScreen').hidden=false;document.getElementById('homeCoach').focus()}
@@ -167,10 +275,14 @@
   screen.querySelector('.coach-nav').addEventListener('click',function(e){var b=e.target.closest('[data-coach-tab]');if(!b)return;C.view=b.dataset.coachTab;render();screen.scrollTop=0;focusHeading()});
   content.addEventListener('click',function(e){
     var b=e.target.closest('button,[data-player]');if(!b)return;
+    if(b.dataset.livePlayer!==undefined){C.player=b.dataset.livePlayer;C.focusOrigin='live-court';C.view='player-focus';history.pushState({volleyCoachFocus:true},'',location.href.split('#')[0]+'#player-focus');C.detailHistory=true;render();screen.scrollTop=0;return}
+    if(b.dataset.focusCourt!==undefined){C.view='live-court';render();screen.scrollTop=0;return}
+    if(b.dataset.focusPrev!==undefined){focusNavigate(-1);return}
+    if(b.dataset.focusNext!==undefined){focusNavigate(1);return}
     if(b.dataset.coachLoadFile!==undefined){coachFileInput.value='';coachFileInput.click();return}
     if(b.dataset.coachLive!==undefined&&!b.disabled){sessionStorage.removeItem(KR);sessionStorage.removeItem(KRS);sessionStorage.removeItem(KU);C.view='overview';C.sourceToken=null;render();return}
     if(b.dataset.coachUnload!==undefined){sessionStorage.removeItem(KR);sessionStorage.removeItem(KRS);sessionStorage.setItem(KU,'1');C.view='overview';C.sourceToken=null;render();return}
-    if(b.dataset.emptyDetail!==undefined){C.view='detail';render();return}
+    if(b.dataset.emptyDetail!==undefined){C.focusOrigin='players';C.view='player-focus';render();return}
     if(b.dataset.emptyPlayers!==undefined){C.view='players';render();return}
     if(b.dataset.period){C.period=b.dataset.period;render();return}
     if(b.dataset.coachGo){C.view=b.dataset.coachGo;render();screen.scrollTop=0;focusHeading();return}
@@ -182,13 +294,13 @@
     if(b.id==='playerDetailCta'){
       if(!C.player){b.disabled=true;b.title='Sélectionnez un joueur pour voir le détail';return}
       b.classList.add('loading');b.disabled=true;b.setAttribute('aria-busy','true');var old=b.querySelector('span:nth-child(2)').textContent;b.querySelector('span:nth-child(2)').textContent='Ouverture du détail joueur';
-      setTimeout(function(){try{C.view='detail';history.pushState({volleyCoachDetail:true},'',location.href.split('#')[0]+'#player-detail');C.detailHistory=true;render();screen.scrollTop=0;focusHeading()}catch(err){b.disabled=false;b.classList.remove('loading');b.removeAttribute('aria-busy');b.querySelector('span:nth-child(2)').textContent=old;b.title='Impossible d’ouvrir le détail. Réessayez.'}},90);return
+      setTimeout(function(){try{C.focusOrigin='players';C.view='player-focus';history.pushState({volleyCoachFocus:true},'',location.href.split('#')[0]+'#player-focus');C.detailHistory=true;render();screen.scrollTop=0}catch(err){b.disabled=false;b.classList.remove('loading');b.removeAttribute('aria-busy');b.querySelector('span:nth-child(2)').textContent=old;b.title='Impossible d’ouvrir PLAYER FOCUS. Réessayez.'}},90);return
     }
     if(b.hasAttribute('data-detail-back')){if(C.detailHistory){C.detailHistory=false;history.back()}else{C.view='players';render();focusHeading()}return}
     if(b.dataset.skill){C.skill=b.dataset.skill;render();return}
     if(b.hasAttribute('data-all-actions')){var p=currentPlayerStats(),msg=p.events.length?p.events.map(function(x){return 'Set '+(x.set||1)+' · '+num(x.scoreA)+'–'+num(x.scoreB)+' · '+actionLabel(x)}).join('\n'):'Aucune action enregistrée.';alert(msg)}
   });
   content.addEventListener('keydown',function(e){var r=e.target.closest&&e.target.closest('tr[data-player]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();C.player=+r.dataset.player;render()}});
-  window.addEventListener('popstate',function(){if(!screen.hidden&&C.view==='detail'){C.detailHistory=false;C.view='players';render();focusHeading()}});
+  window.addEventListener('popstate',function(){if(!screen.hidden&&(C.view==='detail'||C.view==='player-focus')){C.detailHistory=false;C.view=C.focusOrigin||'players';render();focusHeading()}});
   window.VolleyCoach={open:openCoach,close:closeCoach,render:render,buildRallies:buildRallies,metrics:metrics};
 })();

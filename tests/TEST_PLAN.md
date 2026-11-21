@@ -1,4 +1,19 @@
-# Volley Live Capture v1.12.6 — Automated Test Plan
+# Volley Live Capture v1.13.0 — Automated Test Plan
+
+## v1.13.0 LIVE COURT / PLAYER FOCUS acceptance
+
+| ID | Acceptance |
+|---|---|
+| LIVE130-01 | LIVE COURT renders exactly six cards at positions 4-3-2 / 5-6-1 and at most 12 real rallies |
+| LIVE130-02 | Good, Watch and Difficulty use independent neon status borders/arrows and matching alert strips |
+| FOCUS130-01 | A court-card tap opens PLAYER FOCUS; Court and previous/next navigation work |
+| FOCUS130-02 | Four skill panels show five latest real contacts and efficiency curves with filled areas, 50% guide and circled final point |
+| DATA130-01 | POS, GOOD and reception/defense efficiency use non-error events and are marked with `≈`; BLK is NA |
+| DATA130-02 | Capture v1 without intermediate contacts uses NA curves; no flat curve is invented |
+| EMPTY130-01 | Empty LIVE COURT and PLAYER FOCUS contain only neutral 0/NA values |
+| VIEW130-01 | Landscape 1280 × 800 has no overflow; portrait requests device rotation |
+| COMP130-01 | COACH VIEW, ADVANCED STATISTICS, Capture, rotations and the shared pastel palette remain unchanged |
+| PWA130-01 | Home and cache use v1.13.0 and cache the Coach Live configuration |
 
 ## v1.12.6 Update8 capture acceptance
 

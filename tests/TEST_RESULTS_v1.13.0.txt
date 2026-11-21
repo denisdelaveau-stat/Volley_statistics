@@ -1,0 +1,33 @@
+Volley Live Capture v1.13.0 — validation result
+Date: 2026-11-21
+
+RESULT: PASS
+
+Automated suite
+- pytest/Playwright: 60 passed in 102.59 s
+- JavaScript syntax: PASS (coach.js, coach-live-config.js, statistics/adapter.js)
+- Duplicate HTML identifiers: none
+
+New v1.13.0 coverage
+- LIVE COURT renders six players in 4-3-2 / 5-6-1 order.
+- LIVE COURT -> PLAYER FOCUS -> Court navigation.
+- Previous/next player navigation.
+- Good, Watch and Difficulty status states and alert strips.
+- Empty landscape LIVE COURT and PLAYER FOCUS use neutral 0/NA values.
+- v2.1 fixture POS and GOOD derivation, derived trend, five latest actions and four efficiency curves.
+- BLK remains NA.
+- Capture v1 without intermediate contacts renders four NA curves.
+- Portrait rotation guidance.
+- 1280 x 800 has no horizontal or vertical overflow.
+- Existing Capture, rotations, substitutions, Home, Advanced Statistics and shared pastel palette regressions.
+
+Visual controls
+- docs/visual-validation/live-court-v1.13.0-1280x800.png
+- docs/visual-validation/player-focus-v1.13.0-1280x800.png
+- docs/visual-validation/live-court-reference-vs-v1.13.0.png
+- docs/visual-validation/player-focus-reference-vs-v1.13.0.png
+
+PWA
+- Home version: v1.13.0
+- Cache: volley-live-capture-v1.13.0
+- coach-live-config.js is precached.

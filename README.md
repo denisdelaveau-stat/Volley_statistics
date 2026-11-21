@@ -1,7 +1,18 @@
-# Volley Live Capture v1.12.6
+# Volley Live Capture v1.13.0
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
+## v1.13.0 highlights
+
+- Adds the landscape **LIVE COURT** Coach tab with six data-driven player cards in positions 4-3-2 / 5-6-1, neon Good/Watch/Difficulty status, a real-score header and the last 12 rallies.
+- Tapping a court card opens **PLAYER FOCUS**, with previous/next player navigation, court position, ATTACK/BLOCK/RECEPTION/DEFENSE panels, five latest contacts and cumulative efficiency curves.
+- Keeps the single shared pastel role palette: OPP blue, SET yellow, OH red, MB green and LIB grey. Status remains a separate border/arrow signal.
+- Calculates PTS, ERR, EFF, ATT, KILL, TOUCH, DIG, REC, SO and BP from the loaded match. POS, GOOD and reception/defense efficiency are marked `≈` because they are derived from non-error contacts. BLK remains `NA` because the current contract does not identify attacks blocked by the opponent.
+- Uses neutral 0/NA states without demo values when no match is loaded. Capture-v1 exports without intermediate contacts show NA curves rather than invented flat trends.
+- Stores the proposed status thresholds and outcome normalization in `coach-live-config.js`; the defaults remain explicitly subject to coach validation.
+- Includes 1280 × 800 visual-control screenshots and side-by-side reference comparisons in `docs/visual-validation/`.
+- Preserves Capture, rotations, JSON loading, **COACH VIEW**, **ADVANCED STATISTICS** and the v1.12.6 compact capture layout.
+- PWA cache bumped to `volley-live-capture-v1.13.0`.
 
 ## v1.12.6 highlights
 
@@ -81,7 +92,7 @@ Offline-first volleyball match capture and analysis for Basic, Intermediate and 
 - Reads explicit set, rally, score, serve/reception phase, setter rotation, lineup snapshot, on-court players, substitution, action and provenance data.
 - Includes `docs/VolleyLive_Unified_JSON_Format_Specification.md` and `docs/volley-live.match.schema.v2.1.json`.
 - Keeps Capture-v1 local stores only as a labelled migration path for an in-progress match; v1 is no longer the reference fixture.
-- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture and offline fixture module in PWA cache `volley-live-capture-v1.12.6`.
+- Precaches Coach, Advanced Statistics, the shared adapter, JSON fixture, Coach Live configuration and offline fixture module in PWA cache `volley-live-capture-v1.13.0`.
 
 ## Reference data caveat
 
@@ -97,7 +108,7 @@ Open the displayed local URL in a modern browser. Opening HTML directly with `fi
 
 ## Deploy or update
 
-Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.12.6` on Home.
+Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach-live-config.js`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.13.0` on Home.
 
 ## Verification
 
@@ -105,4 +116,4 @@ Publish the **complete folder contents** at the site root. Keep `index.html`, `c
 pytest -q
 ```
 
-The v1.12.6 test suite verifies equal action/result geometry, balanced side controls, the orange two-row on-court player layout, the hidden bench player, **Changer de joueur**, header Undo, fixed controls at 390 × 844, removed export buttons, RELANCE/freeball semantics, same-position replacement filtering and logging, the three-stage New Match flow, the unified fixture contract and both Home analysis interfaces.
+The v1.13.0 suite retains all v1.12.6 Capture checks and adds LIVE COURT ↔ PLAYER FOCUS navigation, previous/next player navigation, Good/Watch/Difficulty states, empty states, Capture-v1 NA curves, v2.1-derived POS/GOOD/trend values, five-contact histories, SVG efficiency curves, portrait rotation guidance and 1280 × 800 overflow checks.

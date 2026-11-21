@@ -1,10 +1,1 @@
-docs/Volley_Live_Capture_Screens_v1.3.2.pdf
-docs/Volley_Live_Capture_Screens_v1.6.5.pdf
-docs/Volley_Live_Capture_Screens_v1.6.6.pdf
-docs/Volley_Live_Capture_Screens_v1.6.7.pdf
-docs/screens_v1.6.7/
-tests/test_ui_modification_v1_6_7.py
-statistics/data/As_cannes_vs_Frejus_2026-11-15.json
-tests/test_json_indicator_provenance_v1_12_2.py
-tests/test_demo_only_highlighting_v1_12_3.py
-tests/test_red_marker_removal_v1_12_4.py
+No files need deletion when updating from v1.12.6.

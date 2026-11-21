@@ -378,13 +378,13 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   <div class="home-actions">
     <button type="button" class="home-btn home-new" id="homeNew"><span class="home-icon">＋</span><span class="home-copy"><span class="home-main">NEW MATCH</span><small>CREATE A NEW MATCH</small></span><span>›</span></button>
     <button type="button" class="home-btn home-cont" id="homeContinue"><span class="home-icon">▶</span><span class="home-copy"><span class="home-main">CONTINUE / VIEW MATCH</span><small id="homeContinueInfo">NO SAVED MATCH</small></span><span>›</span></button>
-    <button type="button" class="home-btn home-coach" id="homeCoach"><span class="home-icon">◉</span><span class="home-copy"><span class="home-main">COACH VIEW</span><small>LIVE OVERVIEW · ROTATIONS · PLAYERS</small></span><span>›</span></button>
+    <button type="button" class="home-btn home-coach" id="homeCoach"><span class="home-icon">◉</span><span class="home-copy"><span class="home-main">COACH VIEW</span><small>LIVE COURT · ROTATIONS · PLAYERS</small></span><span>›</span></button>
     <button type="button" class="home-btn home-statistics" id="homeStatistics"><span class="home-icon">▥</span><span class="home-copy"><span class="home-main">ADVANCED STATISTICS</span><small>TIMELINE · ROTATIONS · RANKINGS · PLAYING TIME</small></span><span>›</span></button>
     <button type="button" class="home-btn home-open" id="homeOpen"><span class="home-icon">▣</span><span class="home-copy"><span class="home-main">OPEN ARCHIVES</span><small>IMPORT A MATCH FILE</small></span><span>›</span></button><input type="file" id="homeFile" accept=".json,application/json" hidden>
   </div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
   <nav class="home-nav" aria-label="Application sections"><button type="button" id="homeTeams"><span class="nav-icon">♟</span>TEAMS</button><button type="button" id="homeSettings"><span class="nav-icon">⚙</span>SETTINGS</button></nav>
-  <div class="home-version" id="appVersion">v1.12.6</div>
+  <div class="home-version" id="appVersion">v1.13.0</div>
 </div>
 <div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
   <div class="coach-shell">
@@ -395,8 +395,10 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
     </header>
     <nav class="coach-nav" aria-label="Navigation coach" role="tablist">
       <button type="button" data-coach-tab="overview" role="tab">Vue coach</button>
+      <button type="button" data-coach-tab="live-court" role="tab">LIVE COURT</button>
       <button type="button" data-coach-tab="rotations" role="tab">Équipe</button>
       <button type="button" data-coach-tab="players" role="tab">Joueurs</button>
+      <button type="button" data-coach-tab="player-focus" class="player-focus-tab" role="tab" hidden>PLAYER FOCUS</button>
     </nav>
     <main id="coachContent"></main>
   </div>
@@ -1630,6 +1632,7 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
 <!-- ===== end v1.6.4 ===== -->
 
 <script src="statistics/adapter.js"></script>
+<script src="coach-live-config.js"></script>
 <script src="coach.js"></script>
 
 

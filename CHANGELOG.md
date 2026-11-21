@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.13.0 — LIVE COURT and PLAYER FOCUS
+
+- Added the landscape LIVE COURT tab and its six real-position player cards.
+- Added PLAYER FOCUS with previous/next navigation, court position, four skill panels, latest-five contacts and cumulative rally curves.
+- Added configurable Good/Watch/Difficulty rules and configurable outcome normalization in `coach-live-config.js`.
+- Added discreet `≈` provenance for POS, GOOD and reception/defense efficiency derived from non-error contacts; BLK remains NA.
+- Added neutral empty states and Capture-v1 NA curve handling when intermediate contacts are absent.
+- Preserved the shared pastel role palette and all v1.12.6 Capture/analysis workflows.
+- Added v2.1 metric tests, landscape visual controls and reference comparison images.
+- Updated Home and offline cache to v1.13.0.
+
 ## v1.12.6 — Update8 capture interface
 
 - Standardized every action and result control to the same size.

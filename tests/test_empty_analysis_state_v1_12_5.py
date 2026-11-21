@@ -25,7 +25,7 @@ def test_coach_empty_file_replay_and_unload(browser):
     color=page.locator("#coachContent .empty-indicator").first.evaluate("e=>getComputedStyle(e).color"); assert color == "rgb(184, 192, 201)"
     page.locator("[data-coach-tab=rotations]").click(); assert "Aucun match actif" in page.locator("#coachContent").inner_text(); assert "NA" in page.locator("#coachContent").inner_text()
     page.locator("[data-coach-tab=players]").click(); assert "0 joueur" in page.locator("#coachContent").inner_text().lower()
-    page.locator("[data-empty-detail]").click(); assert "Détail joueur" in page.locator("#coachContent").inner_text(); assert "NA" in page.locator("#coachContent").inner_text()
+    page.set_viewport_size({"width":844,"height":390}); page.locator("[data-empty-detail]").click(); assert page.locator(".player-focus-view").is_visible(); assert "NA" in page.locator("#coachContent").inner_text()
     page.set_input_files("#coachFileInput", str(FIXTURE)); page.wait_for_timeout(300)
     assert page.locator("#coachLiveLabel").inner_text()=="REPLAY · MATCH"
     assert "Aucun match chargé" not in page.locator("#coachContent").inner_text()
