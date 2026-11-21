@@ -1,4 +1,16 @@
-# Volley Live Capture v1.12.2 — Automated Test Plan
+# Volley Live Capture v1.12.3 — Automated Test Plan
+
+## v1.12.3 demo-only highlighting acceptance
+
+| ID | Acceptance |
+|---|---|
+| DEMO123-01 | The bundled v2.1 reference fixture is classified as demonstration data in both analysis interfaces |
+| DEMO123-02 | Coach View marks demo-only indicators red and labels the source as having no real value |
+| DEMO123-03 | Advanced Statistics marks demo-only fixture indicators red |
+| HIST123-01 | Capture v1 phase, rotation, side-out and lineup values reconstructed from match history are not red |
+| HIST123-02 | Capture v1 provenance remains available for diagnostics without changing the visual theme |
+| THRESH123-01 | Application thresholds keep normal tactical colours and have no red “outside JSON” marker |
+| PWA123-01 | Home shows v1.12.3 and cache `volley-live-capture-v1.12.3` precaches the complete application |
 
 ## v1.12.2 JSON-provenance acceptance
 

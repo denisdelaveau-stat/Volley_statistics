@@ -62,7 +62,7 @@ def test_coach_reference_v2_state_and_accessible_cta(browser):
     page.evaluate("localStorage.clear()")
     page.reload()
     page.locator("#homeCoach").click()
-    assert page.locator("#coachLiveLabel").inner_text() == "V2.1 RÉF"
+    assert page.locator("#coachLiveLabel").inner_text() == "DÉMO · SANS VALEUR RÉELLE"
     assert "as cannes" in page.locator("#coachContent .coach-score").inner_text().lower()
     page.locator('[data-coach-tab="players"]').click()
     cta = page.locator("#playerDetailCta")

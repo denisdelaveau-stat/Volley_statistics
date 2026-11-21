@@ -1,14 +1,13 @@
-# Release notes — v1.12.2
+# Release notes — v1.12.3
 
-## JSON provenance for analysis indicators
+## Red now means demo-only
 
-- **Advanced Statistics** and **Coach View** now expose the origin of every indicator family.
-- Normal-theme values are computed from JSON records.
-- Capture v1 indicators that require reconstructed phase, rotation or on-court lineup are red.
-- App-defined performance thresholds are marked in red as **SEUIL HORS JSON** or with a red dotted underline.
-- Coach player presence is computed from the current lineup instead of being hard-coded.
-- The exact Cannes–Fréjus Capture v1 export and the unified v2.1 fixture are covered by automated tests.
+- **Advanced Statistics** and **Coach View** display red only when a value comes from demonstration/reference fallback data with no real match value.
+- Information read directly from the active/imported match is displayed normally.
+- Information calculated from a real match history is also displayed normally, including Capture v1 phase, rotation, side-out and reconstructed court presence.
+- Performance thresholds retain their normal tactical colours and are no longer given a special red non-JSON marker.
+- The bundled Cannes–Fréjus v2.1 fixture is labelled and highlighted as demonstration data.
 
 ## Preserved baseline
 
-The v1.12.1 capture layout, compact player strip, fixed controls, scoring, rotation logic, History, Undo, compact libero bench, same-position substitutions, pastel role palette, Home navigation and offline PWA behavior are retained.
+The v1.12.2 provenance metadata remains available internally for diagnostics. The v1.12.1 capture layout, compact player strip, fixed controls, scoring, rotation logic, History, Undo, compact libero bench, same-position substitutions, pastel role palette, Home navigation and offline PWA behavior are retained.

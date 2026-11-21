@@ -113,7 +113,7 @@ def test_both_home_buttons_open_v2_backed_interfaces(browser):
 
     page.locator("#homeCoach").click()
     assert page.locator("#coachScreen").is_visible()
-    assert page.locator("#coachLiveLabel").inner_text() == "V2.1 RÉF"
+    assert page.locator("#coachLiveLabel").inner_text() == "DÉMO · SANS VALEUR RÉELLE"
     assert "as cannes" in page.locator("#coachContent .coach-score").inner_text().lower()
     page.locator("#coachHome").click()
 

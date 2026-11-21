@@ -1,0 +1,30 @@
+Volley Live Capture v1.12.3 — validation result
+================================================
+
+Automated regression suite
+- Command: pytest -q
+- Result: 55 passed in 80.13 s
+
+Focused validation
+- JavaScript syntax: statistics/adapter.js PASS
+- JavaScript syntax: coach.js PASS
+- Inline Advanced Statistics JavaScript PASS
+- Bundled v2.1 reference fixture classified as demo-only PASS
+- Coach demo-only indicators red PASS
+- Advanced Statistics demo-only indicators red PASS
+- Capture v1 historical calculations not demo-red in Coach View PASS
+- Capture v1 historical calculations not demo-red in Advanced Statistics PASS
+- App-defined threshold markers no longer treated as demo PASS
+- Player presence remains computed from lineup PASS
+
+Reference Capture v1 inventory
+- 93 event records
+- 93 migrated rallies
+- 2 sets
+- 9 own-team players
+- Action distribution: 51 attack points; 22 attack errors; 10 block points;
+  3 service points; 5 service errors; 1 reception error; 1 defence error
+
+Runtime versions
+- Home: v1.12.3
+- Service-worker cache: volley-live-capture-v1.12.3

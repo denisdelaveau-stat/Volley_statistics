@@ -1,6 +1,6 @@
-# Copy instructions — v1.12.2
+# Copy instructions — v1.12.3
 
-Deploy the complete `Volley_statistics_v1.12.2` folder contents at the application root.
+Deploy the complete `Volley_statistics_v1.12.3` folder contents at the application root.
 
 Keep these paths together:
 
@@ -12,4 +12,4 @@ Keep these paths together:
 
 Delete the obsolete `statistics/data/As_cannes_vs_Frejus_2026-11-15.json` Capture-v1 reference if it remains from v1.9.0.
 
-Do not publish only `index.html`: both analysis interfaces depend on shared files and the service worker precache list. On iPhone, open the deployed site online once, fully close the installed PWA, then reopen it. If an older cache remains, remove and re-add the Home-screen shortcut. Confirm `v1.12.2` on Home.
+Do not publish only `index.html`: both analysis interfaces depend on shared files and the service worker precache list. On iPhone, open the deployed site online once, fully close the installed PWA, then reopen it. If an older cache remains, remove and re-add the Home-screen shortcut. Confirm `v1.12.3` on Home.

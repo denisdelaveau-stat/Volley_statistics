@@ -5,3 +5,4 @@ docs/Volley_Live_Capture_Screens_v1.6.7.pdf
 docs/screens_v1.6.7/
 tests/test_ui_modification_v1_6_7.py
 statistics/data/As_cannes_vs_Frejus_2026-11-15.json
+tests/test_json_indicator_provenance_v1_12_2.py

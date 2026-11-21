@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.12.3 — Demo-only red highlighting
+
+- Red now identifies only values supplied by a bundled or hard-coded demonstration data source.
+- Capture v1 values reconstructed from real match history are no longer red.
+- Application-defined qualitative thresholds are no longer marked as outside JSON.
+- The bundled v2.1 reference fixture is explicitly classified as demo-only in both analysis interfaces.
+- Added browser acceptance tests for demo fallback, Capture v1 historical calculations and threshold rendering.
+- Updated Home and offline cache to v1.12.3.
+
 ## v1.12.2 — JSON provenance audit
 
 - Audited every Advanced Statistics and Coach View indicator against JSON records.
