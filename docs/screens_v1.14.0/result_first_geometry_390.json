@@ -1,0 +1,42 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "scrollWidth": 390,
+  "gridUnchanged": true,
+  "error": {
+    "x": 143,
+    "y": 208.6875,
+    "width": 104,
+    "height": 54,
+    "top": 208.6875,
+    "right": 247,
+    "bottom": 262.6875,
+    "left": 143
+  },
+  "sides": {
+    "HOME": {
+      "x": 32,
+      "y": 208.6875,
+      "width": 104,
+      "height": 54,
+      "top": 208.6875,
+      "right": 136,
+      "bottom": 262.6875,
+      "left": 32
+    },
+    "AWAY": {
+      "x": 254,
+      "y": 208.6875,
+      "width": 104,
+      "height": 54,
+      "top": 208.6875,
+      "right": 358,
+      "bottom": 262.6875,
+      "left": 254
+    }
+  },
+  "axisAligned": true,
+  "equalDimensions": true
+}

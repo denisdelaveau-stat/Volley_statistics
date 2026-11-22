@@ -10,7 +10,8 @@ def test_player_direct_result_and_home_away_direct_result(browser):
     page.click('[data-quick-result="point"]'); assert (events(page)[-1]["player"],events(page)[-1]["action"])==(3,"generic")
     wait_guard(page); page.click('[data-quick-result="error"]'); page.click('[data-quick-side="A"]')
     assert (events(page)[-1]["player"],events(page)[-1]["action"],events(page)[-1]["winningTeam"])==("A","adverse","team1")
-    assert page.locator(".bench-row > #subToggle").count()==1 and not errors; page.close()
+    assert page.locator(".quick-player-tray #subToggle").count()==0
+    assert page.locator("#subToggle.capture-sub-toggle").count()==1 and not errors; page.close()
 
 
 def test_complete_player_action_result_and_free_ball(browser):

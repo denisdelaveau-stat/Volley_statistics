@@ -18,7 +18,7 @@ def _boxes(page):
         '[data-quick-result="error"]',
         '[data-quick-action="reception"]',
         '[data-quick-action="set"]',
-        '.quick-middle',
+        '[data-quick-result="neutral"]',
         '[data-quick-action="defense"]',
     ] + [f'.court-grid [data-zone="{z}"]' for z in ('p4', 'p3', 'p2', 'p5', 'p6', 'p1')]
     return {selector: page.locator(selector).bounding_box() for selector in selectors}
@@ -35,7 +35,7 @@ def test_result_first_layout_and_all_input_boxes_stay_fixed(browser):
     page, errors = open_match(browser, "advanced", focus_off=(), viewport={"width": 390, "height": 844})
     assert page.get_by_text("SAISIE RAPIDE", exact=True).count() == 0
     assert page.locator("#quickMode").count() == 0
-    assert page.locator(".quick-side-selector").is_hidden()
+    assert page.locator('[data-quick-side="T"]').is_hidden() and page.locator('[data-quick-side="A"]').is_hidden()
     assert page.locator("#courtStatus").is_hidden()
     assert page.locator("#phaseBadge").is_hidden()
     assert page.locator("#statsToggle").is_hidden()
@@ -53,19 +53,22 @@ def test_result_first_layout_and_all_input_boxes_stay_fixed(browser):
     page.reload()
     page.wait_for_timeout(100)
     before_result = _rounded(_boxes(page))
-    continue_box = page.locator(".quick-middle").bounding_box()
+    error_box = page.locator('[data-quick-result="error"]').bounding_box()
+    result_boxes = [page.locator(f'[data-quick-result="{r}"]').bounding_box() for r in ("point", "error", "neutral")]
     page.click('[data-quick-result="point"]')
-    assert page.locator(".quick-side-selector").is_visible()
+    assert page.locator('[data-quick-side="T"]').is_visible() and page.locator('[data-quick-side="A"]').is_visible()
     pending_result = _rounded(_boxes(page))
     assert before_result == pending_result
     home = page.locator('[data-quick-side="T"]').bounding_box()
     away = page.locator('[data-quick-side="A"]').bounding_box()
-    assert round(home["x"], 2) == round(continue_box["x"], 2)
-    assert round(away["x"] + away["width"], 2) == round(continue_box["x"] + continue_box["width"], 2)
-    assert round(home["y"], 2) == round(continue_box["y"], 2)
-    assert round(away["y"] + away["height"], 2) == round(continue_box["y"] + continue_box["height"], 2)
+    assert home["x"] < error_box["x"] < away["x"]
+    assert round(home["y"], 2) == round(error_box["y"], 2) == round(away["y"], 2)
+    for box in [home, away] + result_boxes:
+        assert abs(box["width"] - error_box["width"]) < 0.05
+        assert round(box["height"], 2) == round(error_box["height"], 2)
 
     page.click('[data-quick-side="T"]')
+    assert page.locator('[data-quick-side="T"]').is_hidden() and page.locator('[data-quick-side="A"]').is_hidden()
     assert events(page)[-1]["player"] == "T"
     assert events(page)[-1]["result"] == "point"
     assert not errors
@@ -187,7 +190,8 @@ def test_substitute_empty_state_and_logged_undo(browser):
     assert (event["playerOut"], event["playerIn"], event["position"], event["set"], event["rally"]) == (3, 12, "oh", 1, 1)
     match = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1'))")
     assert match["subs"][-1]["eventId"] == event["id"]
-    page.click("#captureUndo")
+    page.click("#historyToggle")
+    page.click("[data-delete-last]")
     assert events(page) == []
     match = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1'))")
     assert match["subs"] == []

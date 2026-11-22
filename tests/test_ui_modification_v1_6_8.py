@@ -25,7 +25,11 @@ def test_orange_player_court_and_round_pastel_players(browser):
     tray=_style(page.locator(".quick-player-tray"),["backgroundImage","borderRadius"])
     assert "rgb(255, 155, 87)" in tray["backgroundImage"] and tray["borderRadius"]=="22px"
     for player in page.locator(".court-grid [data-player]").all():
-        box=player.bounding_box(); assert abs(box["width"]-box["height"])<1.5; assert _style(player,["borderRadius"])["borderRadius"]=="50%"
+        box=player.bounding_box(); assert box["width"] >= 76; assert abs(box["width"]-box["height"])<1.5
+        style=_style(player,["borderRadius","backgroundColor","color"])
+        assert style["borderRadius"]=="50%"
+        assert style["backgroundColor"] in {"rgb(234, 245, 255)","rgb(255, 248, 216)","rgb(255, 240, 240)","rgb(238, 249, 242)","rgb(243, 245, 248)"}
+        assert style["color"] in {"rgb(11, 53, 88)","rgb(90, 67, 0)","rgb(91, 32, 32)","rgb(22, 69, 43)","rgb(37, 49, 66)"}
     assert not errors; page.close()
 
 

@@ -10,12 +10,11 @@ def test_score_sides_quick_pad_player_tray_undo_and_history(browser):
     page, errors=open_match(browser,"advanced",focus_off=())
     score=page.locator("#liveScore").bounding_box(); pad=page.locator(".quick-entry").bounding_box(); tray=page.locator(".quick-player-tray").bounding_box()
     assert score["y"] < pad["y"] < tray["y"]
-    assert page.locator(".quick-side-selector").is_hidden()
+    assert page.locator('[data-quick-side="T"]').is_hidden() and page.locator('[data-quick-side="A"]').is_hidden()
     assert page.locator("[data-quick-side]").count()==2 and page.locator("[data-quick-result]").count()==3 and page.locator("[data-quick-action]").count()==7
     assert page.locator(".court-grid [data-player]").count()==6
     assert page.locator(".court-grid").evaluate("e=>getComputedStyle(e).gridTemplateColumns.split(' ').length")==3
-    undo=page.locator("#captureUndo").bounding_box()
-    assert page.inner_text("#captureUndo")=="↶" and undo["x"]>score["x"]+score["width"]
+    assert page.locator("#captureUndo").count()==0
     assert page.inner_text("#historyToggle").startswith("HISTORY")
     assert not errors; page.close()
 

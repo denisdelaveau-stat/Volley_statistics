@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.14.0 — Last-action Delete in History
+
+- Removed the Undo control from the top-right of the scoreboard.
+- Added a compact Delete control inside the Score cell of the latest History row only.
+- Rebuilds score, service, phase, rotation, lineup, charts and set/match state after deletion.
+- Removes matching substitution metadata when the deleted row is a substitution; deleting a later action keeps the substitution active.
+- Added an empty History state and a 450 ms double-click guard.
+- Added fixed result-first HOME and AWAY slots to the left and right of ERREUR, with equal control dimensions and no grid movement.
+- Added clean toggle/Escape reset, keyboard/touch semantics and preserved the 450 ms result guard.
+- Preserved the orange net-free court, large pastel player circles, dashed separator and Changer de joueur placement from v1.13.1.
+- Preserved JSON loading, same-position substitutions, Coach View, LIVE COURT, PLAYER FOCUS, Advanced Statistics and offline support.
+- Added comprehensive deletion, persistence and 390 × 844 responsive tests; complete suite: 71 passed.
+- Updated Home and offline cache to v1.14.0.
+
 ## v1.13.0 — LIVE COURT and PLAYER FOCUS
 
 - Added the landscape LIVE COURT tab and its six real-position player cards.

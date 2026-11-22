@@ -4,9 +4,9 @@ from helpers import events, open_match, wait_guard
 
 def test_basic_normative_result_bars(browser):
     page, errors = open_match(browser, "basic")
-    assert page.inner_text("#appVersion") == "v1.13.0"
-    assert page.locator(".quick-side-selector").is_hidden()
-    assert page.locator("[data-quick-side]").all_inner_texts() == ["HOME", "AWAY"]
+    assert page.inner_text("#appVersion") == "v1.14.0"
+    assert all(page.locator(f'[data-quick-side="{side}"]').is_hidden() for side in ("T", "A"))
+    assert page.locator("[data-quick-side]").all_text_contents() == ["HOME", "AWAY"]
     assert page.locator("[data-quick-result]").count() == 3
     cases = [
         ("T", "error", "T", "team2", "opponent_error"),
@@ -16,7 +16,7 @@ def test_basic_normative_result_bars(browser):
     ]
     for actor, result, player, winner, origin in cases:
         page.click(f'[data-quick-result="{result}"]')
-        assert page.locator(".quick-side-selector").is_visible()
+        assert all(page.locator(f'[data-quick-side="{side}"]').is_visible() for side in ("T", "A"))
         page.click(f'[data-quick-side="{actor}"]')
         event = events(page)[-1]
         assert (event["player"], event["action"], event["result"], event["winningTeam"], event["pointOrigin"]) == (
@@ -24,7 +24,7 @@ def test_basic_normative_result_bars(browser):
         )
         wait_guard(page)
     assert page.locator("#liveScore .service-line").first.is_hidden()
-    before = len(events(page)); page.click("#captureUndo")
+    before = len(events(page)); page.click("#historyToggle"); page.click("[data-delete-last]")
     assert len(events(page)) == before - 1
     assert not errors
     page.close()

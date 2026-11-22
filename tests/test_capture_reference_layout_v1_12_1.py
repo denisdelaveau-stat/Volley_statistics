@@ -1,4 +1,4 @@
-"""v1.12.6 Update8 action layout, orange court and header Undo acceptance tests."""
+"""v1.14.0 action layout, orange court and History Delete acceptance tests."""
 from __future__ import annotations
 
 from helpers import events, open_match, wait_guard
@@ -69,20 +69,22 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
 
     player_tray = _box(page, ".quick-player-tray")
     action_entry = _box(page, ".quick-entry")
-    assert player_tray["height"] < action_entry["height"]
+    assert player_tray["height"] > 200
     player_boxes = [_box(page, f'.court-grid [data-zone="{zone}"]') for zone in ("p4", "p3", "p2", "p5", "p6", "p1")]
     assert max(box["y"] for box in player_boxes[:3]) - min(box["y"] for box in player_boxes[:3]) <= 1
     assert max(box["y"] for box in player_boxes[3:]) - min(box["y"] for box in player_boxes[3:]) <= 1
     assert player_boxes[3]["y"] > player_boxes[0]["y"]
-    assert page.locator(".quick-player-tray .court-net").is_visible()
+    assert page.locator(".quick-player-tray .court-net").count() == 0
     assert page.locator("#benchBtn").is_hidden()
     assert page.locator("#subToggle").inner_text() == "⟳ Changer de joueur"
+    sub = _box(page, "#subToggle")
+    history = _box(page, "#historyToggle")
+    assert sub["y"] >= player_tray["y"] + player_tray["height"]
+    assert sub["y"] + sub["height"] <= history["y"]
+    assert page.locator(".quick-player-tray #subToggle").count() == 0
 
-    score = _box(page, "#liveScore")
-    undo = _box(page, "#captureUndo")
-    assert undo["x"] > score["x"] + score["width"]
-    assert undo["y"] >= score["y"] and undo["y"] + undo["height"] <= score["y"] + score["height"]
-    assert page.locator("#captureUndo").get_attribute("aria-label") == "Undo last action"
+    assert page.locator("#captureUndo").count() == 0
+    assert page.locator("#liveScore").is_visible()
 
     assert page.locator("#captureSaveJson").count() == 0
     assert page.locator("#captureReport").count() == 0
@@ -92,7 +94,7 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
 
     assert "COACH VIEW" in page.locator("#homeCoach").inner_text()
     assert "ADVANCED STATISTICS" in page.locator("#homeStatistics").inner_text()
-    assert page.locator("#appVersion").inner_text() == "v1.13.0"
+    assert page.locator("#appVersion").inner_text() == "v1.14.0"
     assert not errors
     page.close()
 
