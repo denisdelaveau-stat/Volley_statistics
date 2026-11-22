@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.16.0 — Archive timeline visual simplification
+- Replaced AWAY cards with green/red `A` circles only.
+- Reduced HOME terminal actions to the skill name with POINT/ERROR/NEUTRAL color treatment.
+- Removed visible SO/BP/L badges and qualifiers/icons.
+- Split score pills so only the scoring half is colored: SO yellow, HOME BP green, AWAY BP red.
+- Centered connectors on score pills and stopped them at the score boundary.
+- Added document-specific automated tests and a 1536 × 1024 visual baseline; complete suite: 90 passed.
+- Updated Home and offline cache to v1.16.0.
+
 ## v1.15.0 — Saturated player court and spectator LIVE TIMELINE
 - Increased role-color saturation and reduced action-entry circle size while preserving the orange two-by-three court and dashed separator.
 - Added OPEN ARCHIVES → spectator replay flow with LIVE SCORE, LIVE TIMELINE and STATS navigation.

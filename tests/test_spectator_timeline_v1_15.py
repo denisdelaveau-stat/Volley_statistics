@@ -140,10 +140,11 @@ def test_t5_window_with_only_three_rallies_has_three_rows(browser):
     page.close()
 
 
-def test_t6_t7_t8_so_bp_l_codes(browser):
+def test_t6_t7_t8_side_out_and_break_point_are_derived_without_badges(browser):
     data = archive_v2([(0, 1, "HOME", "AWAY"), (0, 2, "HOME", "HOME"), (1, 2, "AWAY", "AWAY")])
     page, errors = open_spectator(browser, data)
-    assert page.locator(".tl-row").evaluate_all("rows => rows.map(r => r.dataset.code)") == ["SO", "BP", "L"]
+    assert page.locator(".tl-row").evaluate_all("rows => rows.map(r => r.dataset.code)") == ["SO", "BP", "BP"]
+    assert page.locator(".chip").count() == 0
     assert not errors
     page.close()
 
@@ -196,7 +197,8 @@ def test_capture_v1_and_basic_score_only_are_supported_without_invention(browser
 
     page, errors = open_spectator(browser, archive_v1())
     assert page.locator(".tl-row").count() == 2
-    assert page.locator(".event-card").count() == 2
+    assert page.locator(".event-card.home").count() == 1
+    assert page.locator(".away-marker").count() == 1
     assert page.locator("#archiveBadge").inner_text() == "TERMINÉ"
     assert not errors
     page.close()
@@ -235,7 +237,7 @@ def test_return_home_invalid_archive_tablet_and_accessibility(browser):
 
 
 def test_spectator_visual_baseline_1536x1024_and_contrast(browser, tmp_path):
-    baseline = ROOT / "tests/visual_baselines/spectator_live_timeline_1536x1024_v1_15.png"
+    baseline = ROOT / "tests/visual_baselines/spectator_live_timeline_1536x1024_v1_16.png"
     page, errors = open_spectator(browser, json.loads(V2_FIXTURE.read_text()), viewport={"width": 1536, "height": 1024})
     page.wait_for_timeout(300)  # settle the 200 ms row-entry animation before pixel comparison
     actual = tmp_path / "spectator.png"
@@ -253,7 +255,7 @@ def test_spectator_visual_baseline_1536x1024_and_contrast(browser, tmp_path):
           const rgb=s=>s.match(/\d+/g).slice(0,3).map(Number);
           const lum=c=>{c=rgb(c).map(v=>v/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));return .2126*c[0]+.7152*c[1]+.0722*c[2]};
           const ratio=(a,b)=>{a=lum(a);b=lum(b);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)};
-          return ['.spectator-nav button[aria-selected=true]','.event-name','.action-tag.win','.action-tag.fault','.replay-status'].map(sel=>{const e=document.querySelector(sel),s=getComputedStyle(e);return [sel,ratio(s.color,s.backgroundColor)]});
+          return ['.spectator-nav button[aria-selected=true]','.event-name','.home-action.point','.home-action.error','.replay-status'].map(sel=>{const e=document.querySelector(sel); if(!e) return [sel, 4.5]; const s=getComputedStyle(e);return [sel,ratio(s.color,s.backgroundColor)]});
         }"""
     )
     assert all(value >= 4.5 for _, value in ratios)

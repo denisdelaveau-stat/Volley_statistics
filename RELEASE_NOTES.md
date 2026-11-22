@@ -1,23 +1,21 @@
-# Release notes — Volley Live Capture v1.15.0
+# Release notes — Volley Live Capture v1.16.0
 
-## Action-entry court
-- Replaces the pale player-circle fills with a saturated, role-consistent palette: OPP blue, SET yellow, OH red/pink, MB green and LIB grey.
-- Keeps dark role-matched number and role text; every pair is WCAG AA at 4.5:1 or better.
-- Reduces the six circles to `clamp(72px, 23.5vw, 96px)` at standard mobile widths, increases court margins and row spacing, and preserves exactly two rows of three.
-- Retains the orange court, white dashed front/back separator, no net, and the **Changer de joueur** control below the court.
+## LIVE TIMELINE opened from OPEN ARCHIVES
+- AWAY terminal actions are represented only by an `A` circle: green when AWAY wins the point through its action, red when an AWAY error awards the point to HOME. No AWAY card, player name, action label or winning-action wording is rendered.
+- HOME keeps the player circle, jersey number, role and name. The action label is reduced to the skill name only (for example `ATTAQUE`), with green POINT, red ERROR and blue NEUTRAL treatment. Qualifiers such as `GAGNANTE` and `OUT`, plus check/cross icons, are removed.
+- HOME player circles use the shared saturated role palette: OPP blue, SET yellow, OH red/pink, MB green and LIB grey, with WCAG AA text contrast.
+- SO/BP/L badges are removed from the rows and footer. Rally phase remains derived from the archive and is exposed only through row data and score treatment.
+- The score is split into AWAY-left and HOME-right halves. Only the scoring half is colored: SO yellow for either team, HOME BP green, AWAY BP red. The other half remains black.
+- Connectors are vertically centered on the score pill, stop exactly at its edge and join the HOME card or AWAY circle without overlap.
+- DERNIER POINT, order/window filters, ARCHIVE/REPLAY status, AWAY-first order, delta lanes and all existing spectator navigation remain available.
 
-## Spectator archive view
-- **OPEN ARCHIVES** accepts official `volley-live` v2.1 archives and supported Capture v1 archives, validates them, and opens `spectator.html` directly on **LIVE TIMELINE** without replacing the local capture match.
-- Adds spectator navigation: **LIVE SCORE | LIVE TIMELINE | STATS**.
-- Adds AWAY-first scoreboard, current set, sets won, vertical cyan rally spine, AWAY : HOME score pills, SO/BP/L chips, last-point marker, one terminal-action card, and proportional shared-scale delta lanes.
-- Adds persistent order and window filters: **Plus anciennes / Plus récentes** and **5 / 10 / 20 / Tout le set**.
-- Archive status is explicitly **ARCHIVE / REPLAY D’ARCHIVE**, never “Suivi en direct”.
-- Basic score-only data produces timeline rows without invented event cards.
-- Invalid archives show a recoverable error state; service actions attributed to the non-serving team are flagged.
-- The view re-renders from corrected archive data through the storage event or `VolleySpectator.setArchive()`.
+## Data and compatibility
+- Every displayed value is derived from the loaded official `volley-live` v2.1 or supported Capture v1 archive.
+- Basic score-only archives do not invent action labels or cards.
+- OPEN ARCHIVES, LIVE SCORE, LIVE TIMELINE, STATS, Capture, HISTORY Delete, HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and offline operation are retained.
 
-## Compatibility retained
-HISTORY Delete with rollback, fixed HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS, the v2.1 reference fixture and offline operation remain available.
-
-## Offline cache
-The service-worker cache is `volley-live-capture-v1.15.0` and includes the spectator HTML, CSS and JavaScript.
+## Verification
+- 90 automated tests passed, including the new timeline acceptance scenarios and all prior regressions.
+- Visual regression baseline: 1536 × 1024 landscape.
+- Responsive/accessibility checks include 1024 × 768 tablet geometry, minimum 44 px controls and contrast of at least 4.5:1.
+- Offline cache: `volley-live-capture-v1.16.0`.

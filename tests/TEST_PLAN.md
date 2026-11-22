@@ -1,4 +1,17 @@
 
+## v1.16.0 LIVE TIMELINE update
+
+| ID | Acceptance |
+|---|---|
+| TL160-01 | AWAY point/fault renders only a green/red A circle with no descriptive text |
+| TL160-02 | HOME ATTAQUE POINT/ERROR/NEUTRAL shows ATTAQUE only in green/red/blue |
+| TL160-03 | No SO/BP/L badge is rendered; only the scoring score half is colored |
+| TL160-04 | HOME/AWAY SO is yellow; HOME BP green; AWAY BP red; other half black |
+| TL160-05 | Connector center matches score-pill center and ends at the score edge |
+| TL160-06 | OPP/SET/OH/MB/LIB role circles use the shared saturated palette at >= 4.5:1 contrast |
+| TL160-07 | Basic archives invent no action; oldest/newest and 5/10/20/all filters remain correct |
+| TL160-08 | 1536 x 1024 visual baseline, 1024 x 768 tablet geometry and touch targets pass |
+
 ## v1.15.0 saturated court and spectator archive view
 
 | ID | Acceptance |

@@ -1,12 +1,14 @@
-# Volley Live Capture v1.15.0
+# Volley Live Capture v1.16.0
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
-## v1.15.0 highlights
-- Saturated, smaller role-colored player circles on the orange action-entry court.
-- OPEN ARCHIVES now launches the spectator replay interface directly on LIVE TIMELINE.
-- Official volley-live v2.1 and supported Capture v1 archive rendering, persistent timeline filters, score/chips/deltas and replay status.
-- PWA cache bumped to `volley-live-capture-v1.15.0`.
+## v1.16.0 highlights
+- Archive LIVE TIMELINE now renders AWAY as a green/red `A` circle only and HOME as role-colored player identity plus the skill name only.
+- POINT/ERROR/NEUTRAL map to green/red/blue on HOME actions; visible qualifiers and SO/BP/L badges are removed.
+- Score pills color only the scoring half: SO yellow, HOME BP green, AWAY BP red; the other half remains black.
+- Connectors are centered on the score pill and stop at its edge.
+- Basic archives stay score-only; filters, DERNIER POINT, replay status, delta lanes and all previous application workflows are retained.
+- PWA cache bumped to `volley-live-capture-v1.16.0`.
 
 ## v1.13.0 highlights
 
@@ -114,7 +116,7 @@ Open the displayed local URL in a modern browser. Opening HTML directly with `fi
 
 ## Deploy or update
 
-Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach-live-config.js`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.13.0` on Home.
+Publish the **complete folder contents** at the site root. Keep `index.html`, `coach.css`, `coach-live-config.js`, `coach.js`, `statistics/`, `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/` together. On iPhone, launch once online, fully close the installed PWA, then reopen it. Confirm `v1.16.0` on Home.
 
 ## Verification
 
