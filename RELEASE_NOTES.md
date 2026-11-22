@@ -1,21 +1,20 @@
-# Release notes — Volley Live Capture v1.16.0
+# Release notes — Volley Live Capture v1.16.1
 
-## LIVE TIMELINE opened from OPEN ARCHIVES
-- AWAY terminal actions are represented only by an `A` circle: green when AWAY wins the point through its action, red when an AWAY error awards the point to HOME. No AWAY card, player name, action label or winning-action wording is rendered.
-- HOME keeps the player circle, jersey number, role and name. The action label is reduced to the skill name only (for example `ATTAQUE`), with green POINT, red ERROR and blue NEUTRAL treatment. Qualifiers such as `GAGNANTE` and `OUT`, plus check/cross icons, are removed.
-- HOME player circles use the shared saturated role palette: OPP blue, SET yellow, OH red/pink, MB green and LIB grey, with WCAG AA text contrast.
-- SO/BP/L badges are removed from the rows and footer. Rally phase remains derived from the archive and is exposed only through row data and score treatment.
-- The score is split into AWAY-left and HOME-right halves. Only the scoring half is colored: SO yellow for either team, HOME BP green, AWAY BP red. The other half remains black.
-- Connectors are vertically centered on the score pill, stop exactly at its edge and join the HOME card or AWAY circle without overlap.
-- DERNIER POINT, order/window filters, ARCHIVE/REPLAY status, AWAY-first order, delta lanes and all existing spectator navigation remain available.
+## LIVE TIMELINE layout refinement
+- The score spine is intentionally right-shifted to approximately 63% of the desktop board width. The timeline is no longer centered on the page.
+- The AWAY lane uses the available left side and starts at the board's 12 px content inset. A maximum-width AWAY delta bar aligns with that left edge.
+- HOME action cards no longer fill the available lane. Each card wraps its player circle, name and skill label, subject to a safe maximum name width.
+- HOME card side padding is symmetric: 14 px in CSS (15 px measured from the outer border to content).
+- The vertical cyan spine is attached to every score node, so it remains exactly aligned with the score pills at desktop, tablet and horizontally scrolled mobile widths.
 
-## Data and compatibility
-- Every displayed value is derived from the loaded official `volley-live` v2.1 or supported Capture v1 archive.
-- Basic score-only archives do not invent action labels or cards.
-- OPEN ARCHIVES, LIVE SCORE, LIVE TIMELINE, STATS, Capture, HISTORY Delete, HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and offline operation are retained.
+## Preserved behavior
+- AWAY point/fault circles, HOME action colors, split score highlights, delta calculations, filters, DERNIER POINT and replay status remain unchanged from v1.16.0.
+- OPEN ARCHIVES, LIVE SCORE, LIVE TIMELINE, STATS, Capture, HISTORY Delete, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and offline operation are retained.
+- Displayed match data continues to come only from the loaded official JSON/archive model.
 
-## Verification
-- 90 automated tests passed, including the new timeline acceptance scenarios and all prior regressions.
-- Visual regression baseline: 1536 × 1024 landscape.
-- Responsive/accessibility checks include 1024 × 768 tablet geometry, minimum 44 px controls and contrast of at least 4.5:1.
-- Offline cache: `volley-live-capture-v1.16.0`.
+## Web and Android validation
+- Desktop acceptance viewport: 1536 × 1024.
+- Tablet regression viewport: 1024 × 768.
+- Android portrait acceptance viewport: 412 × 915. The page itself does not overflow; the landscape-first timeline scrolls inside its board and controls remain at least 44 px high.
+- Visual baselines and automated geometry assertions are included in the complete source package.
+- Offline cache: `volley-live-capture-v1.16.1`.

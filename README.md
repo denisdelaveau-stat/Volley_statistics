@@ -1,6 +1,13 @@
-# Volley Live Capture v1.16.0
+# Volley Live Capture v1.16.1
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
+
+## v1.16.1 highlights
+- The LIVE TIMELINE score spine is deliberately shifted to the right instead of being centered on the page, giving the AWAY history the requested wider lane.
+- The AWAY delta lane starts 12 px from the board edge and the largest delta bar aligns with that left boundary.
+- HOME action cards now size to their player/action content rather than filling the lane; left and right card padding are balanced.
+- The responsive board remains page-stable on Android portrait and scrolls horizontally inside the timeline when the landscape-first content is wider than the device.
+- PWA cache bumped to `volley-live-capture-v1.16.1`.
 
 ## v1.16.0 highlights
 - Archive LIVE TIMELINE now renders AWAY as a green/red `A` circle only and HOME as role-colored player identity plus the skill name only.

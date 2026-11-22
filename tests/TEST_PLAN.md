@@ -1,4 +1,13 @@
 
+## v1.16.1 LIVE TIMELINE layout refinement
+
+| ID | Acceptance |
+|---|---|
+| TL161-01 | Desktop score spine sits between 61% and 64% of board width instead of page center |
+| TL161-02 | AWAY delta lane starts at the board's 12 px content inset and the maximum bar shares that left edge |
+| TL161-03 | HOME card is narrower than its lane, content-sized, and has equal 14-16 px left/right padding |
+| TL161-04 | Android 412 x 915 has no page overflow; the landscape-first timeline scrolls within its board and keeps >=44 px controls |
+
 ## v1.16.0 LIVE TIMELINE update
 
 | ID | Acceptance |

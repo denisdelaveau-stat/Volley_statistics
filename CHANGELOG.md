@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.16.1 — Archive timeline alignment and compact HOME cards
+- Shifted the LIVE TIMELINE score spine to approximately 63% of the desktop board width.
+- Kept the AWAY delta lane flush with the 12 px content inset and aligned its maximum bar to that boundary.
+- Changed HOME action cards from full-lane width to content width with symmetric 14 px side padding.
+- Preserved connected score geometry, replay filters, role colors, data derivation and all v1.16.0 behaviors.
+- Added desktop and Android portrait acceptance tests and visual validation.
+- Updated Home and offline cache to v1.16.1.
+
 ## v1.16.0 — Archive timeline visual simplification
 - Replaced AWAY cards with green/red `A` circles only.
 - Reduced HOME terminal actions to the skill name with POINT/ERROR/NEUTRAL color treatment.
