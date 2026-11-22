@@ -1,16 +1,12 @@
-# Volley Live Capture v1.14.0
+# Volley Live Capture v1.15.0
 
 Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
 
-## v1.14.0 highlights
-
-- Removes the scoreboard Undo control and adds a compact **Delete** button to the latest History row only.
-- Rebuilds score, service, phase, rotation, lineup and match state from the remaining log; substitution rollback is included.
-- Shows HOME and AWAY in permanently reserved left/right slots aligned with ERREUR during result-first input, without moving the grid.
-- Keeps the orange net-free court, two rows of three large pastel role circles, dashed separator and **⟳ Changer de joueur** above **HISTORY**.
-- Keeps same-position substitutions, the bundled JSON reference, **COACH VIEW**, **LIVE COURT**, **PLAYER FOCUS**, **ADVANCED STATISTICS** and offline operation.
-- Includes 71 automated tests and 390 × 844 visual controls for deletion and result-first HOME/AWAY.
-- PWA cache bumped to `volley-live-capture-v1.14.0`.
+## v1.15.0 highlights
+- Saturated, smaller role-colored player circles on the orange action-entry court.
+- OPEN ARCHIVES now launches the spectator replay interface directly on LIVE TIMELINE.
+- Official volley-live v2.1 and supported Capture v1 archive rendering, persistent timeline filters, score/chips/deltas and replay status.
+- PWA cache bumped to `volley-live-capture-v1.15.0`.
 
 ## v1.13.0 highlights
 

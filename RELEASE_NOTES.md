@@ -1,37 +1,23 @@
-# Release notes — Volley Live Capture v1.14.0
+# Release notes — Volley Live Capture v1.15.0
 
-## Last-action correction from History
+## Action-entry court
+- Replaces the pale player-circle fills with a saturated, role-consistent palette: OPP blue, SET yellow, OH red/pink, MB green and LIB grey.
+- Keeps dark role-matched number and role text; every pair is WCAG AA at 4.5:1 or better.
+- Reduces the six circles to `clamp(72px, 23.5vw, 96px)` at standard mobile widths, increases court margins and row spacing, and preserves exactly two rows of three.
+- Retains the orange court, white dashed front/back separator, no net, and the **Changer de joueur** control below the court.
 
-- Removed the Undo control from the top-right of the scoreboard.
-- Added a compact **Delete** control to the latest History row only.
-- Older History rows remain visible but cannot be deleted directly.
-- Empty History now displays a clear neutral state.
+## Spectator archive view
+- **OPEN ARCHIVES** accepts official `volley-live` v2.1 archives and supported Capture v1 archives, validates them, and opens `spectator.html` directly on **LIVE TIMELINE** without replacing the local capture match.
+- Adds spectator navigation: **LIVE SCORE | LIVE TIMELINE | STATS**.
+- Adds AWAY-first scoreboard, current set, sets won, vertical cyan rally spine, AWAY : HOME score pills, SO/BP/L chips, last-point marker, one terminal-action card, and proportional shared-scale delta lanes.
+- Adds persistent order and window filters: **Plus anciennes / Plus récentes** and **5 / 10 / 20 / Tout le set**.
+- Archive status is explicitly **ARCHIVE / REPLAY D’ARCHIVE**, never “Suivi en direct”.
+- Basic score-only data produces timeline rows without invented event cards.
+- Invalid archives show a recoverable error state; service actions attributed to the non-serving team are flagged.
+- The view re-renders from corrected archive data through the storage event or `VolleySpectator.setArchive()`.
 
-## Complete rollback
+## Compatibility retained
+HISTORY Delete with rollback, fixed HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS, the v2.1 reference fixture and offline operation remain available.
 
-Deleting the latest row recomputes and restores the previous:
-
-- score and set/match lock state;
-- serving team and phase;
-- rotation and on-court lineup;
-- substitution metadata when the deleted row is itself a substitution;
-- charts, statistics and locally persisted JSON state.
-
-The action-entry court remains orange and net-free, with two rows of three large pastel role circles, the dashed front/back separator and **Changer de joueur** on the blue area above History.
-
-## Result-first HOME / AWAY controls
-
-- Selecting POSITIF, ERREUR or NEUTRE before a player/action reveals HOME to the left and AWAY to the right of the result column.
-- HOME, ERREUR and AWAY share the same horizontal axis and control dimensions.
-- Dedicated middle-row slots are always reserved, so showing or hiding HOME/AWAY does not move or resize any action or result control.
-- HOME/AWAY are hidden, removed from the tab order and non-interactive outside result-first mode.
-- Selection, toggle cancellation and Escape reset cleanly; keyboard, touch and the 450 ms result guard are retained.
-
-## Compatibility
-
-**COACH VIEW**, **LIVE COURT**, **PLAYER FOCUS**, **ADVANCED STATISTICS**, the reference JSON, same-position substitutions and offline operation are retained. The service-worker cache is `volley-live-capture-v1.14.0`.
-
-## Validation
-
-- 71 automated tests passed.
-- Coverage includes HOME/AWAY points, errors, neutral actions, score/service/rotation rollback, deletion after and of a substitution, older-row protection, empty History, double-click protection, reload persistence, fixed HOME–ERROR–AWAY geometry, zero grid shift, cancellation/reset, keyboard/touch accessibility and 390 × 844 responsive checks.
+## Offline cache
+The service-worker cache is `volley-live-capture-v1.15.0` and includes the spectator HTML, CSS and JavaScript.

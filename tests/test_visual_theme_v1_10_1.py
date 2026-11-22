@@ -1,22 +1,22 @@
 from helpers import APP_URI
 
 
-def test_pastel_role_palette_and_coach_setup_background(browser):
+def test_saturated_role_palette_and_coach_setup_background(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
-    page.evaluate("""localStorage.setItem('volleyCapture.library.v1', JSON.stringify({team:{'Pastel Club':{team:'Pastel Club',roster:[1,2,3,4,5,6,7],info:{1:{name:'Set',pos:'setter'},2:{name:'Lib',pos:'libero'},3:{name:'OH1',pos:'oh'},4:{name:'OH2',pos:'oh'},5:{name:'MB1',pos:'mb'},6:{name:'MB2',pos:'mb'},7:{name:'Opp',pos:'opp'}}}}}))""")
+    page.evaluate("""localStorage.setItem('volleyCapture.library.v1', JSON.stringify({team:{'Saturated Club':{team:'Saturated Club',roster:[1,2,3,4,5,6,7],info:{1:{name:'Set',pos:'setter'},2:{name:'Lib',pos:'libero'},3:{name:'OH1',pos:'oh'},4:{name:'OH2',pos:'oh'},5:{name:'MB1',pos:'mb'},6:{name:'MB2',pos:'mb'},7:{name:'Opp',pos:'opp'}}}}}))""")
     page.click('#homeNew')
     assert page.locator('#setupScreen').get_attribute('data-setup-step') == '0'
     background = page.locator('#setupScreen').evaluate("e => getComputedStyle(e).backgroundImage")
     assert 'gradient' in background
     assert 'rgb(6, 26, 51)' in background or 'rgb(7, 31, 59)' in background
-    page.select_option('#suTeamSelect', 'Pastel Club')
+    page.select_option('#suTeamSelect', 'Saturated Club')
     page.fill('#suOpp', 'Rivals')
     page.click('#suNext')
     assert page.locator('#setupScreen').get_attribute('data-setup-step') == '1'
-    expected = {'setter':'rgb(247, 215, 116)','oh':'rgb(244, 166, 166)','mb':'rgb(159, 216, 181)','opp':'rgb(143, 200, 248)','libero':'rgb(199, 206, 216)'}
+    expected = {'setter':'rgb(242, 201, 76)','oh':'rgb(235, 111, 122)','mb':'rgb(99, 201, 133)','opp':'rgb(79, 168, 232)','libero':'rgb(154, 165, 177)'}
     court = page.locator('.roster-court').evaluate("e => getComputedStyle(e).backgroundImage")
     assert 'rgb(255, 174, 99)' in court or 'rgb(241, 138, 66)' in court
     for role, color in expected.items():

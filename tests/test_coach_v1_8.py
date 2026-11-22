@@ -76,7 +76,7 @@ def test_coach_empty_state_and_accessible_detail(browser):
     page.close()
 
 
-def test_coach_courts_use_shared_pastel_role_palette(browser):
+def test_coach_courts_use_shared_saturated_role_palette(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -98,11 +98,11 @@ def test_coach_courts_use_shared_pastel_role_palette(browser):
     page.reload()
     page.locator("#homeCoach").click()
     expected = {
-        "opp": ("rgb(143, 200, 248)", "rgb(11, 53, 88)"),
-        "setter": ("rgb(247, 215, 116)", "rgb(90, 67, 0)"),
-        "oh": ("rgb(244, 166, 166)", "rgb(91, 32, 32)"),
-        "mb": ("rgb(159, 216, 181)", "rgb(22, 69, 43)"),
-        "libero": ("rgb(199, 206, 216)", "rgb(37, 49, 66)"),
+        "opp": ("rgb(79, 168, 232)", "rgb(10, 53, 85)"),
+        "setter": ("rgb(242, 201, 76)", "rgb(74, 54, 0)"),
+        "oh": ("rgb(235, 111, 122)", "rgb(80, 20, 27)"),
+        "mb": ("rgb(99, 201, 133)", "rgb(18, 61, 36)"),
+        "libero": ("rgb(154, 165, 177)", "rgb(38, 49, 61)"),
     }
     for role, (background, foreground) in expected.items():
         dot = page.locator(f'.coach-player-dot[data-player-role="{role}"]').first

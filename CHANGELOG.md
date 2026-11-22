@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.15.0 — Saturated player court and spectator LIVE TIMELINE
+- Increased role-color saturation and reduced action-entry circle size while preserving the orange two-by-three court and dashed separator.
+- Added OPEN ARCHIVES → spectator replay flow with LIVE SCORE, LIVE TIMELINE and STATS navigation.
+- Added v2.1/Capture v1 derived timeline, filters, SO/BP/L, decisive actions, shared-scale delta bars, replay state and T1–T11 coverage.
+- Updated offline cache to v1.15.0.
+
+
 ## v1.14.0 — Last-action Delete in History
 
 - Removed the Undo control from the top-right of the scoreboard.

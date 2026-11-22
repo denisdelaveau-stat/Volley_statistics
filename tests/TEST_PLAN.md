@@ -1,3 +1,15 @@
+
+## v1.15.0 saturated court and spectator archive view
+
+| ID | Acceptance |
+|---|---|
+| COURT150-01 | Six saturated role-colored circles remain in exactly two rows of three on the orange court at 390 × 844 |
+| COURT150-02 | OPP, SET, OH, MB and LIB number/role text contrast is at least 4.5:1 |
+| COURT150-03 | The white dashed separator clears both rows; no net is shown; each circle and substitution control is at least 44 px |
+| SPEC150-01 | OPEN ARCHIVES validates v2.1/Capture v1 and opens LIVE TIMELINE directly |
+| SPEC150-02 | T1–T11 cover delta lanes, shared scale, windows, SO/BP/L, service validation, order and correction/undo recomposition |
+| SPEC150-03 | Basic data renders score/chip/delta without invented event cards |
+| SPEC150-04 | Replay status, Home return, invalid archive, tablet and 1536 × 1024 visual/contrast checks pass |
 # Volley Live Capture v1.13.0 — Automated Test Plan
 
 ## v1.13.0 LIVE COURT / PLAYER FOCUS acceptance
@@ -12,7 +24,7 @@
 | DATA130-02 | Capture v1 without intermediate contacts uses NA curves; no flat curve is invented |
 | EMPTY130-01 | Empty LIVE COURT and PLAYER FOCUS contain only neutral 0/NA values |
 | VIEW130-01 | Landscape 1280 × 800 has no overflow; portrait requests device rotation |
-| COMP130-01 | COACH VIEW, ADVANCED STATISTICS, Capture, rotations and the shared pastel palette remain unchanged |
+| COMP130-01 | COACH VIEW, ADVANCED STATISTICS, Capture, rotations and the shared role palette and existing workflows remain available |
 | PWA130-01 | Home and cache use v1.13.0 and cache the Coach Live configuration |
 
 ## v1.12.6 Update8 capture acceptance

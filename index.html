@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>Volley Live Capture</title>
 <style>
-:root{--role-opp:#8fc8f8;--role-opp-surface:#eaf5ff;--role-opp-text:#0b3558;--role-setter:#f7d774;--role-setter-surface:#fff8d8;--role-setter-text:#5a4300;--role-oh:#f4a6a6;--role-oh-surface:#fff0f0;--role-oh-text:#5b2020;--role-mb:#9fd8b5;--role-mb-surface:#eef9f2;--role-mb-text:#16452b;--role-libero:#c7ced8;--role-libero-surface:#f3f5f8;--role-libero-text:#253142}
+:root{--role-opp:#4fa8e8;--role-opp-surface:#cfeafa;--role-opp-text:#0a3555;--role-setter:#f2c94c;--role-setter-surface:#fff0a8;--role-setter-text:#4a3600;--role-oh:#eb6f7a;--role-oh-surface:#ffd1d6;--role-oh-text:#50141b;--role-mb:#63c985;--role-mb-surface:#c9f0d6;--role-mb-text:#123d24;--role-libero:#9aa5b1;--role-libero-surface:#dce1e6;--role-libero-text:#26313d}
 *{box-sizing:border-box}
 body{margin:0;padding:16px;font-family:Segoe UI,Arial,sans-serif;background:#fff;color:#222}
 h1{font-size:20px;margin:0 0 4px}
@@ -303,7 +303,7 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
 #homeInstall{font-size:13px;line-height:1.35;max-width:420px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.6);border-radius:12px;padding:10px 12px;color:#fde68a}
 #homeInstall[hidden]{display:none}
 #appVersion{font-size:11px;opacity:.55}
-</style><link rel="stylesheet" href="coach.css"><script type="text/plain" id="attCss">.att-section{margin:14px 0}
+</style><link rel="stylesheet" href="coach.css"><script src="statistics/adapter.js"></script><script type="text/plain" id="attCss">.att-section{margin:14px 0}
 .att-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .att-head h3{margin:0;font-size:18px}
 .att-scope{display:flex;gap:6px}
@@ -382,7 +382,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
   </div>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
   <nav class="home-nav" aria-label="Application sections"><button type="button" id="homeTeams"><span class="nav-icon">♟</span>TEAMS</button><button type="button" id="homeSettings"><span class="nav-icon">⚙</span>SETTINGS</button></nav>
-  <div class="home-version" id="appVersion">v1.14.0</div>
+  <div class="home-version" id="appVersion">v1.15.0</div>
 </div>
 <div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
   <div class="coach-shell">
@@ -1231,7 +1231,19 @@ function renderErrorCharts(events){
   $('homeContinue').addEventListener('click',function(){if(!this.disabled){home.hidden=true;window.scrollTo(0,0)}});
   $('homeStatistics').addEventListener('click',function(){location.href='statistics/index.html'});
   $('homeOpen').addEventListener('click',function(){$('homeFile').value='';$('homeFile').click()});
-  $('homeFile').addEventListener('change',function(){var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var j=JSON.parse(r.result);if(!j||j.format!=='volley-live-capture'||!j.match||!Array.isArray(j.events))throw new Error('not a match file');if(!confirm('Open "'+(j.match.name||f.name)+'"?\n\nThe match currently on this device will be replaced.'))return;localStorage.setItem(KM,JSON.stringify(j.match));localStorage.setItem(KE,JSON.stringify(j.events));localStorage.setItem(KD,JSON.stringify(j.chartData||[]));sessionStorage.setItem(STAGE,'capture');location.reload()}catch(x){alert('Cannot open this file: '+x.message)}};r.readAsText(f)});
+  $('homeFile').addEventListener('change',function(){
+    var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();
+    r.onload=function(){try{
+      var j=JSON.parse(r.result),v=window.VolleyStatsAdapter&&window.VolleyStatsAdapter.validate(j);
+      if(!v||!v.valid)throw new Error(v&&v.errors&&v.errors.length?v.errors.join(' '):'archive de match non reconnue');
+      localStorage.setItem('volleySpectator.archive.v1',JSON.stringify(j));
+      localStorage.setItem('volleySpectator.archiveName.v1',f.name);
+      sessionStorage.setItem('volleyAnalysis.replay.v1',JSON.stringify(j));
+      sessionStorage.setItem('volleyAnalysis.replay.source.v1',f.name);
+      location.href='spectator.html#live-timeline';
+    }catch(x){alert('Archive invalide : '+x.message)}
+    };r.readAsText(f)
+  });
 
   // ---------- TEAMS ----------
   var TS={name:'',rows:[],selected:''};
@@ -1531,17 +1543,17 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
 .quick-result:disabled{opacity:.5;filter:grayscale(.3)}
 .quick-result.pending{box-shadow:0 0 0 3px #fff,0 0 0 6px #22d3ee}
 #capturePanel.result-guard .quick-result{opacity:.5;pointer-events:none}
-/* v1.14.0 · action-entry court: large pastel role circles, no net, substitution control on blue. */
-.quick-player-tray{--player-orb:clamp(76px,26vw,108px);display:block!important;background:linear-gradient(180deg,#ff9b57,#ed7f3d);border:2px solid #082b4d;border-radius:22px;padding:14px 8px 15px!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.14)}
+/* v1.15.0 · action-entry court: saturated role circles, more breathing room, no net. */
+.quick-player-tray{--player-orb:clamp(72px,23.5vw,96px);display:block!important;background:linear-gradient(180deg,#ff9b57,#ed7f3d);border:2px solid #082b4d;border-radius:22px;padding:14px 8px 15px!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.14)}
 .quick-player-tray #courtStatus,.quick-player-tray #phaseBadge{display:none!important}
 .quick-player-tray .court-adv,.quick-player-tray .bench-label,.quick-player-tray .bench-row{display:none!important}
 .quick-player-tray .court-net{display:none!important}
-.quick-player-tray .court-grid{position:relative;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,var(--player-orb))!important;gap:18px 4px!important;background:transparent!important;border:0!important;padding:2px 4px!important}
-.quick-player-tray .court-grid::after{content:"";position:absolute;z-index:0;left:4px;right:4px;top:50%;border-top:3px dashed rgba(255,255,255,.94);transform:translateY(-1.5px)}
-.quick-player-tray .court-grid .touch{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;aspect-ratio:1/1;min-height:var(--player-orb)!important;height:var(--player-orb)!important;width:min(100%,var(--player-orb))!important;max-width:var(--player-orb)!important;margin:auto;border:4px solid #fff!important;border-radius:50%!important;padding:5px!important;background:var(--rb,#f3f5f8)!important;color:var(--rt,#253142)!important;overflow:hidden;box-shadow:0 5px 11px rgba(7,31,59,.32)}
+.quick-player-tray .court-grid{position:relative;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,var(--player-orb))!important;gap:22px 8px!important;background:transparent!important;border:0!important;padding:4px 10px!important}
+.quick-player-tray .court-grid::after{content:"";position:absolute;z-index:0;left:10px;right:10px;top:50%;border-top:3px dashed rgba(255,255,255,.94);transform:translateY(-1.5px)}
+.quick-player-tray .court-grid .touch{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;aspect-ratio:1/1;min-height:var(--player-orb)!important;height:var(--player-orb)!important;width:min(100%,var(--player-orb))!important;max-width:var(--player-orb)!important;margin:auto;border:4px solid #fff!important;border-radius:50%!important;padding:5px!important;background:var(--rc,#9aa5b1)!important;color:var(--rt,#26313d)!important;overflow:hidden;box-shadow:0 5px 11px rgba(7,31,59,.32)}
 .quick-player-tray .court-grid .touch .pz{top:5px;left:8px;font-size:8px;color:var(--rt,#253142)}
-.quick-player-tray .court-grid .touch .pn{font-size:clamp(27px,9vw,39px);font-weight:1000;line-height:1;color:var(--rt,#253142)}
-.quick-player-tray .court-grid .touch small{display:none!important}.quick-player-tray .court-grid .touch .nm{display:none}.quick-player-tray .court-grid .touch .rl{position:absolute;left:0;right:0;bottom:8px;font-size:10px;margin:0;color:var(--rt,#253142)}.quick-player-tray .court-grid .touch.is-srv::after{display:none!important}
+.quick-player-tray .court-grid .touch .pn{font-size:clamp(25px,8vw,36px);font-weight:1000;line-height:1;color:var(--rt,#253142)}
+.quick-player-tray .court-grid .touch small{display:none!important}.quick-player-tray .court-grid .touch .nm{display:none}.quick-player-tray .court-grid .touch .rl{position:absolute;left:0;right:0;bottom:7px;font-size:10px;margin:0;color:var(--rt,#253142)}.quick-player-tray .court-grid .touch.is-srv::after{display:none!important}
 .quick-player-tray .court-grid .touch.quick-selected{box-shadow:0 0 0 3px #fff,0 0 0 6px #22d3ee!important}
 #capturePanel .capture-sub-toggle{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;margin:9px 0 0;padding:8px 14px;border:3px solid #67e8f9;border-radius:12px;background:#0b4968;color:#e0f2fe;font-size:16px;font-weight:900;touch-action:manipulation}
 #capturePanel .capture-sub-toggle.on{background:#5b21b6;border-color:#c4b5fd;color:#fff}
@@ -1557,7 +1569,7 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
 #capturePanel .history-delete:active{background:#fecaca}#capturePanel .history-delete:disabled{opacity:.48;cursor:not-allowed}
 #capturePanel .history-empty td{padding:16px 8px;color:#64748b;text-align:center;font-weight:700}
 @media(max-width:430px){#capturePanel .history th,#capturePanel .history td{padding:7px 4px}.result-badge{min-width:54px;padding-left:6px;padding-right:6px}.history-delete{min-width:40px!important;padding-left:4px!important;padding-right:4px!important;font-size:9px!important}}
-@media(max-width:360px){.quick-pad{--quick-h:48px;--quick-gap:5px}.quick-action,.quick-result{font-size:12px}.quick-side{min-height:48px;font-size:8px}.quick-player-tray{--player-orb:clamp(72px,26vw,88px);padding:10px 5px 12px!important}.quick-player-tray .court-grid{gap:14px 2px!important;padding-left:2px!important;padding-right:2px!important}.quick-player-tray .court-grid .touch .pn{font-size:28px}.quick-player-tray .court-grid .touch .rl{bottom:6px;font-size:9px}}
+@media(max-width:360px){.quick-pad{--quick-h:48px;--quick-gap:5px}.quick-action,.quick-result{font-size:12px}.quick-side{min-height:48px;font-size:8px}.quick-player-tray{--player-orb:clamp(68px,22.5vw,82px);padding:10px 5px 12px!important}.quick-player-tray .court-grid{gap:20px 5px!important;padding-left:7px!important;padding-right:7px!important}.quick-player-tray .court-grid .touch .pn{font-size:26px}.quick-player-tray .court-grid .touch .rl{bottom:6px;font-size:9px}}
 #statsToggle,#statsPanel{display:none!important}
 /* Initial rotation: compact centred grey bench fitted to the libero circle. */
 .libero-setup{margin:10px auto 0;max-width:240px;text-align:center}

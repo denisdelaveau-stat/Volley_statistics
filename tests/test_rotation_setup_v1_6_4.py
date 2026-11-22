@@ -62,7 +62,7 @@ def test_initial_rotation_has_default_grey_libero_circle_on_centred_bench(browse
     bench = page.locator(".libero-setup")
     assert circle.inner_text() == "L"
     assert page.locator(".libero-seat-name").inner_text() == "SÉLECTIONNER LE LIBÉRO"
-    assert circle.evaluate("e => getComputedStyle(e).backgroundColor") == "rgb(199, 206, 216)"
+    assert circle.evaluate("e => getComputedStyle(e).backgroundColor") == "rgb(154, 165, 177)"
     box = bench.bounding_box()
     assert abs((box["x"] + box["width"] / 2) - 195) < 2
     page.click('[data-rotation-role="libero"]')

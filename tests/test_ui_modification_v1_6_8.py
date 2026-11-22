@@ -20,16 +20,16 @@ def test_undo_history_and_three_result_blocks(browser):
     assert not errors; page.close()
 
 
-def test_orange_player_court_and_round_pastel_players(browser):
+def test_orange_player_court_and_round_saturated_players(browser):
     page, errors=open_match(browser,"advanced",focus_off=())
     tray=_style(page.locator(".quick-player-tray"),["backgroundImage","borderRadius"])
     assert "rgb(255, 155, 87)" in tray["backgroundImage"] and tray["borderRadius"]=="22px"
     for player in page.locator(".court-grid [data-player]").all():
-        box=player.bounding_box(); assert box["width"] >= 76; assert abs(box["width"]-box["height"])<1.5
+        box=player.bounding_box(); assert box["width"] >= 72; assert abs(box["width"]-box["height"])<1.5
         style=_style(player,["borderRadius","backgroundColor","color"])
         assert style["borderRadius"]=="50%"
-        assert style["backgroundColor"] in {"rgb(234, 245, 255)","rgb(255, 248, 216)","rgb(255, 240, 240)","rgb(238, 249, 242)","rgb(243, 245, 248)"}
-        assert style["color"] in {"rgb(11, 53, 88)","rgb(90, 67, 0)","rgb(91, 32, 32)","rgb(22, 69, 43)","rgb(37, 49, 66)"}
+        assert style["backgroundColor"] in {"rgb(79, 168, 232)","rgb(242, 201, 76)","rgb(235, 111, 122)","rgb(99, 201, 133)","rgb(154, 165, 177)"}
+        assert style["color"] in {"rgb(10, 53, 85)","rgb(74, 54, 0)","rgb(80, 20, 27)","rgb(18, 61, 36)","rgb(38, 49, 61)"}
     assert not errors; page.close()
 
 
