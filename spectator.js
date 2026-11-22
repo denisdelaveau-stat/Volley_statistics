@@ -1,4 +1,4 @@
-/* VolleyLive spectator archive view v1.16.1 — derived only from loaded official JSON. */
+/* VolleyLive spectator archive view v1.16.2 — derived only from loaded official JSON. */
 (function () {
   'use strict';
 

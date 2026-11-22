@@ -1,0 +1,314 @@
+{
+  "1536x1024": {
+    "scoreCenter": 958.046875,
+    "card": {
+      "x": 1048.046875,
+      "y": 322.4980163574219,
+      "width": 184.75,
+      "height": 84,
+      "padding": "10px 14px",
+      "gap": "12px",
+      "display": "flex",
+      "backgroundImage": "linear-gradient(110deg, rgba(8, 48, 84, 0.92), rgba(5, 28, 52, 0.96))",
+      "borderColor": "rgb(21, 91, 136)"
+    },
+    "order": [
+      "avatar role-oh",
+      "event-copy"
+    ],
+    "elements": {
+      "avatar": {
+        "x": 15,
+        "y": 11,
+        "width": 62,
+        "height": 62,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgb(235, 111, 122)",
+        "borderColor": "rgb(255, 255, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "flex",
+        "text": "14OH"
+      },
+      "number": {
+        "x": 33.203125,
+        "y": 24.5,
+        "width": 25.59375,
+        "height": 23,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(80, 20, 27)",
+        "fontSize": "23px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "14"
+      },
+      "role": {
+        "x": 37.75,
+        "y": 47.5,
+        "width": 16.5,
+        "height": 12,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(80, 20, 27)",
+        "fontSize": "11px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "OH"
+      },
+      "copy": {
+        "x": 89,
+        "y": 17.5,
+        "width": 80.75,
+        "height": 49,
+        "color": "rgb(244, 251, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(244, 251, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "LoucaATTAQUE"
+      },
+      "name": {
+        "x": 89,
+        "y": 17.5,
+        "width": 80.75,
+        "height": 18,
+        "color": "rgb(244, 251, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(244, 251, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "Louca"
+      },
+      "action": {
+        "x": 89,
+        "y": 40.5,
+        "width": 80.75,
+        "height": 26,
+        "color": "rgb(255, 255, 255)",
+        "backgroundColor": "rgb(20, 108, 58)",
+        "borderColor": "rgb(55, 212, 114)",
+        "fontSize": "12px",
+        "padding": "4px 9px",
+        "gap": "normal",
+        "display": "inline-flex",
+        "text": "ATTAQUE"
+      }
+    }
+  },
+  "1024x768": {
+    "scoreCenter": 629.9375,
+    "card": {
+      "x": 703.9375,
+      "y": 325.59375,
+      "width": 162.75,
+      "height": 78,
+      "padding": "8px",
+      "gap": "12px",
+      "display": "flex",
+      "backgroundImage": "linear-gradient(110deg, rgba(8, 48, 84, 0.92), rgba(5, 28, 52, 0.96))",
+      "borderColor": "rgb(21, 91, 136)"
+    },
+    "order": [
+      "avatar role-oh",
+      "event-copy"
+    ],
+    "elements": {
+      "avatar": {
+        "x": 9,
+        "y": 13,
+        "width": 52,
+        "height": 52,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgb(235, 111, 122)",
+        "borderColor": "rgb(255, 255, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "flex",
+        "text": "14OH"
+      },
+      "number": {
+        "x": 22.203125,
+        "y": 21.5,
+        "width": 25.59375,
+        "height": 23,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(80, 20, 27)",
+        "fontSize": "23px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "14"
+      },
+      "role": {
+        "x": 26.75,
+        "y": 44.5,
+        "width": 16.5,
+        "height": 12,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(80, 20, 27)",
+        "fontSize": "11px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "OH"
+      },
+      "copy": {
+        "x": 73,
+        "y": 14.5,
+        "width": 80.75,
+        "height": 49,
+        "color": "rgb(244, 251, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(244, 251, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "LoucaATTAQUE"
+      },
+      "name": {
+        "x": 73,
+        "y": 14.5,
+        "width": 80.75,
+        "height": 18,
+        "color": "rgb(244, 251, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(244, 251, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "Louca"
+      },
+      "action": {
+        "x": 73,
+        "y": 37.5,
+        "width": 80.75,
+        "height": 26,
+        "color": "rgb(255, 255, 255)",
+        "backgroundColor": "rgb(20, 108, 58)",
+        "borderColor": "rgb(55, 212, 114)",
+        "fontSize": "12px",
+        "padding": "4px 9px",
+        "gap": "normal",
+        "display": "inline-flex",
+        "text": "ATTAQUE"
+      }
+    }
+  },
+  "412x915": {
+    "scoreCenter": 429,
+    "card": {
+      "x": 503,
+      "y": 379.59375,
+      "width": 162.75,
+      "height": 78,
+      "padding": "8px",
+      "gap": "12px",
+      "display": "flex",
+      "backgroundImage": "linear-gradient(110deg, rgba(8, 48, 84, 0.92), rgba(5, 28, 52, 0.96))",
+      "borderColor": "rgb(21, 91, 136)"
+    },
+    "order": [
+      "avatar role-oh",
+      "event-copy"
+    ],
+    "elements": {
+      "avatar": {
+        "x": 9,
+        "y": 13,
+        "width": 52,
+        "height": 52,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgb(235, 111, 122)",
+        "borderColor": "rgb(255, 255, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "flex",
+        "text": "14OH"
+      },
+      "number": {
+        "x": 22.203125,
+        "y": 21.5,
+        "width": 25.59375,
+        "height": 23,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(80, 20, 27)",
+        "fontSize": "23px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "14"
+      },
+      "role": {
+        "x": 26.75,
+        "y": 44.5,
+        "width": 16.5,
+        "height": 12,
+        "color": "rgb(80, 20, 27)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(80, 20, 27)",
+        "fontSize": "11px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "OH"
+      },
+      "copy": {
+        "x": 73,
+        "y": 14.5,
+        "width": 80.75,
+        "height": 49,
+        "color": "rgb(244, 251, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(244, 251, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "LoucaATTAQUE"
+      },
+      "name": {
+        "x": 73,
+        "y": 14.5,
+        "width": 80.75,
+        "height": 18,
+        "color": "rgb(244, 251, 255)",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "borderColor": "rgb(244, 251, 255)",
+        "fontSize": "16px",
+        "padding": "0px",
+        "gap": "normal",
+        "display": "block",
+        "text": "Louca"
+      },
+      "action": {
+        "x": 73,
+        "y": 37.5,
+        "width": 80.75,
+        "height": 26,
+        "color": "rgb(255, 255, 255)",
+        "backgroundColor": "rgb(20, 108, 58)",
+        "borderColor": "rgb(55, 212, 114)",
+        "fontSize": "12px",
+        "padding": "4px 9px",
+        "gap": "normal",
+        "display": "inline-flex",
+        "text": "ATTAQUE"
+      }
+    }
+  }
+}

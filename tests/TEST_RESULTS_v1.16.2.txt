@@ -1,0 +1,39 @@
+Volley Live Capture v1.16.2 — test results
+Date: 2026-11-22
+
+Targeted corrected LIVE TIMELINE suite:
+  node --check spectator.js
+  node --check sw.js
+  pytest -q tests/test_timeline_alignment_v1_16_2.py tests/test_timeline_layout_v1_16_1.py tests/test_spectator_timeline_v1_15.py
+  JavaScript syntax: passed
+  18 passed
+
+Complete regression suite:
+  pytest -q
+  98 passed in 177.96 s
+  0 failed
+
+Geometric validation:
+- Desktop cyan score spine: 44–48% of board width; materially left of the v1.16.1 61–64% band: passed
+- Maximum AWAY delta begins at the left safety inset: passed
+- Every red delta remains left of its A marker: passed
+- Delta and A-marker Y centers match within 1 px: passed
+- Delta-marker gap is constant (12 px desktop, 8 px compact): passed
+- All A markers share one X coordinate: passed
+- A-marker-to-connector gap is 8 px and connector reaches the score edge: passed
+- No badge/marker/connector/score overlap: passed
+
+HOME non-regression:
+- Frozen v1.16.1 card and child bounding-box comparison at 1536x1024, 1024x768 and 412x915: passed
+- Width, height, order, relative offsets, padding, gap, colors, text and score-relative alignment unchanged: passed
+- Only common global X translation allowed and observed: passed
+
+Visual and responsive validation:
+- 1536 x 1024 control screenshot and baseline: passed
+- 1024 x 768 control screenshot and baseline: passed
+- 412 x 915 control screenshot and baseline: passed
+- Document-level horizontal overflow: none
+- Mobile timeline-owned scrolling and score/HOME reachability: passed
+
+Preserved features:
+- Filters, DERNIER POINT, ARCHIVE/REPLAY, proportional deltas, score accents, navigation, JSON/archive flows and PWA regressions: passed

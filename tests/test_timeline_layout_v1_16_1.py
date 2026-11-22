@@ -16,7 +16,7 @@ def layout_fixture():
     return data
 
 
-def test_desktop_spine_is_right_shifted_and_away_delta_hugs_left_edge(browser):
+def test_desktop_spine_is_left_shifted_and_away_delta_hugs_left_edge(browser):
     page, errors = open_spectator(browser, layout_fixture(), viewport={"width": 1536, "height": 1024})
     page.wait_for_timeout(250)
     geometry = page.locator(".timeline-board").evaluate(
@@ -32,7 +32,7 @@ def test_desktop_spine_is_right_shifted_and_away_delta_hugs_left_edge(browser):
         }"""
     )
     relative_spine = (geometry["spine"] - geometry["boardLeft"]) / geometry["boardWidth"]
-    assert 0.61 <= relative_spine <= 0.64
+    assert 0.44 <= relative_spine <= 0.48
     assert 11 <= geometry["laneLeft"] - geometry["boardLeft"] <= 14
     assert abs(geometry["barLeft"] - geometry["laneLeft"]) < 1
     assert not errors

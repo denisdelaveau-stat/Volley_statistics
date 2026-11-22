@@ -1,3 +1,14 @@
+## v1.16.2 compact left-shifted LIVE TIMELINE
+
+| ID | Acceptance |
+|---|---|
+| TL162-01 | Desktop cyan spine/score center is 44-48% of board width and at least 13 percentage points left of the v1.16.1 lower bound |
+| TL162-02 | Maximum AWAY delta begins at the left safety inset; every delta remains entirely left of its A marker |
+| TL162-03 | Red delta and A marker centers share the same Y coordinate; delta-marker gap is constant per viewport |
+| TL162-04 | Every A marker shares one X coordinate; marker-connector gap is 8 px and connector ends at the score edge |
+| TL162-05 | Frozen v1.16.1 HOME card dimensions, child order, relative boxes, spacing and colors are unchanged; card and score receive the same X translation |
+| TL162-06 | Score and HOME cards are fully visible on desktop/tablet and reachable without page overflow in the mobile board scroller |
+| TL162-07 | 1536 x 1024, 1024 x 768 and 412 x 915 visual baselines pass |
 
 ## v1.16.1 LIVE TIMELINE layout refinement
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.16.2 — Compact left-shifted LIVE TIMELINE geometry
+- Shifted the cyan spine and score from the v1.16.1 61-64% position to 44-48% of the desktop board width.
+- Right-aligned proportional AWAY delta bars in a fixed left lane and placed every A marker immediately to their right with a constant 12 px desktop / 8 px compact gap.
+- Vertically centered each red delta and A marker on the same rally axis and retained an 8 px marker-to-connector gap.
+- Preserved HOME card markup, dimensions, internal spacing, colors and score-relative placement exactly; only the shared global X position changes.
+- Added frozen v1.16.1 HOME geometry, responsive geometry assertions and desktop/tablet/mobile visual baselines.
+- Updated Home and offline cache to v1.16.2.
+
 ## v1.16.1 — Archive timeline alignment and compact HOME cards
 - Shifted the LIVE TIMELINE score spine to approximately 63% of the desktop board width.
 - Kept the AWAY delta lane flush with the 12 px content inset and aligned its maximum bar to that boundary.
