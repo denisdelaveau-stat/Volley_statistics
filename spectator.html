@@ -12,8 +12,8 @@
   <header class="spectator-header">
     <a class="spectator-brand" href="index.html" aria-label="Retour à la page principale"><span class="brand-mark">◉</span><strong>VolleyLive</strong></a>
     <span class="archive-badge" id="archiveBadge">ARCHIVE</span>
-    <div class="scoreboard" aria-live="polite">
-      <span class="score-side-label">AWAY</span><strong id="headerAway">0</strong><span class="score-separator">:</span><strong id="headerHome">0</strong><span class="score-side-label">HOME</span>
+    <div class="scoreboard" aria-live="polite" aria-label="Score courant">
+      <span class="score-side-label">HOME</span><strong id="headerHome">0</strong><span class="score-separator">:</span><strong id="headerAway">0</strong><span class="score-side-label">AWAY</span>
       <small id="headerSet">SET 1 · 0–0</small>
     </div>
     <a class="spectator-home" href="index.html"><span aria-hidden="true">⌂</span> ACCUEIL</a>
@@ -33,7 +33,7 @@
     <section class="spectator-panel timeline-panel" data-panel="live-timeline">
       <div class="timeline-filterbar">
         <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-order="oldestFirst">Plus anciennes</button><button type="button" data-order="newestFirst">Plus récentes</button></div></fieldset>
-        <label>Nombre d’actions<select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
+        <label>Nombre d’actions<select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
       </div>
       <div class="timeline-board">
         <div class="timeline-title">
@@ -52,35 +52,41 @@
     </section>
 
     <section class="spectator-panel graph-panel" data-panel="live-graph" hidden aria-labelledby="liveGraphTitle">
-      <div class="timeline-filterbar graph-filterbar">
-        <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-graph-order="oldestFirst">Plus anciennes</button><button type="button" data-graph-order="newestFirst">Plus récentes</button></div></fieldset>
-        <label>Nombre d’actions<select id="graphWindowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
+      <h1 id="liveGraphTitle" class="visually-hidden">Score and Fault Evolution</h1>
+      <div class="evolution-toolbar" aria-label="Contrôles de l’historique">
+        <label>Set<select id="evolutionSet" aria-label="Sélectionner un set"></select></label>
+        <fieldset><legend>Ordre</legend><div class="segment"><button type="button" data-graph-order="oldestFirst">Ancien → récent</button><button type="button" data-graph-order="newestFirst">Récent → ancien</button></div></fieldset>
+        <label>Rallyes visibles<select id="graphWindowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
+        <button id="returnLive" class="return-live" type="button" hidden>Retour au direct</button>
       </div>
-      <div class="graph-board">
-        <header class="graph-heading">
-          <div><p class="graph-kicker">ARCHIVE · JSON OFFICIEL</p><h1 id="liveGraphTitle">LIVE GRAPH</h1></div>
-          <div class="graph-context"><strong id="graphSet">SET 1</strong><span id="graphOrder">Ancien → récent</span></div>
-        </header>
-        <div class="graph-legend" aria-label="Légende des graphiques">
-          <span><i class="legend-line away"></i> Score AWAY</span>
-          <span><i class="legend-line home"></i> Score HOME</span>
-          <span><i class="legend-dot so"></i> Side-out (SO)</span>
-          <span><i class="legend-dot bp-home"></i> Break point HOME</span>
-          <span><i class="legend-dot bp-away"></i> Break point AWAY</span>
-          <span><i class="legend-bar positive"></i> HOME devant</span>
-          <span><i class="legend-bar negative"></i> HOME derrière</span>
+      <div class="graph-board evolution-board">
+        <div id="graphContent" class="evolution-scroll" tabindex="0" aria-label="Historique synchronisé du score et des fautes">
+          <div id="evolutionCanvas" class="evolution-canvas">
+            <article class="evolution-panel score-evolution" aria-labelledby="scoreGraphTitle">
+              <header class="evolution-heading">
+                <div><h2 id="scoreGraphTitle">Évolution du score</h2><p>Derniers points • lecture de gauche à droite</p></div>
+              </header>
+              <div id="scoreRows" class="evolution-rows"></div>
+              <div id="scoreChart" class="evolution-chart"></div>
+              <div class="score-legend" aria-label="Légende des cellules de score">
+                <span><i class="legend-dot so"></i> Side-out</span>
+                <span><i class="legend-dot bp-home"></i> Break HOME</span>
+                <span><i class="legend-dot bp-away"></i> Break AWAY</span>
+              </div>
+              <p id="scoreSummary" class="visually-hidden" role="status"></p>
+            </article>
+            <article class="evolution-panel fault-evolution" aria-labelledby="faultGraphTitle">
+              <header class="evolution-heading">
+                <div><h2 id="faultGraphTitle">Évolution des fautes</h2><p>Fautes cumulées • Δ = HOME − AWAY</p></div>
+              </header>
+              <div id="faultRows" class="evolution-rows"></div>
+              <div id="faultChart" class="evolution-chart"></div>
+              <p class="fault-explanation">Un delta positif indique davantage de fautes HOME.</p>
+              <p id="faultSummary" class="visually-hidden" role="status"></p>
+            </article>
+          </div>
         </div>
-        <div id="graphContent" class="graph-content">
-          <article class="graph-card" aria-labelledby="scoreGraphTitle">
-            <div class="graph-card-title"><h2 id="scoreGraphTitle">Évolution du score</h2><p>Score cumulé après chaque rallye</p></div>
-            <div class="graph-scroll" tabindex="0" aria-label="Graphique défilable de l’évolution des scores"><svg id="scoreGraph" class="score-graph" role="img"></svg></div>
-          </article>
-          <article class="graph-card" aria-labelledby="deltaGraphTitle">
-            <div class="graph-card-title"><h2 id="deltaGraphTitle">Delta HOME − AWAY</h2><p>Vert : HOME devant · rouge : HOME derrière · gris : égalité</p></div>
-            <div class="graph-scroll" tabindex="0" aria-label="Graphique défilable du delta de score"><svg id="deltaGraph" class="delta-graph" role="img"></svg></div>
-          </article>
-        </div>
-        <div id="graphEmpty" class="graph-empty" hidden><strong>Aucun rallye disponible</strong><span>Les courbes et les deltas apparaîtront dès qu’un rallye sera présent dans l’archive.</span></div>
+        <div id="graphEmpty" class="graph-empty" hidden><strong>Aucun rallye disponible</strong><span>Les axes restent disponibles sans point de données fabriqué.</span></div>
       </div>
     </section>
   </main>

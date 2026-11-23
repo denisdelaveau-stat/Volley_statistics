@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.18.0 — Score and Fault Evolution LIVE GRAPH
+- Replaced the former two-series graph with synchronized HOME/AWAY score and cumulative-fault rows.
+- Added uniform cyan score-delta and amber fault-delta curves from one selected-set rally timeline.
+- Added official set selection, neutral empty/one-rally states, history browse and `Retour au direct`.
+- Centralized official ERROR/FAULT classification in the shared statistics adapter.
+- Added exact one-pixel alignment, accessibility, integration, performance and three-viewport visual regression coverage.
+
 ## v1.17.0 — Update 10 spectator timeline and LIVE GRAPH
 - Equal AWAY/HOME connector lengths and compact delta-to-event spacing.
 - Wider vivid split score with attached Rallye cell.

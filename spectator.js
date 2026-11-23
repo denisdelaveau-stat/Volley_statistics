@@ -1,12 +1,21 @@
-/* VolleyLive spectator archive view v1.17.0 — derived only from loaded official JSON. */
+/* VolleyLive spectator archive view v1.18.0 — derived only from loaded official JSON. */
 (function () {
   'use strict';
 
   var ARCHIVE_KEY = 'volleySpectator.archive.v1';
   var ORDER_KEY = 'volleySpectator.timeline.order';
   var WINDOW_KEY = 'volleySpectator.timeline.window';
+  var SET_KEY = 'volleySpectator.evolution.set';
   var raw = null;
   var model = null;
+  var selectedSetNumber = null;
+  var evolutionBrowsing = false;
+
+  var I18N = {
+    scorePositive: 'HOME devant', scoreZero: 'Égalité', scoreNegative: 'AWAY devant',
+    faultPositive: 'HOME : plus de fautes', faultZero: 'Égalité', faultNegative: 'AWAY : plus de fautes',
+    pointsPlayed: 'Points joués', sideOut: 'Side-out', breakPoint: 'Break Point'
+  };
 
   function $(id) { return document.getElementById(id); }
   function esc(v) {
@@ -48,6 +57,21 @@
     var away = teams.find(function (t) { return t.teamId === m.opponentTeamId; }) || teams.find(function (t) { return upper(t.side) === 'OPPONENT'; }) || teams[1] || {};
     return { home: home, away: away, homeId: home.teamId || m.ourTeamId, awayId: away.teamId || m.opponentTeamId };
   }
+  function sideForTeamId(teamId, teams) {
+    if (teamId === teams.homeId) return 'HOME';
+    if (teamId === teams.awayId) return 'AWAY';
+    return null;
+  }
+  function isFaultEvent(event) {
+    return window.VolleyStatsAdapter && typeof VolleyStatsAdapter.isFaultEvent === 'function' ?
+      VolleyStatsAdapter.isFaultEvent(event) : normalizeResult(event && (event.evaluation !== undefined ? event.evaluation : event.result)) === 'error';
+  }
+  function availableSetNumbersV2(d) {
+    var seen = {};
+    (d.sets || []).forEach(function (s) { seen[num(s.setNumber, 1)] = true; });
+    (d.rallies || []).forEach(function (r) { seen[num(r.setNumber, 1)] = true; });
+    return Object.keys(seen).map(Number).sort(function (a, b) { return a - b; });
+  }
   function setsWonV2(d) {
     var a = 0, h = 0;
     (d.sets || []).forEach(function (s) {
@@ -68,7 +92,8 @@
       }).pop() || list[list.length - 1];
     }
     if (!e) return null;
-    var side = e.teamId === t.homeId ? 'HOME' : 'AWAY';
+    var side = sideForTeamId(e.teamId, t);
+    if (!side) return null;
     var outcome = normalizeResult(e.evaluation);
     if (side === 'AWAY') outcome = winner === 'AWAY' ? 'point' : 'error';
     else if (!outcome) outcome = winner === 'HOME' ? 'point' : 'error';
@@ -82,49 +107,66 @@
       teamId: e.teamId
     };
   }
-  function modelV2(d) {
+  function modelV2(d, requestedSet) {
     var t = teamV2(d), players = {};
     (d.players || []).forEach(function (p) {
       players[p.playerId] = { number: p.number, name: p.name || ('Joueur ' + p.number), role: role(p.role || p.position), teamId: p.teamId };
     });
-    var byEvent = {};
-    (d.events || []).forEach(function (e) { byEvent[e.eventId] = e; });
-    var all = (d.rallies || []).slice().filter(function (r) { return upper(r.status || 'CLOSED') !== 'VOIDED'; }).sort(function (a, b) {
+    var byEvent = {}, eventsByRally = {};
+    (d.events || []).forEach(function (e) {
+      byEvent[e.eventId] = e;
+      if (upper(e.eventType || 'ACTION') === 'ACTION' && upper(e.status || 'ACTIVE') !== 'VOIDED' && e.rallyId) {
+        (eventsByRally[e.rallyId] || (eventsByRally[e.rallyId] = [])).push(e);
+      }
+    });
+    var all = (d.rallies || []).slice().filter(function (r) { return upper(r.status || 'CLOSED') !== 'VOIDED' && !!r.winnerTeamId; }).sort(function (a, b) {
       return num(a.setNumber, 1) - num(b.setNumber, 1) || num(a.rallyNumber, 0) - num(b.rallyNumber, 0);
     });
-    var current = num((d.match || {}).currentSetNumber, (all[all.length - 1] || {}).setNumber || 1);
+    var availableSets = availableSetNumbersV2(d);
+    var liveSet = num((d.match || {}).currentSetNumber, (all[all.length - 1] || {}).setNumber || availableSets[0] || 1);
+    var requested = num(requestedSet, liveSet);
+    var current = availableSets.indexOf(requested) >= 0 ? requested : liveSet;
     var selected = all.filter(function (r) { return num(r.setNumber, 1) === current; });
-    var warnings = [];
+    var warnings = [], cumulativeHomeFaults = 0, cumulativeAwayFaults = 0;
     var rallies = selected.map(function (r) {
       var score = r.scoreAfter || {};
-      var winner = r.winnerTeamId === t.homeId ? 'HOME' : 'AWAY';
-      var serving = r.servingTeamId === t.homeId ? 'HOME' : 'AWAY';
-      var phase = winner === serving ? 'BP' : 'SO';
-      var event = terminalV2(d, r, byEvent, players, t, winner);
+      var winner = sideForTeamId(r.winnerTeamId, t);
+      var serving = sideForTeamId(r.servingTeamId, t);
+      var phase = winner && serving ? (winner === serving ? 'BP' : 'SO') : null;
+      var event = winner ? terminalV2(d, r, byEvent, players, t, winner) : null;
       var invalid = false;
       if (String((d.match || {}).detailLevel || '').toLowerCase() === 'basic' || (event && ['GENERIC', 'TEAM'].indexOf(upper(event.skill)) >= 0)) event = null;
       if (event && ['SERVICE', 'SERVE'].indexOf(upper(event.skill)) >= 0 && event.teamId !== r.servingTeamId) {
         invalid = true;
         warnings.push('Rallye ' + r.rallyNumber + ' : action de service rejetée pour l’équipe non au service.');
       }
+      var homeFaultIncrement = 0, awayFaultIncrement = 0;
+      (eventsByRally[r.rallyId] || []).forEach(function (faultEvent) {
+        if (!isFaultEvent(faultEvent)) return;
+        var faultSide = sideForTeamId(faultEvent.teamId, t);
+        if (faultSide === 'HOME') homeFaultIncrement++;
+        if (faultSide === 'AWAY') awayFaultIncrement++;
+      });
+      cumulativeHomeFaults += homeFaultIncrement;
+      cumulativeAwayFaults += awayFaultIncrement;
+      var homeScore = num(score.our, 0), awayScore = num(score.opponent, 0);
       return {
-        set: current,
-        rally: num(r.rallyNumber, 1),
-        score: { away: num(score.opponent, 0), home: num(score.our, 0) },
-        winner: winner,
-        serving: serving,
-        phase: phase,
-        code: phase,
-        event: event,
-        invalid: invalid,
-        id: r.rallyId
+        set: current, rally: num(r.rallyNumber, 1), rallyOrdinal: num(r.rallyNumber, 1), rallyKey: r.rallyId,
+        score: { away: awayScore, home: homeScore }, homeScore: homeScore, awayScore: awayScore,
+        scoreDelta: homeScore - awayScore, winner: winner, scoringTeam: winner, serving: serving,
+        phase: phase, code: phase, pointClassification: phase === 'SO' ? 'SIDE_OUT' : phase === 'BP' ? 'BREAK_POINT' : null,
+        event: event, invalid: invalid, id: r.rallyId,
+        cumulativeHomeFaults: cumulativeHomeFaults, cumulativeAwayFaults: cumulativeAwayFaults,
+        homeFaultIncrement: homeFaultIncrement, awayFaultIncrement: awayFaultIncrement,
+        faultTeam: homeFaultIncrement && !awayFaultIncrement ? 'HOME' : awayFaultIncrement && !homeFaultIncrement ? 'AWAY' : null,
+        faultDelta: cumulativeHomeFaults - cumulativeAwayFaults
       };
     });
     var last = selected[selected.length - 1], score = last && last.scoreAfter || { our: 0, opponent: 0 }, sw = setsWonV2(d);
     return {
       format: 'v2.1', name: (d.match || {}).name || 'Match',
-      homeName: t.home.name || 'HOME', awayName: t.away.name || 'AWAY', currentSet: current,
-      score: { away: num(score.opponent, 0), home: num(score.our, 0) }, sets: sw,
+      homeName: t.home.name || 'HOME', awayName: t.away.name || 'AWAY', currentSet: current, liveSet: liveSet,
+      availableSets: availableSets, score: { away: num(score.opponent, 0), home: num(score.our, 0) }, sets: sw,
       rallies: rallies, warnings: warnings,
       finished: ['COMPLETED', 'FINISHED', 'ENDED'].indexOf(upper((d.match || {}).lifecycleStatus || (d.match || {}).status)) >= 0
     };
@@ -147,15 +189,16 @@
     });
     return sets;
   }
-  function modelV1(d) {
+  function modelV1(d, requestedSet) {
     var m = d.match || {}, roster = {};
     ((m.team || {}).roster || []).forEach(function (p) {
       roster[String(p.number)] = { number: p.number, name: p.name || ('Joueur ' + p.number), role: role(p.position || p.role) };
     });
     var groups = groupV1(d.events || []), setNums = Object.keys(groups).map(Number).sort(function (a, b) { return a - b; });
-    var current = num(m.currentSet, setNums[setNums.length - 1] || 1), rows = groups[current] || [];
+    var liveSet = num(m.currentSet, setNums[setNums.length - 1] || 1), requested = num(requestedSet, liveSet);
+    var current = setNums.indexOf(requested) >= 0 ? requested : liveSet, rows = groups[current] || [];
     var initial = String((m.firstRally || {}).antibesState || 'reception').toLowerCase() === 'service' ? 'HOME' : 'AWAY';
-    var serving = initial, warnings = [];
+    var serving = initial, warnings = [], cumulativeHomeFaults = 0, cumulativeAwayFaults = 0;
     var rallies = rows.filter(function (r) { return r.closed; }).map(function (r) {
       var e = r.terminal || {};
       var isBasic = String(m.detailLevel || '').toLowerCase() === 'basic' || String(e.action || '').toLowerCase() === 'generic' || e.player === 'T';
@@ -171,10 +214,25 @@
         };
       }
       var phase = r.winner === serving ? 'BP' : 'SO';
+      var homeFaultIncrement = 0, awayFaultIncrement = 0;
+      (r.actions || []).forEach(function (action) {
+        if (!isFaultEvent(action)) return;
+        var actionSide = action.player === 'A' || String(action.action || '').toLowerCase() === 'adverse' ? 'AWAY' : 'HOME';
+        if (actionSide === 'HOME') homeFaultIncrement++; else awayFaultIncrement++;
+      });
+      cumulativeHomeFaults += homeFaultIncrement;
+      cumulativeAwayFaults += awayFaultIncrement;
+      var score = r.score || { away: 0, home: 0 };
       var out = {
-        set: current, rally: r.rally, score: r.score || { away: 0, home: 0 }, winner: r.winner,
-        serving: serving, phase: phase, code: phase, event: event, invalid: false,
-        id: 'v1-' + current + '-' + r.rally
+        set: current, rally: r.rally, rallyOrdinal: r.rally, rallyKey: 'v1-' + current + '-' + r.rally,
+        score: score, homeScore: score.home, awayScore: score.away, scoreDelta: score.home - score.away,
+        winner: r.winner, scoringTeam: r.winner, serving: serving, phase: phase, code: phase,
+        pointClassification: phase === 'SO' ? 'SIDE_OUT' : 'BREAK_POINT', event: event, invalid: false,
+        id: 'v1-' + current + '-' + r.rally,
+        cumulativeHomeFaults: cumulativeHomeFaults, cumulativeAwayFaults: cumulativeAwayFaults,
+        homeFaultIncrement: homeFaultIncrement, awayFaultIncrement: awayFaultIncrement,
+        faultTeam: homeFaultIncrement && !awayFaultIncrement ? 'HOME' : awayFaultIncrement && !homeFaultIncrement ? 'AWAY' : null,
+        faultDelta: cumulativeHomeFaults - cumulativeAwayFaults
       };
       serving = r.winner;
       return out;
@@ -187,21 +245,21 @@
     });
     return {
       format: 'capture-v1', name: m.name || 'Match',
-      homeName: (m.team || {}).name || 'HOME', awayName: (m.opponent || {}).name || 'AWAY', currentSet: current,
-      score: last ? last.score : { away: 0, home: 0 }, sets: sets, rallies: rallies, warnings: warnings,
-      finished: String(m.status || '').toLowerCase() === 'finished'
+      homeName: (m.team || {}).name || 'HOME', awayName: (m.opponent || {}).name || 'AWAY', currentSet: current, liveSet: liveSet,
+      availableSets: setNums.length ? setNums : [current], score: last ? last.score : { away: 0, home: 0 }, sets: sets,
+      rallies: rallies, warnings: warnings, finished: String(m.status || '').toLowerCase() === 'finished'
     };
   }
-  function build(d) {
+  function build(d, requestedSet) {
     var v = VolleyStatsAdapter.validate(d);
     if (!v.valid) throw new Error(v.errors.join(' '));
-    return detect(d) === 'unified-v2' ? modelV2(d) : modelV1(d);
+    return detect(d) === 'unified-v2' ? modelV2(d, requestedSet) : modelV1(d, requestedSet);
   }
   function prefs() {
     var order = localStorage.getItem(ORDER_KEY), size = localStorage.getItem(WINDOW_KEY);
     return {
       order: order === 'newestFirst' ? 'newestFirst' : 'oldestFirst',
-      size: ['5', '10', '20', 'all'].indexOf(size) >= 0 ? size : '5'
+       size: ['5', '10', '11', '20', 'all'].indexOf(size) >= 0 ? size : '5'
     };
   }
   function visibleRows() {
@@ -255,82 +313,118 @@
   function svgLine(x1, y1, x2, y2, className) {
     return '<line class="' + className + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"></line>';
   }
-  function svgText(x, y, text, anchor) {
-    return '<text class="graph-label" x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '">' + esc(text) + '</text>';
+  function svgText(x, y, text, anchor, className) {
+    return '<text class="' + (className || 'graph-label') + '" x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '">' + esc(text) + '</text>';
   }
-  function setGraph(id, width, height, label, markup) {
-    var node = $(id);
-    node.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
-    node.setAttribute('width', width);
-    node.setAttribute('height', height);
-    node.style.minWidth = width + 'px';
-    node.setAttribute('aria-label', label);
-    node.innerHTML = '<title>' + esc(label) + '</title>' + markup;
+  function scoreCellState(item, side) {
+    if (item.scoringTeam !== side || !item.pointClassification) return 'neutral';
+    if (item.pointClassification === 'SIDE_OUT') return 'so';
+    return side === 'HOME' ? 'bp-home' : 'bp-away';
   }
-  function renderScoreGraph(rows) {
-    var width = Math.max(680, 112 + rows.length * 58), height = 300;
-    var left = 52, right = 22, top = 20, bottom = 38;
-    var plotW = width - left - right, plotH = height - top - bottom;
-    var maxScore = Math.max(5, rows.reduce(function (mx, r) { return Math.max(mx, r.score.away, r.score.home); }, 0));
-    var tick = Math.max(1, Math.ceil(maxScore / 5)), axisMax = Math.ceil(maxScore / tick) * tick;
-    var x = function (i) { return left + (rows.length === 1 ? plotW / 2 : i * plotW / (rows.length - 1)); };
-    var y = function (v) { return top + plotH - (v / axisMax) * plotH; };
-    var markup = '', v;
-    for (v = 0; v <= axisMax; v += tick) {
-      markup += svgLine(left, y(v), width - right, y(v), 'graph-grid') + svgText(left - 10, y(v) + 4, v, 'end');
+  function scoreCellAria(item, side) {
+    var value = side === 'HOME' ? item.homeScore : item.awayScore;
+    var state = scoreCellState(item, side);
+    var suffix = state === 'so' ? ', ' + I18N.sideOut : state.indexOf('bp-') === 0 ? ', ' + I18N.breakPoint : '';
+    return side + ' ' + value + suffix + ', rallye ' + item.rallyOrdinal;
+  }
+  function faultCellAria(item, side) {
+    var home = side === 'HOME', value = home ? item.cumulativeHomeFaults : item.cumulativeAwayFaults;
+    var increment = home ? item.homeFaultIncrement : item.awayFaultIncrement;
+    return side + ', ' + value + ' fautes cumulées' + (increment ? ', ' + increment + ' nouvelle' + (increment > 1 ? 's' : '') + ' faute' + (increment > 1 ? 's' : '') + ' sur ce rallye' : '') + ', rallye ' + item.rallyOrdinal;
+  }
+  function renderValueRows(items, kind) {
+    var value = function (item, side) {
+      if (kind === 'score') return side === 'HOME' ? item.homeScore : item.awayScore;
+      return side === 'HOME' ? item.cumulativeHomeFaults : item.cumulativeAwayFaults;
+    };
+    return ['HOME', 'AWAY'].map(function (side) {
+      var cells = items.map(function (item) {
+        var state, aria;
+        if (kind === 'score') {
+          state = scoreCellState(item, side);
+          aria = scoreCellAria(item, side);
+        } else {
+          var increment = side === 'HOME' ? item.homeFaultIncrement : item.awayFaultIncrement;
+          state = increment ? 'new-fault' : 'neutral';
+          aria = faultCellAria(item, side);
+        }
+        return '<div class="evolution-cell ' + kind + '-cell ' + state + '" data-rally-key="' + esc(item.rallyKey) + '" role="img" aria-label="' + esc(aria) + '"><span aria-hidden="true">' + value(item, side) + '</span></div>';
+      }).join('');
+      return '<div class="evolution-grid value-row ' + kind + '-row ' + side.toLowerCase() + '"><strong class="row-label">' + side + '</strong>' + cells + '</div>';
+    }).join('');
+  }
+  function deltaChartMarkup(items, valueKey, chartKind, labels, accessibleLabel, measuredWidth) {
+    var n = items.length, width = Math.max(100, measuredWidth || n * 100), height = 178, top = 13, bottom = 31;
+    var plotH = height - top - bottom, zeroY = top + plotH / 2;
+    var magnitude = Math.max(2, items.reduce(function (mx, item) { return Math.max(mx, Math.abs(num(item[valueKey], 0))); }, 0));
+    var y = function (v) { return zeroY - (v / magnitude) * (plotH / 2 - 7); };
+    var columnWidth = width / Math.max(1, n);
+    var x = function (i) { return i * columnWidth + columnWidth / 2; };
+    var markup = '';
+    for (var tick = -magnitude; tick <= magnitude; tick++) {
+      markup += svgLine(0, y(tick), width, y(tick), tick === 0 ? 'graph-zero' : 'graph-grid horizontal');
     }
-    rows.forEach(function (r, i) {
-      markup += svgLine(x(i), top, x(i), top + plotH, 'graph-grid') + svgText(x(i), height - 14, 'R' + r.rally);
+    items.forEach(function (item, i) {
+      markup += svgLine(x(i), top, x(i), top + plotH, 'graph-grid vertical');
+      markup += svgText(x(i), height - 10, item.rallyOrdinal, 'middle', 'rally-label');
     });
-    markup += svgLine(left, top, left, top + plotH, 'graph-axis') + svgLine(left, top + plotH, width - right, top + plotH, 'graph-axis');
-    var awayPath = rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i) + ' ' + y(r.score.away); }).join(' ');
-    var homePath = rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i) + ' ' + y(r.score.home); }).join(' ');
-    markup += '<path class="graph-series away" d="' + awayPath + '"></path><path class="graph-series home" d="' + homePath + '"></path>';
-    rows.forEach(function (r, i) {
-      var accent = r.phase === 'SO' ? 'so' : r.winner === 'HOME' ? 'bp-home' : 'bp-away';
-      markup += '<circle class="graph-point ' + accent + '" data-series="away" cx="' + x(i) + '" cy="' + y(r.score.away) + '" r="5"><title>Rallye ' + r.rally + ' · AWAY ' + r.score.away + '</title></circle>';
-      markup += '<rect class="graph-point ' + accent + '" data-series="home" x="' + (x(i) - 5) + '" y="' + (y(r.score.home) - 5) + '" width="10" height="10" rx="2"><title>Rallye ' + r.rally + ' · HOME ' + r.score.home + '</title></rect>';
-    });
-    setGraph('scoreGraph', width, height, 'Évolution des scores AWAY et HOME sur ' + rows.length + ' rallyes', markup);
+    if (items.length) {
+      var path = items.map(function (item, i) { return (i ? 'L' : 'M') + x(i) + ' ' + y(item[valueKey]); }).join(' ');
+      if (chartKind === 'score') {
+        var area = 'M' + x(0) + ' ' + zeroY + ' ' + items.map(function (item, i) { return 'L' + x(i) + ' ' + y(item[valueKey]); }).join(' ') + ' L' + x(items.length - 1) + ' ' + zeroY + ' Z';
+        markup += '<path class="delta-area score-area" d="' + area + '"></path>';
+      }
+      if (items.length > 1) markup += '<path class="delta-series ' + chartKind + '-series" d="' + path + '"></path>';
+      items.forEach(function (item, i) {
+        var value = item[valueKey];
+        markup += '<circle class="delta-point ' + chartKind + '-point" data-rally-key="' + esc(item.rallyKey) + '" data-value="' + value + '" cx="' + x(i) + '" cy="' + y(value) + '" r="5"><title>Rallye ' + item.rallyOrdinal + ' · delta ' + value + '</title></circle>';
+      });
+    }
+    var yLabels = '<div class="chart-y-labels" aria-hidden="true"><span>' + esc(labels.positive) + '</span><span>' + esc(labels.zero) + '</span><span>' + esc(labels.negative) + '</span></div>';
+    return '<div class="evolution-grid evolution-chart-grid">' + yLabels + '<svg class="delta-line-chart ' + chartKind + '-delta-chart" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none" role="img" aria-label="' + esc(accessibleLabel) + '"><title>' + esc(accessibleLabel) + '</title>' + markup + '</svg></div><div class="axis-title">' + I18N.pointsPlayed + '</div>';
   }
-  function renderDeltaGraph(rows) {
-    var width = Math.max(680, 112 + rows.length * 58), height = 235;
-    var left = 52, right = 22, top = 20, bottom = 38;
-    var plotW = width - left - right, plotH = height - top - bottom, zeroY = top + plotH / 2;
-    var maxDelta = Math.max(1, rows.reduce(function (mx, r) { return Math.max(mx, Math.abs(r.score.home - r.score.away)); }, 0));
-    var step = plotW / rows.length, barW = Math.min(30, Math.max(12, step * .55));
-    var markup = '', ticks = [-maxDelta, 0, maxDelta];
-    ticks.forEach(function (value) {
-      var yy = zeroY - (value / maxDelta) * (plotH / 2 - 8);
-      markup += svgLine(left, yy, width - right, yy, value === 0 ? 'graph-zero' : 'graph-grid') + svgText(left - 10, yy + 4, value, 'end');
-    });
-    rows.forEach(function (r, i) {
-      var value = r.score.home - r.score.away, xx = left + step * i + step / 2;
-      var magnitude = Math.abs(value) / maxDelta * (plotH / 2 - 8);
-      var barY = value >= 0 ? zeroY - magnitude : zeroY;
-      var className = value > 0 ? 'positive' : value < 0 ? 'negative' : 'neutral';
-      var drawnHeight = value === 0 ? 3 : magnitude;
-      markup += svgLine(xx, top, xx, top + plotH, 'graph-grid');
-      markup += '<rect class="delta-bar-svg ' + className + '" x="' + (xx - barW / 2) + '" y="' + (value === 0 ? zeroY - 1.5 : barY) + '" width="' + barW + '" height="' + drawnHeight + '" rx="2"><title>Rallye ' + r.rally + ' · delta HOME − AWAY : ' + value + '</title></rect>';
-      markup += svgText(xx, height - 14, 'R' + r.rally);
-      if (value !== 0) markup += svgText(xx, value > 0 ? barY - 5 : barY + drawnHeight + 13, (value > 0 ? '+' : '') + value);
-    });
-    markup += svgLine(left, top, left, top + plotH, 'graph-axis');
-    setGraph('deltaGraph', width, height, 'Delta HOME moins AWAY sur ' + rows.length + ' rallyes', markup);
+  function updateSetSelector() {
+    var select = $('evolutionSet');
+    var options = (model.availableSets || [model.currentSet]).map(function (setNo) { return '<option value="' + setNo + '">Set ' + setNo + '</option>'; }).join('');
+    if (select.innerHTML !== options) select.innerHTML = options;
+    select.value = String(model.currentSet);
   }
   function renderGraphs(v) {
-    var empty = model.rallies.length === 0;
+    var empty = model.rallies.length === 0, scroll = $('graphContent'), previousScroll = scroll.scrollLeft;
     $('graphContent').hidden = empty;
     $('graphEmpty').hidden = !empty;
-    $('graphSet').textContent = 'SET ' + model.currentSet + ' · ' + model.score.away + ' : ' + model.score.home;
-    $('graphOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
+    updateSetSelector();
     if (empty) {
-      $('scoreGraph').innerHTML = '';
-      $('deltaGraph').innerHTML = '';
+      $('scoreRows').innerHTML = '';
+      $('faultRows').innerHTML = '';
+      $('scoreChart').innerHTML = deltaChartMarkup([], 'scoreDelta', 'score', { positive: I18N.scorePositive, zero: I18N.scoreZero, negative: I18N.scoreNegative }, 'Évolution du score, Set ' + model.currentSet + ', aucun rallye terminé.');
+      $('faultChart').innerHTML = deltaChartMarkup([], 'faultDelta', 'fault', { positive: I18N.faultPositive, zero: I18N.faultZero, negative: I18N.faultNegative }, 'Évolution des fautes, Set ' + model.currentSet + ', aucun rallye terminé.');
       return;
     }
-    renderScoreGraph(v.rows);
-    renderDeltaGraph(v.rows);
+    var rows = v.rows;
+    $('evolutionCanvas').style.setProperty('--visible-rally-count', rows.length);
+    $('evolutionCanvas').style.setProperty('--evolution-min-width', (96 + rows.length * 58) + 'px');
+    $('scoreRows').innerHTML = renderValueRows(rows, 'score');
+    $('faultRows').innerHTML = renderValueRows(rows, 'fault');
+    var finalItem = model.rallies[model.rallies.length - 1];
+    var scoreLabel = 'Évolution du score, Set ' + model.currentSet + '. HOME ' + finalItem.homeScore + ', AWAY ' + finalItem.awayScore + '. Delta ' + (finalItem.scoreDelta >= 0 ? 'plus ' : 'moins ') + Math.abs(finalItem.scoreDelta) + '.';
+    var faultLabel = 'Évolution des fautes, Set ' + model.currentSet + '. HOME ' + finalItem.cumulativeHomeFaults + ' fautes, AWAY ' + finalItem.cumulativeAwayFaults + ' fautes. Delta ' + (finalItem.faultDelta === 0 ? 'zéro' : (finalItem.faultDelta > 0 ? 'plus ' : 'moins ') + Math.abs(finalItem.faultDelta)) + '.';
+    function fillCharts(plotWidth) {
+      $('scoreChart').innerHTML = deltaChartMarkup(rows, 'scoreDelta', 'score', { positive: I18N.scorePositive, zero: I18N.scoreZero, negative: I18N.scoreNegative }, scoreLabel, plotWidth);
+      $('faultChart').innerHTML = deltaChartMarkup(rows, 'faultDelta', 'fault', { positive: I18N.faultPositive, zero: I18N.faultZero, negative: I18N.faultNegative }, faultLabel, plotWidth);
+    }
+    fillCharts(0);
+    requestAnimationFrame(function () {
+      var row = document.querySelector('.score-row'), label = row && row.querySelector('.row-label');
+      if (!row || !label || !row.offsetWidth) return;
+      var plotWidth = row.getBoundingClientRect().width - label.getBoundingClientRect().width;
+      if (plotWidth > 1) fillCharts(plotWidth);
+    });
+    $('scoreSummary').textContent = scoreLabel;
+    $('faultSummary').textContent = faultLabel;
+    if (evolutionBrowsing) scroll.scrollLeft = previousScroll;
+    else if (v.p.order === 'oldestFirst') requestAnimationFrame(function () { scroll.scrollLeft = scroll.scrollWidth; });
+    $('returnLive').hidden = model.finished || model.currentSet !== model.liveSet || !evolutionBrowsing;
   }
   function render() {
     if (!model) return;
@@ -338,7 +432,7 @@
     $('headerAway').textContent = model.score.away;
     $('headerHome').textContent = model.score.home;
     $('headerSet').textContent = 'SET ' + model.currentSet + ' · ' + model.sets.away + '–' + model.sets.home;
-    $('archiveBadge').textContent = model.finished ? 'TERMINÉ' : 'ARCHIVE';
+    $('archiveBadge').textContent = model.finished ? 'TERMINÉ' : '● LIVE';
     $('awayName').textContent = 'AWAY';
     $('homeName').textContent = 'HOME';
     $('timelineSet').textContent = 'SET ' + model.currentSet + ' · Fil du match';
@@ -366,6 +460,7 @@
     });
     document.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = p.dataset.panel !== name; });
     location.hash = name;
+    if (name === 'live-graph' && model) requestAnimationFrame(function () { renderGraphs(visibleRows()); });
   }
   function setArchive(d) {
     var v = VolleyStatsAdapter.validate(d);
@@ -373,7 +468,8 @@
     raw = d;
     localStorage.setItem(ARCHIVE_KEY, JSON.stringify(d));
     sessionStorage.setItem('volleyAnalysis.replay.v1', JSON.stringify(d));
-    model = build(d);
+    model = build(d, selectedSetNumber);
+    selectedSetNumber = model.currentSet;
     render();
     return model;
   }
@@ -382,7 +478,9 @@
     try {
       raw = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || 'null');
       if (!raw) throw new Error('Sélectionnez une archive valide depuis OPEN ARCHIVES.');
-      model = build(raw);
+      selectedSetNumber = num(localStorage.getItem(SET_KEY), null);
+      model = build(raw, selectedSetNumber);
+      selectedSetNumber = model.currentSet;
       render();
     } catch (e) { fatal(e.message); return; }
     document.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { activate(b.dataset.tab); }); });
@@ -392,9 +490,28 @@
     document.querySelectorAll('[data-window-size]').forEach(function (select) {
       select.addEventListener('change', function () { localStorage.setItem(WINDOW_KEY, this.value); render(); });
     });
+    $('evolutionSet').addEventListener('change', function () {
+      selectedSetNumber = num(this.value, model.liveSet);
+      localStorage.setItem(SET_KEY, String(selectedSetNumber));
+      evolutionBrowsing = false;
+      model = build(raw, selectedSetNumber);
+      render();
+    });
+    $('graphContent').addEventListener('scroll', function () {
+      if (model.finished || model.currentSet !== model.liveSet) return;
+      var p = prefs(), latestEdge = p.order === 'oldestFirst' ? this.scrollWidth - this.clientWidth : 0;
+      evolutionBrowsing = Math.abs(this.scrollLeft - latestEdge) > 8;
+      $('returnLive').hidden = !evolutionBrowsing;
+    }, { passive: true });
+    $('returnLive').addEventListener('click', function () {
+      evolutionBrowsing = false;
+      var p = prefs(), scroll = $('graphContent');
+      scroll.scrollTo({ left: p.order === 'oldestFirst' ? scroll.scrollWidth : 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      this.hidden = true;
+    });
     window.addEventListener('storage', function (e) {
       if (e.key === ARCHIVE_KEY && e.newValue) {
-        try { raw = JSON.parse(e.newValue); model = build(raw); render(); } catch (x) { fatal(x.message); }
+        try { raw = JSON.parse(e.newValue); model = build(raw, selectedSetNumber); render(); } catch (x) { fatal(x.message); }
       }
     });
     activate(location.hash === '#live-score' ? 'live-score' : location.hash === '#live-graph' ? 'live-graph' : 'live-timeline');
@@ -403,7 +520,7 @@
   window.VolleySpectator = {
     buildViewModel: build,
     setArchive: setArchive,
-    refresh: function () { model = build(raw); render(); },
+    refresh: function () { model = build(raw, selectedSetNumber); render(); },
     getModel: function () { return model; },
     visibleRows: visibleRows
   };

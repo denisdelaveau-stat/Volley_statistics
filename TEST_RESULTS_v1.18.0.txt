@@ -1,0 +1,29 @@
+Volley Live Capture v1.18.0 — final validation
+Run date: 2026-11-23
+Baseline: verified Volley_statistics_v1.17.0_complete.zip
+Baseline SHA-256: 44bfaf6d4ec5236741a108db1074e3fecd05d62913bb9071f51b555badeb0a78
+
+Static validation
+- node --check spectator.js: PASS
+- node --check statistics/adapter.js: PASS
+- node --check sw.js: PASS
+
+Automated suite
+- Command: python3 -m pytest -q
+- Result: 113 passed, 0 failed
+- Duration: 268.16 s
+
+v1.18.0 coverage
+- Unit derivation: score delta, fault delta, cumulative faults, SO/BP, neutral fallback: PASS
+- Multiple countable faults in one rally through shared adapter rule: PASS
+- Set-boundary reset and atomic set selection: PASS
+- Undo/correction stale-point removal: PASS
+- Official v2.1 fixture integration for every available set: PASS
+- Save/reopen and Live/Replay parity: PASS
+- Shared rally-key and one-timeline invariants: PASS
+- Cross-panel alignment tolerance <= 1 CSS px: PASS
+- Keyboard, 44 px controls, accessible names/summaries, contrast and reduced motion: PASS
+- Empty, one-rally, long-set and history-browse/Retour au direct states: PASS
+- Timeline selector average below 16 ms target: PASS
+- Visual regression at 1536x1024, 844x390 and 390x844: PASS
+- Legacy application regression suite: PASS
