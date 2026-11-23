@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.19.0 — Spectator Live header and momentum
+- Added the VolleyLive header, JSON-derived HOME/AWAY score card and MOMENTUM ACTUEL above the existing Timeline.
+- Added configurable 8-point window, 4-point minimum and 70% advantage threshold.
+- Added chronological H/A tiles, percentages summing to 100, counts and current-set streak.
+- Added no-match, new-set, insufficient-data, finished-set and finished-match states.
+- Rebuilds all values after updates, corrections, Undo and set changes; excludes voided/cancelled/undone records.
+- Added mobile/tablet/landscape layouts, accessibility, offline caching and visual baselines.
+- Added T1–T12 and complete regression coverage: 132 tests passed.
+
 ## v1.18.1 — Compact score-adjacent LIVE TIMELINE delta
 - Standardized the spectator UI on HOME left / AWAY right, including header, LIVE SCORE, timeline and graph rows.
 - Moved HOME/AWAY delta bars from the outer edges to a constant 6 px gap beside the score.

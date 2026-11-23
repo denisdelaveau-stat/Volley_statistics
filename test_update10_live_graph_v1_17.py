@@ -71,11 +71,15 @@ def test_update10_header_score_connectors_home_delta_and_filters(browser):
     for row in rows:
         assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1
         if row["marker"]:
-            assert 11 <= row["marker"]["left"] - row["awayLane"]["right"] <= 13
+            assert 5 <= row["awayLane"]["left"] - row["score"]["right"] <= 7
+            assert 5 <= row["awayConnector"]["left"] - row["awayLane"]["right"] <= 7
+            assert 5 <= row["marker"]["left"] - row["awayConnector"]["right"] <= 7
         if row["card"]:
-            assert 11 <= row["homeLane"]["left"] - row["card"]["right"] <= 13
+            assert 5 <= row["homeConnector"]["left"] - row["card"]["right"] <= 7
+            assert 5 <= row["homeLane"]["left"] - row["homeConnector"]["right"] <= 7
+            assert 5 <= row["score"]["left"] - row["homeLane"]["right"] <= 7
             if row["homeBar"]:
-                assert abs(row["homeBar"]["left"] - row["homeLane"]["left"]) < 1
+                assert abs(row["homeBar"]["right"] - row["homeLane"]["right"]) < 1
                 assert abs((row["homeBar"]["top"] + row["homeBar"]["height"] / 2) -
                            (row["card"]["top"] + row["card"]["height"] / 2)) < 1
 
@@ -173,7 +177,7 @@ def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
         page.close()
 
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.18.0" in sw
+    assert "volley-live-capture-v1.19.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -184,7 +188,7 @@ def test_update10_visual_baselines_at_three_viewports(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_17_0.png"
+        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_19_0.png"
         assert baseline.exists(), f"Missing {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

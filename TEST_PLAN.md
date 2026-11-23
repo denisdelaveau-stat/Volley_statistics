@@ -1,3 +1,24 @@
+## v1.19.0 Live Header & Momentum acceptance
+
+| ID | Requirement |
+|---|---|
+| T1 | H A H H A H H H → 6/2, 75/25, HOME advantage, HOME streak 3 |
+| T2 | Last eight A A A A A H A A → 1/7, 13/87, AWAY advantage, AWAY streak 2 |
+| T3 | Alternating 4/4 → 50/50, balanced, AWAY last point |
+| T4 | H H A H A H A A → 4/4, balanced |
+| T5 | H H H A A H H A → 5/3, balanced below 70% |
+| T6 | Three points → NOT_ENOUGH, real gray counts, five placeholders, real streak |
+| T7 | New set with zero points → eight placeholders and neutral streak |
+| T8 | Undo T1 last point → 5/2, 71/29, HOME streak 2 |
+| T9 | Finished set → final score/sets, frozen momentum and SÉRIE FINALE |
+| T10 | No JSON → neutral 0/NA state and AUCUN MATCH |
+| T11 | 3/7 → 43/57 and exact 100 total |
+| T12 | New-set first AWAY point → AWAY streak 1 without carry-over |
+| VH-13 | HOME remains left, AWAY right, exactly one or zero service indicator |
+| VH-14 | Portrait stack and landscape 50/50 grid pass without page overflow |
+| VH-15 | ARIA summaries/list items, reduced motion and cyan/slate-only top section pass |
+| VH-16 | Existing Timeline, graph, archive, accessibility and offline regression suite passes |
+
 ## v1.18.0 Score and Fault Evolution acceptance
 
 | ID | Requirement |
@@ -260,3 +281,15 @@ All v1.6.9 scoring, rotation, setup, history, Advanced-action, compact-score, ne
 2. Compare with `icon_ref.png`: navy reaches the launcher-mask edge, with no lighter perimeter or white/transparent corner.
 3. Verify `v1.6.10` on Home and confirm offline relaunch and saved-match persistence.
 4. Recheck compact score spacing, net-height posts and the Intermediate/Advanced BENCH divider.
+
+## v1.18.1 — HOME-left spectator and compact score-adjacent deltas
+
+- Header and LIVE SCORE render HOME left of AWAY with unchanged score values.
+- LIVE TIMELINE order is HOME card, HOME connector, green HOME delta, HOME:AWAY score, red AWAY delta, AWAY connector, AWAY marker.
+- Score-to-delta gaps remain 6 CSS px and bar/badge centers remain within 1 CSS px of score center.
+- Connectors contract from 112 to 18 CSS px with no overlap; HOME card internal geometry remains unchanged.
+- SO/BP colors, winning side, terminal action, accessible labels and delta signs remain semantically correct after inversion.
+- LIVE GRAPH keeps HOME above AWAY and `HOME − AWAY` for score and fault deltas.
+- Visual baselines cover 1536×1024, 1024×768, 844×390 and 390×844.
+- Narrow-screen content is reachable through internal board scrolling without document-level horizontal overflow.
+- Offline cache and required spectator assets are validated.

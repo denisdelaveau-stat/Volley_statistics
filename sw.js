@@ -1,9 +1,9 @@
-/* Volley Live Capture v1.18.1 - offline service worker.
+/* Volley Live Capture v1.19.0 - offline service worker.
    Bump CACHE when any file changes so installed phones pick up the new version. */
-var CACHE = 'volley-live-capture-v1.18.1';
+var CACHE = 'volley-live-capture-v1.19.0';
 var ASSETS = ['./', 'index.html', 'manifest.webmanifest',
   'Font_app_ref.jpg', 'coach.css', 'coach-live-config.js', 'coach.js',
-  'statistics/index.html', 'statistics/adapter.js', 'spectator.html', 'spectator.css', 'spectator.js',
+  'statistics/index.html', 'statistics/adapter.js', 'spectator.html', 'spectator.css', 'spectator-live-config.js', 'spectator.js',
   'statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json',
   'statistics/data/reference-fixture.js',
   'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'icons/icon-192.png', 'icons/icon-512.png'];

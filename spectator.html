@@ -3,23 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#03182f">
+  <meta name="theme-color" content="#0A1628">
   <title>VolleyLive · Spectateur</title>
   <link rel="stylesheet" href="spectator.css">
 </head>
 <body>
 <div class="spectator-app" id="spectatorApp">
-  <header class="spectator-header">
-    <a class="spectator-brand" href="index.html" aria-label="Retour à la page principale"><span class="brand-mark">◉</span><strong>VolleyLive</strong></a>
-    <span class="archive-badge" id="archiveBadge">ARCHIVE</span>
-    <div class="scoreboard" aria-live="polite" aria-label="Score courant">
-      <span class="score-side-label">HOME</span><strong id="headerHome">0</strong><span class="score-separator">:</span><strong id="headerAway">0</strong><span class="score-side-label">AWAY</span>
-      <small id="headerSet">SET 1 · 0–0</small>
-    </div>
-    <a class="spectator-home" href="index.html"><span aria-hidden="true">⌂</span> ACCUEIL</a>
+  <header class="spectator-header" aria-label="VolleyLive">
+    <a class="spectator-brand" href="index.html" aria-label="VolleyLive, retour à la page principale">
+      <svg class="brand-ball" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none"/><path d="M7 7c7 1 11 5 12 12M15 2c1 7-2 12-8 15M29 12c-7-2-12 0-16 6M25 25c-6-4-8-9-6-15M3 20c6 4 12 4 18 1"/></svg>
+      <span class="brand-wordmark"><strong>VOLLEY</strong><strong>LIVE</strong></span>
+    </a>
+    <span class="visually-hidden" id="archiveBadge">LIVE</span>
   </header>
 
   <nav class="spectator-nav" aria-label="Navigation spectateur">
+    <a class="spectator-home" href="index.html"><span aria-hidden="true">⌂</span><span>ACCUEIL</span></a>
     <button type="button" data-tab="live-score">LIVE SCORE</button>
     <button type="button" data-tab="live-timeline" aria-selected="true">LIVE TIMELINE</button>
     <button type="button" data-tab="live-graph">LIVE GRAPH</button>
@@ -31,6 +30,44 @@
     </section>
 
     <section class="spectator-panel timeline-panel" data-panel="live-timeline">
+      <section class="live-overview" aria-label="Score et momentum du match">
+        <div class="live-card-grid">
+          <article class="live-card live-score-card" id="liveScoreboard" aria-label="Aucun match">
+            <div class="team-column home-team">
+              <div class="team-crest home-crest" aria-hidden="true"><img id="homeTeamLogo" alt=""><span id="homeMonogram">H</span></div>
+              <strong class="team-display-name" id="homeTeamDisplay">HOME</strong>
+              <svg class="service-ball" id="serviceHome" viewBox="0 0 32 32" aria-label="Service HOME" hidden><circle cx="16" cy="16" r="14"/><path d="M7 7c7 1 11 5 12 12M15 2c1 7-2 12-8 15M29 12c-7-2-12 0-16 6M25 25c-6-4-8-9-6-15M3 20c6 4 12 4 18 1"/></svg>
+            </div>
+            <div class="score-divider" aria-hidden="true"></div>
+            <div class="score-column">
+              <div class="current-score"><strong id="headerHome">0</strong><span>:</span><strong id="headerAway">0</strong></div>
+              <div class="sets-score"><strong id="setsHome">0</strong><span>SETS</span><strong id="setsAway">0</strong></div>
+            </div>
+            <div class="score-divider" aria-hidden="true"></div>
+            <div class="team-column away-team">
+              <div class="team-crest away-crest" aria-hidden="true"><img id="awayTeamLogo" alt=""><span id="awayMonogram">A</span></div>
+              <strong class="team-display-name" id="awayTeamDisplay">AWAY</strong>
+              <svg class="service-ball" id="serviceAway" viewBox="0 0 32 32" aria-label="Service AWAY" hidden><circle cx="16" cy="16" r="14"/><path d="M7 7c7 1 11 5 12 12M15 2c1 7-2 12-8 15M29 12c-7-2-12 0-16 6M25 25c-6-4-8-9-6-15M3 20c6 4 12 4 18 1"/></svg>
+            </div>
+            <div class="score-status" id="headerSet">AUCUN MATCH</div>
+          </article>
+
+          <article class="live-card momentum-card state-no-match" id="momentumCard" aria-label="Momentum indisponible">
+            <header><h2>MOMENTUM ACTUEL</h2><p id="momentumSubtitle">Aucun match chargé</p></header>
+            <div class="momentum-headline" id="momentumHeadline" aria-live="polite"><span id="momentumArrow">—</span><strong id="momentumLeader">NA</strong></div>
+            <div class="momentum-percentages"><strong id="homePct">NA</strong><strong id="awayPct">NA</strong></div>
+            <div class="momentum-bar" role="img" id="momentumBar" aria-label="Répartition indisponible"><span id="homeMomentumBar"></span><span id="awayMomentumBar"></span></div>
+            <div class="momentum-counts"><span><b id="momentumHomeName">HOME</b><strong id="homeCount">0</strong></span><span><strong id="awayCount">0</strong><b id="momentumAwayName">AWAY</b></span></div>
+            <div class="momentum-sequence" id="momentumSequence" role="list" aria-label="Séquence des points récents"></div>
+            <div class="momentum-axis"><i></i><span>Plus ancien</span><b aria-hidden="true">→</b><span>Plus récent</span><i></i></div>
+            <div class="momentum-divider"></div>
+            <div class="streak-row"><span class="streak-pill" id="streakPill">SÉRIE EN COURS</span><strong id="streakText">—</strong></div>
+            <div class="momentum-divider"></div>
+            <p class="momentum-disclaimer">Indicateur de dynamique, pas une prédiction.</p>
+          </article>
+        </div>
+      </section>
+
       <div class="timeline-filterbar">
         <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-order="oldestFirst">Plus anciennes</button><button type="button" data-order="newestFirst">Plus récentes</button></div></fieldset>
         <label>Nombre d’actions<select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
@@ -45,9 +82,7 @@
         <div id="timelineList" class="timeline-list" aria-live="polite"></div>
         <div id="timelineEmpty" class="timeline-empty" hidden>Le set n’a pas encore commencé</div>
         <div id="timelineWarning" class="timeline-warning" hidden></div>
-        <footer class="timeline-footer">
-          <div class="replay-status"><span></span> REPLAY D’ARCHIVE</div>
-        </footer>
+        <footer class="timeline-footer"><div class="replay-status"><span></span> REPLAY D’ARCHIVE</div></footer>
       </div>
     </section>
 
@@ -63,26 +98,15 @@
         <div id="graphContent" class="evolution-scroll" tabindex="0" aria-label="Historique synchronisé du score et des fautes">
           <div id="evolutionCanvas" class="evolution-canvas">
             <article class="evolution-panel score-evolution" aria-labelledby="scoreGraphTitle">
-              <header class="evolution-heading">
-                <div><h2 id="scoreGraphTitle">Évolution du score</h2><p>Derniers points • lecture de gauche à droite</p></div>
-              </header>
-              <div id="scoreRows" class="evolution-rows"></div>
-              <div id="scoreChart" class="evolution-chart"></div>
-              <div class="score-legend" aria-label="Légende des cellules de score">
-                <span><i class="legend-dot so"></i> Side-out</span>
-                <span><i class="legend-dot bp-home"></i> Break HOME</span>
-                <span><i class="legend-dot bp-away"></i> Break AWAY</span>
-              </div>
+              <header class="evolution-heading"><div><h2 id="scoreGraphTitle">Évolution du score</h2><p>Derniers points • lecture de gauche à droite</p></div></header>
+              <div id="scoreRows" class="evolution-rows"></div><div id="scoreChart" class="evolution-chart"></div>
+              <div class="score-legend" aria-label="Légende des cellules de score"><span><i class="legend-dot so"></i> Side-out</span><span><i class="legend-dot bp-home"></i> Break HOME</span><span><i class="legend-dot bp-away"></i> Break AWAY</span></div>
               <p id="scoreSummary" class="visually-hidden" role="status"></p>
             </article>
             <article class="evolution-panel fault-evolution" aria-labelledby="faultGraphTitle">
-              <header class="evolution-heading">
-                <div><h2 id="faultGraphTitle">Évolution des fautes</h2><p>Fautes cumulées • Δ = HOME − AWAY</p></div>
-              </header>
-              <div id="faultRows" class="evolution-rows"></div>
-              <div id="faultChart" class="evolution-chart"></div>
-              <p class="fault-explanation">Un delta positif indique davantage de fautes HOME.</p>
-              <p id="faultSummary" class="visually-hidden" role="status"></p>
+              <header class="evolution-heading"><div><h2 id="faultGraphTitle">Évolution des fautes</h2><p>Fautes cumulées • Δ = HOME − AWAY</p></div></header>
+              <div id="faultRows" class="evolution-rows"></div><div id="faultChart" class="evolution-chart"></div>
+              <p class="fault-explanation">Un delta positif indique davantage de fautes HOME.</p><p id="faultSummary" class="visually-hidden" role="status"></p>
             </article>
           </div>
         </div>
@@ -93,6 +117,7 @@
 </div>
 <div class="fatal" id="fatal" hidden><h1>Archive indisponible</h1><p id="fatalText"></p><a href="index.html">Retour à la page principale</a></div>
 <script src="statistics/adapter.js"></script>
+<script src="spectator-live-config.js"></script>
 <script src="spectator.js"></script>
 </body>
 </html>

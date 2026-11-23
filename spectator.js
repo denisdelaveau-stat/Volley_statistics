@@ -1,4 +1,4 @@
-/* VolleyLive spectator archive view v1.18.1 — HOME-left convention, derived only from loaded official JSON. */
+/* VolleyLive spectator Live view v1.19.0 — score, momentum and timeline derived only from loaded official JSON. */
 (function () {
   'use strict';
 
@@ -8,6 +8,9 @@
   var SET_KEY = 'volleySpectator.evolution.set';
   var raw = null;
   var model = null;
+  var announcedLeader = null;
+  var momentumCfg = Object.assign({ windowSize: 8, minPoints: 4, advantageThreshold: 0.70 },
+    (window.VolleySpectatorConfig && window.VolleySpectatorConfig.momentum) || {});
   var selectedSetNumber = null;
   var evolutionBrowsing = false;
 
@@ -62,6 +65,29 @@
     if (teamId === teams.awayId) return 'AWAY';
     return null;
   }
+  function isVoided(v) {
+    return !!(v && (v.cancelled === true || v.undone === true || ['VOIDED', 'CANCELLED', 'UNDONE'].indexOf(upper(v.status)) >= 0));
+  }
+  function isFinishedStatus(v) { return ['COMPLETED', 'FINISHED', 'ENDED', 'CLOSED'].indexOf(upper(v)) >= 0; }
+  function logoOf(team) { return team && (team.logoUrl || team.logo || team.crestUrl || team.imageUrl) || '';
+  }
+  function monogram(name) {
+    var ignored = ['DE', 'DU', 'LA', 'LE', 'LES', 'DES', 'D'];
+    var words = String(name || '').replace(/[’']/g, ' ').split(/[^A-Za-zÀ-ÖØ-öø-ÿ0-9]+/).filter(Boolean);
+    var significant = words.filter(function (word) { return ignored.indexOf(upper(word)) < 0; });
+    var chosen = significant.length ? significant : words, value = '';
+    chosen.forEach(function (word) {
+      if (value.length >= 3) return;
+      var token = /^[A-ZÀ-ÖØ-Þ]{2,3}$/.test(word) ? upper(word) : upper(word.charAt(0));
+      value += token;
+    });
+    return value.slice(0, 3) || 'NA';
+  }
+  function statusFor(matchFinished, setFinished, pointCount) {
+    if (matchFinished) return 'MATCH_FINISHED';
+    if (setFinished) return 'SET_FINISHED';
+    return pointCount ? 'IN_PROGRESS' : 'NOT_STARTED';
+  }
   function isFaultEvent(event) {
     return window.VolleyStatsAdapter && typeof VolleyStatsAdapter.isFaultEvent === 'function' ?
       VolleyStatsAdapter.isFaultEvent(event) : normalizeResult(event && (event.evaluation !== undefined ? event.evaluation : event.result)) === 'error';
@@ -83,8 +109,9 @@
   }
   function terminalV2(d, r, byEvent, players, t, winner) {
     var e = byEvent[r.terminalEventId];
+    if (isVoided(e)) e = null;
     var list = (d.events || []).filter(function (x) {
-      return x.rallyId === r.rallyId && upper(x.eventType) === 'ACTION' && upper(x.status || 'ACTIVE') !== 'VOIDED';
+      return x.rallyId === r.rallyId && upper(x.eventType) === 'ACTION' && !isVoided(x);
     }).sort(function (a, b) { return num(a.sequenceNumber, 0) - num(b.sequenceNumber, 0); });
     if (!e) {
       e = list.filter(function (x) {
@@ -108,25 +135,28 @@
     };
   }
   function modelV2(d, requestedSet) {
-    var t = teamV2(d), players = {};
+    var t = teamV2(d), players = {}, match = d.match || {};
     (d.players || []).forEach(function (p) {
       players[p.playerId] = { number: p.number, name: p.name || ('Joueur ' + p.number), role: role(p.role || p.position), teamId: p.teamId };
     });
     var byEvent = {}, eventsByRally = {};
     (d.events || []).forEach(function (e) {
       byEvent[e.eventId] = e;
-      if (upper(e.eventType || 'ACTION') === 'ACTION' && upper(e.status || 'ACTIVE') !== 'VOIDED' && e.rallyId) {
+      if (upper(e.eventType || 'ACTION') === 'ACTION' && !isVoided(e) && e.rallyId) {
         (eventsByRally[e.rallyId] || (eventsByRally[e.rallyId] = [])).push(e);
       }
     });
-    var all = (d.rallies || []).slice().filter(function (r) { return upper(r.status || 'CLOSED') !== 'VOIDED' && !!r.winnerTeamId; }).sort(function (a, b) {
+    var all = (d.rallies || []).slice().filter(function (r) { return !isVoided(r) && !!r.winnerTeamId; }).sort(function (a, b) {
       return num(a.setNumber, 1) - num(b.setNumber, 1) || num(a.rallyNumber, 0) - num(b.rallyNumber, 0);
     });
     var availableSets = availableSetNumbersV2(d);
-    var liveSet = num((d.match || {}).currentSetNumber, (all[all.length - 1] || {}).setNumber || availableSets[0] || 1);
+    var liveSet = num(match.currentSetNumber, (all[all.length - 1] || {}).setNumber || availableSets[0] || 1);
+    if (availableSets.indexOf(liveSet) < 0) availableSets.push(liveSet);
+    availableSets.sort(function (a, b) { return a - b; });
     var requested = num(requestedSet, liveSet);
     var current = availableSets.indexOf(requested) >= 0 ? requested : liveSet;
     var selected = all.filter(function (r) { return num(r.setNumber, 1) === current; });
+    var setDef = (d.sets || []).find(function (set) { return num(set.setNumber, 1) === current; }) || {};
     var warnings = [], cumulativeHomeFaults = 0, cumulativeAwayFaults = 0;
     var rallies = selected.map(function (r) {
       var score = r.scoreAfter || {};
@@ -135,7 +165,7 @@
       var phase = winner && serving ? (winner === serving ? 'BP' : 'SO') : null;
       var event = winner ? terminalV2(d, r, byEvent, players, t, winner) : null;
       var invalid = false;
-      if (String((d.match || {}).detailLevel || '').toLowerCase() === 'basic' || (event && ['GENERIC', 'TEAM'].indexOf(upper(event.skill)) >= 0)) event = null;
+      if (String(match.detailLevel || '').toLowerCase() === 'basic' || (event && ['GENERIC', 'TEAM'].indexOf(upper(event.skill)) >= 0)) event = null;
       if (event && ['SERVICE', 'SERVE'].indexOf(upper(event.skill)) >= 0 && event.teamId !== r.servingTeamId) {
         invalid = true;
         warnings.push('Rallye ' + r.rallyNumber + ' : action de service rejetée pour l’équipe non au service.');
@@ -162,18 +192,30 @@
         faultDelta: cumulativeHomeFaults - cumulativeAwayFaults
       };
     });
-    var last = selected[selected.length - 1], score = last && last.scoreAfter || { our: 0, opponent: 0 }, sw = setsWonV2(d);
+    var matchFinished = isFinishedStatus(match.lifecycleStatus || match.status);
+    var setFinished = isFinishedStatus(setDef.status) || current < liveSet;
+    var state = statusFor(matchFinished, setFinished, rallies.length);
+    var last = selected[selected.length - 1], score = last && last.scoreAfter;
+    if (!score && setFinished && setDef.finalScore) score = setDef.finalScore;
+    score = score || { our: 0, opponent: 0 };
+    var sw = setsWonV2(d);
+    var servingSide = null;
+    if (state === 'IN_PROGRESS' || state === 'NOT_STARTED') {
+      servingSide = rallies.length ? rallies[rallies.length - 1].winner : sideForTeamId(setDef.initialServingTeamId, t);
+    }
     return {
-      format: 'v2.1', name: (d.match || {}).name || 'Match',
-      homeName: t.home.name || 'HOME', awayName: t.away.name || 'AWAY', currentSet: current, liveSet: liveSet,
-      availableSets: availableSets, score: { away: num(score.opponent, 0), home: num(score.our, 0) }, sets: sw,
-      rallies: rallies, warnings: warnings,
-      finished: ['COMPLETED', 'FINISHED', 'ENDED'].indexOf(upper((d.match || {}).lifecycleStatus || (d.match || {}).status)) >= 0
+      format: 'v2.1', name: match.name || 'Match',
+      homeName: t.home.name || 'HOME', awayName: t.away.name || 'AWAY', homeLogo: logoOf(t.home), awayLogo: logoOf(t.away),
+      currentSet: current, liveSet: liveSet, availableSets: availableSets,
+      score: { away: num(score.opponent, 0), home: num(score.our, 0) }, sets: sw,
+      rallies: rallies, warnings: warnings, finished: matchFinished, status: state, servingSide: servingSide,
+      noMatch: false
     };
   }
   function groupV1(events) {
     var sets = {}, scores = {};
     (events || []).forEach(function (e) {
+      if (isVoided(e)) return;
       var s = num(e.set, 1);
       if (!sets[s]) sets[s] = [];
       var list = sets[s], r = list.length && !list[list.length - 1].closed ? list[list.length - 1] : null;
@@ -195,7 +237,10 @@
       roster[String(p.number)] = { number: p.number, name: p.name || ('Joueur ' + p.number), role: role(p.position || p.role) };
     });
     var groups = groupV1(d.events || []), setNums = Object.keys(groups).map(Number).sort(function (a, b) { return a - b; });
-    var liveSet = num(m.currentSet, setNums[setNums.length - 1] || 1), requested = num(requestedSet, liveSet);
+    var liveSet = num(m.currentSet, setNums[setNums.length - 1] || 1);
+    if (setNums.indexOf(liveSet) < 0) setNums.push(liveSet);
+    setNums.sort(function (a, b) { return a - b; });
+    var requested = num(requestedSet, liveSet);
     var current = setNums.indexOf(requested) >= 0 ? requested : liveSet, rows = groups[current] || [];
     var initial = String((m.firstRally || {}).antibesState || 'reception').toLowerCase() === 'service' ? 'HOME' : 'AWAY';
     var serving = initial, warnings = [], cumulativeHomeFaults = 0, cumulativeAwayFaults = 0;
@@ -208,10 +253,8 @@
         var outcome = normalizeResult(e.result);
         if (side === 'AWAY') outcome = r.winner === 'AWAY' ? 'point' : 'error';
         else if (!outcome) outcome = r.winner === 'HOME' ? 'point' : 'error';
-        event = {
-          side: side, player: side === 'HOME' ? roster[String(e.player)] || null : null,
-          skill: e.action, label: actionLabel(e.action), outcome: outcome, eventId: e.id, teamId: side
-        };
+        event = { side: side, player: side === 'HOME' ? roster[String(e.player)] || null : null,
+          skill: e.action, label: actionLabel(e.action), outcome: outcome, eventId: e.id, teamId: side };
       }
       var phase = r.winner === serving ? 'BP' : 'SO';
       var homeFaultIncrement = 0, awayFaultIncrement = 0;
@@ -237,23 +280,141 @@
       serving = r.winner;
       return out;
     });
-    var last = rallies[rallies.length - 1], sets = { away: 0, home: 0 };
+    var matchFinished = isFinishedStatus(m.status || m.lifecycleStatus), setFinished = matchFinished || current < liveSet;
+    var state = statusFor(matchFinished, setFinished, rallies.length), last = rallies[rallies.length - 1];
+    var sets = { away: 0, home: 0 };
     setNums.forEach(function (s) {
-      if (s === current) return;
+      var completed = s < liveSet || matchFinished;
+      if (!completed) return;
       var rs = (groups[s] || []).filter(function (r) { return r.closed; }), l = rs[rs.length - 1];
       if (l) { if (l.score.home > l.score.away) sets.home++; else if (l.score.away > l.score.home) sets.away++; }
     });
     return {
       format: 'capture-v1', name: m.name || 'Match',
-      homeName: (m.team || {}).name || 'HOME', awayName: (m.opponent || {}).name || 'AWAY', currentSet: current, liveSet: liveSet,
-      availableSets: setNums.length ? setNums : [current], score: last ? last.score : { away: 0, home: 0 }, sets: sets,
-      rallies: rallies, warnings: warnings, finished: String(m.status || '').toLowerCase() === 'finished'
+      homeName: (m.team || {}).name || 'HOME', awayName: (m.opponent || {}).name || 'AWAY',
+      homeLogo: logoOf(m.team || {}), awayLogo: logoOf(m.opponent || {}), currentSet: current, liveSet: liveSet,
+      availableSets: setNums, score: last ? last.score : { away: 0, home: 0 }, sets: sets,
+      rallies: rallies, warnings: warnings, finished: matchFinished, status: state,
+      servingSide: (state === 'IN_PROGRESS' || state === 'NOT_STARTED') ? (last ? last.winner : initial) : null,
+      noMatch: false
     };
   }
   function build(d, requestedSet) {
     var v = VolleyStatsAdapter.validate(d);
     if (!v.valid) throw new Error(v.errors.join(' '));
     return detect(d) === 'unified-v2' ? modelV2(d, requestedSet) : modelV1(d, requestedSet);
+  }
+  function emptyModel() {
+    return { format: 'empty', name: '', homeName: 'HOME', awayName: 'AWAY', homeLogo: '', awayLogo: '',
+      currentSet: null, liveSet: null, availableSets: [], score: { home: 0, away: 0 }, sets: { home: 0, away: 0 },
+      rallies: [], warnings: [], finished: false, status: 'NO_MATCH', servingSide: null, noMatch: true };
+  }
+  function computeMomentum(points, setNumber, cfg) {
+    cfg = Object.assign({}, momentumCfg, cfg || {});
+    var setPoints = (points || []).filter(function (point) {
+      return !isVoided(point) && (setNumber == null || num(point.set, setNumber) === setNumber) && ['HOME', 'AWAY'].indexOf(point.winner) >= 0;
+    }).slice().sort(function (a, b) { return num(a.rallyOrdinal, a.rally) - num(b.rallyOrdinal, b.rally); });
+    var sequence = setPoints.slice(-cfg.windowSize).map(function (point) { return point.winner; });
+    var k = sequence.length, homeCount = sequence.filter(function (side) { return side === 'HOME'; }).length;
+    var awayCount = k - homeCount, homePct = null, awayPct = null, leader = null;
+    if (k >= cfg.minPoints) {
+      homePct = Math.round(homeCount / k * 100); awayPct = 100 - homePct;
+      var h = homeCount / k, a = awayCount / k;
+      leader = h >= cfg.advantageThreshold ? 'HOME' : a >= cfg.advantageThreshold ? 'AWAY' : 'BALANCED';
+    }
+    var streak = null;
+    if (setPoints.length) {
+      var last = setPoints[setPoints.length - 1].winner, length = 0;
+      for (var i = setPoints.length - 1; i >= 0 && setPoints[i].winner === last; i--) length++;
+      streak = { side: last, length: length };
+    }
+    return { setNumber: setNumber, windowSize: cfg.windowSize, sequence: sequence, homeCount: homeCount, awayCount: awayCount,
+      homePct: homePct, awayPct: awayPct, leader: leader, streak: streak };
+  }
+  function momentumView(m) {
+    var value = computeMomentum(m.rallies, m.currentSet, momentumCfg), state;
+    if (m.status === 'NO_MATCH') state = 'NO_MATCH';
+    else if (m.status === 'MATCH_FINISHED') state = 'MATCH_FINISHED';
+    else if (m.status === 'SET_FINISHED') state = 'SET_FINISHED';
+    else if (!m.rallies.length) state = 'NEW_SET';
+    else if (m.rallies.length < momentumCfg.minPoints) state = 'NOT_ENOUGH';
+    else state = 'ACTIVE';
+    value.state = state;
+    return value;
+  }
+  function statusLabel(m) {
+    if (m.status === 'NO_MATCH') return 'AUCUN MATCH';
+    if (m.status === 'MATCH_FINISHED') return 'MATCH TERMINÉ';
+    if (m.status === 'SET_FINISHED') return 'FIN DU SET ' + m.currentSet;
+    if (m.status === 'NOT_STARTED') return 'SET ' + (m.currentSet || 1) + ' · À VENIR';
+    return 'SET ' + m.currentSet + ' · EN COURS';
+  }
+  function setLogo(img, mono, url, name) {
+    mono.textContent = monogram(name);
+    img.removeAttribute('src');
+    img.hidden = true;
+    if (!url) return;
+    img.onload = function () { img.hidden = false; mono.hidden = true; };
+    img.onerror = function () { img.hidden = true; mono.hidden = false; img.removeAttribute('src'); };
+    mono.hidden = false;
+    img.src = url;
+  }
+  function renderScoreboard(m) {
+    var label = statusLabel(m), noMatch = m.status === 'NO_MATCH';
+    $('headerHome').textContent = m.score.home; $('headerAway').textContent = m.score.away;
+    $('setsHome').textContent = m.sets.home; $('setsAway').textContent = m.sets.away; $('headerSet').textContent = label;
+    $('homeTeamDisplay').textContent = m.homeName; $('awayTeamDisplay').textContent = m.awayName;
+    setLogo($('homeTeamLogo'), $('homeMonogram'), m.homeLogo, m.homeName);
+    setLogo($('awayTeamLogo'), $('awayMonogram'), m.awayLogo, m.awayName);
+    if (m.servingSide === 'HOME') $('serviceHome').removeAttribute('hidden'); else $('serviceHome').setAttribute('hidden', '');
+    if (m.servingSide === 'AWAY') $('serviceAway').removeAttribute('hidden'); else $('serviceAway').setAttribute('hidden', '');
+    $('liveScoreboard').classList.toggle('state-no-match', noMatch);
+    var service = m.servingSide ? ', service ' + (m.servingSide === 'HOME' ? m.homeName : m.awayName) : '';
+    $('liveScoreboard').setAttribute('aria-label', noMatch ? 'Aucun match chargé, score 0 à 0' :
+      m.homeName + ' ' + m.score.home + ', ' + m.awayName + ' ' + m.score.away + ', ' + label.toLowerCase() + ', sets ' + m.sets.home + ' à ' + m.sets.away + service);
+  }
+  function renderMomentum(m) {
+    var vm = momentumView(m), card = $('momentumCard'), k = vm.sequence.length;
+    card.className = 'live-card momentum-card state-' + vm.state.toLowerCase().replace('_', '-');
+    if (vm.leader) card.classList.add('leader-' + vm.leader.toLowerCase());
+    var subtitle = 'Aucun match chargé';
+    if (vm.state === 'NEW_SET') subtitle = 'Nouveau set — en attente du premier point';
+    else if (vm.state === 'NOT_ENOUGH') subtitle = 'Momentum disponible après ' + momentumCfg.minPoints + ' points';
+    else if (vm.state === 'SET_FINISHED' || vm.state === 'MATCH_FINISHED') subtitle = 'Fin du set ' + m.currentSet + ' · ' + k + ' derniers points';
+    else if (vm.state === 'ACTIVE') subtitle = 'Sur les ' + k + ' derniers points';
+    $('momentumSubtitle').textContent = subtitle;
+    var arrow = '—', headline = 'NA';
+    if (vm.leader === 'HOME') { arrow = '↗'; headline = 'Avantage ' + m.homeName; }
+    else if (vm.leader === 'AWAY') { arrow = '↗'; headline = 'Avantage ' + m.awayName; }
+    else if (vm.leader === 'BALANCED') { arrow = '↔'; headline = 'Équilibré'; }
+    $('momentumArrow').textContent = arrow; $('momentumLeader').textContent = headline;
+    if (announcedLeader === vm.leader) $('momentumHeadline').setAttribute('aria-live', 'off');
+    else { $('momentumHeadline').setAttribute('aria-live', 'polite'); announcedLeader = vm.leader; }
+    $('homePct').textContent = vm.homePct == null ? 'NA' : vm.homePct + ' %';
+    $('awayPct').textContent = vm.awayPct == null ? 'NA' : vm.awayPct + ' %';
+    $('homeMomentumBar').style.width = (vm.homePct == null ? 0 : vm.homePct) + '%';
+    $('awayMomentumBar').style.width = (vm.awayPct == null ? 100 : vm.awayPct) + '%';
+    $('momentumBar').setAttribute('aria-label', vm.homePct == null ? 'Répartition indisponible' : m.homeName + ' ' + vm.homePct + ' pour cent, ' + m.awayName + ' ' + vm.awayPct + ' pour cent');
+    $('momentumHomeName').textContent = upper(m.homeName); $('momentumAwayName').textContent = upper(m.awayName);
+    $('homeCount').textContent = vm.homeCount; $('awayCount').textContent = vm.awayCount;
+    var placeholders = Math.max(0, vm.windowSize - k), html = '';
+    for (var i = 0; i < placeholders; i++) html += '<span class="momentum-tile placeholder" role="listitem" aria-label="Emplacement vide"></span>';
+    vm.sequence.forEach(function (side, index) {
+      var team = side === 'HOME' ? m.homeName : m.awayName;
+      html += '<span class="momentum-tile ' + side.toLowerCase() + '" role="listitem" aria-label="Point ' + (index + 1) + ' : ' + esc(team) + '">' + (side === 'HOME' ? 'H' : 'A') + '</span>';
+    });
+    $('momentumSequence').style.setProperty('--momentum-slots', vm.windowSize);
+    $('momentumSequence').innerHTML = html;
+    var streakText = '—';
+    if (vm.streak) {
+      var streakTeam = vm.streak.side === 'HOME' ? m.homeName : m.awayName;
+      streakText = vm.streak.length === 1 ? 'Dernier point · ' + streakTeam : vm.streak.length + ' points consécutifs · ' + streakTeam;
+    }
+    $('streakText').textContent = streakText;
+    $('streakPill').textContent = (vm.state === 'SET_FINISHED' || vm.state === 'MATCH_FINISHED') ? 'SÉRIE FINALE' : 'SÉRIE EN COURS';
+    $('streakPill').classList.toggle('emphasis', !!vm.streak && vm.streak.length >= 5);
+    var ariaLeader = vm.leader === 'HOME' ? 'avantage ' + m.homeName : vm.leader === 'AWAY' ? 'avantage ' + m.awayName : vm.leader === 'BALANCED' ? 'équilibré' : 'indisponible';
+    card.setAttribute('aria-label', 'Momentum : ' + ariaLeader + (k ? ', ' + vm.homeCount + ' points sur ' + k + ' pour ' + m.homeName : '') + (vm.streak ? ', série de ' + vm.streak.length + ' point' + (vm.streak.length > 1 ? 's' : '') + ' pour ' + (vm.streak.side === 'HOME' ? m.homeName : m.awayName) : ''));
   }
   function prefs() {
     var order = localStorage.getItem(ORDER_KEY), size = localStorage.getItem(WINDOW_KEY);
@@ -385,9 +546,9 @@
   }
   function updateSetSelector() {
     var select = $('evolutionSet');
-    var options = (model.availableSets || [model.currentSet]).map(function (setNo) { return '<option value="' + setNo + '">Set ' + setNo + '</option>'; }).join('');
+    var options = (model.availableSets || []).map(function (setNo) { return '<option value="' + setNo + '">Set ' + setNo + '</option>'; }).join('');
     if (select.innerHTML !== options) select.innerHTML = options;
-    select.value = String(model.currentSet);
+    if (model.currentSet != null) select.value = String(model.currentSet);
   }
   function renderGraphs(v) {
     var empty = model.rallies.length === 0, scroll = $('graphContent'), previousScroll = scroll.scrollLeft;
@@ -429,28 +590,23 @@
   function render() {
     if (!model) return;
     var last = model.rallies[model.rallies.length - 1], v = visibleRows();
-    $('headerAway').textContent = model.score.away;
-    $('headerHome').textContent = model.score.home;
-    $('headerSet').textContent = 'SET ' + model.currentSet + ' · ' + model.sets.away + '–' + model.sets.home;
-    $('archiveBadge').textContent = model.finished ? 'TERMINÉ' : '● LIVE';
-    $('awayName').textContent = 'AWAY';
-    $('homeName').textContent = 'HOME';
-    $('timelineSet').textContent = 'SET ' + model.currentSet + ' · Fil du match';
+    renderScoreboard(model); renderMomentum(model);
+    $('archiveBadge').textContent = model.finished ? 'TERMINÉ' : 'LIVE';
+    $('awayName').textContent = 'AWAY'; $('homeName').textContent = 'HOME';
+    $('timelineSet').textContent = model.currentSet == null ? 'AUCUN MATCH · Fil du match' : 'SET ' + model.currentSet + ' · Fil du match';
     $('timelineOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
-    $('summaryHome').textContent = model.score.home;
-    $('summaryAway').textContent = model.score.away;
-    $('summaryMatch').textContent = model.homeName + ' — ' + model.awayName;
-    $('summarySet').textContent = 'SET ' + model.currentSet + ' · sets ' + model.sets.away + '–' + model.sets.home;
+    $('summaryHome').textContent = model.score.home; $('summaryAway').textContent = model.score.away;
+    $('summaryMatch').textContent = model.noMatch ? 'Aucun match' : model.homeName + ' — ' + model.awayName;
+    $('summarySet').textContent = model.noMatch ? 'AUCUN MATCH' : 'SET ' + model.currentSet + ' · sets ' + model.sets.home + '–' + model.sets.away;
     document.querySelectorAll('[data-order],[data-graph-order]').forEach(function (b) {
       var choice = b.dataset.order || b.dataset.graphOrder;
-      b.classList.toggle('active', choice === v.p.order);
-      b.setAttribute('aria-pressed', choice === v.p.order ? 'true' : 'false');
+      b.classList.toggle('active', choice === v.p.order); b.setAttribute('aria-pressed', choice === v.p.order ? 'true' : 'false');
     });
     document.querySelectorAll('[data-window-size]').forEach(function (select) { select.value = v.p.size; });
     $('timelineList').innerHTML = v.rows.map(function (r) { return renderRow(r, last && r.id === last.id, v.scale, v.p.order); }).join('');
     $('timelineEmpty').hidden = model.rallies.length !== 0;
-    $('timelineWarning').hidden = !model.warnings.length;
-    $('timelineWarning').textContent = model.warnings.join(' ');
+    $('timelineEmpty').textContent = model.noMatch ? 'Aucun match chargé' : 'Le set n’a pas encore commencé';
+    $('timelineWarning').hidden = !model.warnings.length; $('timelineWarning').textContent = model.warnings.join(' ');
     renderGraphs(v);
   }
   function activate(name) {
@@ -477,9 +633,8 @@
   function init() {
     try {
       raw = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || 'null');
-      if (!raw) throw new Error('Sélectionnez une archive valide depuis OPEN ARCHIVES.');
       selectedSetNumber = num(localStorage.getItem(SET_KEY), null);
-      model = build(raw, selectedSetNumber);
+      model = raw ? build(raw, selectedSetNumber) : emptyModel();
       selectedSetNumber = model.currentSet;
       render();
     } catch (e) { fatal(e.message); return; }
@@ -491,6 +646,7 @@
       select.addEventListener('change', function () { localStorage.setItem(WINDOW_KEY, this.value); render(); });
     });
     $('evolutionSet').addEventListener('change', function () {
+      if (!raw) return;
       selectedSetNumber = num(this.value, model.liveSet);
       localStorage.setItem(SET_KEY, String(selectedSetNumber));
       evolutionBrowsing = false;
@@ -510,8 +666,8 @@
       this.hidden = true;
     });
     window.addEventListener('storage', function (e) {
-      if (e.key === ARCHIVE_KEY && e.newValue) {
-        try { raw = JSON.parse(e.newValue); model = build(raw, selectedSetNumber); render(); } catch (x) { fatal(x.message); }
+      if (e.key === ARCHIVE_KEY) {
+        try { raw = e.newValue ? JSON.parse(e.newValue) : null; model = raw ? build(raw, selectedSetNumber) : emptyModel(); render(); } catch (x) { fatal(x.message); }
       }
     });
     activate(location.hash === '#live-score' ? 'live-score' : location.hash === '#live-graph' ? 'live-graph' : 'live-timeline');
@@ -520,9 +676,13 @@
   window.VolleySpectator = {
     buildViewModel: build,
     setArchive: setArchive,
-    refresh: function () { model = build(raw, selectedSetNumber); render(); },
+    refresh: function () { model = raw ? build(raw, selectedSetNumber) : emptyModel(); render(); },
     getModel: function () { return model; },
-    visibleRows: visibleRows
+    visibleRows: visibleRows,
+    computeMomentum: computeMomentum,
+    momentumView: momentumView,
+    monogram: monogram,
+    config: momentumCfg
   };
   init();
 })();

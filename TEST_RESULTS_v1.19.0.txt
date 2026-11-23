@@ -1,0 +1,20 @@
+Volley Live Capture v1.19.0 — automated validation
+Date: 2026-11-23
+
+Commands:
+  node --check spectator.js
+  node --check spectator-live-config.js
+  pytest -q
+
+Result:
+  132 passed in 292.49 s
+  0 failed
+
+Coverage added:
+  - Momentum specification T1–T12
+  - no-match/new-set/not-enough/set-finished/match-finished states
+  - full recomputation after Undo/correction and set reset
+  - HOME-left/AWAY-right score and service
+  - mobile portrait, tablet portrait, phone landscape, desktop landscape
+  - accessibility, reduced motion, reserved colors and offline cache
+  - complete v1.18.1 regression suite

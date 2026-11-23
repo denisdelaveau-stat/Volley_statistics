@@ -1,36 +1,27 @@
-# Release notes — Volley Live Capture v1.18.1
+# Release notes — Volley Live Capture v1.19.0
 
-## Compact LIVE TIMELINE
+## Spectator Live header, score and momentum
 
-- Adopted the HOME-left / AWAY-right convention in the spectator header, LIVE SCORE, LIVE TIMELINE and LIVE GRAPH.
-- Moved proportional HOME/AWAY delta lanes beside the score while preserving the shared score spine.
-- Added a fixed, readable `+delta` badge inside each proportional bar.
-- Kept a constant 6 px score-to-delta gap and exact shared vertical centre.
-- Reordered each rally row as HOME card → adaptive HOME connector → green HOME delta → HOME:AWAY score → red AWAY delta → adaptive AWAY connector → AWAY marker.
-- Capped desktop connectors at 112 px and reduced them down to 18 px on narrow screens.
-- Preserved Rallye N, single-half SO/BP score coloring on the correct team half, DERNIER POINT, filters and archive/replay.
-- Kept LIVE GRAPH rows HOME above AWAY and retained `HOME − AWAY` delta semantics.
+- Added the VolleyLive wordmark header with no visible replay/archive badge in the new top section.
+- Added the score card: HOME left, AWAY right, JSON-derived team names/crests or monograms, current score, sets score, service and French match/set state.
+- Added **MOMENTUM ACTUEL** from the current set only: chronological H/A tiles, integer percentages summing to 100, counts, 70% advantage headline and whole-set current streak.
+- Defaults are configurable in `spectator-live-config.js`: `windowSize=8`, `minPoints=4`, `advantageThreshold=0.70`.
+- Full JSON rebuild occurs after every load/update, correction, Undo or set transition; voided/cancelled/undone records are excluded.
+- Added neutral no-match, new-set and insufficient-data states, plus frozen finished-set/match momentum.
+- Added optional JSON team logos with shield/monogram fallback and first-rally service fallback.
+- Preserved the complete v1.18.1 Timeline, filters, LIVE GRAPH, archive navigation, accessibility and offline behavior.
+
+## Responsive and accessible behavior
+
+- 16 px card padding and 16 px inter-card gap.
+- Portrait cards stack and center at a 640 px maximum width; landscape cards use a 50/50 grid.
+- The existing Timeline keeps its narrow-screen internal scroller and remains below the cards.
+- New-section colors are cyan/slate only; BP/SO green, yellow and red remain confined to the Timeline/graph conventions.
+- H/A text, ARIA card summaries, list semantics, polite leader-change announcements and reduced-motion handling are included.
 
 ## Quality
 
-- Added geometry, no-overlap, badge, card-preservation, accessibility, offline and four-viewport visual tests.
-- Offline cache version: `volley-live-capture-v1.18.1`.
-
-## LIVE GRAPH retained from v1.18.0
-
-- Replaced the former two-series score/bar graph with the approved Score and Fault Evolution view.
-- Added HOME/AWAY post-rally score rows and a uniform cyan `HOME − AWAY` delta curve.
-- Added cumulative HOME/AWAY fault rows and a uniform amber `HOME faults − AWAY faults` curve.
-- Added strict shared rally-column geometry across all four rows and both curves.
-- Added official-set selection, empty/one-rally states, live-history browse and `Retour au direct`.
-
-## Data integrity
-
-- Every value is recomputed from normalized official JSON records.
-- Fault counting uses the shared statistics adapter rule for active ACTION records evaluated as ERROR/FAULT.
-- Set boundaries reset score/fault timeline state; voided records are excluded; Undo/corrections rebuild the timeline.
-- Missing score classification remains neutral and is never guessed.
-
-## v1.18.0 quality retained
-
-- New automated coverage: derivation formulas, reset, classification, multiple states, Undo, official fixture integration, save/reopen stability, exact alignment, accessibility, responsive behavior and visual regression.
+- Specification cases T1–T12 implemented.
+- Visual validation: 390×844, 768×1024, 844×390 and 1536×1024.
+- Complete suite: **132 passed**, no failures.
+- Offline cache: `volley-live-capture-v1.19.0`.
