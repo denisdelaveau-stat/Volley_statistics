@@ -1,0 +1,17 @@
+mobile: viewport=390 scrollWidth=390
+  teamsTitle x=10.0,y=88.0,w=370.0,h=29.4
+  teamNew x=10.0,y=156.4,w=370.0,h=88.0
+  teamsBody x=10.0,y=267.4,w=370.0,h=148.0
+  teamImport x=10.0,y=438.4,w=370.0,h=64.0
+  teamName x=0.0,y=0.0,w=0.0,h=0.0
+  teamAdd x=0.0,y=0.0,w=0.0,h=0.0
+  teamRoster x=0.0,y=0.0,w=0.0,h=0.0
+tablet: viewport=1024 scrollWidth=1024
+  teamsTitle x=146.0,y=79.0,w=732.0,h=45.1
+  teamNew x=0.0,y=0.0,w=0.0,h=0.0
+  teamsBody x=0.0,y=0.0,w=0.0,h=0.0
+  teamImport x=0.0,y=0.0,w=0.0,h=0.0
+  teamEditor x=146.0,y=163.1,w=732.0,h=667.0
+  teamName x=161.0,y=251.1,w=702.0,h=48.0
+  teamAdd x=815.0,y=377.6,w=48.0,h=48.0
+  teamRoster x=161.0,y=533.1,w=702.0,h=186.0

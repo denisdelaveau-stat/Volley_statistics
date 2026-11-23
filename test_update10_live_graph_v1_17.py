@@ -177,7 +177,7 @@ def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
         page.close()
 
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.20.0" in sw
+    assert "volley-live-capture-v1.24.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 

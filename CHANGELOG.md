@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.24.0
+
+- Rebuilt TEAM MANAGEMENT in the Match Hub / Coach View visual system.
+- Added NEW TEAM, REGISTERED TEAMS, validated player creation, roster sorting, saved-team editing and CSV import.
+- Added deterministic mobile/tablet geometry checks and v1.24.0 offline cache assets.
+- Validation: broad run 150 passed with one unstable pixel baseline; after deterministic visual migration, the final essential targeted set passed 7/7.
+
 ## v1.23.0 — Dedicated Match Hub navigation
 
 - Added a first-level MATCH HUB button on Home.

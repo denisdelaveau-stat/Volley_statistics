@@ -1,3 +1,3 @@
-# Release notes
+# Current release
 
-See `RELEASE_NOTES_v1.23.0.md` for the current Home and dedicated Match Hub navigation release.
+See `RELEASE_NOTES_v1.24.0.md` for the v1.24.0 Team Management release.

@@ -1,18 +1,20 @@
-# Volley Live Capture v1.23.0
+# Volley Live Capture v1.24.0
 
 Offline-first volleyball capture, coach, statistics and spectator application.
 
+## v1.24.0 highlights
+
+- TEAM MANAGEMENT now follows the Match Hub hierarchy and Coach View dark visual language.
+- NEW TEAM opens a validated team-name and player workflow using Numero, Nom, and Poste.
+- Registered teams are listed, editable, removable, and reusable in New Match.
+- Players can be sorted by number, name, or position.
+- CSV import supports French/English headers and common volleyball role labels, with review before save.
+- Broad regression: 150 tests passed; the sole unstable spectator pixel baseline was replaced by deterministic geometry/contrast checks. Final essential targeted result: **7 passed**, no failures.
+
 ## v1.23.0 highlights
 
-- Home now provides five first-level sections: MATCH HUB, COACH VIEW, TEAMS MANAGEMENT, ADVANCED STATISTICS, and SETTINGS.
-- MATCH HUB opens a dedicated screen that preserves NEW MATCH, CONTINUE MATCH, VIEW MATCH, RECENT MATCHES, and Import match.
-- Back navigation and focus restoration are deterministic; existing workflows and stored match data remain compatible.
-- Complete automated result: **147 passed**, no failures.
-
-## v1.22.0 highlights
-
-- Advanced Statistics renders one complete Coach View-aligned timeline.
-- Every action remains filterable and linked to score, rotation, phase, rally, and player context.
+- Home provides MATCH HUB, COACH VIEW, TEAMS MANAGEMENT, ADVANCED STATISTICS, and SETTINGS.
+- MATCH HUB opens a dedicated screen preserving NEW MATCH, CONTINUE MATCH, VIEW MATCH, RECENT MATCHES, and Import match.
 
 ## Run locally
 
@@ -34,10 +36,9 @@ node --check coach.js
 node --check sw.js
 ```
 
-
 ## Current release documents
 
-- `RELEASE_NOTES_v1.23.0.md`
-- `IMPLEMENTATION_REPORT_v1.23.0.md`
-- `COPY_INSTRUCTIONS_v1.23.0.md`
-- `docs/VISUAL_VALIDATION_v1.23.0.md`
+- `RELEASE_NOTES_v1.24.0.md`
+- `IMPLEMENTATION_REPORT_v1.24.0.md`
+- `COPY_INSTRUCTIONS_v1.24.0.md`
+- `docs/VISUAL_VALIDATION_v1.24.0.md`

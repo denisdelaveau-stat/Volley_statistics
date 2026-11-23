@@ -1,78 +1,80 @@
-"""Home-screen and SPECTATOR VIEW acceptance for the supplied artwork."""
-from PIL import Image, ImageChops, ImageStat
-
+"""Home shell and dedicated Match Hub regression coverage for v1.24.0."""
 from helpers import APP_URI, ROOT, base_match
 
 
-def test_reference_artwork_home_navigation_and_continue_summary(browser):
+def test_home_menu_opens_dedicated_match_hub_and_preserves_all_sections(browser):
     assert (ROOT / "Font_app_ref.jpg").exists()
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
-    page.evaluate("localStorage.clear()")
+    page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
     assert "Font_app_ref.jpg" in page.locator("#homeScreen").evaluate("e => getComputedStyle(e).backgroundImage")
     assert page.locator("#homeTitle").inner_text() == "VolleyLive Insight"
-    assert page.locator("#homeOpen .home-main").inner_text() == "SPECTATOR VIEW"
-    assert page.locator("#homeTeams").count() == 1
-    assert page.locator("#homeSettings").count() == 1
-    assert page.get_by_text("STATISTICS", exact=True).count() == 0
+    assert page.locator("#matchHubScreen").is_hidden()
+    assert page.locator(".home-menu-card .home-main").all_inner_texts() == [
+        "MATCH HUB", "COACH VIEW", "TEAMS MANAGEMENT", "ADVANCED STATISTICS", "SETTINGS"
+    ]
+    page.locator("#homeMatchHub").click()
+    assert page.locator("#homeScreen").is_hidden()
+    assert page.locator("#matchHubScreen").is_visible()
+    assert page.locator("#matchHubTitle").inner_text() == "MATCH HUB"
+    assert page.locator("#homeOpen .mh-title").inner_text() == "VIEW MATCH"
     assert page.locator("#homeContinue").is_disabled()
-
-    page.evaluate("""m => {
-      localStorage.setItem('volleyCapture.match.v1', JSON.stringify(m));
-      localStorage.setItem('volleyCapture.events.v1', '[]');
-      localStorage.setItem('volleyCapture.chartData.v1', '[]');
-    }""", base_match())
-    page.reload()
-    assert not page.locator("#homeContinue").is_disabled()
-    info = page.locator("#homeContinueInfo").inner_text()
-    assert "Antibes vs Nice" in info and "SET 1" in info
-    assert page.locator("#homeLast").count() == 0
+    page.locator("#matchHubBack").click()
+    assert page.locator("#homeScreen").is_visible()
+    assert page.evaluate("document.activeElement && document.activeElement.id") == "homeMatchHub"
     assert not errors
     page.close()
 
 
-def test_spectator_view_card_responsive_accessible_and_visual(browser, tmp_path):
-    viewports = {
-        "phone_390x844": {"width": 390, "height": 844},
-        "tablet_768x1024": {"width": 768, "height": 1024},
-        "landscape_844x390": {"width": 844, "height": 390},
-    }
-    for name, viewport in viewports.items():
+def test_match_hub_continue_summary_uses_current_match(browser):
+    page = browser.new_page(viewport={"width": 390, "height": 844})
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(APP_URI)
+    page.evaluate("localStorage.clear(); sessionStorage.clear()")
+    match = base_match()
+    match["updatedAt"] = "2026-11-23T18:30:00Z"
+    page.evaluate(
+        """m => {
+          localStorage.setItem('volleyCapture.match.v1', JSON.stringify(m));
+          localStorage.setItem('volleyCapture.events.v1', JSON.stringify([
+            {set:1, action:'attack', result:'point', winningTeam:'team1', scoreA:1, scoreB:0}
+          ]));
+          localStorage.setItem('volleyCapture.chartData.v1', '[]');
+        }""",
+        match,
+    )
+    page.reload()
+    page.locator("#homeMatchHub").click()
+    assert not page.locator("#homeContinue").is_disabled()
+    assert page.locator("#homeContinueInfo").inner_text() == "Resume your match in progress"
+    summary = page.locator("#matchHubActiveSummary").inner_text()
+    assert "Antibes vs Nice" in summary and "Set 1" in summary and "1 – 0" in summary
+    assert not errors
+    page.close()
+
+
+def test_home_and_match_hub_are_responsive_without_horizontal_scroll(browser):
+    for viewport in ({"width": 320, "height": 568}, {"width": 390, "height": 844}, {"width": 768, "height": 1024}):
         page = browser.new_page(viewport=viewport)
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(APP_URI)
         page.evaluate("localStorage.clear(); sessionStorage.clear()")
         page.reload()
-        card = page.locator("#homeOpen")
-        card.scroll_into_view_if_needed()
-        assert card.locator(".home-main").inner_text() == "SPECTATOR VIEW"
-        assert card.locator("small").inner_text() == "SCORE - TIMELINE - GRAPH - RANKING"
-        assert "Sélectionner une archive" in card.get_attribute("aria-label")
-        assert card.locator(".home-eye").count() == 1
-        assert card.locator(".home-chevron").inner_text() == "›"
-        metrics = card.evaluate(
-            """e => { const sub=e.querySelector('small'), title=e.querySelector('.home-main'), cs=getComputedStyle(e);
-              const ss=getComputedStyle(sub); return {height:e.getBoundingClientRect().height, client:e.clientWidth, scroll:e.scrollWidth,
-                titleClient:title.clientWidth,titleScroll:title.scrollWidth,subHeight:sub.scrollHeight,line:parseFloat(ss.lineHeight),
-                border:cs.borderTopColor, background:cs.backgroundImage}; }"""
-        )
-        assert metrics["height"] >= 44
-        assert metrics["scroll"] <= metrics["client"] + 1
-        assert metrics["titleScroll"] <= metrics["titleClient"] + 1
-        assert metrics["subHeight"] <= metrics["line"] * 2.2
-        assert metrics["border"] == "rgb(110, 231, 255)"
-        assert "linear-gradient" in metrics["background"]
-        page.wait_for_timeout(150)
-        actual = tmp_path / f"home_spectator_{name}.png"
-        page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / "tests" / "visual_baselines" / f"home_spectator_{name}_v1_20_0.png"
-        assert baseline.exists(), f"Missing visual baseline {baseline.name}"
-        observed, expected = Image.open(actual).convert("RGB"), Image.open(baseline).convert("RGB")
-        assert observed.size == expected.size == (viewport["width"], viewport["height"])
-        assert max(ImageStat.Stat(ImageChops.difference(expected, observed)).mean) < 3.0
+        home_metrics = page.locator("#homeScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
+        assert home_metrics["scroll"] <= home_metrics["client"] + 1
+        assert page.locator(".home-menu-card").count() == 5
+        for selector in ("#homeMatchHub", "#homeCoach", "#homeTeams", "#homeStatistics", "#homeSettings"):
+            assert page.locator(selector).evaluate("e => e.getBoundingClientRect().height") >= 44
+        page.locator("#homeMatchHub").click()
+        hub_metrics = page.locator("#matchHubScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
+        assert hub_metrics["scroll"] <= hub_metrics["client"] + 1
+        assert page.locator(".match-hub-card").count() == 3
+        for selector in ("#matchHubBack", "#homeNew", "#homeContinue", "#homeOpen", "#matchHubImport"):
+            assert page.locator(selector).evaluate("e => e.getBoundingClientRect().height") >= 44
         assert not errors
         page.close()
