@@ -6,7 +6,7 @@ Date: 2026-11-18
 
 ### Home
 - Uses the supplied `Font_app_ref.jpg` as the full-screen reference artwork.
-- New `VolleyLive Insight` overlay layout with `NEW MATCH`, `CONTINUE / VIEW MATCH`, and `OPEN ARCHIVES`.
+- New `VolleyLive Insight` overlay layout with `NEW MATCH`, `CONTINUE / VIEW MATCH`, and `SPECTATOR VIEW`.
 - Active-match details are rendered inside the Continue button; the former separate footer summary is removed.
 - Added `TEAMS` and `SETTINGS` navigation.
 - Removed the `STATISTICS` home control.

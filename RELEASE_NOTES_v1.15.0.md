@@ -7,7 +7,7 @@
 - Retains the orange court, white dashed front/back separator, no net, and the **Changer de joueur** control below the court.
 
 ## Spectator archive view
-- **OPEN ARCHIVES** accepts official `volley-live` v2.1 archives and supported Capture v1 archives, validates them, and opens `spectator.html` directly on **LIVE TIMELINE** without replacing the local capture match.
+- **SPECTATOR VIEW** accepts official `volley-live` v2.1 archives and supported Capture v1 archives, validates them, and opens `spectator.html` directly on **LIVE TIMELINE** without replacing the local capture match.
 - Adds spectator navigation: **LIVE SCORE | LIVE TIMELINE | STATS**.
 - Adds AWAY-first scoreboard, current set, sets won, vertical cyan rally spine, AWAY : HOME score pills, SO/BP/L chips, last-point marker, one terminal-action card, and proportional shared-scale delta lanes.
 - Adds persistent order and window filters: **Plus anciennes / Plus récentes** and **5 / 10 / 20 / Tout le set**.

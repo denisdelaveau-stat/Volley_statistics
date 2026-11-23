@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.20.0 — SPECTATOR VIEW Ranking and simplified Advanced Statistics
+- Renamed the Home archive action to SPECTATOR VIEW and added the approved eye card with exact SCORE - TIMELINE - GRAPH - RANKING subtitle.
+- Renamed spectator tabs to SCORES, TIMELINE and GRAPH; added RANKING.
+- Moved Roster Ranking into SPECTATOR VIEW with Highlight, Lowlight, Delta and category filters.
+- Kept official-JSON-only values and neutral gray 0/NA empty states.
+- Reduced Advanced Statistics to its complete timeline and detailed text metrics, without Rotation metrics, Temps de jeu or graphs.
+- Added responsive Home, Ranking and Advanced Statistics baselines; 139 tests pass.
+
 ## v1.19.1 — Move score and momentum to LIVE SCORE
 - Replaced the legacy LIVE SCORE summary with the v1.19.0 crest-based score card.
 - Moved MOMENTUM ACTUEL directly below the score card in LIVE SCORE.
@@ -66,7 +74,7 @@
 
 ## v1.15.0 — Saturated player court and spectator LIVE TIMELINE
 - Increased role-color saturation and reduced action-entry circle size while preserving the orange two-by-three court and dashed separator.
-- Added OPEN ARCHIVES → spectator replay flow with LIVE SCORE, LIVE TIMELINE and STATS navigation.
+- Added SPECTATOR VIEW → spectator replay flow with LIVE SCORE, LIVE TIMELINE and STATS navigation.
 - Added v2.1/Capture v1 derived timeline, filters, SO/BP/L, decisive actions, shared-scale delta bars, replay state and T1–T11 coverage.
 - Updated offline cache to v1.15.0.
 
@@ -224,7 +232,7 @@
 
 ## v1.7.0 – 2026-11-18
 - Applied the supplied `Font_app_ref.jpg` as the Home reference artwork and rebuilt the Home overlay.
-- Moved current-match information inside Continue/View Match and renamed Open Match to Open Archives.
+- Moved current-match information inside Continue/View Match and renamed Open Match to Spectator View.
 - Added Teams and Settings navigation and removed the Statistics control.
 - Replaced team setup with a single reusable team editor, Add Player rows, jersey numbers 1–40 and role colors; removed Focus from reusable teams.
 - Replaced the old New Match wizard with saved-team selection, Present/Focus confirmation, setter-position-driven role rotation, compatible-player assignment and Service/Reception libero preview.

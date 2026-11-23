@@ -9,7 +9,7 @@
 
 ## Preserved behavior
 - AWAY point/fault circles, HOME action colors, split score highlights, delta calculations, filters, DERNIER POINT and replay status remain unchanged from v1.16.0.
-- OPEN ARCHIVES, LIVE SCORE, LIVE TIMELINE, STATS, Capture, HISTORY Delete, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and offline operation are retained.
+- SPECTATOR VIEW, LIVE SCORE, LIVE TIMELINE, STATS, Capture, HISTORY Delete, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and offline operation are retained.
 - Displayed match data continues to come only from the loaded official JSON/archive model.
 
 ## Web and Android validation

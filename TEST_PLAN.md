@@ -1,3 +1,18 @@
+## v1.20.0 SPECTATOR VIEW, Ranking and Advanced Statistics acceptance
+
+| ID | Requirement |
+|---|---|
+| V120-01 | Home archive button is named SPECTATOR VIEW and keeps valid-archive selection/redirect behavior |
+| V120-02 | Eye card uses navy background, cyan luminous border, white title/icon/chevron and exact cyan subtitle |
+| V120-03 | Home card has accessible names, ≥44 px touch area and responsive 390×844 / 768×1024 / 844×390 visuals |
+| V120-04 | Spectator tabs are SCORES / TIMELINE / GRAPH / RANKING |
+| V120-05 | RANKING exposes Highlight / Lowlight / Delta and Attack / Block / Defence / Reception / Service / All |
+| V120-06 | Ranking order and values derive only from active official JSON actions and exclude opponent rows |
+| V120-07 | Empty Ranking renders gray 0/NA without demo values |
+| V120-08 | Advanced Statistics has no Rotation metrics, Roster ranking or Temps de jeu subpage |
+| V120-09 | Advanced Statistics keeps the complete timeline and detailed text values without rendered graphs |
+| V120-10 | Complete capture, coach, score, momentum, timeline, graph, offline and visual regression suite passes |
+
 ## v1.19.1 LIVE SCORE placement & Momentum acceptance
 
 Placement invariant for every T1–T12 case: `#liveScoreboard` and `#momentumCard` occur exactly once inside LIVE SCORE, in that order; neither occurs inside LIVE TIMELINE; the obsolete `.summary-card` is absent.
@@ -96,7 +111,7 @@ Placement invariant for every T1–T12 case: `#liveScoreboard` and `#momentumCar
 | COURT150-01 | Six saturated role-colored circles remain in exactly two rows of three on the orange court at 390 × 844 |
 | COURT150-02 | OPP, SET, OH, MB and LIB number/role text contrast is at least 4.5:1 |
 | COURT150-03 | The white dashed separator clears both rows; no net is shown; each circle and substitution control is at least 44 px |
-| SPEC150-01 | OPEN ARCHIVES validates v2.1/Capture v1 and opens LIVE TIMELINE directly |
+| SPEC150-01 | SPECTATOR VIEW validates v2.1/Capture v1 and opens LIVE TIMELINE directly |
 | SPEC150-02 | T1–T11 cover delta lanes, shared scale, windows, SO/BP/L, service validation, order and correction/undo recomposition |
 | SPEC150-03 | Basic data renders score/chip/delta without invented event cards |
 | SPEC150-04 | Replay status, Home return, invalid archive, tablet and 1536 × 1024 visual/contrast checks pass |

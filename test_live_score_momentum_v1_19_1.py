@@ -271,7 +271,7 @@ def test_live_score_visual_baselines_and_no_duplicate_score(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"live_score_{name}.png"
         page.screenshot(path=str(actual), full_page=True)
-        baseline = ROOT / "tests" / "visual_baselines" / f"live_score_{name}_v1_19_1.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"live_score_{name}_v1_20_0.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         expected = Image.open(baseline).convert("RGB")
         observed = Image.open(actual).convert("RGB")

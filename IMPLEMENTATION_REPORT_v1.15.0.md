@@ -4,11 +4,11 @@
 This release builds on v1.14.0. It combines the player-circle visibility adjustment with the archive spectator LIVE TIMELINE described in `docs/Live_Timeline_Spectator_View_Spec.md` and visually guided by `docs/IMG_5695.JPG`.
 
 ## Main implementation
-- `index.html`: saturated role tokens, smaller action-entry player circles and OPEN ARCHIVES validation/redirect.
+- `index.html`: saturated role tokens, smaller action-entry player circles and SPECTATOR VIEW validation/redirect.
 - `spectator.html`, `spectator.css`, `spectator.js`: archive replay shell, tabs, scoreboard, filters, timeline view-model, rendering, validation and refresh API.
 - `sw.js`: v1.15.0 cache and spectator assets.
 - `tests/test_player_court_palette_v1_15.py`: five-color contrast, 390 × 844 geometry, touch sizing, separator clearance and visual regression.
-- `tests/test_spectator_timeline_v1_15.py`: T1–T11, OPEN ARCHIVES flow, v2.1, Capture v1, Basic data, invalid input, Home return, tablet, 1536 × 1024 visual regression and contrast.
+- `tests/test_spectator_timeline_v1_15.py`: T1–T11, SPECTATOR VIEW flow, v2.1, Capture v1, Basic data, invalid input, Home return, tablet, 1536 × 1024 visual regression and contrast.
 
 ## Data rules
 - v2.1 uses explicit `rallies`, `terminalEventId`, `servingTeamId`, `winnerTeamId`, `scoreAfter`, teams and players.

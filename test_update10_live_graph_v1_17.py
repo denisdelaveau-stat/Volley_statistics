@@ -122,7 +122,7 @@ def test_live_graph_replaces_stats_and_is_json_driven(browser):
     data = update10_fixture()
     page, errors = open_spectator(browser, data, VIEWPORTS["1536x1024"])
     assert page.locator('[data-tab="stats"]').count() == 0
-    assert page.locator('[data-tab="live-graph"]').inner_text() == "LIVE GRAPH"
+    assert page.locator('[data-tab="live-graph"]').inner_text() == "GRAPH"
     page.locator('[data-tab="live-graph"]').click()
     assert page.locator('[data-panel="live-graph"]').is_visible()
     assert page.locator(".score-row.home .evolution-cell").count() == 5
@@ -177,7 +177,7 @@ def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
         page.close()
 
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.19.1" in sw
+    assert "volley-live-capture-v1.20.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -188,7 +188,7 @@ def test_update10_visual_baselines_at_three_viewports(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_19_1.png"
+        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_20_0.png"
         assert baseline.exists(), f"Missing {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

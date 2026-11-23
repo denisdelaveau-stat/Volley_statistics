@@ -1,0 +1,19 @@
+Volley Live Capture v1.16.0 — test results
+Date: 2026-11-22
+
+Targeted timeline suite:
+  pytest -q tests/test_timeline_update_v1_16.py tests/test_spectator_timeline_v1_15.py -k 'not visual'
+  15 passed
+
+Complete regression suite:
+  90 collected
+  First execution window: tests 1–86 passed with no failure before the 180 s command window ended.
+  Continuation: tests 87–90 passed (4 passed).
+  Combined result: 90 passed, 0 failed.
+
+Additional checks:
+- node --check spectator.js: passed
+- 1536 × 1024 visual baseline generated and inspected
+- 1024 × 768 tablet overflow and touch-target checks: passed
+- role/action contrast >= 4.5:1: passed
+- SPECTATOR VIEW -> LIVE TIMELINE, Basic score-only and offline-cache regressions: passed

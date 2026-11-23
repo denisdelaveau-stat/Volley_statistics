@@ -1,0 +1,33 @@
+Volley Live Capture v1.7.0 automated verification
+Date: 2026-11-18
+
+Automated suite
+- Command: pytest -q
+- Result: 26 passed
+- Browser: Playwright Chromium
+- Primary viewport: 390 × 844 CSS px, device scale factor 2
+- Uncaught JavaScript errors: none
+
+v1.7.0 acceptance
+- Supplied Font_app_ref.jpg used as the Home background: passed
+- Home buttons and active-match details inside Continue: passed
+- SPECTATOR VIEW label, Teams and Settings navigation: passed
+- Statistics control removed: passed
+- Single-screen Teams editor with 1–40 number selector and no Focus field: passed
+- Saved-team persistence and reload compatibility: passed
+- New Match team selection, Present and Focus confirmation: passed
+- Setter P1–P6 placement and S/OH1/MB1/OPP/OH2/MB2 sequence: passed
+- Compatible-player lineup selection: passed
+- Libero bench and Reception replacement preview: passed
+- Settings format/detail persistence: passed
+- PWA cache v1.7.0 and reference image caching: passed
+
+Regression
+- Live scoring and duplicate-entry guard: passed
+- Rotation, service state and per-event rotation metadata: passed
+- Basic, Intermediate and Advanced capture: passed
+- History, Undo, substitutions and exports: passed
+- Existing application icons and manifest: passed
+
+Visual QA
+- Home, Teams, Settings, New Match team confirmation and Initial rotation reviewed at 390 × 844 CSS px.

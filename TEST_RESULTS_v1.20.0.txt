@@ -1,0 +1,19 @@
+Volley Live Capture v1.20.0 — automated and visual validation
+
+Command:
+  python -m pytest -q
+
+Result:
+  139 passed in 310.24 s
+  0 failed
+
+Validated scope:
+- SPECTATOR VIEW Home label, exact subtitle, eye card, accessibility, ≥44 px target and responsive visuals
+- supported archive JSON selection and TIMELINE opening flow
+- SCORES / TIMELINE / GRAPH / RANKING labels
+- Highlight / Lowlight / Delta and Attack / Block / Defence / Reception / Service / All filters
+- official-JSON ranking values, opponent exclusion and gray 0/NA empty states
+- complete Advanced Statistics timeline with text details and without removed subpages/graphs
+- crest score, MOMENTUM ACTUEL, Timeline, Score and Fault Evolution Graph
+- Capture, HISTORY Delete, HOME | ERREUR | AWAY, Coach, Live Court, Player Focus
+- offline cache, responsive layouts, accessibility and all retained visual baselines

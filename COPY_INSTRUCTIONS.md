@@ -1,15 +1,21 @@
-# Copy instructions — v1.13.0
+# Copy instructions — v1.20.0
 
-Deploy the complete `Volley_statistics_v1.13.0` folder contents at the application root.
+## Complete package
 
-Keep these paths together:
+Deploy the complete `Volley_statistics_v1.20.0` folder contents at the application root. Keep `index.html`, `spectator.html`, `spectator.css`, `spectator.js`, `statistics/`, `coach.*`, `sw.js`, `manifest.webmanifest`, images, icons, documentation, and tests together.
 
-- `index.html`, `coach.css`, `coach-live-config.js`, `coach.js`;
-- `statistics/index.html` and `statistics/adapter.js`;
-- `statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json`;
-- `statistics/data/reference-fixture.js`;
-- `sw.js`, `manifest.webmanifest`, `Font_app_ref.jpg` and `icons/`.
+## Delta from v1.19.1
 
-Delete the obsolete `statistics/data/As_cannes_vs_Frejus_2026-11-15.json` Capture-v1 reference if it remains from v1.9.0.
+Run the included updater against a clean or deployed v1.19.1 application folder:
 
-Do not publish only `index.html`: both analysis interfaces depend on shared files and the service worker precache list. On iPhone, open the deployed site online once, fully close the installed PWA, then reopen it. If an older cache remains, remove and re-add the Home-screen shortcut. Confirm `v1.13.0` on Home.
+```bash
+python3 APPLY_UPDATE.py /path/to/Volley_statistics_v1.19.1
+```
+
+The updater verifies the known v1.19.1 base files before writing, copies all changed/new v1.20.0 files, removes paths listed in `DELETE_THESE.txt` when present, writes `VERSION` as `1.20.0`, and verifies the final tree against the bundled target manifest.
+
+## Offline refresh
+
+After deployment, open the site online once so service worker cache `volley-live-capture-v1.20.0` is installed. Fully close and reopen the PWA. If the older cache remains on iOS, remove and re-add the Home-screen shortcut.
+
+Confirm `v1.20.0` on Home and verify SPECTATOR VIEW opens a valid JSON archive on TIMELINE.

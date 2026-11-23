@@ -201,7 +201,7 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
 
 def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.19.1" in sw
+    assert "volley-live-capture-v1.20.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -210,7 +210,7 @@ def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"compact_timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_19_1.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_20_0.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

@@ -19,9 +19,10 @@
 
   <nav class="spectator-nav" aria-label="Navigation spectateur">
     <a class="spectator-home" href="index.html"><span aria-hidden="true">⌂</span><span>ACCUEIL</span></a>
-    <button type="button" data-tab="live-score">LIVE SCORE</button>
-    <button type="button" data-tab="live-timeline" aria-selected="true">LIVE TIMELINE</button>
-    <button type="button" data-tab="live-graph">LIVE GRAPH</button>
+    <button type="button" data-tab="live-score">SCORES</button>
+    <button type="button" data-tab="live-timeline" aria-selected="true">TIMELINE</button>
+    <button type="button" data-tab="live-graph">GRAPH</button>
+    <button type="button" data-tab="ranking">RANKING</button>
   </nav>
 
   <main>
@@ -110,6 +111,40 @@
         </div>
         <div id="graphEmpty" class="graph-empty" hidden><strong>Aucun rallye disponible</strong><span>Les axes restent disponibles sans point de données fabriqué.</span></div>
       </div>
+    </section>
+
+    <section class="spectator-panel ranking-panel" data-panel="ranking" hidden aria-labelledby="rankingTitle">
+      <header class="ranking-heading">
+        <div>
+          <p>SPECTATOR VIEW</p>
+          <h1 id="rankingTitle">Roster Ranking</h1>
+          <span>Classement calculé uniquement depuis le JSON officiel chargé.</span>
+        </div>
+        <div class="ranking-filters" aria-label="Filtres du classement">
+          <label>Vue
+            <select id="rankingView">
+              <option value="highlight">Highlight</option>
+              <option value="lowlight">Lowlight</option>
+              <option value="delta">Delta</option>
+            </select>
+          </label>
+          <label>Catégorie
+            <select id="rankingCategory">
+              <option value="all">All</option>
+              <option value="attack">Attack</option>
+              <option value="block">Block</option>
+              <option value="defence">Defence</option>
+              <option value="reception">Reception</option>
+              <option value="service">Service</option>
+            </select>
+          </label>
+        </div>
+      </header>
+      <section id="rankingSection" class="ranking-section" aria-live="polite">
+        <div class="ranking-section-title"><h2 id="rankingModeTitle">Highlight</h2><p id="rankingSummary">0 joueur · 0 action</p></div>
+        <div id="rankingCards" class="ranking-cards"></div>
+      </section>
+      <p class="ranking-note"><b>Highlight</b> : points marqués. <b>Lowlight</b> : erreurs. <b>Delta</b> : points marqués − erreurs. Les actions neutres restent comptées dans le total.</p>
     </section>
   </main>
 </div>

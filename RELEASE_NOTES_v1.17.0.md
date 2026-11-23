@@ -20,5 +20,5 @@
 - Tablet and portrait layouts use chart-owned horizontal scrolling and never create document-level horizontal overflow.
 
 ## Compatibility and offline
-- OPEN ARCHIVES, LIVE SCORE, LIVE TIMELINE, DERNIER POINT, ARCHIVE/REPLAY, capture, HISTORY Delete, HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and official JSON adapters remain available.
+- SPECTATOR VIEW, LIVE SCORE, LIVE TIMELINE, DERNIER POINT, ARCHIVE/REPLAY, capture, HISTORY Delete, HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and official JSON adapters remain available.
 - Offline cache version: `volley-live-capture-v1.17.0`.
