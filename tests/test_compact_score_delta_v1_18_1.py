@@ -151,15 +151,11 @@ def test_badges_are_readable_accessible_and_mobile_content_can_be_reached(browse
 
 def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(browser):
     page, errors = open_spectator(browser, compact_fixture(), VIEWPORTS["1024x768"])
-    header_home = page.locator("#headerHome").bounding_box()
-    header_away = page.locator("#headerAway").bounding_box()
     title_home = page.locator("#homeName").bounding_box()
     title_away = page.locator("#awayName").bounding_box()
-    assert header_home["x"] < header_away["x"]
     assert title_home["x"] < title_away["x"]
-    assert page.locator("#headerHome").inner_text() == "3"
-    assert page.locator("#headerAway").inner_text() == "2"
     assert "Score : HOME — AWAY" in page.locator(".timeline-title").inner_text()
+    assert page.locator('[data-panel="live-timeline"] #liveScoreboard, [data-panel="live-timeline"] #momentumCard').count() == 0
 
     halves = page.locator(".score-pill").first.locator(".score-half")
     assert halves.nth(0).get_attribute("class").split()[1] == "home"
@@ -176,12 +172,16 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
     assert page.locator(".last-point").count() == 1
 
     page.locator('[data-tab="live-score"]').click()
-    summary_home = page.locator("#summaryHome").bounding_box()
-    summary_away = page.locator("#summaryAway").bounding_box()
-    assert summary_home["x"] < summary_away["x"]
-    assert page.locator("#summaryHome").inner_text() == "3"
-    assert page.locator("#summaryAway").inner_text() == "2"
-    assert page.locator("#summaryMatch").inner_text() == "HOME — AWAY"
+    header_home = page.locator("#headerHome").bounding_box()
+    header_away = page.locator("#headerAway").bounding_box()
+    assert header_home["x"] < header_away["x"]
+    assert page.locator("#headerHome").inner_text() == "3"
+    assert page.locator("#headerAway").inner_text() == "2"
+    assert page.locator(".team-crest").count() == 2
+    assert page.locator("#liveScoreboard").count() == 1
+    assert page.locator("#momentumCard").count() == 1
+    assert page.locator(".summary-card").count() == 0
+    assert page.locator("#momentumCard").bounding_box()["y"] > page.locator("#liveScoreboard").bounding_box()["y"]
 
     page.locator('[data-tab="live-graph"]').click()
     score_rows = page.locator("#scoreRows .value-row")
@@ -201,7 +201,7 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
 
 def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.18.1" in sw
+    assert "volley-live-capture-v1.21.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -210,7 +210,7 @@ def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"compact_timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_18_1.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_20_0.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

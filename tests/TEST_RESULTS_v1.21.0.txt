@@ -1,0 +1,25 @@
+Volley Live Capture v1.21.0 — automated and visual validation
+
+Command:
+  python3 -m pytest -q
+
+Result:
+  146 passed in 322.99 s
+  0 failed
+
+Additional syntax validation:
+  node --check match-hub.js spectator.js spectator-live-config.js statistics/adapter.js coach.js coach-live-config.js sw.js
+  all passed
+
+Validated Match Hub scope:
+- approved MATCH HUB hierarchy and exact English labels
+- enabled/disabled Continue Match states from persisted status
+- official persisted team, set, point-score and save-state mapping
+- completed-match sort, two-row Home limit and set-score display
+- active-match overwrite decision dialog and existing setup workflow
+- View Match selector and read-only spectator hand-off
+- valid/invalid JSON, 10 MB/type controls, unsafe-key rejection and duplicate IDs
+- empty, loading, error and unavailable-data states without demonstration values
+- 320/390/768 responsive geometry, no horizontal overflow, touch targets and keyboard focus
+- orange card white-text contrast at both gradient endpoints >= 4.5:1
+- complete legacy capture, coach, statistics, spectator, timeline, graph, ranking, PWA and visual baselines

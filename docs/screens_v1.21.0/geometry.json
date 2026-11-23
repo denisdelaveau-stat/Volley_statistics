@@ -1,0 +1,65 @@
+{
+  "empty_320x568": {
+    "viewport": [
+      320,
+      568
+    ],
+    "documentScrollWidth": 320,
+    "homeClientWidth": 320,
+    "homeScrollWidth": 320,
+    "homeScrollHeight": 935,
+    "hub": {
+      "x": 12,
+      "y": 90.875,
+      "width": 296,
+      "height": 589.84375,
+      "top": 90.875,
+      "right": 308,
+      "bottom": 680.71875,
+      "left": 12
+    },
+    "minimumVisibleTarget": 44
+  },
+  "active_390x844": {
+    "viewport": [
+      390,
+      844
+    ],
+    "documentScrollWidth": 390,
+    "homeClientWidth": 390,
+    "homeScrollWidth": 390,
+    "homeScrollHeight": 1075,
+    "hub": {
+      "x": 16,
+      "y": 104.53125,
+      "width": 358,
+      "height": 748.78125,
+      "top": 104.53125,
+      "right": 374,
+      "bottom": 853.3125,
+      "left": 16
+    },
+    "minimumVisibleTarget": 44
+  },
+  "tablet_768x1024": {
+    "viewport": [
+      768,
+      1024
+    ],
+    "documentScrollWidth": 768,
+    "homeClientWidth": 768,
+    "homeScrollWidth": 768,
+    "homeScrollHeight": 1024,
+    "hub": {
+      "x": 24,
+      "y": 120.953125,
+      "width": 720,
+      "height": 645,
+      "top": 120.953125,
+      "right": 744,
+      "bottom": 765.953125,
+      "left": 24
+    },
+    "minimumVisibleTarget": 44
+  }
+}

@@ -1,16 +1,16 @@
-# Volley Live Capture v1.20.0
+# Volley Live Capture v1.21.0
 
 Offline-first volleyball capture, coach, statistics and spectator application.
 
-## v1.20.0 highlights
+## v1.21.0 highlights
 
-- Home now exposes the archive workflow as **SPECTATOR VIEW**, using the approved navy/cyan eye card and exact subtitle `SCORE - TIMELINE - GRAPH - RANKING`.
-- Spectator navigation is now **SCORES**, **TIMELINE**, **GRAPH**, **RANKING**.
-- RANKING contains the previous roster information with **Highlight / Lowlight / Delta** and **Attack / Block / Defence / Reception / Service / All** filters.
-- Ranking values come only from the loaded official JSON; neutral empty categories use gray `0` / `NA`.
-- Advanced Statistics keeps the complete Set Timeline and detailed text metrics while removing Rotation metrics, Roster ranking, Temps de jeu, and rendered graphs.
-- Score with crests, MOMENTUM ACTUEL, Timeline, Score and Fault Evolution Graph, capture, coach views, HISTORY Delete, offline operation, responsive layouts, and role colors are retained.
-- Full automated and visual regression result: **139 passed**, no failures.
+- Home now contains the approved **MATCH HUB** hierarchy: New Match, Continue Match, View Match, Recent Matches, and Import match.
+- Continue Match uses only persisted active status and official match/event data; absent values stay explicitly unavailable.
+- Recent completed/imported matches are sorted by effective date, limited to two on Home, and opened read-only by stable ID.
+- New Match protects an existing active match from silent overwrite.
+- JSON import validates shared Capture v1 / VolleyLive v2 structures, enforces a 10 MB limit, rejects unsafe keys, and handles duplicate IDs without silent replacement.
+- Coach View, Advanced Statistics, spectator score/timeline/graph/ranking, capture, HISTORY Delete, responsive layouts, and offline operation are retained.
+- Full automated and visual regression result: **146 passed**, no failures.
 
 ## Run locally
 
@@ -24,8 +24,10 @@ Then open the local URL shown by the server.
 
 ```bash
 python3 -m pytest -q
+node --check match-hub.js
 node --check spectator.js
 node --check spectator-live-config.js
 node --check statistics/adapter.js
+node --check coach.js
 node --check sw.js
 ```

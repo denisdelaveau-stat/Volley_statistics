@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.21.0 — Home Match Hub
+- Consolidated New Match, Continue Match and read-only View Match in the approved Match Hub hierarchy.
+- Added a real-data active summary, two-row Recent Matches list, complete selector and honest empty/error/loading states.
+- Protected active matches from silent overwrite and retained the existing setup/capture workflows.
+- Added validated 10 MB JSON import, unsafe-key rejection, duplicate-ID choices and read-only spectator hand-off.
+- Added mobile/tablet accessibility and responsive coverage; 145 tests pass.
+
 ## v1.20.0 — SPECTATOR VIEW Ranking and simplified Advanced Statistics
 - Renamed the Home archive action to SPECTATOR VIEW and added the approved eye card with exact SCORE - TIMELINE - GRAPH - RANKING subtitle.
 - Renamed spectator tabs to SCORES, TIMELINE and GRAPH; added RANKING.

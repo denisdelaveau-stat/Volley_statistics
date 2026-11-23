@@ -1,3 +1,7 @@
+# Current release
+
+See `RELEASE_NOTES_v1.21.0.md` for the Match Hub release.
+
 # Release notes — Volley Live Capture v1.20.0
 
 ## SPECTATOR VIEW and archive Ranking
