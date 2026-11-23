@@ -22,7 +22,7 @@
   <nav class="spectator-nav" aria-label="Navigation spectateur">
     <button type="button" data-tab="live-score">LIVE SCORE</button>
     <button type="button" data-tab="live-timeline" aria-selected="true">LIVE TIMELINE</button>
-    <button type="button" data-tab="stats">STATS</button>
+    <button type="button" data-tab="live-graph">LIVE GRAPH</button>
   </nav>
 
   <main>
@@ -33,7 +33,7 @@
     <section class="spectator-panel timeline-panel" data-panel="live-timeline">
       <div class="timeline-filterbar">
         <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-order="oldestFirst">Plus anciennes</button><button type="button" data-order="newestFirst">Plus récentes</button></div></fieldset>
-        <label>Nombre d’actions<select id="windowSize"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
+        <label>Nombre d’actions<select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
       </div>
       <div class="timeline-board">
         <div class="timeline-title">
@@ -51,8 +51,37 @@
       </div>
     </section>
 
-    <section class="spectator-panel" data-panel="stats" hidden>
-      <div class="stats-card"><h1>STATS</h1><p id="statsSummary"></p><button type="button" id="openAdvancedStats">OUVRIR ADVANCED STATISTICS</button></div>
+    <section class="spectator-panel graph-panel" data-panel="live-graph" hidden aria-labelledby="liveGraphTitle">
+      <div class="timeline-filterbar graph-filterbar">
+        <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-graph-order="oldestFirst">Plus anciennes</button><button type="button" data-graph-order="newestFirst">Plus récentes</button></div></fieldset>
+        <label>Nombre d’actions<select id="graphWindowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
+      </div>
+      <div class="graph-board">
+        <header class="graph-heading">
+          <div><p class="graph-kicker">ARCHIVE · JSON OFFICIEL</p><h1 id="liveGraphTitle">LIVE GRAPH</h1></div>
+          <div class="graph-context"><strong id="graphSet">SET 1</strong><span id="graphOrder">Ancien → récent</span></div>
+        </header>
+        <div class="graph-legend" aria-label="Légende des graphiques">
+          <span><i class="legend-line away"></i> Score AWAY</span>
+          <span><i class="legend-line home"></i> Score HOME</span>
+          <span><i class="legend-dot so"></i> Side-out (SO)</span>
+          <span><i class="legend-dot bp-home"></i> Break point HOME</span>
+          <span><i class="legend-dot bp-away"></i> Break point AWAY</span>
+          <span><i class="legend-bar positive"></i> HOME devant</span>
+          <span><i class="legend-bar negative"></i> HOME derrière</span>
+        </div>
+        <div id="graphContent" class="graph-content">
+          <article class="graph-card" aria-labelledby="scoreGraphTitle">
+            <div class="graph-card-title"><h2 id="scoreGraphTitle">Évolution du score</h2><p>Score cumulé après chaque rallye</p></div>
+            <div class="graph-scroll" tabindex="0" aria-label="Graphique défilable de l’évolution des scores"><svg id="scoreGraph" class="score-graph" role="img"></svg></div>
+          </article>
+          <article class="graph-card" aria-labelledby="deltaGraphTitle">
+            <div class="graph-card-title"><h2 id="deltaGraphTitle">Delta HOME − AWAY</h2><p>Vert : HOME devant · rouge : HOME derrière · gris : égalité</p></div>
+            <div class="graph-scroll" tabindex="0" aria-label="Graphique défilable du delta de score"><svg id="deltaGraph" class="delta-graph" role="img"></svg></div>
+          </article>
+        </div>
+        <div id="graphEmpty" class="graph-empty" hidden><strong>Aucun rallye disponible</strong><span>Les courbes et les deltas apparaîtront dès qu’un rallye sera présent dans l’archive.</span></div>
+      </div>
     </section>
   </main>
 </div>

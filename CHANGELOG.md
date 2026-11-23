@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.17.0 — Update 10 spectator timeline and LIVE GRAPH
+- Equal AWAY/HOME connector lengths and compact delta-to-event spacing.
+- Wider vivid split score with attached Rallye cell.
+- Generic equal AWAY/HOME header cells.
+- STATS replaced by JSON-driven LIVE GRAPH score and delta charts.
+- Responsive, accessible and offline validation at three target viewports.
+
 ## v1.16.2 — Compact left-shifted LIVE TIMELINE geometry
 - Shifted the cyan spine and score from the v1.16.1 61-64% position to 44-48% of the desktop board width.
 - Right-aligned proportional AWAY delta bars in a fixed left lane and placed every A marker immediately to their right with a constant 12 px desktop / 8 px compact gap.

@@ -1,14 +1,12 @@
-# Volley Live Capture v1.16.2
+# Volley Live Capture v1.17.0
 
-Offline-first volleyball match capture and analysis for Basic, Intermediate and Advanced workflows.
+Offline-first volleyball capture, replay and analysis application.
 
-## v1.16.2 highlights
-- LIVE TIMELINE now shifts the complete score geometry left: cyan spine, score pills, connectors, AWAY lane and HOME container move together.
-- Each AWAY row is a compact horizontal sequence: proportional red delta, constant gap, A circle on the same vertical center, cyan connector and score.
-- AWAY delta bars are right-aligned in their fixed lane, so all A circles share one X coordinate while the maximum bar starts at the 12 px safety inset.
-- HOME cards retain the v1.16.1 DOM order, dimensions, internal offsets, spacing, colors and score-relative alignment; an automated frozen-geometry comparison covers desktop, tablet and mobile.
-- Visual baselines cover 1536 x 1024, 1024 x 768 and 412 x 915.
-- PWA cache bumped to `volley-live-capture-v1.16.2`.
+## v1.17.0 highlights
+- Spectator LIVE TIMELINE has equal AWAY/HOME connectors, an attached rally cell, vivid elongated score cells and compact deltas on both sides.
+- Spectator headers now use equal generic AWAY/HOME cells.
+- The STATS tab is replaced by JSON-driven LIVE GRAPH score and HOME−AWAY delta charts.
+- Responsive chart-owned scrolling, explicit no-rally state, accessible contrast and cache `volley-live-capture-v1.17.0`.
 
 ## v1.16.1 highlights
 - The LIVE TIMELINE score spine is deliberately shifted to the right instead of being centered on the page, giving the AWAY history the requested wider lane.

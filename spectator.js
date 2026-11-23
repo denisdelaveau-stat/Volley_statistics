@@ -1,4 +1,4 @@
-/* VolleyLive spectator archive view v1.16.2 — derived only from loaded official JSON. */
+/* VolleyLive spectator archive view v1.17.0 — derived only from loaded official JSON. */
 (function () {
   'use strict';
 
@@ -241,13 +241,96 @@
       '" data-winner="' + r.winner + '" data-score-accent="' + accent + '" data-valid="' + (!r.invalid) + '">' +
       '<div class="delta-lane away">' + (side === 'away' ? delta : '') + '</div>' +
       '<div class="event-slot away-slot ' + (awayEvent ? 'has-event' : '') + '">' + awayEvent + '</div>' +
+      '<div class="timeline-connector away"' + (awayEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
       '<div class="score-node"><div class="rally-caption"><span>Rallye ' + r.rally + '</span></div>' +
       '<div class="score-pill ' + (isLast ? 'latest' : '') + '"><span class="score-half away' + awayScoreClass + '">' + r.score.away +
       '</span><b>:</b><span class="score-half home' + homeScoreClass + '">' + r.score.home + '</span></div>' +
       (isLast ? '<span class="last-point">DERNIER POINT</span>' : '') +
       (r.invalid ? '<span class="invalid-note">DONNÉE À VÉRIFIER</span>' : '') + '</div>' +
+      '<div class="timeline-connector home"' + (homeEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
       '<div class="event-slot home-slot ' + (homeEvent ? 'has-event' : '') + '">' + homeEvent + '</div>' +
       '<div class="delta-lane home">' + (side === 'home' ? delta : '') + '</div></div>';
+  }
+
+  function svgLine(x1, y1, x2, y2, className) {
+    return '<line class="' + className + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"></line>';
+  }
+  function svgText(x, y, text, anchor) {
+    return '<text class="graph-label" x="' + x + '" y="' + y + '" text-anchor="' + (anchor || 'middle') + '">' + esc(text) + '</text>';
+  }
+  function setGraph(id, width, height, label, markup) {
+    var node = $(id);
+    node.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    node.setAttribute('width', width);
+    node.setAttribute('height', height);
+    node.style.minWidth = width + 'px';
+    node.setAttribute('aria-label', label);
+    node.innerHTML = '<title>' + esc(label) + '</title>' + markup;
+  }
+  function renderScoreGraph(rows) {
+    var width = Math.max(680, 112 + rows.length * 58), height = 300;
+    var left = 52, right = 22, top = 20, bottom = 38;
+    var plotW = width - left - right, plotH = height - top - bottom;
+    var maxScore = Math.max(5, rows.reduce(function (mx, r) { return Math.max(mx, r.score.away, r.score.home); }, 0));
+    var tick = Math.max(1, Math.ceil(maxScore / 5)), axisMax = Math.ceil(maxScore / tick) * tick;
+    var x = function (i) { return left + (rows.length === 1 ? plotW / 2 : i * plotW / (rows.length - 1)); };
+    var y = function (v) { return top + plotH - (v / axisMax) * plotH; };
+    var markup = '', v;
+    for (v = 0; v <= axisMax; v += tick) {
+      markup += svgLine(left, y(v), width - right, y(v), 'graph-grid') + svgText(left - 10, y(v) + 4, v, 'end');
+    }
+    rows.forEach(function (r, i) {
+      markup += svgLine(x(i), top, x(i), top + plotH, 'graph-grid') + svgText(x(i), height - 14, 'R' + r.rally);
+    });
+    markup += svgLine(left, top, left, top + plotH, 'graph-axis') + svgLine(left, top + plotH, width - right, top + plotH, 'graph-axis');
+    var awayPath = rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i) + ' ' + y(r.score.away); }).join(' ');
+    var homePath = rows.map(function (r, i) { return (i ? 'L' : 'M') + x(i) + ' ' + y(r.score.home); }).join(' ');
+    markup += '<path class="graph-series away" d="' + awayPath + '"></path><path class="graph-series home" d="' + homePath + '"></path>';
+    rows.forEach(function (r, i) {
+      var accent = r.phase === 'SO' ? 'so' : r.winner === 'HOME' ? 'bp-home' : 'bp-away';
+      markup += '<circle class="graph-point ' + accent + '" data-series="away" cx="' + x(i) + '" cy="' + y(r.score.away) + '" r="5"><title>Rallye ' + r.rally + ' · AWAY ' + r.score.away + '</title></circle>';
+      markup += '<rect class="graph-point ' + accent + '" data-series="home" x="' + (x(i) - 5) + '" y="' + (y(r.score.home) - 5) + '" width="10" height="10" rx="2"><title>Rallye ' + r.rally + ' · HOME ' + r.score.home + '</title></rect>';
+    });
+    setGraph('scoreGraph', width, height, 'Évolution des scores AWAY et HOME sur ' + rows.length + ' rallyes', markup);
+  }
+  function renderDeltaGraph(rows) {
+    var width = Math.max(680, 112 + rows.length * 58), height = 235;
+    var left = 52, right = 22, top = 20, bottom = 38;
+    var plotW = width - left - right, plotH = height - top - bottom, zeroY = top + plotH / 2;
+    var maxDelta = Math.max(1, rows.reduce(function (mx, r) { return Math.max(mx, Math.abs(r.score.home - r.score.away)); }, 0));
+    var step = plotW / rows.length, barW = Math.min(30, Math.max(12, step * .55));
+    var markup = '', ticks = [-maxDelta, 0, maxDelta];
+    ticks.forEach(function (value) {
+      var yy = zeroY - (value / maxDelta) * (plotH / 2 - 8);
+      markup += svgLine(left, yy, width - right, yy, value === 0 ? 'graph-zero' : 'graph-grid') + svgText(left - 10, yy + 4, value, 'end');
+    });
+    rows.forEach(function (r, i) {
+      var value = r.score.home - r.score.away, xx = left + step * i + step / 2;
+      var magnitude = Math.abs(value) / maxDelta * (plotH / 2 - 8);
+      var barY = value >= 0 ? zeroY - magnitude : zeroY;
+      var className = value > 0 ? 'positive' : value < 0 ? 'negative' : 'neutral';
+      var drawnHeight = value === 0 ? 3 : magnitude;
+      markup += svgLine(xx, top, xx, top + plotH, 'graph-grid');
+      markup += '<rect class="delta-bar-svg ' + className + '" x="' + (xx - barW / 2) + '" y="' + (value === 0 ? zeroY - 1.5 : barY) + '" width="' + barW + '" height="' + drawnHeight + '" rx="2"><title>Rallye ' + r.rally + ' · delta HOME − AWAY : ' + value + '</title></rect>';
+      markup += svgText(xx, height - 14, 'R' + r.rally);
+      if (value !== 0) markup += svgText(xx, value > 0 ? barY - 5 : barY + drawnHeight + 13, (value > 0 ? '+' : '') + value);
+    });
+    markup += svgLine(left, top, left, top + plotH, 'graph-axis');
+    setGraph('deltaGraph', width, height, 'Delta HOME moins AWAY sur ' + rows.length + ' rallyes', markup);
+  }
+  function renderGraphs(v) {
+    var empty = model.rallies.length === 0;
+    $('graphContent').hidden = empty;
+    $('graphEmpty').hidden = !empty;
+    $('graphSet').textContent = 'SET ' + model.currentSet + ' · ' + model.score.away + ' : ' + model.score.home;
+    $('graphOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
+    if (empty) {
+      $('scoreGraph').innerHTML = '';
+      $('deltaGraph').innerHTML = '';
+      return;
+    }
+    renderScoreGraph(v.rows);
+    renderDeltaGraph(v.rows);
   }
   function render() {
     if (!model) return;
@@ -256,24 +339,25 @@
     $('headerHome').textContent = model.score.home;
     $('headerSet').textContent = 'SET ' + model.currentSet + ' · ' + model.sets.away + '–' + model.sets.home;
     $('archiveBadge').textContent = model.finished ? 'TERMINÉ' : 'ARCHIVE';
-    $('awayName').textContent = model.awayName;
-    $('homeName').textContent = model.homeName;
+    $('awayName').textContent = 'AWAY';
+    $('homeName').textContent = 'HOME';
     $('timelineSet').textContent = 'SET ' + model.currentSet + ' · Fil du match';
     $('timelineOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
     $('summaryAway').textContent = model.score.away;
     $('summaryHome').textContent = model.score.home;
     $('summaryMatch').textContent = model.awayName + ' — ' + model.homeName;
     $('summarySet').textContent = 'SET ' + model.currentSet + ' · sets ' + model.sets.away + '–' + model.sets.home;
-    $('statsSummary').textContent = model.rallies.length + ' rallyes · ' + model.format + ' · ' + model.awayName + ' ' + model.score.away + ' : ' + model.score.home + ' ' + model.homeName;
-    document.querySelectorAll('[data-order]').forEach(function (b) {
-      b.classList.toggle('active', b.dataset.order === v.p.order);
-      b.setAttribute('aria-pressed', b.dataset.order === v.p.order ? 'true' : 'false');
+    document.querySelectorAll('[data-order],[data-graph-order]').forEach(function (b) {
+      var choice = b.dataset.order || b.dataset.graphOrder;
+      b.classList.toggle('active', choice === v.p.order);
+      b.setAttribute('aria-pressed', choice === v.p.order ? 'true' : 'false');
     });
-    $('windowSize').value = v.p.size;
+    document.querySelectorAll('[data-window-size]').forEach(function (select) { select.value = v.p.size; });
     $('timelineList').innerHTML = v.rows.map(function (r) { return renderRow(r, last && r.id === last.id, v.scale, v.p.order); }).join('');
     $('timelineEmpty').hidden = model.rallies.length !== 0;
     $('timelineWarning').hidden = !model.warnings.length;
     $('timelineWarning').textContent = model.warnings.join(' ');
+    renderGraphs(v);
   }
   function activate(name) {
     document.querySelectorAll('[data-tab]').forEach(function (b) {
@@ -302,21 +386,18 @@
       render();
     } catch (e) { fatal(e.message); return; }
     document.querySelectorAll('[data-tab]').forEach(function (b) { b.addEventListener('click', function () { activate(b.dataset.tab); }); });
-    document.querySelectorAll('[data-order]').forEach(function (b) {
-      b.addEventListener('click', function () { localStorage.setItem(ORDER_KEY, b.dataset.order); render(); });
+    document.querySelectorAll('[data-order],[data-graph-order]').forEach(function (b) {
+      b.addEventListener('click', function () { localStorage.setItem(ORDER_KEY, b.dataset.order || b.dataset.graphOrder); render(); });
     });
-    $('windowSize').addEventListener('change', function () { localStorage.setItem(WINDOW_KEY, this.value); render(); });
-    $('openAdvancedStats').addEventListener('click', function () {
-      sessionStorage.setItem('volleyAnalysis.replay.v1', JSON.stringify(raw));
-      sessionStorage.setItem('volleyAnalysis.replay.source.v1', localStorage.getItem('volleySpectator.archiveName.v1') || 'archive.json');
-      location.href = 'statistics/index.html';
+    document.querySelectorAll('[data-window-size]').forEach(function (select) {
+      select.addEventListener('change', function () { localStorage.setItem(WINDOW_KEY, this.value); render(); });
     });
     window.addEventListener('storage', function (e) {
       if (e.key === ARCHIVE_KEY && e.newValue) {
         try { raw = JSON.parse(e.newValue); model = build(raw); render(); } catch (x) { fatal(x.message); }
       }
     });
-    activate(location.hash === '#live-score' ? 'live-score' : location.hash === '#stats' ? 'stats' : 'live-timeline');
+    activate(location.hash === '#live-score' ? 'live-score' : location.hash === '#live-graph' ? 'live-graph' : 'live-timeline');
   }
 
   window.VolleySpectator = {

@@ -51,10 +51,10 @@ def test_score_colours_only_the_scoring_half_for_home_and_away_so_bp(browser):
     assert page.locator(".chip").count() == 0
     rows = page.locator(".tl-row")
     expected = [
-        ("rgb(5, 7, 11)", "rgb(245, 197, 66)"),
-        ("rgb(245, 197, 66)", "rgb(5, 7, 11)"),
-        ("rgb(5, 7, 11)", "rgb(21, 128, 61)"),
-        ("rgb(185, 28, 28)", "rgb(5, 7, 11)"),
+        ("rgb(5, 7, 11)", "rgb(255, 212, 59)"),
+        ("rgb(255, 212, 59)", "rgb(5, 7, 11)"),
+        ("rgb(5, 7, 11)", "rgb(24, 184, 90)"),
+        ("rgb(217, 4, 41)", "rgb(5, 7, 11)"),
     ]
     observed = rows.evaluate_all(
         "rows => rows.map(r => [getComputedStyle(r.querySelector('.score-half.away')).backgroundColor, getComputedStyle(r.querySelector('.score-half.home')).backgroundColor])"
@@ -75,23 +75,26 @@ def test_connector_is_score_centred_and_stops_at_score_edge(browser):
     page, errors = open_spectator(browser, data, viewport={"width": 1536, "height": 1024})
     geometry = page.locator(".tl-row").evaluate_all(
         """rows => rows.map(r => {
-          const slot = r.querySelector('.event-slot.has-event').getBoundingClientRect();
           const pill = r.querySelector('.score-pill').getBoundingClientRect();
-          const event = r.querySelector('.away-marker,.event-card').getBoundingClientRect();
-          const away = !!r.querySelector('.away-slot.has-event');
-          return {away, slotCenter:(slot.top+slot.bottom)/2, pillCenter:(pill.top+pill.bottom)/2,
-                  slotLeft:slot.left, slotRight:slot.right, pillLeft:pill.left, pillRight:pill.right,
-                  eventLeft:event.left, eventRight:event.right};
+          const awayEvent = r.querySelector('.away-marker');
+          const homeEvent = r.querySelector('.event-card.home');
+          const awayConnector = r.querySelector('.timeline-connector.away').getBoundingClientRect();
+          const homeConnector = r.querySelector('.timeline-connector.home').getBoundingClientRect();
+          const event = (awayEvent || homeEvent).getBoundingClientRect();
+          return {away:!!awayEvent, pill:pill.toJSON(), event:event.toJSON(),
+                  awayConnector:awayConnector.toJSON(), homeConnector:homeConnector.toJSON()};
         })"""
     )
     for g in geometry:
-        assert abs(g["slotCenter"] - g["pillCenter"]) < 1
+        assert abs((g["event"]["top"] + g["event"]["bottom"]) / 2 -
+                   (g["pill"]["top"] + g["pill"]["bottom"]) / 2) < 1
+        assert abs(g["awayConnector"]["width"] - g["homeConnector"]["width"]) < 1
         if g["away"]:
-            assert 26 <= g["pillLeft"] - g["slotRight"] <= 28
-            assert g["eventRight"] <= g["slotRight"] <= g["pillLeft"]
+            assert 11 <= g["awayConnector"]["left"] - g["event"]["right"] <= 13
+            assert 11 <= g["pill"]["left"] - g["awayConnector"]["right"] <= 13
         else:
-            assert 26 <= g["slotLeft"] - g["pillRight"] <= 28
-            assert g["pillRight"] <= g["slotLeft"] <= g["eventLeft"]
+            assert 11 <= g["homeConnector"]["left"] - g["pill"]["right"] <= 13
+            assert 11 <= g["event"]["left"] - g["homeConnector"]["right"] <= 13
     assert not errors
     page.close()
 

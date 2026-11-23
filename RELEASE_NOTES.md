@@ -1,17 +1,24 @@
-# Release notes — Volley Live Capture v1.16.2
+# Release notes — Volley Live Capture v1.17.0
 
-## Corrected LIVE TIMELINE geometry
-- The whole timeline geometry moves left together. On desktop, the cyan score spine is now between 44% and 48% of the board width instead of the v1.16.1 range of 61% to 64%.
-- Every AWAY rally follows one horizontal sequence: red proportional delta, constant gap, A marker on the same Y center, 8 px connector gap, cyan connector and score.
-- AWAY delta bars are right-aligned in a fixed lane. The maximum bar starts at the board's 12 px safety inset, while all A markers retain one stable X coordinate.
-- The delta-to-marker gap is 12 px on desktop and 8 px at the compact tablet/mobile layout.
+## Spectator LIVE TIMELINE
+- AWAY and HOME connector tracks now have exactly the same computed length on every row and viewport.
+- The compact sequence remains `AWAY delta → A marker → connector → score → connector → HOME card → HOME delta`.
+- HOME delta bars sit immediately beside the HOME information card with the same constant grid gap used on the AWAY side.
+- The score cell is wider, uses a brighter accessible SO/BP palette, and keeps exactly one coloured half while the other remains black.
+- `Rallye N` is rendered in a separate attached cell directly above the score.
+- The timeline title always displays generic `AWAY` and `HOME` cells of identical size and style; archive team names are not shown there.
+- `Nombre d’actions` and both order buttons share the same control width, height, border, radius, typography and vertical alignment.
 
-## HOME non-regression
-- HOME card DOM order, width, height, player circle, number, role, name, action, colors, padding and internal gaps are identical to v1.16.1.
-- The HOME container and card receive the same global X translation as the cyan spine and score; their relative score alignment is unchanged.
-- A frozen v1.16.1 bounding-box/style baseline verifies the desktop, tablet and mobile layouts.
+## LIVE GRAPH
+- The former `STATS` spectator tab is replaced by `LIVE GRAPH`.
+- The upper SVG chart draws the AWAY and HOME score series from the selected archive rally scores.
+- The lower SVG chart draws `HOME − AWAY`: green above zero, red below zero and neutral grey at zero.
+- SO, HOME BP and AWAY BP points use the same contextual yellow, green and red palette as LIVE TIMELINE.
+- Order and rally-window preferences are shared with LIVE TIMELINE and remain persistent.
+- Basic archives never receive invented actions; score lines and deltas remain available from rally scores.
+- Archives with no rally show an explicit empty state.
+- Tablet and portrait layouts use chart-owned horizontal scrolling and never create document-level horizontal overflow.
 
-## Preserved behavior and validation
-- Filters, DERNIER POINT, ARCHIVE/REPLAY, proportional delta calculations, split score highlights, archive normalization and responsive board scrolling are preserved.
-- Control screenshots and visual baselines cover 1536 × 1024, 1024 × 768 and 412 × 915.
-- Offline cache: `volley-live-capture-v1.16.2`.
+## Compatibility and offline
+- OPEN ARCHIVES, LIVE SCORE, LIVE TIMELINE, DERNIER POINT, ARCHIVE/REPLAY, capture, HISTORY Delete, HOME | ERREUR | AWAY, COACH VIEW, LIVE COURT, PLAYER FOCUS, ADVANCED STATISTICS and official JSON adapters remain available.
+- Offline cache version: `volley-live-capture-v1.17.0`.

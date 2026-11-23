@@ -1,0 +1,35 @@
+Volley Live Capture v1.17.0 — final test results
+Date: 2026-11-23
+Baseline: verified Volley_statistics_v1.16.2_complete.zip
+
+Syntax validation:
+  node --check spectator.js
+  node --check sw.js
+  Result: passed
+
+Complete automated regression suite:
+  pytest -q --disable-warnings --maxfail=1
+  103 passed in 198.90 s
+  0 failed
+
+Update 10 automated coverage:
+- AWAY and HOME connector track widths equal within 1 browser pixel.
+- Compact AWAY delta / A marker / connector / score sequence preserved.
+- HOME connector / card / delta spacing constant with no unused internal lane gap.
+- Score pill elongated; attached Rallye N cell; exactly one vivid SO/BP half and one black half.
+- AWAY/HOME timeline headings generic, same width, height and style; real team names absent.
+- Nombre d’actions and order controls share width, height, border, radius, typography and alignment.
+- LIVE GRAPH replaces STATS and renders two JSON-driven score series.
+- HOME − AWAY bars include green positive, red negative and neutral zero cases.
+- Shared order/window persistence verified between LIVE TIMELINE and LIVE GRAPH.
+- No-rally empty state verified.
+- Basic score/delta charts verified without invented action/player cards.
+- Contrast checks meet 4.5:1 for score accents and active controls.
+- Offline cache `volley-live-capture-v1.17.0` includes spectator assets.
+
+Visual and responsive validation:
+- LIVE TIMELINE and LIVE GRAPH baselines passed at 1536 × 1024.
+- LIVE TIMELINE and LIVE GRAPH baselines passed at 1024 × 768.
+- LIVE TIMELINE and LIVE GRAPH baselines passed at 412 × 915.
+- No document-level horizontal overflow.
+- Timeline and graph horizontal overflow is owned by internal scroll containers on portrait screens.

@@ -47,13 +47,16 @@ def test_home_card_is_content_sized_with_balanced_side_padding(browser):
           const avatar=card.querySelector('.avatar').getBoundingClientRect();
           const copy=card.querySelector('.event-copy').getBoundingClientRect();
           const slot=card.closest('.event-slot').getBoundingClientRect();
+          const lane=card.closest('.tl-row').querySelector('.delta-lane.home').getBoundingClientRect();
           return {cardWidth:c.width, slotWidth:slot.width,
-                  leftPad:avatar.left-c.left, rightPad:c.right-copy.right};
+                  leftPad:avatar.left-c.left, rightPad:c.right-copy.right,
+                  deltaGap:lane.left-c.right};
         }"""
     )
-    assert geometry["cardWidth"] < geometry["slotWidth"] - 20
+    assert abs(geometry["cardWidth"] - geometry["slotWidth"]) < 1
     assert abs(geometry["leftPad"] - geometry["rightPad"]) <= 1
     assert 14 <= geometry["leftPad"] <= 16
+    assert 11 <= geometry["deltaGap"] <= 13
     assert not errors
     page.close()
 

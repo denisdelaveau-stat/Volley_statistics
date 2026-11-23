@@ -1,3 +1,20 @@
+## v1.17.0 update 10 spectator acceptance
+
+| ID | Acceptance |
+|---|---|
+| U10-01 | AWAY and HOME connector tracks have equal measured lengths at all target viewports |
+| U10-02 | Rallye cell is attached above an elongated vivid split score with exactly one black half |
+| U10-03 | Header displays generic equal AWAY/HOME cells without archive team names |
+| U10-04 | HOME delta is adjacent to the unchanged information-card contents and aligned horizontally |
+| U10-05 | Nombre d’actions matches both order cells in visual dimensions and remains responsive |
+| U10-06 | LIVE GRAPH replaces STATS and draws AWAY/HOME score series from archive rallies |
+| U10-07 | Delta graph draws green positive, red negative and neutral zero bars from HOME−AWAY |
+| U10-08 | Timeline and graph share persistent order/window filters |
+| U10-09 | Basic archives preserve calculable score/delta data without invented actions |
+| U10-10 | Empty archives show a no-rally graph state |
+| U10-11 | 1536×1024, 1024×768 and 412×915 visual baselines pass with internal-only scrolling |
+| U10-12 | Contrast, keyboard focus, SVG labels and v1.17.0 offline cache pass |
+
 ## v1.16.2 compact left-shifted LIVE TIMELINE
 
 | ID | Acceptance |
