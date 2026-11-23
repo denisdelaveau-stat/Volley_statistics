@@ -1,4 +1,4 @@
-/* VolleyLive spectator archive view v1.18.0 — derived only from loaded official JSON. */
+/* VolleyLive spectator archive view v1.18.1 — HOME-left convention, derived only from loaded official JSON. */
 (function () {
   'use strict';
 
@@ -288,7 +288,7 @@
     var w = value ? Math.max(38, Math.round(value / scale * 100)) + '%' : '0';
     var delta = side ? '<div class="delta-bar ' + side + '" style="width:' + w + '" role="img" aria-label="' +
       (side === 'away' ? 'AWAY' : 'HOME') + ' mène de ' + value + ' points" title="' +
-      (side === 'away' ? 'AWAY' : 'HOME') + ' +' + value + ' (' + r.score.away + '–' + r.score.home + ')">+' + value + '</div>' : '';
+      (side === 'away' ? 'AWAY' : 'HOME') + ' +' + value + ' (' + r.score.away + '–' + r.score.home + ')"><span class="delta-badge">+' + value + '</span></div>' : '';
     var accent = r.phase === 'SO' ? 'so' : r.winner === 'HOME' ? 'bp-home' : 'bp-away';
     var awayScoreClass = r.winner === 'AWAY' ? ' score-accent ' + accent : '';
     var homeScoreClass = r.winner === 'HOME' ? ' score-accent ' + accent : '';
@@ -297,17 +297,17 @@
     return '<div class="tl-row ' + (isLast ? 'is-last ' : '') + (r.invalid ? 'invalid-row ' : '') +
       (order === 'newestFirst' ? 'newest-first' : '') + '" data-rally="' + r.rally + '" data-code="' + r.phase +
       '" data-winner="' + r.winner + '" data-score-accent="' + accent + '" data-valid="' + (!r.invalid) + '">' +
-      '<div class="delta-lane away">' + (side === 'away' ? delta : '') + '</div>' +
-      '<div class="event-slot away-slot ' + (awayEvent ? 'has-event' : '') + '">' + awayEvent + '</div>' +
-      '<div class="timeline-connector away"' + (awayEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
+      '<div class="event-slot home-slot ' + (homeEvent ? 'has-event' : '') + '">' + homeEvent + '</div>' +
+      '<div class="timeline-connector home"' + (homeEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
+      '<div class="delta-lane home">' + (side === 'home' ? delta : '') + '</div>' +
       '<div class="score-node"><div class="rally-caption"><span>Rallye ' + r.rally + '</span></div>' +
-      '<div class="score-pill ' + (isLast ? 'latest' : '') + '"><span class="score-half away' + awayScoreClass + '">' + r.score.away +
-      '</span><b>:</b><span class="score-half home' + homeScoreClass + '">' + r.score.home + '</span></div>' +
+      '<div class="score-pill ' + (isLast ? 'latest' : '') + '"><span class="score-half home' + homeScoreClass + '">' + r.score.home +
+      '</span><b>:</b><span class="score-half away' + awayScoreClass + '">' + r.score.away + '</span></div>' +
       (isLast ? '<span class="last-point">DERNIER POINT</span>' : '') +
       (r.invalid ? '<span class="invalid-note">DONNÉE À VÉRIFIER</span>' : '') + '</div>' +
-      '<div class="timeline-connector home"' + (homeEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
-      '<div class="event-slot home-slot ' + (homeEvent ? 'has-event' : '') + '">' + homeEvent + '</div>' +
-      '<div class="delta-lane home">' + (side === 'home' ? delta : '') + '</div></div>';
+      '<div class="delta-lane away">' + (side === 'away' ? delta : '') + '</div>' +
+      '<div class="timeline-connector away"' + (awayEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
+      '<div class="event-slot away-slot ' + (awayEvent ? 'has-event' : '') + '">' + awayEvent + '</div></div>';
   }
 
   function svgLine(x1, y1, x2, y2, className) {
@@ -437,9 +437,9 @@
     $('homeName').textContent = 'HOME';
     $('timelineSet').textContent = 'SET ' + model.currentSet + ' · Fil du match';
     $('timelineOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
-    $('summaryAway').textContent = model.score.away;
     $('summaryHome').textContent = model.score.home;
-    $('summaryMatch').textContent = model.awayName + ' — ' + model.homeName;
+    $('summaryAway').textContent = model.score.away;
+    $('summaryMatch').textContent = model.homeName + ' — ' + model.awayName;
     $('summarySet').textContent = 'SET ' + model.currentSet + ' · sets ' + model.sets.away + '–' + model.sets.home;
     document.querySelectorAll('[data-order],[data-graph-order]').forEach(function (b) {
       var choice = b.dataset.order || b.dataset.graphOrder;

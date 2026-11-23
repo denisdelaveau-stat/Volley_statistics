@@ -27,7 +27,7 @@
 
   <main>
     <section class="spectator-panel" data-panel="live-score" hidden>
-      <div class="summary-card"><p>REPLAY D’ARCHIVE</p><div><strong id="summaryAway">0</strong><span>:</span><strong id="summaryHome">0</strong></div><h1 id="summaryMatch">Match</h1><p id="summarySet">Set 1</p></div>
+      <div class="summary-card"><p>REPLAY D’ARCHIVE</p><div><strong id="summaryHome">0</strong><span>:</span><strong id="summaryAway">0</strong></div><h1 id="summaryMatch">Match</h1><p id="summarySet">Set 1</p></div>
     </section>
 
     <section class="spectator-panel timeline-panel" data-panel="live-timeline">
@@ -37,11 +37,11 @@
       </div>
       <div class="timeline-board">
         <div class="timeline-title">
-          <strong id="awayName">AWAY</strong>
-          <div><h1 id="timelineSet">SET 1 · Fil du match</h1><p>Score : AWAY — HOME</p><p id="timelineOrder">Ancien → récent</p></div>
           <strong id="homeName">HOME</strong>
+          <div><h1 id="timelineSet">SET 1 · Fil du match</h1><p>Score : HOME — AWAY</p><p id="timelineOrder">Ancien → récent</p></div>
+          <strong id="awayName">AWAY</strong>
         </div>
-        <div class="timeline-columns" aria-hidden="true"><span>0</span><b>AWAY</b><i></i><b>HOME</b><span>0</span></div>
+        <div class="timeline-columns" aria-hidden="true"><span>0</span><b>HOME</b><i></i><b>AWAY</b><span>0</span></div>
         <div id="timelineList" class="timeline-list" aria-live="polite"></div>
         <div id="timelineEmpty" class="timeline-empty" hidden>Le set n’a pas encore commencé</div>
         <div id="timelineWarning" class="timeline-warning" hidden></div>

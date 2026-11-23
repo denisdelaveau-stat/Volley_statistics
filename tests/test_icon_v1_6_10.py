@@ -59,6 +59,6 @@ def test_manifest_html_and_service_worker_reference_correct_assets():
     for name in ("apple-touch-icon.png", "favicon-32.png", "icon-192.png"):
         assert f"icons/{name}" in html
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.17.0" in service_worker
+    assert "volley-live-capture-v1.18.1" in service_worker
     for name in EXPECTED:
         assert f"icons/{name}" in service_worker

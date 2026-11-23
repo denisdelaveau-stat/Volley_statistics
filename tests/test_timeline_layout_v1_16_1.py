@@ -16,7 +16,7 @@ def layout_fixture():
     return data
 
 
-def test_desktop_spine_is_left_shifted_and_away_delta_hugs_left_edge(browser):
+def test_desktop_spine_is_home_left_mirrored_and_away_delta_hugs_score(browser):
     page, errors = open_spectator(browser, layout_fixture(), viewport={"width": 1536, "height": 1024})
     page.wait_for_timeout(250)
     geometry = page.locator(".timeline-board").evaluate(
@@ -28,12 +28,13 @@ def test_desktop_spine_is_left_shifted_and_away_delta_hugs_left_edge(browser):
           const box=board.getBoundingClientRect();
           return {boardLeft:box.left, boardWidth:box.width,
                   spine:(node.left+node.right)/2,
-                  laneLeft:lane.left, barLeft:bar.left};
+                  laneLeft:lane.left, barLeft:bar.left,
+                  scoreRight:node.right};
         }"""
     )
     relative_spine = (geometry["spine"] - geometry["boardLeft"]) / geometry["boardWidth"]
-    assert 0.44 <= relative_spine <= 0.48
-    assert 11 <= geometry["laneLeft"] - geometry["boardLeft"] <= 14
+    assert 0.52 <= relative_spine <= 0.56
+    assert 5 <= geometry["barLeft"] - geometry["scoreRight"] <= 7
     assert abs(geometry["barLeft"] - geometry["laneLeft"]) < 1
     assert not errors
     page.close()
@@ -47,16 +48,16 @@ def test_home_card_is_content_sized_with_balanced_side_padding(browser):
           const avatar=card.querySelector('.avatar').getBoundingClientRect();
           const copy=card.querySelector('.event-copy').getBoundingClientRect();
           const slot=card.closest('.event-slot').getBoundingClientRect();
-          const lane=card.closest('.tl-row').querySelector('.delta-lane.home').getBoundingClientRect();
+              const connector=card.closest('.tl-row').querySelector('.timeline-connector.home').getBoundingClientRect();
           return {cardWidth:c.width, slotWidth:slot.width,
                   leftPad:avatar.left-c.left, rightPad:c.right-copy.right,
-                  deltaGap:lane.left-c.right};
+                      connectorGap:connector.left-c.right};
         }"""
     )
     assert abs(geometry["cardWidth"] - geometry["slotWidth"]) < 1
     assert abs(geometry["leftPad"] - geometry["rightPad"]) <= 1
     assert 14 <= geometry["leftPad"] <= 16
-    assert 11 <= geometry["deltaGap"] <= 13
+    assert 5 <= geometry["connectorGap"] <= 7
     assert not errors
     page.close()
 
@@ -68,9 +69,9 @@ def test_android_portrait_keeps_page_stable_and_timeline_scrollable(browser):
     board = page.locator(".timeline-board")
     dimensions = board.evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
     assert dimensions["scroll"] > dimensions["client"]
-    assert page.locator(".delta-lane.away").first.bounding_box()["x"] <= 20
+    assert page.locator(".home-slot").first.bounding_box()["x"] <= 60
     board.evaluate("e => e.scrollLeft = e.scrollWidth")
-    assert page.locator(".event-card.home").bounding_box()["x"] < 412
+    assert page.locator(".away-marker").first.bounding_box()["x"] < 412
     for selector in ("[data-order=oldestFirst]", "[data-order=newestFirst]", "#windowSize"):
         assert page.locator(selector).bounding_box()["height"] >= 44
     assert not errors

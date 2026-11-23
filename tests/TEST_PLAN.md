@@ -1,3 +1,20 @@
+## v1.18.0 Score and Fault Evolution acceptance
+
+| ID | Requirement |
+|---|---|
+| SF-01 | One normalized selected-set rally timeline drives both panels |
+| SF-02 | Score and fault deltas match their formulas for HOME lead, tie and AWAY lead |
+| SF-03 | Score/fault cumulative values reset at set boundaries |
+| SF-04 | SO, HOME BP, AWAY BP and neutral classification states render correctly |
+| SF-05 | Shared fault selector counts active official ERROR/FAULT records, including multiple faults |
+| SF-06 | Undo/correction rebuild removes stale cells and points |
+| SF-07 | Every available official set can be selected and matches final official scores |
+| SF-08 | Score cell, score point, fault cell and fault point centers align within 1 CSS px |
+| SF-09 | Empty, one-rally, long-set, history-browse and return-live states work |
+| SF-10 | Keyboard, touch size, screen-reader summaries, contrast and reduced motion pass |
+| SF-11 | Desktop, smartphone landscape and smartphone portrait visual regressions pass |
+| SF-12 | Complete legacy and v1.18.0 automated suite passes |
+
 ## v1.17.0 update 10 spectator acceptance
 
 | ID | Acceptance |
@@ -243,3 +260,15 @@ All v1.6.9 scoring, rotation, setup, history, Advanced-action, compact-score, ne
 2. Compare with `icon_ref.png`: navy reaches the launcher-mask edge, with no lighter perimeter or white/transparent corner.
 3. Verify `v1.6.10` on Home and confirm offline relaunch and saved-match persistence.
 4. Recheck compact score spacing, net-height posts and the Intermediate/Advanced BENCH divider.
+
+## v1.18.1 — HOME-left spectator and compact score-adjacent deltas
+
+- Header and LIVE SCORE render HOME left of AWAY with unchanged score values.
+- LIVE TIMELINE order is HOME card, HOME connector, green HOME delta, HOME:AWAY score, red AWAY delta, AWAY connector, AWAY marker.
+- Score-to-delta gaps remain 6 CSS px and bar/badge centers remain within 1 CSS px of score center.
+- Connectors contract from 112 to 18 CSS px with no overlap; HOME card internal geometry remains unchanged.
+- SO/BP colors, winning side, terminal action, accessible labels and delta signs remain semantically correct after inversion.
+- LIVE GRAPH keeps HOME above AWAY and `HOME − AWAY` for score and fault deltas.
+- Visual baselines cover 1536×1024, 1024×768, 844×390 and 390×844.
+- Narrow-screen content is reachable through internal board scrolling without document-level horizontal overflow.
+- Offline cache and required spectator assets are validated.

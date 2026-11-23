@@ -1,0 +1,19 @@
+Volley Live Capture v1.18.1 — validation finale
+================================================
+
+Static checks:
+- node --check spectator.js: PASS
+- node --check statistics/adapter.js: PASS
+- node --check sw.js: PASS
+
+Automated suite:
+- pytest -q --disable-warnings
+- 118 passed, 0 failed
+
+Validated viewports:
+- 1536x1024
+- 1024x768
+- 844x390
+- 390x844
+
+Coverage includes HOME-left/AWAY-right semantics, compact score-adjacent deltas, connector geometry, SO/BP winner mapping, terminal actions, LIVE GRAPH HOME-AWAY delta signs, accessible labels, contrast, internal mobile scrolling and offline cache.

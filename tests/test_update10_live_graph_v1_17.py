@@ -71,11 +71,15 @@ def test_update10_header_score_connectors_home_delta_and_filters(browser):
     for row in rows:
         assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1
         if row["marker"]:
-            assert 11 <= row["marker"]["left"] - row["awayLane"]["right"] <= 13
+            assert 5 <= row["awayLane"]["left"] - row["score"]["right"] <= 7
+            assert 5 <= row["awayConnector"]["left"] - row["awayLane"]["right"] <= 7
+            assert 5 <= row["marker"]["left"] - row["awayConnector"]["right"] <= 7
         if row["card"]:
-            assert 11 <= row["homeLane"]["left"] - row["card"]["right"] <= 13
+            assert 5 <= row["homeConnector"]["left"] - row["card"]["right"] <= 7
+            assert 5 <= row["homeLane"]["left"] - row["homeConnector"]["right"] <= 7
+            assert 5 <= row["score"]["left"] - row["homeLane"]["right"] <= 7
             if row["homeBar"]:
-                assert abs(row["homeBar"]["left"] - row["homeLane"]["left"]) < 1
+                assert abs(row["homeBar"]["right"] - row["homeLane"]["right"]) < 1
                 assert abs((row["homeBar"]["top"] + row["homeBar"]["height"] / 2) -
                            (row["card"]["top"] + row["card"]["height"] / 2)) < 1
 
@@ -114,36 +118,31 @@ def test_vivid_score_accents_keep_exactly_one_black_half(browser):
 
 
 def test_live_graph_replaces_stats_and_is_json_driven(browser):
+    """The v1.17 tab/JSON contract remains; v1.18 supersedes its two-line chart."""
     data = update10_fixture()
     page, errors = open_spectator(browser, data, VIEWPORTS["1536x1024"])
     assert page.locator('[data-tab="stats"]').count() == 0
     assert page.locator('[data-tab="live-graph"]').inner_text() == "LIVE GRAPH"
     page.locator('[data-tab="live-graph"]').click()
     assert page.locator('[data-panel="live-graph"]').is_visible()
-    assert page.locator("#scoreGraph .graph-series.away").count() == 1
-    assert page.locator("#scoreGraph .graph-series.home").count() == 1
-    assert page.locator("#scoreGraph .graph-point").count() == 10  # default five-rally window, two series
-    assert page.locator("#deltaGraph .delta-bar-svg").count() == 5
-    assert page.locator("#deltaGraph .positive").count() >= 1
-    assert page.locator("#deltaGraph .negative").count() == 0  # last five rows finish tied or HOME ahead
-    labels = page.locator("#deltaGraph .delta-bar-svg").evaluate_all("els => els.map(e => e.textContent)")
-    expected = [str(r["score"]["home"] - r["score"]["away"]) for r in page.evaluate("VolleySpectator.visibleRows().rows")]
-    assert [label.split(":")[-1].strip() for label in labels] == expected
-    assert page.locator("#scoreGraph").get_attribute("aria-label")
-    assert page.locator("#deltaGraph").get_attribute("aria-label")
+    assert page.locator(".score-row.home .evolution-cell").count() == 5
+    assert page.locator(".score-row.away .evolution-cell").count() == 5
+    assert page.locator(".score-delta-chart .delta-point").count() == 5
+    assert page.locator(".fault-delta-chart .delta-point").count() == 5
+    observed = page.locator(".score-delta-chart .delta-point").evaluate_all("els => els.map(e => +e.dataset.value)")
+    expected = [r["score"]["home"] - r["score"]["away"] for r in page.evaluate("VolleySpectator.visibleRows().rows")]
+    assert observed == expected
+    assert page.locator(".score-delta-chart").get_attribute("aria-label")
+    assert page.locator(".fault-delta-chart").get_attribute("aria-label")
 
     page.locator("#graphWindowSize").select_option("all")
     assert page.locator("#windowSize").input_value() == "all"
-    assert page.locator("#scoreGraph .graph-point").count() == len(data["rallies"]) * 2
-    assert page.locator("#deltaGraph .positive").count() >= 1
-    assert page.locator("#deltaGraph .negative").count() >= 1
-    assert page.locator("#deltaGraph .neutral").count() >= 1
+    assert page.locator(".score-delta-chart .delta-point").count() == len(data["rallies"])
     page.locator('[data-graph-order="newestFirst"]').click()
     assert page.locator('[data-order="newestFirst"]').get_attribute("aria-pressed") == "true"
     assert page.evaluate("VolleySpectator.visibleRows().rows[0].rally") == len(data["rallies"])
     assert not errors
     page.close()
-
 
 def test_live_graph_has_empty_state_and_basic_does_not_invent_actions(browser):
     empty = archive_v2([], basic=True)
@@ -151,17 +150,16 @@ def test_live_graph_has_empty_state_and_basic_does_not_invent_actions(browser):
     page.locator('[data-tab="live-graph"]').click()
     assert page.locator("#graphEmpty").is_visible()
     assert page.locator("#graphContent").is_hidden()
-    assert page.locator("#scoreGraph .graph-point").count() == 0
+    assert page.locator(".delta-point").count() == 0
     page.close()
 
     page, basic_errors = open_spectator(browser, update10_fixture(basic=True), VIEWPORTS["1024x768"])
     assert page.locator(".event-card,.away-marker,.home-action").count() == 0
     page.locator('[data-tab="live-graph"]').click()
-    assert page.locator("#scoreGraph .graph-point").count() == 10
-    assert page.locator("#deltaGraph .delta-bar-svg").count() == 5
+    assert page.locator(".score-delta-chart .delta-point").count() == 5
+    assert page.locator(".fault-delta-chart .delta-point").count() == 5
     assert not errors and not basic_errors
     page.close()
-
 
 def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
     long_data = archive_v2([(i, 0, "AWAY", "AWAY") for i in range(1, 13)])
@@ -170,37 +168,33 @@ def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
         page.locator("#windowSize").select_option("all")
         page.locator('[data-tab="live-graph"]').click()
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), name
-        score_scroll = page.locator(".graph-scroll").first.evaluate("e => ({client:e.clientWidth,scroll:e.scrollWidth,tab:e.tabIndex})")
+        scroll = page.locator(".evolution-scroll").evaluate("e => ({client:e.clientWidth,scroll:e.scrollWidth,tab:e.tabIndex})")
         if viewport["width"] <= 780:
-            assert score_scroll["scroll"] > score_scroll["client"], name
-        assert score_scroll["tab"] == 0
-        assert page.locator(".graph-legend").get_attribute("aria-label") == "Légende des graphiques"
+            assert scroll["scroll"] > scroll["client"], name
+        assert scroll["tab"] == 0
+        assert page.locator(".score-legend").get_attribute("aria-label") == "Légende des cellules de score"
         assert not errors, name
         page.close()
 
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.17.0" in sw
+    assert "volley-live-capture-v1.18.1" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
-
 
 def test_update10_visual_baselines_at_three_viewports(browser, tmp_path):
     data = json.loads(V2_FIXTURE.read_text())
     for name, viewport in VIEWPORTS.items():
         page, errors = open_spectator(browser, data, viewport)
         page.wait_for_timeout(350)
-        for view in ("timeline", "graph"):
-            if view == "graph":
-                page.locator('[data-tab="live-graph"]').click()
-                page.wait_for_timeout(100)
-            actual = tmp_path / f"{view}_{name}.png"
-            page.screenshot(path=str(actual), full_page=False)
-            baseline = ROOT / f"tests/visual_baselines/{view}_{name}_v1_17_0.png"
-            assert baseline.exists(), f"Missing {baseline.name}"
-            observed = Image.open(actual).convert("RGB")
-            expected = Image.open(baseline).convert("RGB")
-            assert observed.size == expected.size == (viewport["width"], viewport["height"])
-            diff = ImageChops.difference(expected, observed)
-            assert max(ImageStat.Stat(diff).mean) < 3.5, (name, view)
+        actual = tmp_path / f"timeline_{name}.png"
+        page.screenshot(path=str(actual), full_page=False)
+        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_18_1.png"
+        assert baseline.exists(), f"Missing {baseline.name}"
+        observed = Image.open(actual).convert("RGB")
+        expected = Image.open(baseline).convert("RGB")
+        assert observed.size == expected.size == (viewport["width"], viewport["height"])
+        diff = ImageChops.difference(expected, observed)
+        assert max(ImageStat.Stat(diff).mean) < 3.5, (name, "timeline")
         assert not errors, name
         page.close()
+

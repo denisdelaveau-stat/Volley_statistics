@@ -237,7 +237,7 @@ def test_return_home_invalid_archive_tablet_and_accessibility(browser):
 
 
 def test_spectator_visual_baseline_1536x1024_and_contrast(browser, tmp_path):
-    baseline = ROOT / "tests/visual_baselines/spectator_live_timeline_1536x1024_v1_17_0.png"
+    baseline = ROOT / "tests/visual_baselines/spectator_live_timeline_1536x1024_v1_18_1.png"
     page, errors = open_spectator(browser, json.loads(V2_FIXTURE.read_text()), viewport={"width": 1536, "height": 1024})
     page.wait_for_timeout(300)  # settle the 200 ms row-entry animation before pixel comparison
     actual = tmp_path / "spectator.png"

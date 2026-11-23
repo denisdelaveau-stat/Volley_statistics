@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.18.1 — Compact score-adjacent LIVE TIMELINE delta
+- Standardized the spectator UI on HOME left / AWAY right, including header, LIVE SCORE, timeline and graph rows.
+- Moved HOME/AWAY delta bars from the outer edges to a constant 6 px gap beside the score.
+- Placed the green HOME delta left of the HOME:AWAY score and the red AWAY delta to its right.
+- Added explicit readable `+delta` badges and exact vertical centering against the score pill.
+- Added responsive 18–112 px connectors with no overlap and retained HOME card internals.
+- Added controlled narrow-screen board scrolling and four target viewport baselines.
+- Preserved all v1.18.0 LIVE GRAPH, archive/replay, filter, score-color and offline functions.
+
 ## v1.18.0 — Score and Fault Evolution LIVE GRAPH
 - Replaced the former two-series graph with synchronized HOME/AWAY score and cumulative-fault rows.
 - Added uniform cyan score-delta and amber fault-delta curves from one selected-set rally timeline.

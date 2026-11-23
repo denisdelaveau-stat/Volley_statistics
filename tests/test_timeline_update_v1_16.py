@@ -67,7 +67,7 @@ def test_score_colours_only_the_scoring_half_for_home_and_away_so_bp(browser):
     page.close()
 
 
-def test_connector_is_score_centred_and_stops_at_score_edge(browser):
+def test_connector_delta_and_score_are_centred_in_compact_sequence(browser):
     data = archive_v2([
         (1, 0, "AWAY", "AWAY", "AWAY", "ATTACK", "POINT"),
         (1, 1, "HOME", "AWAY", "HOME", "ATTACK", "POINT"),
@@ -80,9 +80,12 @@ def test_connector_is_score_centred_and_stops_at_score_edge(browser):
           const homeEvent = r.querySelector('.event-card.home');
           const awayConnector = r.querySelector('.timeline-connector.away').getBoundingClientRect();
           const homeConnector = r.querySelector('.timeline-connector.home').getBoundingClientRect();
+          const awayLane = r.querySelector('.delta-lane.away').getBoundingClientRect();
+          const homeLane = r.querySelector('.delta-lane.home').getBoundingClientRect();
           const event = (awayEvent || homeEvent).getBoundingClientRect();
           return {away:!!awayEvent, pill:pill.toJSON(), event:event.toJSON(),
-                  awayConnector:awayConnector.toJSON(), homeConnector:homeConnector.toJSON()};
+                  awayConnector:awayConnector.toJSON(), homeConnector:homeConnector.toJSON(),
+                  awayLane:awayLane.toJSON(), homeLane:homeLane.toJSON()};
         })"""
     )
     for g in geometry:
@@ -90,11 +93,13 @@ def test_connector_is_score_centred_and_stops_at_score_edge(browser):
                    (g["pill"]["top"] + g["pill"]["bottom"]) / 2) < 1
         assert abs(g["awayConnector"]["width"] - g["homeConnector"]["width"]) < 1
         if g["away"]:
-            assert 11 <= g["awayConnector"]["left"] - g["event"]["right"] <= 13
-            assert 11 <= g["pill"]["left"] - g["awayConnector"]["right"] <= 13
+            assert 5 <= g["awayLane"]["left"] - g["pill"]["right"] <= 7
+            assert 5 <= g["awayConnector"]["left"] - g["awayLane"]["right"] <= 7
+            assert 5 <= g["event"]["left"] - g["awayConnector"]["right"] <= 7
         else:
-            assert 11 <= g["homeConnector"]["left"] - g["pill"]["right"] <= 13
-            assert 11 <= g["event"]["left"] - g["homeConnector"]["right"] <= 13
+            assert 5 <= g["homeConnector"]["left"] - g["event"]["right"] <= 7
+            assert 5 <= g["homeLane"]["left"] - g["homeConnector"]["right"] <= 7
+            assert 5 <= g["pill"]["left"] - g["homeLane"]["right"] <= 7
     assert not errors
     page.close()
 

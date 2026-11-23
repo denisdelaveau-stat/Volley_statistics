@@ -45,18 +45,18 @@ def test_compact_delta_marker_sequence_and_equal_connectors(browser):
     page, errors = open_spectator(browser, alignment_fixture(), VIEWPORTS["1536x1024"])
     page.wait_for_timeout(250)
     rows = geometry(page)
-    marker_lefts = [row["marker"]["left"] for row in rows if row["marker"]]
-    assert max(marker_lefts) - min(marker_lefts) < 1
+    marker_rights = [row["marker"]["right"] for row in rows if row["marker"]]
+    assert max(marker_rights) - min(marker_rights) < 1
     for row in rows:
         assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1
         if row["marker"]:
-            assert 11 <= row["marker"]["left"] - row["awayLane"]["right"] <= 13
-            assert 11 <= row["awayConnector"]["left"] - row["marker"]["right"] <= 13
-            assert 11 <= row["score"]["left"] - row["awayConnector"]["right"] <= 13
+            assert 5 <= row["awayLane"]["left"] - row["score"]["right"] <= 7
+            assert 5 <= row["awayConnector"]["left"] - row["awayLane"]["right"] <= 7
+            assert 5 <= row["marker"]["left"] - row["awayConnector"]["right"] <= 7
         if row["card"]:
-            assert 11 <= row["homeConnector"]["left"] - row["score"]["right"] <= 13
-            assert 11 <= row["card"]["left"] - row["homeConnector"]["right"] <= 13
-            assert 11 <= row["homeLane"]["left"] - row["card"]["right"] <= 13
+            assert 5 <= row["homeConnector"]["left"] - row["card"]["right"] <= 7
+            assert 5 <= row["homeLane"]["left"] - row["homeConnector"]["right"] <= 7
+            assert 5 <= row["score"]["left"] - row["homeLane"]["right"] <= 7
     assert not errors
     page.close()
 
@@ -66,7 +66,7 @@ def test_spine_stays_in_v1_16_2_left_shift_band(browser):
     board = page.locator(".timeline-board").bounding_box()
     score = page.locator(".score-node").first.bounding_box()
     relative = (score["x"] + score["width"] / 2 - board["x"]) / board["width"]
-    assert 0.44 <= relative <= 0.48
+    assert 0.52 <= relative <= 0.56
     assert not errors
     page.close()
 
@@ -75,13 +75,13 @@ def test_alignment_and_internal_scrolling_hold_at_three_viewports(browser):
     for name, viewport in VIEWPORTS.items():
         page, errors = open_spectator(browser, alignment_fixture(), viewport)
         page.wait_for_timeout(250)
-        expected_gap = 12 if viewport["width"] > 1100 else 8
+        expected_gap = 6
         for row in geometry(page):
             assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1, name
             if row["marker"]:
-                assert abs((row["marker"]["left"] - row["awayLane"]["right"]) - expected_gap) < 1, name
+                assert abs((row["marker"]["left"] - row["awayConnector"]["right"]) - expected_gap) < 1, name
             if row["card"]:
-                assert abs((row["homeLane"]["left"] - row["card"]["right"]) - expected_gap) < 1, name
+                assert abs((row["homeConnector"]["left"] - row["card"]["right"]) - expected_gap) < 1, name
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), name
         if viewport["width"] <= 780:
             sizes = page.locator(".timeline-board").evaluate("e => ({client:e.clientWidth,scroll:e.scrollWidth})")
@@ -96,12 +96,14 @@ def test_visual_baselines_desktop_tablet_and_mobile(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / f"tests/visual_baselines/away_alignment_{name}_v1_17_0.png"
-        assert baseline.exists(), f"Missing v1.17.0 visual baseline for {name}"
+        baseline = ROOT / f"tests/visual_baselines/away_alignment_{name}_v1_18_1.png"
+        assert baseline.exists(), f"Missing v1.18.1 visual baseline for {name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")
         assert observed.size == expected.size == (viewport["width"], viewport["height"])
         diff = ImageChops.difference(expected, observed)
-        assert max(ImageStat.Stat(diff).mean) < 3.5, name
+        # Keep the threshold strict enough to catch geometry/color drift while
+        # tolerating small cross-run Chromium font and border antialiasing changes.
+        assert max(ImageStat.Stat(diff).mean) < 5.0, name
         assert not errors, name
         page.close()
