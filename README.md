@@ -1,6 +1,12 @@
-# Volley Live Capture v1.21.0
+# Volley Live Capture v1.22.0
 
 Offline-first volleyball capture, coach, statistics and spectator application.
+
+## v1.22.0 highlights
+
+- Advanced Statistics now renders one complete timeline only.
+- The timeline visual system is aligned with Coach View.
+- Every action remains filterable and linked to score, rotation, phase, rally, and player context.
 
 ## v1.21.0 highlights
 
@@ -31,3 +37,10 @@ node --check statistics/adapter.js
 node --check coach.js
 node --check sw.js
 ```
+
+
+## Current release documents
+
+- `RELEASE_NOTES_v1.22.0.md`
+- `IMPLEMENTATION_REPORT_v1.22.0.md`
+- `COPY_INSTRUCTIONS_v1.22.0.md`

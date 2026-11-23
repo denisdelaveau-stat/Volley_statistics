@@ -1,0 +1,12 @@
+Volley Live Capture v1.22.0 — automated and visual validation
+
+JavaScript syntax: PASS
+Targeted acceptance/regression suite: 9 passed
+Full automated suite: 146 passed, 0 failed
+Responsive visual verification:
+- 390 x 844 phone: PASS
+- 844 x 390 short landscape: PASS
+- 1536 x 1024 desktop: PASS
+Page errors: 0
+Document horizontal overflow: 0 px at all verified viewports
+Narrow-screen timeline overflow: contained inside the timeline panel

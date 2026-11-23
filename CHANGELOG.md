@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.22.0 — Coach-aligned Advanced Statistics timeline
+
+- Removed all separate Advanced Statistics cards, charts, KPIs, and secondary pages.
+- Kept one complete timeline containing score, rotation, phase, rally, players, and actions.
+- Aligned the full responsive presentation with the Coach View navy/cyan design system.
+- Retained JSON/live loading, filters, orientation switching, reset, empty state, and offline support.
+
 ## v1.21.0 — Home Match Hub
 - Consolidated New Match, Continue Match and read-only View Match in the approved Match Hub hierarchy.
 - Added a real-data active summary, two-row Recent Matches list, complete selector and honest empty/error/loading states.

@@ -41,13 +41,14 @@ def test_advanced_statistics_empty_file_replay_and_unload(browser):
     assert page.locator("html.stats-empty-state").count()==1
     assert page.locator(".demo-only-indicator, .json-audit-badge, html.stats-demo-only").count()==0
     assert "NaN" not in page.locator("body").inner_text() and "Infinity" not in page.locator("body").inner_text()
-    color=page.locator(".empty-indicator").first.evaluate("e=>getComputedStyle(e).color"); assert color == "rgb(122, 131, 141)"
+    color=page.locator(".empty-indicator").first.evaluate("e=>getComputedStyle(e).color"); assert color == "rgb(154, 167, 182)"
     assert page.locator("#mc").inner_text()=="0" and page.locator("#mr").inner_text()=="0"
-    assert page.locator("#playerStats").inner_text().count("NA")>=3
-    page.locator("#rotationMetricsBtn").click(); assert page.locator("#rmActions").inner_text()=="0"; assert page.locator("#rmAttackEff").inner_text()=="NA"; assert page.locator("#rmSideout").inner_text()=="NA"
-    page.locator("#backTimelineBtn").click(); page.locator("#rosterRankingBtn").click(); assert "0 joueur" in page.locator("#rosterRankingCards").inner_text().lower()
-    page.locator("#backRosterBtn").click(); page.locator("#playingTimeBtn").click(); assert page.locator("#playingSetRallies").inner_text()=="0"; assert "NA" in page.locator("#ralliesPlayedList").inner_text()
-    page.locator("#backPlayingBtn").click(); page.set_input_files("#statsFileInput",str(FIXTURE)); page.wait_for_selector("#statsLoader",state="hidden")
+    assert page.locator("#playerStats,.stats-panel,.stat-detail").count()==0
+    assert page.locator("#view .empty-indicator").count()==3
+    assert page.locator("#rotationMetricsBtn,#rosterRankingBtn,#playingTimeBtn").count()==0
+    assert page.locator("#rotationPage,#rosterPage,#playingPage").count()==0
+    assert page.locator(".mini-chart,.mini-pie,.efficiency-curves,.curve-card,.chart-modal").count()==0
+    page.set_input_files("#statsFileInput",str(FIXTURE)); page.wait_for_selector("#statsLoader",state="hidden")
     assert "cannes" in page.locator("#statsMatchTitle").inner_text().lower(); assert page.locator("html.stats-empty-state").count()==0; assert int(page.locator("#mc").inner_text())>0
     page.locator("#statsUnloadBtn").click(); page.wait_for_selector("#statsLoader",state="hidden")
     assert "Aucun match chargé" in page.locator("#statsMatchTitle").inner_text(); assert "Cannes" not in page.locator("body").inner_text(); assert page.locator("#mc").inner_text()=="0"
