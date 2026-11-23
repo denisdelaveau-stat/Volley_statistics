@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.23.0 — Dedicated Match Hub navigation
+
+- Added a first-level MATCH HUB button on Home.
+- Home now contains MATCH HUB, COACH VIEW, TEAMS MANAGEMENT, ADVANCED STATISTICS, and SETTINGS.
+- Moved New Match, Continue Match, View Match, Recent Matches, and Import match into a dedicated Match Hub screen.
+- Preserved all existing data, capture, viewer, import, coach, team, settings, and statistics workflows.
+- Corrected legacy navigation tests and validated deterministic phone/tablet geometry; 147 tests pass.
+
 ## v1.22.0 — Coach-aligned Advanced Statistics timeline
 
 - Removed all separate Advanced Statistics cards, charts, KPIs, and secondary pages.

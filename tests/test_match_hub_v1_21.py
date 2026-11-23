@@ -14,6 +14,7 @@ def open_empty(browser, viewport=None):
     page.goto(APP_URI)
     page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
+    page.locator("#homeMatchHub").click()
     return page, errors
 
 
@@ -73,6 +74,7 @@ def test_active_match_uses_persisted_status_score_set_and_saved_time(browser):
         {"match": match, "events": events},
     )
     page.reload()
+    page.locator("#homeMatchHub").click()
     assert not page.locator("#homeContinue").is_disabled()
     assert page.locator("#matchHubTeams").inner_text() == "Antibes vs Nice"
     assert page.locator("#matchHubScore").inner_text() == "18 – 16"
@@ -98,6 +100,7 @@ def test_completed_recent_matches_are_sorted_limited_and_show_set_scores(browser
     ]
     page.evaluate("rows => localStorage.setItem('volleyMatchHub.history.v1', JSON.stringify(rows))", rows)
     page.reload()
+    page.locator("#homeMatchHub").click()
     recent = page.locator(".mh-recent-row")
     assert recent.count() == 2
     assert recent.nth(0).locator(".mh-recent-teams").inner_text() == "New Home vs New Away"
@@ -140,6 +143,7 @@ def test_import_rejects_invalid_json_unsafe_keys_and_duplicate_ids(browser):
         {"id": "duplicate", "raw": raw, "sourceName": "existing.json"},
     )
     page.reload()
+    page.locator("#homeMatchHub").click()
     valid = {"name": "duplicate.json", "mimeType": "application/json", "buffer": json.dumps(raw).encode()}
     page.locator("#matchHubFile").set_input_files(valid)
     assert page.locator("#matchHubDuplicate").is_visible()
@@ -162,6 +166,7 @@ def test_missing_save_timestamp_is_reported_honestly(browser):
         match,
     )
     page.reload()
+    page.locator("#homeMatchHub").click()
     assert "Save status unavailable" in page.locator("#matchHubMeta").inner_text()
     assert "18" not in page.locator("#matchHubActiveSummary").inner_text()
     assert not errors

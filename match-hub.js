@@ -1,4 +1,4 @@
-/* VolleyLive Match Hub v1.21.0 */
+/* VolleyLive Match Hub v1.23.0 */
 (function () {
   'use strict';
   var KE='volleyCapture.events.v1', KD='volleyCapture.chartData.v1', KM='volleyCapture.match.v1';
@@ -212,7 +212,7 @@
     $('matchHubOpenExisting').addEventListener('click',function(){var id=this.dataset.matchId,sum=state.all.find(function(item){return item.id===id});closeDialog($('matchHubDuplicate'));openViewer(sum)});
     $('matchHubImportCopy').addEventListener('click',function(){if(!state.pendingImport)return;try{var copyId=(summaryFrom(state.pendingImport,'copy').id||'match')+'-copy-'+Date.now(),sum=upsertHistory(state.pendingImport,state.pendingFileName,copyId);closeDialog($('matchHubDuplicate'));state.pendingImport=null;setStatus('Match imported as a copy.','success');render();openViewer(sum)}catch(error){importFailure(error.message,'duplicate')}});
     window.addEventListener('online',render);window.addEventListener('offline',render);window.addEventListener('pageshow',render);window.addEventListener('focus',render);
-    var home=$('homeScreen');if(home&&window.MutationObserver)new MutationObserver(function(records){records.forEach(function(record){if(record.attributeName==='hidden'&&!home.hidden)render()})}).observe(home,{attributes:true});
+    var screen=$('matchHubScreen');if(screen&&window.MutationObserver)new MutationObserver(function(records){records.forEach(function(record){if(record.attributeName==='hidden'&&!screen.hidden)render()})}).observe(screen,{attributes:true});
   }
   function init(){var hub=$('matchHub');if(!hub)return;hub.setAttribute('aria-busy','true');bind();render();hub.setAttribute('aria-busy','false');window.VolleyMatchHub={refresh:render,summaryFrom:summaryFrom,validateImport:validateImport,openViewer:openViewer,archiveCurrent:archiveCurrent}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

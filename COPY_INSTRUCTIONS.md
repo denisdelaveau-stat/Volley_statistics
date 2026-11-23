@@ -1,24 +1,25 @@
-# Copy instructions — v1.22.0
+# Copy instructions — v1.23.0
 
 ## Complete installation
 
-Deploy the complete contents of the `Volley_statistics_v1.22.0` folder at the application root, replacing the previous application files. Keep the directory structure unchanged.
+Deploy the complete contents of the `Volley_statistics_v1.23.0` folder at the application root, replacing the previous application files. Keep the directory structure unchanged.
 
-Open the application online once so service worker cache `volley-live-capture-v1.22.0` is installed, then fully close and reopen the PWA.
+Open the application online once so service worker cache `volley-live-capture-v1.23.0` is installed, then fully close and reopen the PWA.
 
-## Update from v1.21.0
+## Update from v1.22.0
 
-Extract `Volley_statistics_v1.22.0_update_from_v1.21.0.zip`, then run:
+Extract `Volley_statistics_v1.23.0_update_from_v1.22.0.zip`, then run:
 
 ```bash
-python3 APPLY_UPDATE.py /path/to/Volley_statistics_v1.21.0
+python3 APPLY_UPDATE.py /path/to/Volley_statistics_v1.22.0
 ```
 
-The updater verifies the expected v1.21.0 base files, copies the v1.22.0 changed/new files, writes `VERSION` as `1.22.0`, removes obsolete files listed by the package, and verifies the resulting tree against the bundled target hashes.
+The updater verifies the expected v1.22.0 base files, copies v1.23.0 changed/new files, removes obsolete cache artifacts, writes `VERSION` as `1.23.0`, and verifies the resulting application tree against the bundled target hashes.
 
 ## Verification
 
-- Home displays `v1.22.0`.
-- Advanced Statistics opens a single Coach View-aligned timeline.
-- No separate statistics cards, graphs, KPI panels, or secondary Advanced Statistics pages are present.
-- Filters may be expanded/collapsed and the timeline remains horizontally scrollable on narrow screens.
+- Home displays `v1.23.0`.
+- Home contains MATCH HUB, COACH VIEW, TEAMS MANAGEMENT, ADVANCED STATISTICS, and SETTINGS.
+- MATCH HUB opens a separate screen containing NEW MATCH, CONTINUE MATCH, VIEW MATCH, RECENT MATCHES, and Import match.
+- The Match Hub Back control returns to Home.
+- Existing match, coach, statistics, team, settings, capture, spectator, and import workflows remain available.

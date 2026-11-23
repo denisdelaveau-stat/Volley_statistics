@@ -96,6 +96,7 @@ def test_initial_rotation_libero_bench_is_compact_centred_and_label_removed(brow
     page.goto(APP_URI)
     _seed_setup_team(page)
     page.reload()
+    page.click("#homeMatchHub")
     page.click("#homeNew")
     page.select_option("#suTeamSelect", "Antibes U18")
     page.fill("#suOpp", "Nice")

@@ -373,7 +373,20 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
 <div id="homeScreen" role="dialog" aria-labelledby="homeTitle">
   <div class="home-spacer" aria-hidden="true"></div>
   <div class="home-brand"><h1 id="homeTitle">VolleyLive <span>Insight</span></h1><p>Match intelligence</p></div>
-  <main class="home-actions home-content">
+  <main class="home-actions home-content home-menu" aria-label="Application sections">
+    <button type="button" class="home-btn home-menu-card home-match-hub" id="homeMatchHub"><span class="home-menu-icon" aria-hidden="true">⌁</span><span class="home-copy"><span class="home-main">MATCH HUB</span><small>NEW · CONTINUE · VIEW · RECENT · IMPORT</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-menu-card home-coach" id="homeCoach"><span class="home-menu-icon" aria-hidden="true">◉</span><span class="home-copy"><span class="home-main">COACH VIEW</span><small>LIVE COURT · ROTATIONS · PLAYERS</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-menu-card home-teams" id="homeTeams"><span class="home-menu-icon" aria-hidden="true">♟</span><span class="home-copy"><span class="home-main">TEAMS MANAGEMENT</span><small>ROSTERS · PLAYERS · POSITIONS</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-menu-card home-statistics" id="homeStatistics"><span class="home-menu-icon" aria-hidden="true">▥</span><span class="home-copy"><span class="home-main">ADVANCED STATISTICS</span><small>COMPLETE MATCH TIMELINE</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-menu-card home-settings" id="homeSettings"><span class="home-menu-icon" aria-hidden="true">⚙</span><span class="home-copy"><span class="home-main">SETTINGS</span><small>MATCH FORMAT · CAPTURE DETAIL</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+  </main>
+  <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
+  <div class="home-version" id="appVersion">v1.23.0</div>
+</div>
+
+<div id="matchHubScreen" class="app-overlay match-hub-screen" hidden aria-labelledby="matchHubTitle">
+  <div class="match-hub-shell">
+    <header class="match-hub-topbar"><button type="button" id="matchHubBack" aria-label="Back to Home">‹ <span>HOME</span></button><div class="match-hub-brand">VolleyLive <b>Insight</b></div></header>
     <section class="match-hub" id="matchHub" aria-labelledby="matchHubTitle" aria-busy="true">
       <header class="match-hub-head"><h2 id="matchHubTitle">MATCH HUB</h2><p>Your match starts here <span class="mh-offline" id="matchHubOffline" hidden>OFFLINE</span></p></header>
       <button type="button" class="home-btn match-hub-card mh-new" id="homeNew" aria-label="Start a new match"><span class="mh-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="32" rx="2"/><path d="M14 8v32M34 8v32M14 24h20M24 8v6M24 34v6"/><circle cx="24" cy="24" r="7"/><path d="M24 20v8M20 24h8"/></svg></span><span class="mh-copy"><span class="mh-title">NEW MATCH</span><span class="mh-subtitle">Set up teams and start tracking</span></span><span class="mh-chevron" aria-hidden="true">›</span></button>
@@ -385,15 +398,8 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
       <input type="file" id="matchHubFile" aria-label="Import a VolleyLive match JSON file" accept=".json,application/json" hidden>
       <p class="mh-status" id="matchHubStatus" role="status" aria-live="polite"></p><button type="button" class="mh-retry" id="matchHubRetry" hidden>Try again</button>
     </section>
-    <section class="home-tools" aria-label="Analysis tools">
-      <button type="button" class="home-btn home-coach" id="homeCoach"><span class="home-icon">◉</span><span class="home-copy"><span class="home-main">COACH VIEW</span><small>LIVE COURT · ROTATIONS · PLAYERS</small></span><span>›</span></button>
-      <button type="button" class="home-btn home-statistics" id="homeStatistics"><span class="home-icon">▥</span><span class="home-copy"><span class="home-main">ADVANCED STATISTICS</span><small>TIMELINE · PLAYERS · ACTIONS</small></span><span>›</span></button>
-    </section>
     <input type="file" id="homeFile" aria-label="Select a match archive for spectator view" accept=".json,application/json" hidden>
-  </main>
-  <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
-  <nav class="home-nav" aria-label="Application sections"><button type="button" id="homeTeams"><span class="nav-icon">♟</span>TEAMS</button><button type="button" id="homeSettings"><span class="nav-icon">⚙</span>SETTINGS</button></nav>
-  <div class="home-version" id="appVersion">v1.22.0</div>
+  </div>
 </div>
 
 <dialog class="match-hub-dialog" id="matchHubDecision" aria-labelledby="matchHubDecisionTitle"><div class="mh-dialog-inner"><h2 id="matchHubDecisionTitle">Match already in progress</h2><p id="matchHubDecisionText"></p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubContinueCurrent">Continue current match</button><button type="button" id="matchHubSaveStart">Save current &amp; start another</button><button type="button" class="mh-danger" id="matchHubDiscardStart">Discard current &amp; start another</button><button type="button" class="mh-cancel" data-dialog-close>Cancel</button></div><p class="mh-dialog-note">VolleyLive stores one editable local match at a time. Saving or discarding the current match is required before another can start.</p></div></dialog>
@@ -1223,7 +1229,7 @@ function renderErrorCharts(events){
 (function(){
   var KE='volleyCapture.events.v1',KD='volleyCapture.chartData.v1',KM='volleyCapture.match.v1',STAGE='volleyCapture.stage';
   var LIBK='volleyCapture.library.v1',SETK='volleyCapture.settings.v1';
-  var $=function(id){return document.getElementById(id)},home=$('homeScreen'),setup=$('setupScreen'),teams=$('teamsScreen'),settings=$('settingsScreen');
+  var $=function(id){return document.getElementById(id)},home=$('homeScreen'),matchHubScreen=$('matchHubScreen'),setup=$('setupScreen'),teams=$('teamsScreen'),settings=$('settingsScreen');
   function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
   function defName(team,opp){return (team||'Team_A')+'_vs_'+(opp||'Opponent')+'_'+today()}
@@ -1233,7 +1239,7 @@ function renderErrorCharts(events){
   function libPut(l){localStorage.setItem(LIBK,JSON.stringify(l))}
   function settingsGet(){try{var x=JSON.parse(localStorage.getItem(SETK)||'{}');return {setsToWin:x.setsToWin===2?2:3,detailLevel:['basic','intermediate','advanced'].indexOf(x.detailLevel)>-1?x.detailLevel:'advanced'}}catch(e){return {setsToWin:3,detailLevel:'advanced'}}}
   function settingsPut(x){localStorage.setItem(SETK,JSON.stringify(x))}
-  function hideAll(){home.hidden=true;setup.hidden=true;teams.hidden=true;settings.hidden=true}
+  function hideAll(){home.hidden=true;matchHubScreen.hidden=true;setup.hidden=true;teams.hidden=true;settings.hidden=true}
   function show(el){hideAll();el.hidden=false;el.scrollTop=0}
   function roleClass(pos){return 'role-'+(pos||'')}
   var PLAB={setter:'SET',oh:'OH',mb:'MB',opp:'OPP',libero:'LIB'};
@@ -1243,7 +1249,9 @@ function renderErrorCharts(events){
   function saveJson(){var f=buildMatchFile(),name=fileName((f.match&&f.match.name)||defName());var txt=JSON.stringify(f,null,2),blob=new Blob([txt],{type:'application/json'});try{var file=new File([blob],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})&&/iPhone|iPad|iPod/.test(navigator.userAgent)){navigator.share({files:[file],title:name}).catch(function(){});return name}}catch(x){}var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},1500);return name}
   window.saveMatchJson=saveJson;var sj=$('captureSaveJson');if(sj)sj.addEventListener('click',function(){var n=saveJson();$('fileStatus').textContent='Saved file: '+n});
   function updateHome(){var ev=[],dt=[],match=null;try{ev=JSON.parse(localStorage.getItem(KE)||'[]')}catch(e){}try{dt=JSON.parse(localStorage.getItem(KD)||'[]')}catch(e){}try{match=JSON.parse(localStorage.getItem(KM)||'null')}catch(e){}var c=$('homeContinue'),info=$('homeContinueInfo');c.disabled=!match;if(!match){info.textContent='NO SAVED MATCH';return}var p=dt.length?dt[dt.length-1]:{a:0,b:0};info.textContent=(match.name?match.name+' · ':'')+(match.team.name||'Team A')+' vs '+(match.opponent.name||'Team B')+' · SET '+(match.currentSet||1)+' · '+ev.length+' EVENTS · '+(p.a||0)+':'+(p.b||0)}
-  $('homeContinue').addEventListener('click',function(){if(!this.disabled){home.hidden=true;window.scrollTo(0,0)}});
+  $('homeContinue').addEventListener('click',function(){if(!this.disabled){hideAll();window.scrollTo(0,0)}});
+  $('homeMatchHub').addEventListener('click',function(){show(matchHubScreen);if(window.VolleyMatchHub)window.VolleyMatchHub.refresh();$('matchHubBack').focus()});
+  $('matchHubBack').addEventListener('click',function(){show(home);$('homeMatchHub').focus()});
   $('homeStatistics').addEventListener('click',function(){location.href='statistics/index.html'});
   $('homeOpen').addEventListener('click',function(){$('homeFile').value='';$('homeFile').click()});
   $('homeFile').addEventListener('change',function(){
@@ -1328,7 +1336,7 @@ function renderErrorCharts(events){
   $('suBody').addEventListener('change',function(e){var t=e.target;if(t.id==='suTeamSelect'){loadSetupTeam(t.value);renderSetup()}else if(t.id==='rosterSort'){S.sort=t.value;renderSetup()}else if(t.dataset.present!==undefined){var r=S.roster[+t.dataset.present];r.present=t.checked;if(!r.present)r.focus=false;else r.focus=true;clearInvalidAssignments();renderSetup()}else if(t.dataset.focus!==undefined){S.roster[+t.dataset.focus].focus=t.checked}});
   $('suBody').addEventListener('input',function(e){if(e.target.id==='suOpp'){S.opp=e.target.value;if(S.nameAuto){S.name=defName(S.teamName,S.opp);var nameField=$('suName');if(nameField)nameField.value=S.name}var n=$('suNext');if(n)n.disabled=!S.teamKey||!S.opp.trim()}else if(e.target.id==='suName'){S.name=e.target.value;S.nameAuto=false}});
   $('suBody').addEventListener('click',function(e){var t=e.target.closest('button');if(!t)return;if(t.id==='suOpenTeams'){openTeams()}else if(t.dataset.setterZone){S.setterZone=t.dataset.setterZone;S.pickerRole=null;renderSetup()}else if(t.dataset.rotationRole){S.pickerRole=t.dataset.rotationRole;renderSetup()}else if(t.dataset.lineupPlayer){S.assign[S.pickerRole]=+t.dataset.lineupPlayer;S.pickerRole=null;renderSetup()}else if(t.hasAttribute('data-close-picker')){S.pickerRole=null;renderSetup()}else if(t.dataset.first){S.first=t.dataset.first;renderSetup()}});
-  $('suBack').addEventListener('click',function(){if(S.step===2){S.step=1;S.pickerRole=null;renderSetup()}else if(S.step===1){S.step=0;renderSetup()}else{show(home);updateHome()}});
+  $('suBack').addEventListener('click',function(){if(S.step===2){S.step=1;S.pickerRole=null;renderSetup()}else if(S.step===1){S.step=0;renderSetup()}else{show(matchHubScreen);updateHome();if(window.VolleyMatchHub)window.VolleyMatchHub.refresh()}});
   $('suNext').addEventListener('click',function(){
     if(S.step===0){S.opp=($('suOpp')&&$('suOpp').value||S.opp).trim();S.name=($('suName')&&$('suName').value||S.name||defName(S.teamName,S.opp)).trim();if(!S.teamKey){$('suMsg').textContent='Sélectionne une équipe.';return}if(!S.opp){$('suMsg').textContent='Entre le nom de l\'adversaire.';return}S.step=1;renderSetup();setup.scrollTop=0;return}
     if(S.step===1){var re=rosterError();if(re){$('suMsg').textContent=re;return}S.step=2;renderSetup();setup.scrollTop=0;return}

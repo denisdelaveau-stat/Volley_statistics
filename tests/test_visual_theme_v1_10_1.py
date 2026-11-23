@@ -7,6 +7,7 @@ def test_saturated_role_palette_and_coach_setup_background(browser):
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
     page.evaluate("""localStorage.setItem('volleyCapture.library.v1', JSON.stringify({team:{'Saturated Club':{team:'Saturated Club',roster:[1,2,3,4,5,6,7],info:{1:{name:'Set',pos:'setter'},2:{name:'Lib',pos:'libero'},3:{name:'OH1',pos:'oh'},4:{name:'OH2',pos:'oh'},5:{name:'MB1',pos:'mb'},6:{name:'MB2',pos:'mb'},7:{name:'Opp',pos:'opp'}}}}}))""")
+    page.click('#homeMatchHub')
     page.click('#homeNew')
     assert page.locator('#setupScreen').get_attribute('data-setup-step') == '0'
     background = page.locator('#setupScreen').evaluate("e => getComputedStyle(e).backgroundImage")
