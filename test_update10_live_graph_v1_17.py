@@ -177,7 +177,7 @@ def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
         page.close()
 
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.19.0" in sw
+    assert "volley-live-capture-v1.19.1" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -188,7 +188,7 @@ def test_update10_visual_baselines_at_three_viewports(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_19_0.png"
+        baseline = ROOT / f"tests/visual_baselines/timeline_{name}_v1_19_1.png"
         assert baseline.exists(), f"Missing {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

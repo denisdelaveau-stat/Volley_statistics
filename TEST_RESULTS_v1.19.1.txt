@@ -1,0 +1,25 @@
+Volley Live Capture v1.19.1 — automated validation
+Date: 2026-11-23
+
+Commands:
+  node --check spectator.js
+  node --check spectator-live-config.js
+  node --check statistics/adapter.js
+  node --check sw.js
+  pytest -q
+
+Result:
+  133 passed in 295.60 s
+  0 failed
+
+Coverage added/updated:
+  - Momentum specification T1–T12 with LIVE SCORE placement assertions
+  - one crest-based score card and one MOMENTUM ACTUEL card in LIVE SCORE
+  - score before Momentum at phone, tablet, landscape and desktop sizes
+  - no legacy summary and no duplicate score
+  - score and Momentum absent from LIVE TIMELINE
+  - no-match/new-set/not-enough/set-finished/match-finished states
+  - complete recomputation after Undo/correction and set reset
+  - HOME-left/AWAY-right, two crests/monograms and one service indicator
+  - accessibility, reduced motion, reserved colors and offline cache
+  - complete v1.19.0 regression suite

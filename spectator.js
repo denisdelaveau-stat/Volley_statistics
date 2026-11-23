@@ -1,4 +1,4 @@
-/* VolleyLive spectator Live view v1.19.0 — score, momentum and timeline derived only from loaded official JSON. */
+/* VolleyLive spectator Live view v1.19.1 — score and momentum in LIVE SCORE, derived only from loaded official JSON. */
 (function () {
   'use strict';
 
@@ -595,9 +595,6 @@
     $('awayName').textContent = 'AWAY'; $('homeName').textContent = 'HOME';
     $('timelineSet').textContent = model.currentSet == null ? 'AUCUN MATCH · Fil du match' : 'SET ' + model.currentSet + ' · Fil du match';
     $('timelineOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
-    $('summaryHome').textContent = model.score.home; $('summaryAway').textContent = model.score.away;
-    $('summaryMatch').textContent = model.noMatch ? 'Aucun match' : model.homeName + ' — ' + model.awayName;
-    $('summarySet').textContent = model.noMatch ? 'AUCUN MATCH' : 'SET ' + model.currentSet + ' · sets ' + model.sets.home + '–' + model.sets.away;
     document.querySelectorAll('[data-order],[data-graph-order]').forEach(function (b) {
       var choice = b.dataset.order || b.dataset.graphOrder;
       b.classList.toggle('active', choice === v.p.order); b.setAttribute('aria-pressed', choice === v.p.order ? 'true' : 'false');

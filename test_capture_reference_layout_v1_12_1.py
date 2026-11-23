@@ -94,7 +94,7 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
 
     assert "COACH VIEW" in page.locator("#homeCoach").inner_text()
     assert "ADVANCED STATISTICS" in page.locator("#homeStatistics").inner_text()
-    assert page.locator("#appVersion").inner_text() == "v1.19.0"
+    assert page.locator("#appVersion").inner_text() == "v1.19.1"
     assert not errors
     page.close()
 

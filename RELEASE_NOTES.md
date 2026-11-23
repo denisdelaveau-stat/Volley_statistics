@@ -1,27 +1,29 @@
-# Release notes — Volley Live Capture v1.19.0
+# Release notes — Volley Live Capture v1.19.1
 
-## Spectator Live header, score and momentum
+## LIVE SCORE: score with crests and current momentum
 
-- Added the VolleyLive wordmark header with no visible replay/archive badge in the new top section.
-- Added the score card: HOME left, AWAY right, JSON-derived team names/crests or monograms, current score, sets score, service and French match/set state.
-- Added **MOMENTUM ACTUEL** from the current set only: chronological H/A tiles, integer percentages summing to 100, counts, 70% advantage headline and whole-set current streak.
-- Defaults are configurable in `spectator-live-config.js`: `windowSize=8`, `minPoints=4`, `advantageThreshold=0.70`.
-- Full JSON rebuild occurs after every load/update, correction, Undo or set transition; voided/cancelled/undone records are excluded.
-- Added neutral no-match, new-set and insufficient-data states, plus frozen finished-set/match momentum.
-- Added optional JSON team logos with shield/monogram fallback and first-rally service fallback.
-- Preserved the complete v1.18.1 Timeline, filters, LIVE GRAPH, archive navigation, accessibility and offline behavior.
+- Moved the v1.19.0 **MOMENTUM ACTUEL** card from **LIVE TIMELINE** to **LIVE SCORE**.
+- Replaced the old LIVE SCORE archive summary with the v1.19.0 score card: HOME crest/name on the left, large score and sets in the centre, set-status badge and service indicator, AWAY crest/name on the right.
+- LIVE SCORE now has one non-duplicated sequence: VolleyLive header, score card, then MOMENTUM ACTUEL immediately below.
+- Team crests still use a JSON logo when supplied, otherwise the existing JSON-derived monogram/initials fallback.
+- Removed score/momentum markup from LIVE TIMELINE; its filters, board, rally ordering, scrolling and graph navigation are otherwise unchanged.
 
-## Responsive and accessible behavior
+## Preserved behavior
 
-- 16 px card padding and 16 px inter-card gap.
-- Portrait cards stack and center at a 640 px maximum width; landscape cards use a 50/50 grid.
-- The existing Timeline keeps its narrow-screen internal scroller and remains below the cards.
-- New-section colors are cyan/slate only; BP/SO green, yellow and red remain confined to the Timeline/graph conventions.
-- H/A text, ARIA card summaries, list semantics, polite leader-change announcements and reduced-motion handling are included.
+- Momentum still uses the last 8 valid points of the current set, with a 4-point minimum and 70% advantage threshold.
+- H/A sequence remains oldest to newest; percentages, counts and the current streak are unchanged.
+- Score and momentum still rebuild from the loaded JSON after each point, correction, Undo and set change.
+- No-match, new-set and insufficient-data states remain neutral gray.
+- HOME stays on the left and AWAY on the right.
+- Accessibility, responsive layouts and offline operation are preserved.
 
-## Quality
+## Validation
 
-- Specification cases T1–T12 implemented.
-- Visual validation: 390×844, 768×1024, 844×390 and 1536×1024.
-- Complete suite: **132 passed**, no failures.
-- Offline cache: `volley-live-capture-v1.19.0`.
+- T1–T12 now open LIVE SCORE and verify that the score and momentum cards are present there and absent from LIVE TIMELINE.
+- Visual checks cover LIVE SCORE at 390×844, 768×1024, 844×390 and 1536×1024, including two crests, score, sets, set badge, vertical card order and absence of the legacy duplicate score.
+- LIVE TIMELINE visual baselines were refreshed only for removal of the score/momentum section.
+- Full automated result: **133 passed in 295.60 s**, 0 failed; recorded in `tests/TEST_RESULTS_v1.19.1.txt`.
+
+## Offline cache
+
+- Cache name: `volley-live-capture-v1.19.1`.

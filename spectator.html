@@ -25,11 +25,7 @@
   </nav>
 
   <main>
-    <section class="spectator-panel" data-panel="live-score" hidden>
-      <div class="summary-card"><p>REPLAY D’ARCHIVE</p><div><strong id="summaryHome">0</strong><span>:</span><strong id="summaryAway">0</strong></div><h1 id="summaryMatch">Match</h1><p id="summarySet">Set 1</p></div>
-    </section>
-
-    <section class="spectator-panel timeline-panel" data-panel="live-timeline">
+    <section class="spectator-panel live-score-panel" data-panel="live-score" hidden>
       <section class="live-overview" aria-label="Score et momentum du match">
         <div class="live-card-grid">
           <article class="live-card live-score-card" id="liveScoreboard" aria-label="Aucun match">
@@ -67,7 +63,9 @@
           </article>
         </div>
       </section>
+    </section>
 
+    <section class="spectator-panel timeline-panel" data-panel="live-timeline">
       <div class="timeline-filterbar">
         <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-order="oldestFirst">Plus anciennes</button><button type="button" data-order="newestFirst">Plus récentes</button></div></fieldset>
         <label>Nombre d’actions<select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>

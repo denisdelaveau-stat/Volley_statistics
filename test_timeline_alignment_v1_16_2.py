@@ -96,8 +96,8 @@ def test_visual_baselines_desktop_tablet_and_mobile(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / f"tests/visual_baselines/away_alignment_{name}_v1_19_0.png"
-        assert baseline.exists(), f"Missing v1.19.0 visual baseline for {name}"
+        baseline = ROOT / f"tests/visual_baselines/away_alignment_{name}_v1_19_1.png"
+        assert baseline.exists(), f"Missing v1.19.1 visual baseline for {name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")
         assert observed.size == expected.size == (viewport["width"], viewport["height"])

@@ -1,4 +1,6 @@
-## v1.19.0 Live Header & Momentum acceptance
+## v1.19.1 LIVE SCORE placement & Momentum acceptance
+
+Placement invariant for every T1–T12 case: `#liveScoreboard` and `#momentumCard` occur exactly once inside LIVE SCORE, in that order; neither occurs inside LIVE TIMELINE; the obsolete `.summary-card` is absent.
 
 | ID | Requirement |
 |---|---|

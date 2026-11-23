@@ -153,9 +153,6 @@ button, select, a { font: inherit; }
   .timeline-list { --delta-lane-size: 78px; --home-card-size: fit-content(220px); min-width: 660px; }
   .timeline-footer { min-width: 720px; }
 }
-.summary-card { max-width: 760px; margin: 12vh auto; padding: 38px; border: 1px solid #146797; border-radius: 18px; background: #061d38; text-align: center; }
-.summary-card > div { font-size: 74px; font-weight: 1000; }
-.summary-card span { color: var(--cyan); padding: 0 20px; }
 .fatal a { min-height: 48px; display: inline-flex; align-items: center; padding: 10px 18px; border: 1px solid #22d3ee; border-radius: 9px; background: #087aa1; color: #fff; text-decoration: none; font-weight: 900; }
 
 /* LIVE GRAPH v1.18.0: synchronized score and fault evolution from one rally timeline. */
@@ -290,7 +287,7 @@ button, select, a { font: inherit; }
   .chart-y-labels { font-size: 10px; }
 }
 
-/* Spectator Live header, scoreboard and momentum v1.19.0. */
+/* Spectator Live header, scoreboard and momentum v1.19.1. */
 :root {
   --vl-bg-page: #0a1628;
   --vl-bg-card: #0e1e36;
@@ -384,10 +381,8 @@ html, body { background: radial-gradient(circle at 50% -20%, #123b63 0, transpar
 .momentum-card.state-no-match .momentum-counts *, .momentum-card.state-new-set .momentum-counts *, .momentum-card.state-not-enough .momentum-counts * { color: #98a3b2; }
 .momentum-card.state-no-match .momentum-bar span, .momentum-card.state-new-set .momentum-bar span, .momentum-card.state-not-enough .momentum-bar span { background: var(--vl-neutral); }
 .timeline-panel > .timeline-filterbar, .timeline-panel > .timeline-board { max-width: 1480px; margin-left: auto; margin-right: auto; }
-@media (orientation: landscape) and (min-width: 640px) {
-  .live-card-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
-  .live-score-card, .momentum-card { min-height: 360px; }
-}
+/* LIVE SCORE order is invariant: score first, MOMENTUM ACTUEL immediately below. */
+.live-score-panel .live-card-grid { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 780px) {
   .spectator-app { padding-left: 16px; padding-right: 16px; }
   .spectator-header { grid-template-columns: none; }

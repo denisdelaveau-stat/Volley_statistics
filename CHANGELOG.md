@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.19.1 — Move score and momentum to LIVE SCORE
+- Replaced the legacy LIVE SCORE summary with the v1.19.0 crest-based score card.
+- Moved MOMENTUM ACTUEL directly below the score card in LIVE SCORE.
+- Removed both cards from LIVE TIMELINE without changing its controls, timeline or graph behavior.
+- Preserved the 8-point / 4-point / 70% momentum calculation and complete JSON-driven recomputation.
+- Updated T1–T12, placement assertions and phone/tablet/landscape/desktop visual baselines.
+
 ## v1.19.0 — Spectator Live header and momentum
 - Added the VolleyLive header, JSON-derived HOME/AWAY score card and MOMENTUM ACTUEL above the existing Timeline.
 - Added configurable 8-point window, 4-point minimum and 70% advantage threshold.
