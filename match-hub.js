@@ -1,11 +1,12 @@
-/* VolleyLive Match Hub v1.23.0 */
+/* VolleyLive navigation, Match Capture and shared Match Library v1.25.0 */
 (function () {
   'use strict';
   var KE='volleyCapture.events.v1', KD='volleyCapture.chartData.v1', KM='volleyCapture.match.v1';
-  var KH='volleyMatchHub.history.v1', STAGE='volleyCapture.stage';
+  var KH='volleyMatchHub.history.v1', KS='volleyMatchLibrary.selected.v1', STAGE='volleyCapture.stage';
+  var KR='volleyAnalysis.replay.v1', KRS='volleyAnalysis.replay.source.v1', KU='volleyAnalysis.unloaded.v1';
   var MAX_FILE_BYTES=10*1024*1024, ACTIVE={live:1,paused:1,in_progress:1};
   var $=function(id){return document.getElementById(id)};
-  var state={active:null,history:[],all:[],pendingImport:null,pendingFileName:'',rendering:false};
+  var state={active:null,history:[],all:[],selected:null,filter:'active',mode:'library',pendingImport:null,pendingFileName:'',report:null,rendering:false};
 
   function safeParse(value,fallback){try{var parsed=JSON.parse(value);return parsed==null?fallback:parsed}catch(e){return fallback}}
   function storageGet(key,fallback){return safeParse(localStorage.getItem(key)||'',fallback)}
@@ -16,204 +17,82 @@
   function finite(value){if(value===undefined||value===null||value==='')return null;var n=Number(value);return isFinite(n)?n:null}
   function dateValue(value){var n=Date.parse(value||'');return isFinite(n)?n:0}
   function first(){for(var i=0;i<arguments.length;i++){var value=arguments[i];if(value!==undefined&&value!==null&&text(value)!=='')return value}return null}
-  function emit(name,properties){try{window.dispatchEvent(new CustomEvent('matchhub:telemetry',{detail:{event:name,properties:properties||{}}}))}catch(e){}}
-  function setStatus(message,tone){var el=$('matchHubStatus');if(!el)return;el.textContent=message||'';if(tone)el.dataset.tone=tone;else el.removeAttribute('data-tone')}
-  function hasUnsafeKey(value){
-    if(!value||typeof value!=='object')return false;
-    var names=Object.getOwnPropertyNames(value);
-    for(var i=0;i<names.length;i++){
-      var key=names[i];
-      if(key==='__proto__'||key==='prototype'||key==='constructor')return true;
-      if(hasUnsafeKey(value[key]))return true;
-    }
-    return false;
-  }
-  function teamFromV2(raw,id,fallbackIndex){
-    var teams=Array.isArray(raw.teams)?raw.teams:[];
-    var found=null;
-    for(var i=0;i<teams.length;i++)if(String(first(teams[i].teamId,teams[i].id,''))===String(id||'')){found=teams[i];break}
-    found=found||teams[fallbackIndex]||{};
-    return {id:first(found.teamId,found.id,null),name:first(found.name,found.displayName,null),shortName:first(found.shortName,found.abbreviation,null)};
-  }
-  function captureTeams(match){
-    return {
-      home:{id:first(match.team&&match.team.id,null),name:first(match.team&&match.team.name,null),shortName:first(match.team&&match.team.shortName,null)},
-      away:{id:first(match.opponent&&match.opponent.id,null),name:first(match.opponent&&match.opponent.name,null),shortName:first(match.opponent&&match.opponent.shortName,null)}
-    };
-  }
-  function pointScore(raw,match,currentSet){
-    var home=null,away=null,events=Array.isArray(raw.events)?raw.events:[],rallies=Array.isArray(raw.rallies)?raw.rallies:[];
-    var rows=events.concat(rallies),best=null,bestOrder=-1;
-    rows.forEach(function(row,index){
-      var setNo=finite(first(row.set,row.setNumber,row.setIndex));if(setNo!==null&&setNo!==Number(currentSet))return;
-      var score=row.scoreAfter||row.score||null,a,b;
-      if(score){a=finite(first(score.home,score.our,score.team1,score.a));b=finite(first(score.away,score.opponent,score.team2,score.b))}
-      if(a==null||b==null){a=finite(first(row.scoreA,row.homeScore));b=finite(first(row.scoreB,row.awayScore))}
-      var order=finite(first(row.sequenceNumber,row.actionOrder,row.rallyNumber,index));
-      if(a!=null&&b!=null&&order>=bestOrder){best={home:a,away:b};bestOrder=order}
-    });
-    if(best)return best;
-    var chart=Array.isArray(raw.chartData)?raw.chartData:storageGet(KD,[]),last=chart.length?chart[chart.length-1]:null;
-    if(last)return {home:finite(first(last.a,last.home,0)),away:finite(first(last.b,last.away,0))};
-    var sets=Array.isArray(raw.sets)?raw.sets:[],set=null;
-    for(var i=0;i<sets.length;i++)if(Number(first(sets[i].setNumber,sets[i].number,i+1))===Number(currentSet)){set=sets[i];break}
-    set=set||sets[sets.length-1];
-    if(set){var fs=set.currentScore||set.score||set.finalScore||{};return {home:finite(first(fs.home,fs.our,fs.team1,set.homeScore,set.ourScore)),away:finite(first(fs.away,fs.opponent,fs.team2,set.awayScore,set.opponentScore))}}
-    return {home:null,away:null};
-  }
-  function setScore(raw,match){
-    var home=finite(first(match.homeSetsWon,match.ourSetsWon,raw.homeSetsWon));
-    var away=finite(first(match.awaySetsWon,match.opponentSetsWon,raw.awaySetsWon));
-    if(home!==null&&away!==null)return {home:home,away:away};
-    if(window.VolleySets&&window.VolleySets.summary&&raw.format==='volley-live-capture'){
-      try{var summary=window.VolleySets.summary(match,Array.isArray(raw.events)?raw.events:[]);return {home:finite(summary.wonA),away:finite(summary.wonB)}}catch(e){}
-    }
-    var sets=Array.isArray(raw.sets)?raw.sets:[],h=0,a=0,seen=false;
-    sets.forEach(function(set){
-      var score=set.finalScore||set.score||{},x=finite(first(score.home,score.our,score.team1,set.homeScore,set.ourScore)),y=finite(first(score.away,score.opponent,score.team2,set.awayScore,set.opponentScore));
-      var winner=lower(first(set.winner,set.winnerSide,set.winningSide,''));
-      if(winner==='home'||winner==='our'||winner==='team1'){h++;seen=true}else if(winner==='away'||winner==='opponent'||winner==='team2'){a++;seen=true}else if(x!==null&&y!==null&&x!==y&&lower(first(set.status,''))==='completed'){x>y?h++:a++;seen=true}
-    });
-    return {home:seen?h:null,away:seen?a:null};
-  }
-  function currentSetNumber(raw,match){
-    var n=finite(first(match.currentSet,match.currentSetNumber,raw.currentSetNumber));if(n!==null)return n;
-    var sets=Array.isArray(raw.sets)?raw.sets:[];if(!sets.length)return null;
-    var active=sets.filter(function(set){return ACTIVE[lower(set.status)]});
-    var selected=(active.length?active:sets)[(active.length?active:sets).length-1];
-    return finite(first(selected.setNumber,selected.number,sets.indexOf(selected)+1));
-  }
-  function archiveCurrent(){
-    var match=storageGet(KM,null);if(!match)return null;
-    return {format:'volley-live-capture',version:1,savedAt:first(match.updatedAt,match.savedAt,null),match:match,events:storageGet(KE,[]),chartData:storageGet(KD,[])};
-  }
-  function summaryFrom(raw,sourceName){
-    if(!raw||typeof raw!=='object')return null;
-    var match=raw.match&&typeof raw.match==='object'?raw.match:raw;
-    var isV2=Array.isArray(raw.teams),teams=isV2?{
-      home:teamFromV2(raw,first(match.ourTeamId,match.homeTeamId),0),
-      away:teamFromV2(raw,first(match.opponentTeamId,match.awayTeamId),1)
-    }:captureTeams(match);
-    var id=text(first(match.id,match.matchId,raw.id,raw.matchId,''));
-    if(!id)return null;
-    var status=lower(first(match.status,raw.status,'completed'));
-    var setNo=currentSetNumber(raw,match),points=pointScore(raw,match,setNo),sets=setScore(raw,match);
-    var updated=first(match.updatedAt,match.savedAt,raw.updatedAt,raw.savedAt,null);
-    var matchDate=first(match.matchDate,match.date,match.startedAt,match.createdAt,raw.matchDate,raw.createdAt,null);
-    return {id:id,status:status,homeTeam:teams.home,awayTeam:teams.away,currentSetNumber:setNo,currentHomePoints:points.home,currentAwayPoints:points.away,homeSetsWon:sets.home,awaySetsWon:sets.away,matchDate:matchDate,updatedAt:updated,schemaVersion:first(raw.schemaVersion,raw.version,null),raw:raw,sourceName:sourceName||'match.json'};
-  }
+  function emit(name,properties){try{window.dispatchEvent(new CustomEvent('volleylive:telemetry',{detail:{event:name,properties:properties||{}}}))}catch(e){}}
+  function setStatus(id,message,tone){var el=$(id);if(!el)return;el.textContent=message||'';if(tone)el.dataset.tone=tone;else el.removeAttribute('data-tone')}
+  function hasUnsafeKey(value){if(!value||typeof value!=='object')return false;var names=Object.getOwnPropertyNames(value);for(var i=0;i<names.length;i++){var key=names[i];if(key==='__proto__'||key==='prototype'||key==='constructor')return true;if(hasUnsafeKey(value[key]))return true}return false}
+  function teamFromV2(raw,id,fallbackIndex){var teams=Array.isArray(raw.teams)?raw.teams:[],found=null;for(var i=0;i<teams.length;i++)if(String(first(teams[i].teamId,teams[i].id,''))===String(id||'')){found=teams[i];break}found=found||teams[fallbackIndex]||{};return {id:first(found.teamId,found.id,null),name:first(found.name,found.displayName,null),shortName:first(found.shortName,found.abbreviation,null)}}
+  function captureTeams(match){return {home:{id:first(match.team&&match.team.id,null),name:first(match.team&&match.team.name,null),shortName:first(match.team&&match.team.shortName,null)},away:{id:first(match.opponent&&match.opponent.id,null),name:first(match.opponent&&match.opponent.name,null),shortName:first(match.opponent&&match.opponent.shortName,null)}}}
+  function pointScore(raw,match,currentSet){var events=Array.isArray(raw.events)?raw.events:[],rallies=Array.isArray(raw.rallies)?raw.rallies:[],rows=events.concat(rallies),best=null,bestOrder=-1;rows.forEach(function(row,index){var setNo=finite(first(row.set,row.setNumber,row.setIndex));if(setNo!==null&&currentSet!==null&&setNo!==Number(currentSet))return;var score=row.scoreAfter||row.score||null,a,b;if(score){a=finite(first(score.home,score.our,score.team1,score.a));b=finite(first(score.away,score.opponent,score.team2,score.b))}if(a==null||b==null){a=finite(first(row.scoreA,row.homeScore));b=finite(first(row.scoreB,row.awayScore))}var order=finite(first(row.sequenceNumber,row.actionOrder,row.rallyNumber,index));if(a!=null&&b!=null&&order>=bestOrder){best={home:a,away:b};bestOrder=order}});if(best)return best;var chart=Array.isArray(raw.chartData)?raw.chartData:[],last=chart.length?chart[chart.length-1]:null;if(last)return {home:finite(first(last.a,last.home,0)),away:finite(first(last.b,last.away,0))};var sets=Array.isArray(raw.sets)?raw.sets:[],set=null;for(var i=0;i<sets.length;i++)if(Number(first(sets[i].setNumber,sets[i].number,i+1))===Number(currentSet)){set=sets[i];break}set=set||sets[sets.length-1];if(set){var fs=set.currentScore||set.score||set.finalScore||{};return {home:finite(first(fs.home,fs.our,fs.team1,set.homeScore,set.ourScore)),away:finite(first(fs.away,fs.opponent,fs.team2,set.awayScore,set.opponentScore))}}return {home:null,away:null}}
+  function setScore(raw,match){var home=finite(first(match.homeSetsWon,match.ourSetsWon,raw.homeSetsWon)),away=finite(first(match.awaySetsWon,match.opponentSetsWon,raw.awaySetsWon));if(home!==null&&away!==null)return {home:home,away:away};if(window.VolleySets&&window.VolleySets.summary&&raw.format==='volley-live-capture'){try{var summary=window.VolleySets.summary(match,Array.isArray(raw.events)?raw.events:[]);return {home:finite(summary.wonA),away:finite(summary.wonB)}}catch(e){}}var sets=Array.isArray(raw.sets)?raw.sets:[],h=0,a=0,seen=false;sets.forEach(function(set){var score=set.finalScore||set.score||{},x=finite(first(score.home,score.our,score.team1,set.homeScore,set.ourScore)),y=finite(first(score.away,score.opponent,score.team2,set.awayScore,set.opponentScore)),winner=lower(first(set.winner,set.winnerSide,set.winningSide,''));if(winner==='home'||winner==='our'||winner==='team1'){h++;seen=true}else if(winner==='away'||winner==='opponent'||winner==='team2'){a++;seen=true}else if(x!==null&&y!==null&&x!==y&&lower(first(set.status,''))==='completed'){x>y?h++:a++;seen=true}});return {home:seen?h:null,away:seen?a:null}}
+  function currentSetNumber(raw,match){var n=finite(first(match.currentSet,match.currentSetNumber,raw.currentSetNumber));if(n!==null)return n;var sets=Array.isArray(raw.sets)?raw.sets:[];if(!sets.length)return null;var active=sets.filter(function(set){return ACTIVE[lower(set.status)]}),selected=(active.length?active:sets)[(active.length?active:sets).length-1];return finite(first(selected.setNumber,selected.number,sets.indexOf(selected)+1))}
+  function archiveCurrent(){var match=storageGet(KM,null);if(!match)return null;return {format:'volley-live-capture',version:1,savedAt:first(match.updatedAt,match.savedAt,null),match:match,events:storageGet(KE,[]),chartData:storageGet(KD,[])}}
+  function summaryFrom(raw,sourceName,meta){if(!raw||typeof raw!=='object')return null;var match=raw.match&&typeof raw.match==='object'?raw.match:raw,isV2=Array.isArray(raw.teams),teams=isV2?{home:teamFromV2(raw,first(match.ourTeamId,match.homeTeamId),0),away:teamFromV2(raw,first(match.opponentTeamId,match.awayTeamId),1)}:captureTeams(match),id=text(first(match.id,match.matchId,raw.id,raw.matchId,''));if(!id)return null;var status=lower(first(match.status,match.lifecycleStatus,raw.status,'completed')),setNo=currentSetNumber(raw,match),points=pointScore(raw,match,setNo),sets=setScore(raw,match),updated=first(match.updatedAt,match.savedAt,raw.updatedAt,raw.savedAt,null),matchDate=first(match.matchDate,match.date,match.startedAt,match.createdAt,raw.matchDate,raw.createdAt,null),sourceType=meta&&meta.sourceType||'finished';return {id:id,status:status,homeTeam:teams.home,awayTeam:teams.away,currentSetNumber:setNo,currentHomePoints:points.home,currentAwayPoints:points.away,homeSetsWon:sets.home,awaySetsWon:sets.away,matchDate:matchDate,updatedAt:updated,schemaVersion:first(raw.schemaVersion,raw.version,null),raw:raw,sourceName:sourceName||'match.json',sourceType:sourceType,imported:sourceType==='imported',current:sourceType==='active'}}
   function isActive(summary){return !!(summary&&ACTIVE[lower(summary.status)])}
   function displayName(team,fallback){return text(first(team&&team.shortName,team&&team.name,fallback))||fallback}
   function longName(team,fallback){return text(first(team&&team.name,team&&team.shortName,fallback))||fallback}
+  function matchName(sum){return longName(sum.homeTeam,'HOME')+' vs '+longName(sum.awayTeam,'AWAY')}
   function formatDate(value){if(!value)return 'Date unavailable';var date=new Date(value);if(!isFinite(date.getTime()))return 'Date unavailable';try{return new Intl.DateTimeFormat(undefined,{day:'2-digit',month:'short',year:'numeric'}).format(date)}catch(e){return date.toLocaleDateString()}}
-  function savedLabel(value){
-    if(!value)return 'Save status unavailable';var when=new Date(value),now=new Date();if(!isFinite(when.getTime()))return 'Save status unavailable';
-    var diff=Math.max(0,now.getTime()-when.getTime());if(diff<60000)return 'Saved just now';if(diff<3600000)return 'Saved '+Math.floor(diff/60000)+' min ago';
-    if(when.toDateString()===now.toDateString())return 'Saved at '+when.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    return 'Saved '+formatDate(value)+' '+when.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  }
+  function savedLabel(value){if(!value)return 'Save status unavailable';var when=new Date(value),now=new Date();if(!isFinite(when.getTime()))return 'Save status unavailable';var diff=Math.max(0,now.getTime()-when.getTime());if(diff<60000)return 'Saved just now';if(diff<3600000)return 'Saved '+Math.floor(diff/60000)+' min ago';if(when.toDateString()===now.toDateString())return 'Saved at '+when.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});return 'Saved '+formatDate(value)+' '+when.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
   function readHistory(){var rows=storageGet(KH,[]);return Array.isArray(rows)?rows.filter(function(row){return row&&row.raw&&row.id}):[]}
   function writeHistory(rows){storageSet(KH,rows.slice(0,100))}
-  function upsertHistory(raw,sourceName,copyId){
-    var value=raw;if(copyId){value=JSON.parse(JSON.stringify(raw));if(value.match)value.match.id=copyId;else value.id=copyId}
-    var sum=summaryFrom(value,sourceName);if(!sum)throw new Error('Missing stable match ID or required team fields.');
-    var rows=readHistory(),record={id:sum.id,raw:value,sourceName:sourceName||'match.json',importedAt:new Date().toISOString(),updatedAt:first(sum.updatedAt,new Date().toISOString())};
-    rows=rows.filter(function(row){return row.id!==record.id});rows.unshift(record);writeHistory(rows);return summaryFrom(value,record.sourceName)
-  }
-  function syncCurrent(){
-    var raw=archiveCurrent(),sum=summaryFrom(raw,'Current match');
-    if(sum&&sum.status==='completed'){
-      var rows=readHistory(),exists=rows.some(function(row){return row.id===sum.id});
-      if(!exists){rows.unshift({id:sum.id,raw:raw,sourceName:'Completed local match',importedAt:new Date().toISOString(),updatedAt:first(sum.updatedAt,new Date().toISOString())});writeHistory(rows)}
-    }
-    return sum;
-  }
-  function load(){
-    var active=syncCurrent(),history=readHistory().map(function(row){return summaryFrom(row.raw,row.sourceName)}).filter(Boolean);
-    history.sort(function(a,b){var ac=a.status==='completed'?1:0,bc=b.status==='completed'?1:0;if(ac!==bc)return bc-ac;var ad=dateValue(a.matchDate),bd=dateValue(b.matchDate);if(ad!==bd)return bd-ad;return dateValue(b.updatedAt)-dateValue(a.updatedAt)});
-    state.active=isActive(active)?active:null;state.history=history;state.all=[];
-    if(active)state.all.push(active);
-    history.forEach(function(item){if(!state.all.some(function(existing){return existing.id===item.id}))state.all.push(item)});
-  }
-  function currentScoreLabel(sum){var home=sum.currentHomePoints,away=sum.currentAwayPoints;return (home===null||away===null)?'— – —':home+' – '+away}
-  function recentScore(sum){if(sum.status==='completed'&&sum.homeSetsWon!==null&&sum.awaySetsWon!==null)return sum.homeSetsWon+' – '+sum.awaySetsWon;return sum.status?sum.status.replace(/_/g,' ').toUpperCase():'STATUS NA'}
-  function calendarIcon(){return '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="7" width="24" height="21" rx="3"/><path d="M10 4v6M22 4v6M4 13h24M10 18h3M18 18h3M10 23h3M18 23h3"/></svg>'}
-  function renderRecent(){
-    var list=$('matchHubRecentList');if(!list)return;var rows=state.history.slice(0,2);
-    if(!rows.length){list.innerHTML='<div class="mh-empty"><strong>No matches yet</strong><span>Start a new match or import an existing one.</span><div class="mh-empty-actions"><button type="button" data-mh-new>New match</button><button type="button" data-mh-import>Import match</button></div></div>';return}
-    list.innerHTML=rows.map(function(sum){var home=longName(sum.homeTeam,'HOME'),away=longName(sum.awayTeam,'AWAY');return '<button type="button" class="mh-recent-row" data-match-id="'+esc(sum.id)+'" aria-label="Open '+esc(home)+' versus '+esc(away)+' played '+esc(formatDate(sum.matchDate))+', '+esc(recentScore(sum))+'"><span class="mh-calendar">'+calendarIcon()+'</span><span class="mh-recent-copy"><span class="mh-recent-teams">'+esc(home)+' <small>vs</small> '+esc(away)+'</span><span class="mh-recent-date">'+esc(formatDate(sum.matchDate))+'</span></span><span class="mh-result">'+esc(recentScore(sum))+'</span><span class="mh-recent-chevron" aria-hidden="true">›</span></button>'}).join('');
-  }
-  function render(){
-    if(state.rendering)return;state.rendering=true;
-    try{
-      load();var button=$('homeContinue'),info=$('homeContinueInfo'),summary=$('matchHubActiveSummary');
-      if(button){button.disabled=!state.active;button.setAttribute('aria-disabled',state.active?'false':'true')}
-      if(!state.active){if(info)info.textContent='No match in progress';if(summary)summary.hidden=true;if(button)button.setAttribute('aria-label','No match in progress');}
-      else{
-        var home=displayName(state.active.homeTeam,'HOME'),away=displayName(state.active.awayTeam,'AWAY'),setNo=state.active.currentSetNumber;
-        if(info)info.textContent='Resume your match in progress';if(summary){summary.hidden=false;$('matchHubTeams').textContent=home+' vs '+away;$('matchHubScore').textContent=currentScoreLabel(state.active);$('matchHubMeta').textContent=(setNo?'Set '+setNo:'Set unavailable')+' • '+savedLabel(state.active.updatedAt)}
-        if(button)button.setAttribute('aria-label','Continue '+home+' versus '+away+', '+(setNo?'Set '+setNo+', ':'')+'score '+(state.active.currentHomePoints===null?'unavailable':state.active.currentHomePoints+' to '+state.active.currentAwayPoints));
-      }
-      renderRecent();var see=$('matchHubSeeAll');if(see)see.hidden=!state.history.length;
-      var off=$('matchHubOffline');if(off)off.hidden=navigator.onLine;
-      emit('match_hub_viewed',{source:'home',hasActiveMatch:!!state.active,recentMatchCount:state.history.length});
-    }catch(error){setStatus('Matches could not be loaded.','error');var retry=$('matchHubRetry');if(retry)retry.hidden=false;var button=$('homeContinue');if(button){button.disabled=true;button.setAttribute('aria-disabled','true')}}
-    state.rendering=false;
-  }
+  function upsertHistory(raw,sourceName,copyId,sourceType){var value=raw;if(copyId){value=JSON.parse(JSON.stringify(raw));if(value.match)value.match.id=copyId;else value.id=copyId}var sum=summaryFrom(value,sourceName,{sourceType:sourceType||'imported'});if(!sum)throw new Error('Missing stable match ID or required team fields.');var rows=readHistory(),record={id:sum.id,raw:value,sourceName:sourceName||'match.json',sourceType:sourceType||'imported',importedAt:new Date().toISOString(),updatedAt:first(sum.updatedAt,new Date().toISOString())};rows=rows.filter(function(row){return row.id!==record.id});rows.unshift(record);writeHistory(rows);return summaryFrom(value,record.sourceName,record)}
+  function syncCurrent(){var raw=archiveCurrent(),sum=summaryFrom(raw,'Current match',{sourceType:'active'});if(sum&&sum.status==='completed'){var rows=readHistory(),exists=rows.some(function(row){return row.id===sum.id});if(!exists){rows.unshift({id:sum.id,raw:raw,sourceName:'Completed local match',sourceType:'finished',importedAt:null,updatedAt:first(sum.updatedAt,new Date().toISOString())});writeHistory(rows)}}return sum}
+  function load(){var current=syncCurrent(),rows=readHistory(),history=rows.map(function(row){return summaryFrom(row.raw,row.sourceName,row)}).filter(Boolean);history.sort(function(a,b){var ad=dateValue(a.matchDate),bd=dateValue(b.matchDate);if(ad!==bd)return bd-ad;return dateValue(b.updatedAt)-dateValue(a.updatedAt)});state.active=isActive(current)?current:null;state.history=history;state.all=[];if(current)state.all.push(current);history.forEach(function(item){if(!state.all.some(function(existing){return existing.id===item.id&&existing.sourceType===item.sourceType}))state.all.push(item)});var selected=storageGet(KS,null);state.selected=selected?state.all.find(function(item){return item.id===selected.id&&(!selected.sourceType||item.sourceType===selected.sourceType)}):null;if(!state.selected&&state.all.length){state.selected=state.active||state.all[0];persistSelected(state.selected)}}
+  function persistSelected(sum){if(!sum)return;storageSet(KS,{id:sum.id,sourceType:sum.sourceType});state.selected=sum}
+  function currentScoreLabel(sum){return sum.currentHomePoints===null||sum.currentAwayPoints===null?'0 – 0':sum.currentHomePoints+' – '+sum.currentAwayPoints}
+  function resultLabel(sum){if(sum.status==='completed'&&sum.homeSetsWon!==null&&sum.awaySetsWon!==null)return sum.homeSetsWon+' – '+sum.awaySetsWon;if(isActive(sum))return currentScoreLabel(sum);return 'NA'}
+  function stateLabel(sum){if(sum.imported)return 'IMPORTED';if(isActive(sum)&&sum.current)return 'LIVE';if(sum.status==='completed')return 'FINISHED';return text(sum.status||'NA').replace(/_/g,' ').toUpperCase()}
+  function filtered(){return state.all.filter(function(sum){if(state.filter==='active')return isActive(sum)&&sum.current;if(state.filter==='imported')return sum.imported;return !sum.imported&&!isActive(sum)})}
+  function setDefaultFilter(){var counts={active:state.all.filter(function(x){return isActive(x)&&x.current}).length,finished:state.all.filter(function(x){return !x.imported&&!isActive(x)}).length,imported:state.all.filter(function(x){return x.imported}).length};if(counts[state.filter])return;if(counts.active)state.filter='active';else if(counts.finished)state.filter='finished';else if(counts.imported)state.filter='imported'}
+  function renderCapture(){load();var button=$('homeContinue'),info=$('homeContinueInfo'),summary=$('matchHubActiveSummary');if(button){button.disabled=!state.active;button.setAttribute('aria-disabled',state.active?'false':'true')}if(!state.active){if(info)info.textContent='No match in progress';if(summary)summary.hidden=true;if(button)button.setAttribute('aria-label','No match in progress')}else{var home=displayName(state.active.homeTeam,'HOME'),away=displayName(state.active.awayTeam,'AWAY'),setNo=state.active.currentSetNumber;if(info)info.textContent='Resume official data entry';if(summary){summary.hidden=false;$('matchHubTeams').textContent=home+' vs '+away;$('matchHubScore').textContent=currentScoreLabel(state.active);$('matchHubMeta').textContent=(setNo?'Set '+setNo:'Set unavailable')+' • '+savedLabel(state.active.updatedAt)}if(button)button.setAttribute('aria-label','Continue capture '+home+' versus '+away)}var off=$('matchHubOffline');if(off)off.hidden=navigator.onLine;emit('match_capture_viewed',{hasActiveMatch:!!state.active})}
+  function renderSelected(){var box=$('librarySelected');if(!box)return;if(!state.selected){box.hidden=true;return}box.hidden=false;$('librarySelectedName').textContent=matchName(state.selected);$('librarySelectedMeta').textContent=formatDate(state.selected.matchDate)+' · '+resultLabel(state.selected);$('librarySelectedState').textContent=stateLabel(state.selected)}
+  function actionButtons(sum){var buttons='<button type="button" class="primary" data-library-action="coach" data-id="'+esc(sum.id)+'" data-source="'+esc(sum.sourceType)+'">COACH VIEW</button><button type="button" data-library-action="spectator" data-id="'+esc(sum.id)+'" data-source="'+esc(sum.sourceType)+'">SPECTATOR</button><button type="button" data-library-action="report" data-id="'+esc(sum.id)+'" data-source="'+esc(sum.sourceType)+'">REPORTS</button>';if(sum.current&&isActive(sum))buttons='<button type="button" class="write" data-library-action="continue" data-id="'+esc(sum.id)+'" data-source="'+esc(sum.sourceType)+'">CONTINUE CAPTURE</button>'+buttons;return buttons}
+  function renderLibrary(){if(state.rendering)return;state.rendering=true;try{load();setDefaultFilter();var active=state.all.filter(function(x){return isActive(x)&&x.current}).length,finished=state.all.filter(function(x){return !x.imported&&!isActive(x)}).length,imported=state.all.filter(function(x){return x.imported}).length;$('libraryActiveCount').textContent=active;$('libraryFinishedCount').textContent=finished;$('libraryImportedCount').textContent=imported;document.querySelectorAll('[data-library-filter]').forEach(function(button){var on=button.dataset.libraryFilter===state.filter;button.classList.toggle('active',on);button.setAttribute('aria-current',on?'page':'false')});renderSelected();var items=filtered(),list=$('matchLibraryList');if(!items.length){list.innerHTML='<div class="library-empty"><strong>No '+esc(state.filter)+' matches</strong><span>0 matches · No demonstration data is shown.</span></div>'}else{list.innerHTML=items.map(function(sum){var selected=state.selected&&state.selected.id===sum.id&&state.selected.sourceType===sum.sourceType;return '<article class="library-card'+(selected?' selected':'')+'" data-library-card="'+esc(sum.id)+'"><div class="library-card-head"><div class="library-card-title"><strong>'+esc(matchName(sum))+'</strong><small>'+esc(formatDate(sum.matchDate))+' · '+esc(resultLabel(sum))+' · '+esc(sum.sourceName)+'</small></div><span class="library-state">'+esc(stateLabel(sum))+'</span></div><div class="library-actions"><button type="button" data-library-action="select" data-id="'+esc(sum.id)+'" data-source="'+esc(sum.sourceType)+'">'+(selected?'SELECTED':'SELECT MATCH')+'</button>'+actionButtons(sum)+'</div></article>'}).join('')}var offline=$('libraryOffline');if(offline)offline.hidden=navigator.onLine;$('matchLibrarySubtitle').textContent=state.mode==='coach'?'Select a match for Coach View.':state.mode==='spectator'?'Select a match for Spectator View.':state.mode==='reports'?'Select a match for reports and exports.':'Select a match once, then open any compatible view.';emit('match_library_viewed',{filter:state.filter,count:items.length,mode:state.mode})}catch(error){setStatus('matchLibraryStatus','Matches could not be loaded: '+error.message,'error')}state.rendering=false}
+  function displayScreen(screen){['homeScreen','setupCaptureScreen','insightsScreen','matchHubScreen','matchLibraryScreen','setupScreen','teamsScreen','settingsScreen'].forEach(function(id){var el=$(id);if(el)el.hidden=true});screen.hidden=false;screen.scrollTop=0}
+  function openLibrary(mode){state.mode=mode||'library';load();if(state.mode==='coach'&&state.active)state.filter='active';else if(state.mode==='reports'&&state.history.length)state.filter=state.history.some(function(x){return !x.imported&&!isActive(x)})?'finished':'imported';displayScreen($('matchLibraryScreen'));renderLibrary();$('matchLibraryBack').focus()}
+  function findSum(id,source){return state.all.find(function(item){return item.id===id&&(!source||item.sourceType===source)})}
+  function prepareReplay(sum){persistSelected(sum);sessionStorage.removeItem(KU);if(sum.current&&isActive(sum)){sessionStorage.removeItem(KR);sessionStorage.removeItem(KRS)}else{sessionStorage.setItem(KR,JSON.stringify(sum.raw));sessionStorage.setItem(KRS,sum.sourceName||'match.json')}}
+  function openCoach(sum){if(!sum)return;prepareReplay(sum);var coach=$('coachScreen');if(coach)coach.dataset.returnScreen='matchLibraryScreen';if(window.VolleyCoach&&window.VolleyCoach.open)window.VolleyCoach.open();else setStatus('matchLibraryStatus','Coach View is unavailable.','error')}
+  function openSpectator(sum,tab){if(!sum)return;persistSelected(sum);localStorage.setItem('volleySpectator.archive.v1',JSON.stringify(sum.raw));localStorage.setItem('volleySpectator.archiveName.v1',sum.sourceName||'match.json');sessionStorage.setItem(KR,JSON.stringify(sum.raw));sessionStorage.setItem(KRS,sum.sourceName||'match.json');location.href='spectator.html#'+(tab||'live-score')}
   function openDialog(dialog){if(!dialog)return;if(typeof dialog.showModal==='function'){if(!dialog.open)dialog.showModal()}else dialog.setAttribute('open','')}
   function closeDialog(dialog){if(!dialog)return;if(typeof dialog.close==='function'&&dialog.open)dialog.close();else dialog.removeAttribute('open')}
-  function openViewer(sum){
-    if(!sum||!sum.raw)return;localStorage.setItem('volleySpectator.archive.v1',JSON.stringify(sum.raw));localStorage.setItem('volleySpectator.archiveName.v1',sum.sourceName||'match.json');sessionStorage.setItem('volleyAnalysis.replay.v1',JSON.stringify(sum.raw));sessionStorage.setItem('volleyAnalysis.replay.source.v1',sum.sourceName||'match.json');location.href='spectator.html#live-score';
-  }
   function clearCurrent(){localStorage.removeItem(KM);localStorage.removeItem(KE);localStorage.removeItem(KD)}
   function beginSetup(){sessionStorage.setItem(STAGE,'setup');location.reload()}
-  function newMatch(event){
-    if(!state.active){emit('match_hub_new_match_selected',{source:'home',hasActiveMatch:false});return}
-    event.preventDefault();event.stopImmediatePropagation();$('matchHubDecisionText').textContent='A match is already in progress: '+longName(state.active.homeTeam,'HOME')+' vs '+longName(state.active.awayTeam,'AWAY')+'. Continue it, save it before starting another, or cancel.';openDialog($('matchHubDecision'));emit('match_hub_new_match_selected',{source:'home',hasActiveMatch:true});
-  }
-  function selectorItems(scope){var items=scope==='history'?state.history:state.all,container=$('matchHubSelectorList');if(!container)return;container.innerHTML='';
-    if(!items.length){container.innerHTML='<div class="mh-empty"><strong>No matches available</strong><span>Create a new match or import a VolleyLive JSON file.</span></div>';return}
-    container.innerHTML=items.map(function(sum){return '<button type="button" class="mh-selector-item" data-select-id="'+esc(sum.id)+'"><span><b>'+esc(longName(sum.homeTeam,'HOME'))+' vs '+esc(longName(sum.awayTeam,'AWAY'))+'</b><br><small>'+esc(formatDate(sum.matchDate))+' · '+esc(sum.status.replace(/_/g,' '))+'</small></span><strong>'+esc(recentScore(sum))+'</strong></button>'}).join('')}
-  function openSelector(scope){load();selectorItems(scope);$('matchHubSelectorTitle').textContent=scope==='history'?'Match history':'View match';openDialog($('matchHubSelector'));emit(scope==='history'?'match_hub_see_all_selected':'match_hub_view_match_selected',{source:'home',recentMatchCount:state.history.length})}
-  function validateImport(raw){
-    if(hasUnsafeKey(raw))throw new Error('Unsafe object keys are not allowed.');
-    var check=window.VolleyStatsAdapter&&window.VolleyStatsAdapter.validate?window.VolleyStatsAdapter.validate(raw):null;
-    if(!check||!check.valid)throw new Error(check&&check.errors&&check.errors.length?check.errors.join(' '):'Unsupported VolleyLive JSON structure.');
-    var sum=summaryFrom(raw,'Imported match');if(!sum)throw new Error('Missing stable match ID or required team fields.');
-    if(!text(first(sum.homeTeam.name,sum.homeTeam.shortName,''))||!text(first(sum.awayTeam.name,sum.awayTeam.shortName,'')))throw new Error('Required team fields are missing.');
-    return sum;
-  }
-  function chooseFile(){var input=$('matchHubFile');if(!input)return;input.value='';input.click();emit('match_hub_import_selected',{source:'home'})}
-  function importFailure(message,category){setStatus('Import failed: '+message,'error');emit('match_hub_import_failed',{source:'home',errorCategory:category||'validation'})}
-  function importRaw(raw,fileName){
-    var sum;try{sum=validateImport(raw)}catch(error){importFailure(error.message,'validation');return}
-    var existing=state.all.some(function(item){return item.id===sum.id});
-    if(existing){state.pendingImport=raw;state.pendingFileName=fileName;$('matchHubDuplicateText').textContent='A match with ID '+sum.id+' already exists. Open the existing match, import this file as a copy, or cancel.';$('matchHubOpenExisting').dataset.matchId=sum.id;openDialog($('matchHubDuplicate'));return}
-    try{var imported=upsertHistory(raw,fileName);setStatus('Match imported successfully.','success');emit('match_hub_import_succeeded',{source:'home',matchStatus:imported.status,schemaVersion:imported.schemaVersion||'unknown'});render();openViewer(imported)}catch(error){importFailure(error.message,'persistence')}
-  }
+  function newMatch(event){load();if(!state.active){emit('match_capture_new_selected',{hasActiveMatch:false});return}event.preventDefault();event.stopImmediatePropagation();$('matchHubDecisionText').textContent='A match is already in progress: '+matchName(state.active)+'. Continue it, save it before starting another, or cancel.';openDialog($('matchHubDecision'));emit('match_capture_new_selected',{hasActiveMatch:true})}
+  function validateImport(raw){if(hasUnsafeKey(raw))throw new Error('Unsafe object keys are not allowed.');var check=window.VolleyStatsAdapter&&window.VolleyStatsAdapter.validate?window.VolleyStatsAdapter.validate(raw):null;if(!check||!check.valid)throw new Error(check&&check.errors&&check.errors.length?check.errors.join(' '):'Unsupported VolleyLive JSON structure.');var sum=summaryFrom(raw,'Imported match',{sourceType:'imported'});if(!sum)throw new Error('Missing stable match ID or required team fields.');if(!text(first(sum.homeTeam.name,sum.homeTeam.shortName,''))||!text(first(sum.awayTeam.name,sum.awayTeam.shortName,'')))throw new Error('Required team fields are missing.');return sum}
+  function chooseFile(){var input=$('matchLibraryFile');input.value='';input.click();emit('match_library_import_selected',{})}
+  function importFailure(message,category){setStatus('matchLibraryStatus','Import failed: '+message,'error');emit('match_library_import_failed',{errorCategory:category||'validation'})}
+  function importRaw(raw,fileName){var sum;try{sum=validateImport(raw)}catch(error){importFailure(error.message,'validation');return}load();var existing=state.all.some(function(item){return item.id===sum.id});if(existing){state.pendingImport=raw;state.pendingFileName=fileName;$('matchHubDuplicateText').textContent='A match with ID '+sum.id+' already exists. Open the existing match, import this file as a copy, or cancel.';$('matchHubOpenExisting').dataset.matchId=sum.id;openDialog($('matchHubDuplicate'));return}try{var imported=upsertHistory(raw,fileName,null,'imported');persistSelected(imported);state.filter='imported';setStatus('matchLibraryStatus','Match imported successfully in read-only mode.','success');renderLibrary()}catch(error){importFailure(error.message,'persistence')}}
   function onFile(){var file=this.files&&this.files[0];if(!file)return;if(file.size>MAX_FILE_BYTES){importFailure('File exceeds the 10 MB limit.','size');return}if(!/\.json$/i.test(file.name)){importFailure('Select a .json file.','type');return}var reader=new FileReader();reader.onerror=function(){importFailure('The file could not be read.','read')};reader.onload=function(){var raw;try{raw=JSON.parse(reader.result)}catch(error){importFailure('Invalid JSON syntax.','parse');return}importRaw(raw,file.name)};reader.readAsText(file)}
+  function rawEvents(sum){var raw=sum&&sum.raw||{};return Array.isArray(raw.events)?raw.events:[]}
+  function safeName(value){return text(value||'match').replace(/[^a-z0-9_-]+/gi,'_').replace(/^_+|_+$/g,'').slice(0,80)||'match'}
+  function download(name,type,content){var blob=new Blob([content],{type:type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1500)}
+  function reportHtml(sum){var events=rawEvents(sum),rows=events.map(function(e,index){return '<tr><td>'+(index+1)+'</td><td>'+esc(first(e.set,e.setNumber,'NA'))+'</td><td>'+esc(first(e.player,e.playerId,'NA'))+'</td><td>'+esc(first(e.action,e.actionType,e.eventType,'NA'))+'</td><td>'+esc(first(e.result,e.evaluation,'NA'))+'</td><td>'+esc(first(e.scoreA,e.homeScore,'0'))+' – '+esc(first(e.scoreB,e.awayScore,'0'))+'</td></tr>'}).join('');return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>'+esc(matchName(sum))+' report</title><style>body{font:14px Arial;margin:24px;color:#17212b}h1{color:#123b62}.badge{display:inline-block;padding:5px 8px;border:1px solid #6a52bf;border-radius:99px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{padding:7px;border:1px solid #ccd6df;text-align:left}th{background:#eaf2f8}</style></head><body><span class="badge">READ ONLY · '+esc(stateLabel(sum))+'</span><h1>'+esc(matchName(sum))+'</h1><p>'+esc(formatDate(sum.matchDate))+' · '+esc(resultLabel(sum))+' · '+events.length+' events</p><table><thead><tr><th>#</th><th>Set</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody>'+rows+'</tbody></table><p>Generated locally by VolleyLive v1.25.0.</p></body></html>'}
+  function reportCsv(sum){var rows=['Sequence,Set,Player,Action,Result,HomeScore,AwayScore'];rawEvents(sum).forEach(function(e,index){function csv(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}rows.push([index+1,first(e.set,e.setNumber,''),first(e.player,e.playerId,''),first(e.action,e.actionType,e.eventType,''),first(e.result,e.evaluation,''),first(e.scoreA,e.homeScore,0),first(e.scoreB,e.awayScore,0)].map(csv).join(','))});return rows.join('\r\n')}
+  function openReports(sum){if(!sum)return;persistSelected(sum);state.report=sum;$('matchReportText').textContent=matchName(sum)+' · '+stateLabel(sum)+' · READ ONLY · '+rawEvents(sum).length+' events';openDialog($('matchReportDialog'))}
+  function doLibraryAction(action,sum){if(!sum)return;persistSelected(sum);if(action==='select'){renderLibrary();return}if(action==='continue'&&sum.current&&isActive(sum)){$('homeContinue').click();return}if(action==='coach'){openCoach(sum);return}if(action==='spectator'){openSpectator(sum,'live-score');return}if(action==='report'){openReports(sum)}}
+  function render(){renderCapture();if($('matchLibraryScreen')&&!$('matchLibraryScreen').hidden)renderLibrary()}
   function bind(){
-    var homeNew=$('homeNew'),homeOpen=$('homeOpen'),recent=$('matchHubRecentList');
-    if(homeNew)homeNew.addEventListener('click',newMatch,true);
-    if(homeOpen)homeOpen.addEventListener('click',function(event){event.preventDefault();event.stopImmediatePropagation();openSelector('all')},true);
-    if($('homeContinue'))$('homeContinue').addEventListener('click',function(){if(!this.disabled)emit('match_hub_continue_selected',{source:'home',matchStatus:state.active&&state.active.status})},true);
-    if($('matchHubImport'))$('matchHubImport').addEventListener('click',chooseFile);
-    if($('matchHubFile'))$('matchHubFile').addEventListener('change',onFile);
-    if($('matchHubSeeAll'))$('matchHubSeeAll').addEventListener('click',function(){openSelector('history')});
-    if($('matchHubRetry'))$('matchHubRetry').addEventListener('click',function(){this.hidden=true;setStatus('');render()});
-    if(recent)recent.addEventListener('click',function(event){var row=event.target.closest('[data-match-id]');if(row){var sum=state.all.find(function(item){return item.id===row.dataset.matchId});emit('match_hub_recent_match_selected',{source:'home',matchStatus:sum&&sum.status});openViewer(sum);return}if(event.target.closest('[data-mh-new]'))homeNew.click();if(event.target.closest('[data-mh-import]'))chooseFile()});
+    $('homeNew').addEventListener('click',newMatch,true);
+    $('homeContinue').addEventListener('click',function(){if(!this.disabled)emit('match_capture_continue_selected',{matchStatus:state.active&&state.active.status})},true);
+    $('matchHubRetry').addEventListener('click',function(){this.hidden=true;setStatus('matchHubStatus','');renderCapture()});
+    document.querySelectorAll('[data-library-mode]').forEach(function(button){button.addEventListener('click',function(){openLibrary(button.dataset.libraryMode)})});
+    $('matchLibraryBack').addEventListener('click',function(){displayScreen($('insightsScreen'));$('insightsMatchLibrary').focus()});
+    $('matchLibraryImport').addEventListener('click',chooseFile);$('matchLibraryFile').addEventListener('change',onFile);
+    document.querySelector('.library-filters').addEventListener('click',function(event){var button=event.target.closest('[data-library-filter]');if(!button)return;state.filter=button.dataset.libraryFilter;renderLibrary()});
+    $('matchLibraryList').addEventListener('click',function(event){var button=event.target.closest('[data-library-action]');if(!button)return;doLibraryAction(button.dataset.libraryAction,findSum(button.dataset.id,button.dataset.source))});
     document.querySelectorAll('[data-dialog-close]').forEach(function(button){button.addEventListener('click',function(){closeDialog(button.closest('dialog'))})});
     $('matchHubContinueCurrent').addEventListener('click',function(){closeDialog($('matchHubDecision'));$('homeContinue').click()});
-    $('matchHubSaveStart').addEventListener('click',function(){try{if(window.saveMatchJson)window.saveMatchJson();var raw=archiveCurrent();if(raw)upsertHistory(raw,'Saved local match')}catch(e){}clearCurrent();beginSetup()});
+    $('matchHubSaveStart').addEventListener('click',function(){try{if(window.saveMatchJson)window.saveMatchJson();var raw=archiveCurrent();if(raw)upsertHistory(raw,'Saved local match',null,'finished')}catch(e){}clearCurrent();beginSetup()});
     $('matchHubDiscardStart').addEventListener('click',function(){clearCurrent();beginSetup()});
-    $('matchHubSelectorList').addEventListener('click',function(event){var row=event.target.closest('[data-select-id]');if(!row)return;var sum=state.all.find(function(item){return item.id===row.dataset.selectId});openViewer(sum)});
-    $('matchHubSelectorImport').addEventListener('click',function(){closeDialog($('matchHubSelector'));chooseFile()});
-    $('matchHubSelectorNew').addEventListener('click',function(){closeDialog($('matchHubSelector'));homeNew.click()});
-    $('matchHubOpenExisting').addEventListener('click',function(){var id=this.dataset.matchId,sum=state.all.find(function(item){return item.id===id});closeDialog($('matchHubDuplicate'));openViewer(sum)});
-    $('matchHubImportCopy').addEventListener('click',function(){if(!state.pendingImport)return;try{var copyId=(summaryFrom(state.pendingImport,'copy').id||'match')+'-copy-'+Date.now(),sum=upsertHistory(state.pendingImport,state.pendingFileName,copyId);closeDialog($('matchHubDuplicate'));state.pendingImport=null;setStatus('Match imported as a copy.','success');render();openViewer(sum)}catch(error){importFailure(error.message,'duplicate')}});
+    $('matchHubOpenExisting').addEventListener('click',function(){load();var id=this.dataset.matchId,sum=state.all.find(function(item){return item.id===id});closeDialog($('matchHubDuplicate'));if(sum){persistSelected(sum);state.filter=sum.imported?'imported':isActive(sum)?'active':'finished';renderLibrary()}});
+    $('matchHubImportCopy').addEventListener('click',function(){if(!state.pendingImport)return;try{var copyId=(summaryFrom(state.pendingImport,'copy',{sourceType:'imported'}).id||'match')+'-copy-'+Date.now(),sum=upsertHistory(state.pendingImport,state.pendingFileName,copyId,'imported');closeDialog($('matchHubDuplicate'));state.pendingImport=null;persistSelected(sum);state.filter='imported';setStatus('matchLibraryStatus','Match imported as a read-only copy.','success');renderLibrary()}catch(error){importFailure(error.message,'duplicate')}});
+    $('matchReportHtml').addEventListener('click',function(){if(state.report)download(safeName(matchName(state.report))+'_report.html','text/html',reportHtml(state.report))});
+    $('matchReportCsv').addEventListener('click',function(){if(state.report)download(safeName(matchName(state.report))+'_events.csv','text/csv',reportCsv(state.report))});
+    $('matchReportJson').addEventListener('click',function(){if(state.report)download(safeName(matchName(state.report))+'.json','application/json',JSON.stringify(state.report.raw,null,2))});
     window.addEventListener('online',render);window.addEventListener('offline',render);window.addEventListener('pageshow',render);window.addEventListener('focus',render);
-    var screen=$('matchHubScreen');if(screen&&window.MutationObserver)new MutationObserver(function(records){records.forEach(function(record){if(record.attributeName==='hidden'&&!screen.hidden)render()})}).observe(screen,{attributes:true});
+    var capture=$('matchHubScreen'),library=$('matchLibraryScreen');if(window.MutationObserver){new MutationObserver(function(records){records.forEach(function(record){if(record.attributeName==='hidden'&&!capture.hidden)renderCapture()})}).observe(capture,{attributes:true});new MutationObserver(function(records){records.forEach(function(record){if(record.attributeName==='hidden'&&!library.hidden)renderLibrary()})}).observe(library,{attributes:true})}
   }
-  function init(){var hub=$('matchHub');if(!hub)return;hub.setAttribute('aria-busy','true');bind();render();hub.setAttribute('aria-busy','false');window.VolleyMatchHub={refresh:render,summaryFrom:summaryFrom,validateImport:validateImport,openViewer:openViewer,archiveCurrent:archiveCurrent}}
+  function init(){var hub=$('matchHub');if(!hub)return;hub.setAttribute('aria-busy','true');bind();render();hub.setAttribute('aria-busy','false');window.VolleyMatchHub={refresh:render,summaryFrom:summaryFrom,validateImport:validateImport,openViewer:openSpectator,openLibrary:openLibrary,archiveCurrent:archiveCurrent};window.VolleyMatchLibrary=window.VolleyMatchHub}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

@@ -155,7 +155,7 @@ def test_deleted_state_persists_after_reload(browser):
     page.reload(); page.wait_for_timeout(150)
     assert len(events(page)) == 1
     if page.locator("#homeScreen").is_visible():
-        page.click("#homeMatchHub")
+        page.click("#homeSetupCapture"); page.click("#setupMatchCapture")
         page.click("#homeContinue")
     assert _score(page) == ["1", "0"]
     _open_history(page)

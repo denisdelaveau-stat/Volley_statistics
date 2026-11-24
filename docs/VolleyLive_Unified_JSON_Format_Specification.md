@@ -1,7 +1,7 @@
 # VolleyLive Unified JSON Format Specification
 
 **Version:** 2.1.0  
-**Status:** official application contract for Volley Live Capture, Coach View, Advanced Statistics, live score and multi-match analysis  
+**Status:** official application contract for Volley Live Capture, Coach View, Spectator View, Match Library, reports and multi-match analysis  
 **Canonical fixture:** `statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json`
 
 ## 1. Authority and design rules
@@ -172,9 +172,9 @@ Capture writes source events and explicit rally context. It never writes derived
 
 Coach View reads players, rally phase, setter rotation, lineup snapshots, actions and scores from v2.1. It may accept a Capture-v1 local store only through a clearly labelled in-memory migration path.
 
-### Advanced Statistics
+### Spectator timeline and ranking
 
-Advanced Statistics reads the same v2.1 document. Timeline columns represent `ACTION` events; substitutions remain in the source-event count but not in action denominators. Filters and aggregates must use explicit rally and lineup context.
+SPECTATOR VIEW reads the same v2.1 document. Timeline entries represent `ACTION` events; substitutions remain in the source-event count but not in action denominators. Timeline, graph and ranking filters must use explicit rally and lineup context. The former separate Advanced Statistics route was removed in v1.25.0.
 
 ### Multi-match analysis
 
@@ -210,4 +210,4 @@ A conforming validator checks at least:
 | inferred phase and rotation | explicit rally context |
 | `match.subs[]` | `SUBSTITUTION` event |
 
-Capture v1 is a migration input, not the reference contract for Coach View or Advanced Statistics from application v1.9.1 onward.
+Capture v1 is a migration input, not the reference contract for Coach View, Spectator View, Match Library or reports.

@@ -52,7 +52,7 @@ def test_initial_rotation_has_default_grey_libero_circle_on_centred_bench(browse
     page.goto(APP_URI)
     _seed_team(page)
     page.reload()
-    page.click("#homeMatchHub")
+    page.click("#homeSetupCapture"); page.click("#setupMatchCapture")
     page.click("#homeNew")
     page.select_option("#suTeamSelect", "Antibes U18")
     page.fill("#suOpp", "Nice")
@@ -87,7 +87,7 @@ def test_settings_and_new_match_sequence(browser):
     page.click("#settingsSave")
     page.click("#settingsBack")
 
-    page.click("#homeMatchHub")
+    page.click("#homeSetupCapture"); page.click("#setupMatchCapture")
     page.click("#homeNew")
     assert page.locator("#suTitle").inner_text() == "Sélectionne ton équipe"
     assert page.locator(".su-steps").is_hidden()

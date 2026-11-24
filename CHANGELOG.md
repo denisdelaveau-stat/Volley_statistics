@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.25.0 — Setup & Capture / Insights & Viewing
+- Replaced the five-entry Home with two primary workspaces plus separate Settings.
+- Added shared Match Library filters for Active, Finished, and Imported matches.
+- Moved match JSON import into Match Library and retained team CSV import in Team Management.
+- Added shared selected-match routing for Coach, Spectator, and Reports.
+- Added local HTML, CSV, and official JSON report exports.
+- Removed Advanced Statistics navigation, route, cache entry, dedicated files, documentation, baselines, and tests while retaining the shared adapter.
+
 ## v1.24.0
 
 - Rebuilt TEAM MANAGEMENT in the Match Hub / Coach View visual system.

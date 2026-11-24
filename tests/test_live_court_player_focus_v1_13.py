@@ -26,7 +26,7 @@ def _open_with_raw(browser, raw, viewport=None):
         raw,
     )
     page.reload()
-    page.locator("#homeCoach").click()
+    page.evaluate("window.VolleyCoach.open()")
     page.locator('[data-coach-tab="live-court"]').click()
     return page, errors
 
@@ -132,7 +132,7 @@ def test_empty_landscape_is_neutral_zero_or_na(browser):
     page.goto(APP_URI)
     page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
-    page.locator("#homeCoach").click()
+    page.evaluate("window.VolleyCoach.open()")
     page.locator('[data-coach-tab="live-court"]').click()
 
     assert page.locator(".live-player-card.status-neutral").count() == 6

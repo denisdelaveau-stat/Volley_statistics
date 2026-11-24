@@ -1,4 +1,4 @@
-"""Empty -> loaded -> unloaded acceptance for Coach View and Advanced Statistics v1.12.5."""
+"""Empty -> loaded -> unloaded acceptance for read-only Coach View."""
 from __future__ import annotations
 
 import re
@@ -14,7 +14,7 @@ def _only_zero_or_na(values):
     return all(re.fullmatch(r"(?:0|NA)", value.strip()) for value in values if value.strip())
 
 def test_coach_empty_file_replay_and_unload(browser):
-    page=browser.new_page(viewport={"width":390,"height":844}); page.goto(APP_URI); _clear(page); page.locator("#homeCoach").click()
+    page=browser.new_page(viewport={"width":390,"height":844}); page.goto(APP_URI); _clear(page); page.evaluate("window.VolleyCoach.open()")
     assert page.locator("#coachLiveLabel").inner_text()=="AUCUN MATCH"
     assert "Aucun match chargé" in page.locator("#coachContent").inner_text()
     assert "Cannes" not in page.locator("#coachContent").inner_text()
@@ -34,30 +34,10 @@ def test_coach_empty_file_replay_and_unload(browser):
     assert "Aucun match chargé" in page.locator("#coachContent").inner_text(); assert "Replay JSON chargé" not in page.locator("#coachContent").inner_text()
     page.close()
 
-def test_advanced_statistics_empty_file_replay_and_unload(browser):
-    page=browser.new_page(viewport={"width":820,"height":900}); page.goto(APP_URI.replace("index.html","statistics/index.html")); _clear(page); page.wait_for_selector("#statsLoader",state="hidden")
-    assert "Aucun match chargé" in page.locator("#statsMatchTitle").inner_text()
-    assert "Cannes" not in page.locator("body").inner_text()
-    assert page.locator("html.stats-empty-state").count()==1
-    assert page.locator(".demo-only-indicator, .json-audit-badge, html.stats-demo-only").count()==0
-    assert "NaN" not in page.locator("body").inner_text() and "Infinity" not in page.locator("body").inner_text()
-    color=page.locator(".empty-indicator").first.evaluate("e=>getComputedStyle(e).color"); assert color == "rgb(154, 167, 182)"
-    assert page.locator("#mc").inner_text()=="0" and page.locator("#mr").inner_text()=="0"
-    assert page.locator("#playerStats,.stats-panel,.stat-detail").count()==0
-    assert page.locator("#view .empty-indicator").count()==3
-    assert page.locator("#rotationMetricsBtn,#rosterRankingBtn,#playingTimeBtn").count()==0
-    assert page.locator("#rotationPage,#rosterPage,#playingPage").count()==0
-    assert page.locator(".mini-chart,.mini-pie,.efficiency-curves,.curve-card,.chart-modal").count()==0
-    page.set_input_files("#statsFileInput",str(FIXTURE)); page.wait_for_selector("#statsLoader",state="hidden")
-    assert "cannes" in page.locator("#statsMatchTitle").inner_text().lower(); assert page.locator("html.stats-empty-state").count()==0; assert int(page.locator("#mc").inner_text())>0
-    page.locator("#statsUnloadBtn").click(); page.wait_for_selector("#statsLoader",state="hidden")
-    assert "Aucun match chargé" in page.locator("#statsMatchTitle").inner_text(); assert "Cannes" not in page.locator("body").inner_text(); assert page.locator("#mc").inner_text()=="0"
-    page.close()
-
-def test_no_automatic_reference_fixture_loading():
-    home=(ROOT/"index.html").read_text(encoding="utf-8"); stats=(ROOT/"statistics/index.html").read_text(encoding="utf-8")
-    assert "reference-fixture.js" not in home and "reference-fixture.js" not in stats
-    assert "fetch('data/As_cannes_vs_Frejus" not in stats
+def test_no_automatic_reference_fixture_loading_and_no_advanced_route():
+    home=(ROOT/"index.html").read_text(encoding="utf-8")
+    assert "reference-fixture.js" not in home
+    assert not (ROOT/"statistics/index.html").exists()
     assert "window.VolleyReferenceFixture" not in (ROOT/"coach.js").read_text(encoding="utf-8")
 
 
@@ -78,7 +58,7 @@ def test_coach_court_is_compact_without_legend_at_phone_and_tablet(browser):
             }""",
             {"match": match, "events": [event]},
         )
-        page.reload(); page.locator("#homeCoach").click()
+        page.reload(); page.evaluate("window.VolleyCoach.open()")
         assert page.locator(".coach-court-legend").count() == 0
         assert "P : Passeuse" not in page.locator(".coach-court-card").inner_text()
         assert page.locator(".coach-court-card .coach-chip").inner_text().startswith("Passeuse en P")

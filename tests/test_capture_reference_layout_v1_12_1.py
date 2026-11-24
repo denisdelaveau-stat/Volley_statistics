@@ -92,9 +92,10 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
     assert page.get_by_text("SAVE .JSON", exact=True).count() == 0
     assert page.get_by_text("REPORT .HTML", exact=True).count() == 0
 
-    assert "COACH VIEW" in page.locator("#homeCoach").inner_text()
-    assert "ADVANCED STATISTICS" in page.locator("#homeStatistics").inner_text()
-    assert page.locator("#appVersion").inner_text() == "v1.23.0"
+    assert "SETUP & CAPTURE" in page.locator("#homeSetupCapture").inner_text()
+    assert "INSIGHTS & VIEWING" in page.locator("#homeInsights").inner_text()
+    assert page.locator("#homeStatistics").count() == 0
+    assert page.locator("#appVersion").inner_text() == "v1.25.0"
     assert not errors
     page.close()
 

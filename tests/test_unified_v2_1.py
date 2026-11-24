@@ -92,38 +92,39 @@ def test_role_rotation_and_recorded_server_constraints():
             assert event["playerId"] in {zones["p2"], zones["p3"], zones["p4"]}
 
 
-def test_home_keeps_both_required_buttons_and_v2_assets():
+
+def test_home_keeps_shared_v2_adapter_and_removes_advanced_route():
     home = (ROOT / "index.html").read_text(encoding="utf-8")
-    assert 'id="homeCoach"' in home
-    assert 'class="home-main">COACH VIEW<' in home
-    assert 'id="homeStatistics"' in home
-    assert 'class="home-main">ADVANCED STATISTICS<' in home
+    assert 'id="homeSetupCapture"' in home
+    assert 'id="homeInsights"' in home
+    assert 'id="insightsCoach"' in home
+    assert 'id="insightsSpectator"' in home
+    assert 'id="homeStatistics"' not in home
+    assert not (ROOT / "statistics/index.html").exists()
     assert 'statistics/data/reference-fixture.js' not in home
     assert 'statistics/adapter.js' in home
     assert FIXTURE.exists()
 
 
-def test_both_home_buttons_open_neutral_empty_interfaces(browser):
+def test_coach_empty_state_and_match_library_zero_state(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
     page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
-
-    page.locator("#homeCoach").click()
+    page.evaluate("window.VolleyCoach.open()")
     assert page.locator("#coachScreen").is_visible()
     assert page.locator("#coachLiveLabel").inner_text() == "AUCUN MATCH"
     assert "as cannes" not in page.locator("#coachContent").inner_text().lower()
     assert "Aucun match chargé" in page.locator("#coachContent").inner_text()
     page.locator("#coachHome").click()
-
-    page.locator("#homeStatistics").click()
-    page.wait_for_url("**/statistics/index.html")
-    page.wait_for_selector("#statsLoader", state="attached")
-    page.wait_for_selector("#statsLoader", state="hidden")
-    assert "Aucun match chargé" in page.locator("#dataStatusTitle").inner_text()
-    assert page.locator("#mc").inner_text() == "0"
-    assert page.locator("#mr").inner_text() == "0"
+    page.locator("#matchLibraryBack").click() if page.locator("#matchLibraryScreen").is_visible() else None
+    if page.locator("#homeScreen").is_hidden():
+        page.locator("#insightsBack").click()
+    page.locator("#homeInsights").click()
+    page.locator("#insightsMatchLibrary").click()
+    assert page.locator(".library-filters span").all_inner_texts() == ["0", "0", "0"]
+    assert "0 matches" in page.locator("#matchLibraryList").inner_text()
     assert not errors
     page.close()

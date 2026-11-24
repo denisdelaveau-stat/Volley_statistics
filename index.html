@@ -392,39 +392,73 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
 </div>
 <div id="homeScreen" role="dialog" aria-labelledby="homeTitle">
   <div class="home-spacer" aria-hidden="true"></div>
-  <div class="home-brand"><h1 id="homeTitle">VolleyLive <span>Insight</span></h1><p>Match intelligence</p></div>
-  <main class="home-actions home-content home-menu" aria-label="Application sections">
-    <button type="button" class="home-btn home-menu-card home-match-hub" id="homeMatchHub"><span class="home-menu-icon" aria-hidden="true">⌁</span><span class="home-copy"><span class="home-main">MATCH HUB</span><small>NEW · CONTINUE · VIEW · RECENT · IMPORT</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
-    <button type="button" class="home-btn home-menu-card home-coach" id="homeCoach"><span class="home-menu-icon" aria-hidden="true">◉</span><span class="home-copy"><span class="home-main">COACH VIEW</span><small>LIVE COURT · ROTATIONS · PLAYERS</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
-    <button type="button" class="home-btn home-menu-card home-teams" id="homeTeams"><span class="home-menu-icon" aria-hidden="true">♟</span><span class="home-copy"><span class="home-main">TEAMS MANAGEMENT</span><small>ROSTERS · PLAYERS · POSITIONS</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
-    <button type="button" class="home-btn home-menu-card home-statistics" id="homeStatistics"><span class="home-menu-icon" aria-hidden="true">▥</span><span class="home-copy"><span class="home-main">ADVANCED STATISTICS</span><small>COMPLETE MATCH TIMELINE</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+  <div class="home-brand"><h1 id="homeTitle">VolleyLive <span>Insight</span></h1><p>Capture once. Use everywhere.</p></div>
+  <main class="home-actions home-content home-zones" aria-label="Application sections">
+    <button type="button" class="home-btn home-zone-card home-zone-setup" id="homeSetupCapture"><span class="home-zone-icon" aria-hidden="true">⌁</span><span class="home-zone-copy"><span class="home-zone-kicker">WRITE ACCESS</span><span class="home-main">SETUP &amp; CAPTURE</span><small>Prepare teams and record matches</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-zone-card home-zone-insights" id="homeInsights"><span class="home-zone-icon" aria-hidden="true">◉</span><span class="home-zone-copy"><span class="home-zone-kicker">READ ONLY</span><span class="home-main">INSIGHTS &amp; VIEWING</span><small>View, analyse and share match data</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
     <button type="button" class="home-btn home-menu-card home-settings" id="homeSettings"><span class="home-menu-icon" aria-hidden="true">⚙</span><span class="home-copy"><span class="home-main">SETTINGS</span><small>MATCH FORMAT · CAPTURE DETAIL</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
   </main>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
-  <div class="home-version" id="appVersion">v1.24.0</div>
+  <div class="home-version" id="appVersion">v1.25.0</div>
+</div>
+
+<div id="setupCaptureScreen" class="app-overlay navigation-screen" hidden aria-labelledby="setupCaptureTitle">
+  <div class="navigation-shell">
+    <header class="navigation-topbar"><button type="button" id="setupCaptureBack" aria-label="Back to Home">‹ <span>HOME</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
+    <main class="navigation-panel navigation-write">
+      <header class="navigation-heading"><div><span class="navigation-mode">WRITE ACCESS</span><h2 id="setupCaptureTitle">SETUP &amp; CAPTURE</h2><p>Prepare teams and record matches</p></div></header>
+      <button type="button" class="navigation-card" id="setupMatchCapture"><span class="navigation-icon" aria-hidden="true">⌁</span><span><strong>MATCH CAPTURE</strong><small>New match · Continue capture</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="setupTeamManagement"><span class="navigation-icon" aria-hidden="true">♟</span><span><strong>TEAM MANAGEMENT</strong><small>New team · Registered teams · Import team CSV</small></span><b aria-hidden="true">›</b></button>
+      <aside class="navigation-principle"><strong>OFFICIAL DATA WORKSPACE</strong><span>Score, service, rotation and events can only be changed in Match Capture.</span></aside>
+    </main>
+  </div>
+</div>
+
+<div id="insightsScreen" class="app-overlay navigation-screen" hidden aria-labelledby="insightsTitle">
+  <div class="navigation-shell">
+    <header class="navigation-topbar"><button type="button" id="insightsBack" aria-label="Back to Home">‹ <span>HOME</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
+    <main class="navigation-panel navigation-read">
+      <header class="navigation-heading"><div><span class="navigation-mode">READ ONLY</span><h2 id="insightsTitle">INSIGHTS &amp; VIEWING</h2><p>View, analyse and share match data</p></div></header>
+      <button type="button" class="navigation-card" id="insightsMatchLibrary" data-library-mode="library"><span class="navigation-icon" aria-hidden="true">▤</span><span><strong>MATCH LIBRARY</strong><small>Active · Finished · Imported · Import match JSON</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="insightsCoach" data-library-mode="coach"><span class="navigation-icon" aria-hidden="true">◉</span><span><strong>COACH VIEW</strong><small>Live court · Player focus · Team and player analysis</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="insightsSpectator" data-library-mode="spectator"><span class="navigation-icon" aria-hidden="true">◎</span><span><strong>SPECTATOR VIEW</strong><small>Scores · Timeline · Graph · Ranking</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="insightsReports" data-library-mode="reports"><span class="navigation-icon" aria-hidden="true">⇩</span><span><strong>MATCH REPORTS</strong><small>HTML report · CSV events · Official JSON</small></span><b aria-hidden="true">›</b></button>
+      <aside class="navigation-principle"><strong>READ-ONLY WORKSPACE</strong><span>No score, service, rotation or event can be changed from these views.</span></aside>
+    </main>
+  </div>
 </div>
 
 <div id="matchHubScreen" class="app-overlay match-hub-screen" hidden aria-labelledby="matchHubTitle">
   <div class="match-hub-shell">
-    <header class="match-hub-topbar"><button type="button" id="matchHubBack" aria-label="Back to Home">‹ <span>HOME</span></button><div class="match-hub-brand">VolleyLive <b>Insight</b></div></header>
+    <header class="match-hub-topbar"><button type="button" id="matchHubBack" aria-label="Back to Setup and Capture">‹ <span>SETUP</span></button><div class="match-hub-brand">VolleyLive <b>Insight</b></div></header>
     <section class="match-hub" id="matchHub" aria-labelledby="matchHubTitle" aria-busy="true">
-      <header class="match-hub-head"><h2 id="matchHubTitle">MATCH HUB</h2><p>Your match starts here <span class="mh-offline" id="matchHubOffline" hidden>OFFLINE</span></p></header>
-      <button type="button" class="home-btn match-hub-card mh-new" id="homeNew" aria-label="Start a new match"><span class="mh-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="32" rx="2"/><path d="M14 8v32M34 8v32M14 24h20M24 8v6M24 34v6"/><circle cx="24" cy="24" r="7"/><path d="M24 20v8M20 24h8"/></svg></span><span class="mh-copy"><span class="mh-title">NEW MATCH</span><span class="mh-subtitle">Set up teams and start tracking</span></span><span class="mh-chevron" aria-hidden="true">›</span></button>
-      <button type="button" class="home-btn match-hub-card mh-continue" id="homeContinue" aria-disabled="true" disabled><span class="mh-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="m20 16 12 8-12 8Z"/></svg></span><span class="mh-copy"><span class="mh-title">CONTINUE MATCH</span><span class="mh-subtitle" id="homeContinueInfo">No match in progress</span></span><span class="mh-chevron" aria-hidden="true">›</span><span class="mh-summary" id="matchHubActiveSummary" hidden><span class="mh-live">LIVE</span><span class="mh-teams" id="matchHubTeams"></span><strong class="mh-score" id="matchHubScore"></strong><span class="mh-meta" id="matchHubMeta"></span></span></button>
-      <button type="button" class="home-btn match-hub-card mh-view" id="homeOpen" aria-label="View matches"><span class="mh-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M4 35V23M12 35V15M20 35V8M28 35V20"/><path d="M20 34s5-8 13-8 13 8 13 8-5 8-13 8-13-8-13-8Z"/><circle cx="33" cy="34" r="3.5"/></svg></span><span class="mh-copy"><span class="mh-title">VIEW MATCH</span><span class="mh-subtitle">Explore scores, timeline and stats</span></span><span class="mh-chevron" aria-hidden="true">›</span></button>
-      <div class="match-hub-section-head"><h3>RECENT MATCHES</h3><button type="button" class="match-hub-link" id="matchHubSeeAll" hidden>See all <span class="mh-chevron" aria-hidden="true">›</span></button></div>
-      <div class="mh-recent-list" id="matchHubRecentList"><div class="mh-skeleton" aria-hidden="true"></div></div>
-      <button type="button" class="mh-import" id="matchHubImport"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h8l4 4v16H6Z"/><path d="M14 2v5h5M12 18V10M8.5 13.5 12 10l3.5 3.5"/></svg><span>Import match</span></button>
-      <input type="file" id="matchHubFile" aria-label="Import a VolleyLive match JSON file" accept=".json,application/json" hidden>
+      <header class="match-hub-head"><span class="navigation-mode">WRITE ACCESS</span><h2 id="matchHubTitle">MATCH CAPTURE</h2><p>Create and update official match data <span class="mh-offline" id="matchHubOffline" hidden>OFFLINE</span></p></header>
+      <button type="button" class="home-btn match-hub-card mh-new" id="homeNew" aria-label="Start a new match"><span class="mh-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="32" rx="2"/><path d="M14 8v32M34 8v32M14 24h20M24 8v6M24 34v6"/><circle cx="24" cy="24" r="7"/><path d="M24 20v8M20 24h8"/></svg></span><span class="mh-copy"><span class="mh-title">NEW MATCH</span><span class="mh-subtitle">Create and start an official match</span></span><span class="mh-chevron" aria-hidden="true">›</span></button>
+      <button type="button" class="home-btn match-hub-card mh-continue" id="homeContinue" aria-disabled="true" disabled><span class="mh-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="m20 16 12 8-12 8Z"/></svg></span><span class="mh-copy"><span class="mh-title">CONTINUE CAPTURE</span><span class="mh-subtitle" id="homeContinueInfo">No match in progress</span></span><span class="mh-chevron" aria-hidden="true">›</span><span class="mh-summary" id="matchHubActiveSummary" hidden><span class="mh-live">LIVE</span><span class="mh-teams" id="matchHubTeams"></span><strong class="mh-score" id="matchHubScore"></strong><span class="mh-meta" id="matchHubMeta"></span></span></button>
+      <aside class="navigation-principle"><strong>WRITE MODE</strong><span>Changes are stored in the official JSON and event history.</span></aside>
       <p class="mh-status" id="matchHubStatus" role="status" aria-live="polite"></p><button type="button" class="mh-retry" id="matchHubRetry" hidden>Try again</button>
     </section>
-    <input type="file" id="homeFile" aria-label="Select a match archive for spectator view" accept=".json,application/json" hidden>
+  </div>
+</div>
+
+<div id="matchLibraryScreen" class="app-overlay match-library-screen" hidden aria-labelledby="matchLibraryTitle">
+  <div class="match-library-shell">
+    <header class="navigation-topbar"><button type="button" id="matchLibraryBack" aria-label="Back to Insights and Viewing">‹ <span>INSIGHTS</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
+    <main class="match-library">
+      <header class="library-heading"><div><span class="navigation-mode">READ ONLY</span><h2 id="matchLibraryTitle">MATCH LIBRARY</h2><p id="matchLibrarySubtitle">Select a match once, then open any compatible view.</p></div><span class="library-offline" id="libraryOffline" hidden>OFFLINE</span></header>
+      <section class="library-selected" id="librarySelected" hidden aria-live="polite"><span>SELECTED MATCH</span><strong id="librarySelectedName"></strong><small id="librarySelectedMeta"></small><div class="library-selected-badges"><b id="librarySelectedState">NA</b><b>READ ONLY</b></div></section>
+      <nav class="library-filters" aria-label="Match status filters"><button type="button" data-library-filter="active">ACTIVE <span id="libraryActiveCount">0</span></button><button type="button" data-library-filter="finished">FINISHED <span id="libraryFinishedCount">0</span></button><button type="button" data-library-filter="imported">IMPORTED <span id="libraryImportedCount">0</span></button></nav>
+      <section class="library-list" id="matchLibraryList" aria-live="polite"></section>
+      <button type="button" class="library-import" id="matchLibraryImport"><span aria-hidden="true">⇧</span><strong>IMPORT MATCH JSON</strong><small>Add a read-only match to the library</small></button>
+      <input type="file" id="matchLibraryFile" accept=".json,application/json" hidden>
+      <p class="library-status" id="matchLibraryStatus" role="status" aria-live="polite"></p>
+    </main>
   </div>
 </div>
 
 <dialog class="match-hub-dialog" id="matchHubDecision" aria-labelledby="matchHubDecisionTitle"><div class="mh-dialog-inner"><h2 id="matchHubDecisionTitle">Match already in progress</h2><p id="matchHubDecisionText"></p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubContinueCurrent">Continue current match</button><button type="button" id="matchHubSaveStart">Save current &amp; start another</button><button type="button" class="mh-danger" id="matchHubDiscardStart">Discard current &amp; start another</button><button type="button" class="mh-cancel" data-dialog-close>Cancel</button></div><p class="mh-dialog-note">VolleyLive stores one editable local match at a time. Saving or discarding the current match is required before another can start.</p></div></dialog>
-<dialog class="match-hub-dialog" id="matchHubSelector" aria-labelledby="matchHubSelectorTitle"><div class="mh-dialog-inner"><h2 id="matchHubSelectorTitle">View match</h2><p>Select a stored match to open it read-only, or import a VolleyLive JSON file.</p><div class="mh-selector-list" id="matchHubSelectorList"></div><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubSelectorImport">Import JSON</button><button type="button" id="matchHubSelectorNew">New match</button><button type="button" class="mh-cancel" data-dialog-close>Close</button></div></div></dialog>
 <dialog class="match-hub-dialog" id="matchHubDuplicate" aria-labelledby="matchHubDuplicateTitle"><div class="mh-dialog-inner"><h2 id="matchHubDuplicateTitle">Match already exists</h2><p id="matchHubDuplicateText"></p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubOpenExisting">Open existing</button><button type="button" id="matchHubImportCopy">Import as a copy</button><button type="button" class="mh-cancel" data-dialog-close>Cancel</button></div></div></dialog>
+<dialog class="match-hub-dialog" id="matchReportDialog" aria-labelledby="matchReportTitle"><div class="mh-dialog-inner"><h2 id="matchReportTitle">MATCH REPORTS</h2><p id="matchReportText">Select a match to prepare its reports.</p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchReportHtml">Export HTML report</button><button type="button" id="matchReportCsv">Export event CSV</button><button type="button" id="matchReportJson">Export official JSON</button><button type="button" class="mh-cancel" data-dialog-close>Close</button></div><p class="mh-dialog-note">Exports are generated locally and remain available offline.</p></div></dialog>
 <div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
   <div class="coach-shell">
     <header class="coach-top">
@@ -1249,7 +1283,7 @@ function renderErrorCharts(events){
 (function(){
   var KE='volleyCapture.events.v1',KD='volleyCapture.chartData.v1',KM='volleyCapture.match.v1',STAGE='volleyCapture.stage';
   var LIBK='volleyCapture.library.v1',SETK='volleyCapture.settings.v1';
-  var $=function(id){return document.getElementById(id)},home=$('homeScreen'),matchHubScreen=$('matchHubScreen'),setup=$('setupScreen'),teams=$('teamsScreen'),settings=$('settingsScreen');
+  var $=function(id){return document.getElementById(id)},home=$('homeScreen'),setupCaptureScreen=$('setupCaptureScreen'),insightsScreen=$('insightsScreen'),matchHubScreen=$('matchHubScreen'),matchLibraryScreen=$('matchLibraryScreen'),setup=$('setupScreen'),teams=$('teamsScreen'),settings=$('settingsScreen');
   function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
   function defName(team,opp){return (team||'Team_A')+'_vs_'+(opp||'Opponent')+'_'+today()}
@@ -1259,7 +1293,7 @@ function renderErrorCharts(events){
   function libPut(l){localStorage.setItem(LIBK,JSON.stringify(l))}
   function settingsGet(){try{var x=JSON.parse(localStorage.getItem(SETK)||'{}');return {setsToWin:x.setsToWin===2?2:3,detailLevel:['basic','intermediate','advanced'].indexOf(x.detailLevel)>-1?x.detailLevel:'advanced'}}catch(e){return {setsToWin:3,detailLevel:'advanced'}}}
   function settingsPut(x){localStorage.setItem(SETK,JSON.stringify(x))}
-  function hideAll(){home.hidden=true;matchHubScreen.hidden=true;setup.hidden=true;teams.hidden=true;settings.hidden=true}
+  function hideAll(){home.hidden=true;setupCaptureScreen.hidden=true;insightsScreen.hidden=true;matchHubScreen.hidden=true;matchLibraryScreen.hidden=true;setup.hidden=true;teams.hidden=true;settings.hidden=true}
   function show(el){hideAll();el.hidden=false;el.scrollTop=0}
   function roleClass(pos){return 'role-'+(pos||'')}
   var PLAB={setter:'SET',oh:'OH',mb:'MB',opp:'OPP',libero:'LIB'};
@@ -1270,23 +1304,12 @@ function renderErrorCharts(events){
   window.saveMatchJson=saveJson;var sj=$('captureSaveJson');if(sj)sj.addEventListener('click',function(){var n=saveJson();$('fileStatus').textContent='Saved file: '+n});
   function updateHome(){var ev=[],dt=[],match=null;try{ev=JSON.parse(localStorage.getItem(KE)||'[]')}catch(e){}try{dt=JSON.parse(localStorage.getItem(KD)||'[]')}catch(e){}try{match=JSON.parse(localStorage.getItem(KM)||'null')}catch(e){}var c=$('homeContinue'),info=$('homeContinueInfo');c.disabled=!match;if(!match){info.textContent='NO SAVED MATCH';return}var p=dt.length?dt[dt.length-1]:{a:0,b:0};info.textContent=(match.name?match.name+' · ':'')+(match.team.name||'Team A')+' vs '+(match.opponent.name||'Team B')+' · SET '+(match.currentSet||1)+' · '+ev.length+' EVENTS · '+(p.a||0)+':'+(p.b||0)}
   $('homeContinue').addEventListener('click',function(){if(!this.disabled){hideAll();window.scrollTo(0,0)}});
-  $('homeMatchHub').addEventListener('click',function(){show(matchHubScreen);if(window.VolleyMatchHub)window.VolleyMatchHub.refresh();$('matchHubBack').focus()});
-  $('matchHubBack').addEventListener('click',function(){show(home);$('homeMatchHub').focus()});
-  $('homeStatistics').addEventListener('click',function(){location.href='statistics/index.html'});
-  $('homeOpen').addEventListener('click',function(){$('homeFile').value='';$('homeFile').click()});
-  $('homeFile').addEventListener('change',function(){
-    var f=this.files&&this.files[0];if(!f)return;var r=new FileReader();
-    r.onload=function(){try{
-      var j=JSON.parse(r.result),v=window.VolleyStatsAdapter&&window.VolleyStatsAdapter.validate(j);
-      if(!v||!v.valid)throw new Error(v&&v.errors&&v.errors.length?v.errors.join(' '):'archive de match non reconnue');
-      localStorage.setItem('volleySpectator.archive.v1',JSON.stringify(j));
-      localStorage.setItem('volleySpectator.archiveName.v1',f.name);
-      sessionStorage.setItem('volleyAnalysis.replay.v1',JSON.stringify(j));
-      sessionStorage.setItem('volleyAnalysis.replay.source.v1',f.name);
-      location.href='spectator.html#live-timeline';
-    }catch(x){alert('Archive invalide : '+x.message)}
-    };r.readAsText(f)
-  });
+  $('homeSetupCapture').addEventListener('click',function(){show(setupCaptureScreen);$('setupCaptureBack').focus()});
+  $('setupCaptureBack').addEventListener('click',function(){show(home);$('homeSetupCapture').focus()});
+  $('homeInsights').addEventListener('click',function(){show(insightsScreen);$('insightsBack').focus()});
+  $('insightsBack').addEventListener('click',function(){show(home);$('homeInsights').focus()});
+  $('setupMatchCapture').addEventListener('click',function(){show(matchHubScreen);if(window.VolleyMatchHub)window.VolleyMatchHub.refresh();$('matchHubBack').focus()});
+  $('matchHubBack').addEventListener('click',function(){show(setupCaptureScreen);$('setupMatchCapture').focus()});
 
   // ---------- TEAMS ----------
   var TS={name:'',rows:[],selected:'',sort:'number',dir:1};
@@ -1333,7 +1356,7 @@ function renderErrorCharts(events){
   function importTeamCsv(file){
     var reader=new FileReader();reader.onload=function(){try{var text=String(reader.result||'').replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n'),lines=text.split('\n').filter(function(line){return line.trim()});if(lines.length<2)throw new Error('The CSV must contain a header and at least one player.');var first=lines[0],counts={',':(first.match(/,/g)||[]).length,';':(first.match(/;/g)||[]).length,'\t':(first.match(/\t/g)||[]).length},sep=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]})[0],headers=parseCsvLine(first,sep).map(normalizeCsvHeader),ni=headers.indexOf('numero'),namei=headers.indexOf('nom'),pi=headers.indexOf('poste');if(ni<0)ni=headers.indexOf('number');if(namei<0)namei=headers.indexOf('name');if(pi<0)pi=headers.indexOf('position');if(ni<0||namei<0||pi<0)throw new Error('Required headers: Numero, Nom, Poste.');var rows=[],seen={};for(var i=1;i<lines.length;i++){var cells=parseCsvLine(lines[i],sep),number=+cells[ni],name=String(cells[namei]||'').trim(),pos=normalizeRole(cells[pi]);if(!Number.isInteger(number)||number<1||number>99)throw new Error('Line '+(i+1)+': invalid Numero.');if(!name)throw new Error('Line '+(i+1)+': missing Nom.');if(!pos)throw new Error('Line '+(i+1)+': unsupported Poste "'+String(cells[pi]||'')+'".');if(seen[number])throw new Error('Line '+(i+1)+': duplicate Numero '+number+'.');seen[number]=1;rows.push({number:number,name:name,pos:pos})}if(rows.length>40)throw new Error('Maximum 40 players.');var teamName=file.name.replace(/\.csv$/i,'').replace(/[_-]+/g,' ').trim();openTeamEditor(teamName,rows);tmMessage(rows.length+' players imported. Review the roster, then save the team.','success')}catch(error){alert('CSV import failed: '+error.message)}};reader.onerror=function(){alert('CSV import failed: the file could not be read.')};reader.readAsText(file)
   }
-  $('homeTeams').addEventListener('click',openTeams);$('teamsBack').addEventListener('click',function(){show(home);updateHome();$('homeTeams').focus()});
+  $('setupTeamManagement').addEventListener('click',openTeams);$('teamsBack').addEventListener('click',function(){show(setupCaptureScreen);updateHome();$('setupTeamManagement').focus()});
   $('teamNew').addEventListener('click',function(){openTeamEditor('',[])});$('teamEditorBack').addEventListener('click',showTeamOverview);$('teamCancel').addEventListener('click',showTeamOverview);$('teamAdd').addEventListener('click',addTeamPlayer);$('teamsSave').addEventListener('click',saveTeam);
   $('teamPlayerName').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addTeamPlayer()}});$('teamPlayerPosition').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();addTeamPlayer()}});
   $('teamImport').addEventListener('click',function(){$('teamCsvFile').value='';$('teamCsvFile').click()});$('teamCsvFile').addEventListener('change',function(){var file=this.files&&this.files[0];if(file)importTeamCsv(file)});
@@ -1344,7 +1367,7 @@ function renderErrorCharts(events){
   // ---------- SETTINGS ----------
   var CFG=settingsGet();
   function renderSettings(){var h='<div class="su-card"><label class="field-label">Match format</label><div class="su-format"><button type="button" class="su-btn'+(CFG.setsToWin===2?' sel':'')+'" data-setting-format="2">2 WINNING SETS<small>best of 3 · set 3 to 15</small></button><button type="button" class="su-btn'+(CFG.setsToWin===3?' sel':'')+'" data-setting-format="3">3 WINNING SETS<small>best of 5 · set 5 to 15</small></button></div><label class="field-label" for="settingsLevel">Detail level</label><select id="settingsLevel" class="su-select settings-level-'+CFG.detailLevel+'"><option value="basic"'+(CFG.detailLevel==='basic'?' selected':'')+'>Basic</option><option value="intermediate"'+(CFG.detailLevel==='intermediate'?' selected':'')+'>Intermediate</option><option value="advanced"'+(CFG.detailLevel==='advanced'?' selected':'')+'>Advanced</option></select><div class="su-hint">Basic: team result only · Intermediate: optional focus player · Advanced: player, action and result.</div></div>';$('settingsBody').innerHTML=h;$('settingsMsg').textContent=''}
-  $('homeSettings').addEventListener('click',function(){CFG=settingsGet();renderSettings();show(settings)});$('settingsBack').addEventListener('click',function(){show(home)});
+  $('homeSettings').addEventListener('click',function(){CFG=settingsGet();renderSettings();show(settings)});$('settingsBack').addEventListener('click',function(){show(home);$('homeSettings').focus()});
   $('settingsBody').addEventListener('click',function(e){var t=e.target.closest('[data-setting-format]');if(t){CFG.setsToWin=+t.dataset.settingFormat;renderSettings()}});$('settingsBody').addEventListener('change',function(e){if(e.target.id==='settingsLevel'){CFG.detailLevel=e.target.value;renderSettings()}});$('settingsSave').addEventListener('click',function(){settingsPut(CFG);$('settingsMsg').textContent='Settings saved.'});
 
   // ---------- NEW MATCH ----------
@@ -1369,7 +1392,7 @@ function renderErrorCharts(events){
     if(S.step===0){
       $('suTitle').textContent='Sélectionne ton équipe';$('suSub').textContent='Prépare le nouveau match.';
       var opts='<option value="">— sélectionne une équipe —</option>'+names.map(function(n){return '<option value="'+esc(n)+'"'+(S.teamKey===n?' selected':'')+'>'+esc(n)+'</option>'}).join('');
-      var h='<div class="setup-intro"><div class="su-card"><div class="setup-intro-title">Sélectionne ton équipe</div><select id="suTeamSelect" class="su-select"'+(names.length?'':' disabled')+'>'+opts+'</select>'+(names.length?'':'<div class="su-hint">Aucune équipe configurée. Crée d’abord une équipe.</div><button type="button" class="add-player" id="suOpenTeams">OUVRIR TEAMS</button>')+'</div>';
+      var h='<div class="setup-intro"><div class="su-card"><div class="setup-intro-title">Sélectionne ton équipe</div><select id="suTeamSelect" class="su-select"'+(names.length?'':' disabled')+'>'+opts+'</select>'+(names.length?'':'<div class="su-hint">Aucune équipe configurée. Crée d’abord une équipe.</div><button type="button" class="add-player" id="suOpenTeams">OPEN TEAM MANAGEMENT</button>')+'</div>';
       if(S.teamKey)h+='<div class="su-card"><label class="field-label" for="suOpp">Nom de l\'adversaire</label><input type="text" id="suOpp" autocomplete="off" placeholder="Nom de l\'adversaire" value="'+esc(S.opp)+'"><label class="field-label" for="suName">Match name</label><input type="text" id="suName" value="'+esc(S.name)+'"><div class="su-hint">Le nom du match est généré automatiquement et reste modifiable.</div></div>';
       body.innerHTML=h+'</div>';next.textContent='VALIDE';next.disabled=!S.teamKey||!S.opp.trim();return;
     }

@@ -32,8 +32,8 @@ def test_coach_navigation_live_data_and_player_detail(browser):
     page.goto(APP_URI)
     _seed(page)
 
-    assert page.locator("#homeCoach .home-main").inner_text() == "COACH VIEW"
-    page.locator("#homeCoach").click()
+    assert page.locator("#insightsCoach strong").inner_text() == "COACH VIEW"
+    page.evaluate("window.VolleyCoach.open()")
     assert page.locator("#coachScreen").is_visible()
     assert page.locator("#coachContent .coach-title").inner_text().startswith("Vue coach")
     assert "ANTIBES" in page.locator("#coachContent .coach-score").inner_text()
@@ -62,7 +62,7 @@ def test_coach_empty_state_and_accessible_detail(browser):
     page.goto(APP_URI)
     page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
-    page.locator("#homeCoach").click()
+    page.evaluate("window.VolleyCoach.open()")
     assert page.locator("#coachLiveLabel").inner_text() == "AUCUN MATCH"
     assert "Aucun match chargé" in page.locator("#coachContent").inner_text()
     assert "as cannes" not in page.locator("#coachContent").inner_text().lower()
@@ -96,7 +96,7 @@ def test_coach_courts_use_shared_saturated_role_palette(browser):
         {"match": match, "events": events},
     )
     page.reload()
-    page.locator("#homeCoach").click()
+    page.evaluate("window.VolleyCoach.open()")
     expected = {
         "opp": ("rgb(79, 168, 232)", "rgb(10, 53, 85)"),
         "setter": ("rgb(242, 201, 76)", "rgb(74, 54, 0)"),
