@@ -1,4 +1,4 @@
-"""Match Library single-row redesign acceptance for VolleyLive v1.27.0."""
+"""Match Library single-row redesign acceptance for VolleyLive v1.28.0."""
 from __future__ import annotations
 
 import json

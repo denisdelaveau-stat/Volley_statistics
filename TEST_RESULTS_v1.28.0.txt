@@ -1,0 +1,31 @@
+VolleyLive v1.28.0 final validation
+===================================
+
+Runtime acceptance
+- tests/test_runtime_input_v1_28.py
+- 13 passed
+- Covers runtime-only mode selection, absence from SETTINGS, state preservation,
+  FOCUS/SPEED+/FLOW layouts, canonical event parity, opponent, undo, double tap,
+  role preferences and fixed action order.
+
+Approved regression suite
+- 127 passed in 294.11 s
+- Includes runtime acceptance plus Coach View, Spectator View, Match Library,
+  PWA shell, navigation, reports, unified JSON and statistics regressions.
+
+Static validation
+- runtime-input.js, match-hub.js, spectator.js, statistics/adapter.js,
+  coach.js and sw.js parse successfully.
+- All executable inline scripts in index.html parse successfully.
+
+Visual validation
+- FOCUS 390 x 844
+- SPEED+ 820 x 1000
+- FLOW 1180 x 820
+- FLOW stacked 390 x 844
+- No horizontal overflow at validated widths.
+
+Superseded coverage
+- Legacy v1.6.x quick-pad capture tests are intentionally superseded by
+  test_runtime_input_v1_28.py because the quick-pad UI was replaced by the
+  approved FOCUS / SPEED+ / FLOW runtime interfaces.

@@ -303,7 +303,7 @@ h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
 #homeInstall{font-size:13px;line-height:1.35;max-width:420px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.6);border-radius:12px;padding:10px 12px;color:#fde68a}
 #homeInstall[hidden]{display:none}
 #appVersion{font-size:11px;opacity:.55}
-</style><link rel="stylesheet" href="coach.css"><link rel="stylesheet" href="match-hub.css"><link rel="stylesheet" href="team-management.css"><script src="statistics/adapter.js"></script><script type="text/plain" id="attCss">.att-section{margin:14px 0}
+</style><link rel="stylesheet" href="coach.css"><link rel="stylesheet" href="match-hub.css"><link rel="stylesheet" href="team-management.css"><link rel="stylesheet" href="runtime-input.css"><script src="statistics/adapter.js"></script><script type="text/plain" id="attCss">.att-section{margin:14px 0}
 .att-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .att-head h3{margin:0;font-size:18px}
 .att-scope{display:flex;gap:6px}
@@ -399,7 +399,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
     <button type="button" class="home-btn home-menu-card home-settings" id="homeSettings"><span class="home-menu-icon" aria-hidden="true">⚙</span><span class="home-copy"><span class="home-main">SETTINGS</span><small>MATCH FORMAT · CAPTURE DETAIL</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
   </main>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
-  <div class="home-version" id="appVersion">v1.27.0</div>
+  <div class="home-version" id="appVersion">v1.28.0</div>
 </div>
 
 <div id="setupCaptureScreen" class="app-overlay navigation-screen" hidden aria-labelledby="setupCaptureTitle">
@@ -1235,7 +1235,9 @@ function renderErrorCharts(events){
       if(choice.result==='point'){ if(playerValue==='A'){winningTeam='team2';pointOrigin='earned';}else{winningTeam='team1';pointOrigin='earned';} }
       else if(choice.result==='error'){ if(playerValue==='A'){winningTeam='team1';pointOrigin='opponent_error';}else{winningTeam='team2';pointOrigin='opponent_error';} }
       if(winningTeam==='team1')a++; else if(winningTeam==='team2')b++;
-      var ev={id:EVENTS.length+1,set:(window.VOLLEY_MATCH&&VOLLEY_MATCH.currentSet)||1,timestamp:new Date().toISOString(),time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}),action:choice.action,result:choice.result,player:playerValue,winningTeam:winningTeam,pointOrigin:pointOrigin,rotation:currentRotationNumber(),scoreA:a,scoreB:b};
+      var runtimeContext=window.VLC_RUNTIME_CONTEXT||{},runtimePlayer=playerValue==='A'||playerValue==='T'?null:rosterInfo(playerValue),runtimeRole=runtimePlayer?({setter:'SET',oh:'OH',mb:'MB',opp:'OPP',libero:'LIB'}[runtimePlayer.position]||String(runtimePlayer.position||'').toUpperCase()):'OPPONENT',runtimeAction={service:'SERVE',reception:'RECEPTION',set:'SET',attack:'ATTACK',block:'BLOCK',defense:'DEFENCE',freeball:'RELANCE'}[choice.action]||String(choice.action||'').toUpperCase(),runtimeStatus={point:'POSITIVE',neutral:'NEUTRAL',error:'ERROR'}[choice.result]||String(choice.result||'').toUpperCase();
+      var ev={id:EVENTS.length+1,eventId:runtimeContext.eventId||('evt_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)),set:(window.VOLLEY_MATCH&&VOLLEY_MATCH.currentSet)||1,setNumber:(window.VOLLEY_MATCH&&VOLLEY_MATCH.currentSet)||1,timestamp:new Date().toISOString(),time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}),authorSide:playerValue==='A'?'AWAY':'HOME',playerId:runtimePlayer?'player_'+runtimePlayer.number:null,playerNumber:runtimePlayer?Number(runtimePlayer.number):null,playerRole:runtimeRole,action:choice.action,actionCode:runtimeAction,result:choice.result,status:runtimeStatus,player:playerValue,winningTeam:winningTeam,pointOrigin:pointOrigin,rotation:currentRotationNumber(),scoreBefore:{home:sc.a,away:sc.b},scoreAfter:{home:a,away:b},scoreA:a,scoreB:b,inputMode:runtimeContext.inputMode||'LEGACY',schemaVersion:'runtime-input-v1'};
+      if(EVENTS.some(function(existing){return existing.eventId&&existing.eventId===ev.eventId})){status.textContent='Événement déjà enregistré.';return}
       EVENTS.push(ev);
       if(choice.result!=='neutral')DATA.push({n:DATA.length+1,a:a,b:b,w:winningTeam==='team1'?'A':'B',c:(playerValue==='A'?0:playerValue),action:choice.action,result:choice.result,winningTeam:winningTeam,pointOrigin:pointOrigin,ts:ev.timestamp});
       persist(); choice={player:null,action:null,result:null}; showStep('player'); render();
@@ -1777,6 +1779,7 @@ html[data-level="intermediate"] .vlc-result-bar.team,html[data-level="advanced"]
 <script src="coach-live-config.js"></script>
 <script src="coach.js"></script>
 <script src="match-hub.js"></script>
+<script src="runtime-input.js"></script>
 
 
 </body></html>

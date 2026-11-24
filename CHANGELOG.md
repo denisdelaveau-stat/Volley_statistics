@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.28.0 — FOCUS, SPEED+ and FLOW runtime input
+- Added three capture layouts on one shared event and score transaction.
+- Added direct in-capture mode switching; no runtime mode selector exists in SETTINGS.
+- Preserved pending author/action, match, score and event history across mode changes.
+- Added fixed action geography, opponent A, role preference highlights and immediate result commit.
+- Added canonical event metadata, idempotent event IDs, double-tap protection and atomic Undo.
+- Added responsive phone/tablet/desktop validation and v1.28.0 offline assets.
+
 ## v1.27.0 — MATCH LIBRARY single-row redesign
 - Replaced card duplication and per-match actions with one aligned row per match.
 - Added All / Live / Finished lifecycle filters, status counters, sorting, persistent filter and selection.

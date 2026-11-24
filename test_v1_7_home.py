@@ -29,7 +29,7 @@ def test_home_workspace_navigation_and_back_paths(browser):
     assert page.locator("#homeScreen .home-main").all_inner_texts() == [
         "SETUP & CAPTURE", "INSIGHTS & VIEWING", "SETTINGS"
     ]
-    assert page.locator("#appVersion").inner_text() == "v1.27.0"
+    assert page.locator("#appVersion").inner_text() == "v1.28.0"
 
     page.locator("#homeSetupCapture").click()
     assert page.locator("#setupCaptureTitle").inner_text() == "SETUP & CAPTURE"

@@ -1,32 +1,33 @@
-# Copy instructions — v1.27.0
+# Instructions d’installation — VolleyLive v1.28.0
 
-## Complete package
+## Package complet
 
-Deploy the complete contents of the `Volley_statistics_v1.27.0` folder at the application root, replacing the previous application files while preserving the directory structure.
+Déployer le contenu complet du dossier `Volley_statistics_v1.28.0` à la racine de l’application en conservant l’arborescence.
 
-Open the application online once so service-worker cache `volley-live-capture-v1.27.0` is installed, then fully close and reopen the PWA.
+Ouvrir l’application en ligne une fois afin d’installer le cache `volley-live-capture-v1.28.0`, puis fermer et rouvrir complètement la PWA.
 
-## Delta from v1.26.1
+## Mise à jour depuis v1.27.0
 
-Extract `Volley_statistics_v1.27.0_update_from_v1.26.1.zip`, then run:
-
-```bash
-python3 APPLY_UPDATE.py /path/to/Volley_statistics_v1.26.1
-```
-
-The updater verifies the v1.26.1 base tree, applies changed and new files, removes obsolete paths, writes `VERSION` as `1.27.0`, and verifies the resulting tree against the bundled v1.27.0 target manifest.
-
-Verification only:
+Extraire `Volley_statistics_v1.28.0_update_from_v1.27.0.zip`, puis exécuter :
 
 ```bash
-python3 APPLY_UPDATE.py /path/to/Volley_statistics_v1.27.0 --verify-only
+python3 APPLY_UPDATE.py /chemin/vers/Volley_statistics_v1.27.0
 ```
 
-## Smoke check
+Le programme vérifie la base v1.27.0, applique les fichiers ajoutés/modifiés et les suppressions, puis vérifie l’arbre cible v1.28.0.
 
-1. Home displays `v1.27.0` and the v1.26.1 workflows remain available.
-2. MATCH LIBRARY shows All / Live / Finished with inline counters.
-3. Each match uses one aligned, non-wrapping row.
-4. The selected row shows a lavender tint, left edge and check.
-5. Coach View, Spectator and Reports use the selected match.
-6. Import, duplicate handling, capture, Coach, Spectator and report exports remain available.
+Vérification seule :
+
+```bash
+python3 APPLY_UPDATE.py /chemin/vers/Volley_statistics_v1.28.0 --verify-only
+```
+
+## Contrôle rapide
+
+1. Démarrer ou reprendre un match.
+2. Vérifier les onglets FOCUS, SPEED+ et FLOW directement sous le score.
+3. Sélectionner un joueur puis une action, changer de mode et vérifier que la sélection est conservée.
+4. Choisir un résultat et vérifier l’enregistrement immédiat et le score.
+5. Toucher Annuler et vérifier le retour au score précédent.
+6. Ouvrir SETTINGS et vérifier qu’aucun choix FOCUS / SPEED+ / FLOW n’y figure.
+7. Fermer et rouvrir la capture : le dernier mode runtime choisi doit être conservé.

@@ -204,7 +204,7 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
 
 def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.27.0" in sw
+    assert "volley-live-capture-v1.28.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
