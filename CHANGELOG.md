@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.27.0 — MATCH LIBRARY single-row redesign
+- Replaced card duplication and per-match actions with one aligned row per match.
+- Added All / Live / Finished lifecycle filters, status counters, sorting, persistent filter and selection.
+- Added independent match details, accessible listbox navigation, and responsive empty/error states.
+- Added the fixed Coach View / Spectator / Reports action bar and compact header Import action.
+- Preserved import validation, duplicate/import-as-copy handling, capture, Coach, Spectator, reports, and offline behavior.
+
 ## v1.26.1 — SPECTATOR VIEW Timeline reference alignment
 - Kept complete player names on one line without truncation.
 - Normalized HOME and AWAY connectors to 40 px at every responsive breakpoint and removed intermediate layout gaps.

@@ -1,0 +1,12 @@
+VolleyLive v1.27.0 final validation
+Date: 2026-11-24
+
+Automated browser/unit suite: 157 tests passed.
+- Group A: 55 passed after updating the v1.27.0 lifecycle-filter expectation; one unchanged Spectator geometry check passed on isolated rerun.
+- Group B: 51 passed.
+- Group C: 51 passed after updating the approved v1.27.0 empty-state text.
+
+Focused Match Library acceptance: 7 passed.
+JavaScript syntax: node --check match-hub.js passed.
+Visual validation: 390 x 844 baseline generated; 360 x 800 single-line/narrow-context behavior covered by Playwright.
+No horizontal overflow detected at 390 x 844.

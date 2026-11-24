@@ -399,7 +399,7 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
     <button type="button" class="home-btn home-menu-card home-settings" id="homeSettings"><span class="home-menu-icon" aria-hidden="true">⚙</span><span class="home-copy"><span class="home-main">SETTINGS</span><small>MATCH FORMAT · CAPTURE DETAIL</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
   </main>
   <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
-  <div class="home-version" id="appVersion">v1.26.1</div>
+  <div class="home-version" id="appVersion">v1.27.0</div>
 </div>
 
 <div id="setupCaptureScreen" class="app-overlay navigation-screen" hidden aria-labelledby="setupCaptureTitle">
@@ -443,21 +443,24 @@ html[data-level="basic"] .touch-grid.result .touch,html[data-level="intermediate
 
 <div id="matchLibraryScreen" class="app-overlay match-library-screen" hidden aria-labelledby="matchLibraryTitle">
   <div class="match-library-shell">
-    <header class="navigation-topbar"><button type="button" id="matchLibraryBack" aria-label="Back to Insights and Viewing">‹ <span>INSIGHTS</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
+    <header class="library-topbar"><button type="button" id="matchLibraryBack" aria-label="Back to Insights and Viewing">‹ <span>INSIGHTS</span></button><div class="library-brand" aria-label="VolleyLive"><span class="library-brand-ball" aria-hidden="true">◉</span><strong>Volley<span>Live</span></strong></div><span class="library-offline" id="libraryOffline" hidden>OFFLINE</span></header>
     <main class="match-library">
-      <header class="library-heading"><div><span class="navigation-mode">READ ONLY</span><h2 id="matchLibraryTitle">MATCH LIBRARY</h2><p id="matchLibrarySubtitle">Select a match once, then open any compatible view.</p></div><span class="library-offline" id="libraryOffline" hidden>OFFLINE</span></header>
-      <section class="library-selected" id="librarySelected" hidden aria-live="polite"><span>SELECTED MATCH</span><strong id="librarySelectedName"></strong><small id="librarySelectedMeta"></small><div class="library-selected-badges"><b id="librarySelectedState">NA</b><b>READ ONLY</b></div></section>
-      <nav class="library-filters" aria-label="Match status filters"><button type="button" data-library-filter="active">ACTIVE <span id="libraryActiveCount">0</span></button><button type="button" data-library-filter="finished">FINISHED <span id="libraryFinishedCount">0</span></button><button type="button" data-library-filter="imported">IMPORTED <span id="libraryImportedCount">0</span></button></nav>
-      <section class="library-list" id="matchLibraryList" aria-live="polite"></section>
-      <button type="button" class="library-import" id="matchLibraryImport"><span aria-hidden="true">⇧</span><strong>IMPORT MATCH JSON</strong><small>Add a read-only match to the library</small></button>
+      <header class="library-heading"><div><h2 id="matchLibraryTitle">MATCH LIBRARY</h2><p id="matchLibrarySubtitle">Choose a match, then open a view.</p></div><button type="button" class="library-import" id="matchLibraryImport" aria-label="Import match JSON"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v6h14v-6"/></svg><span>Import</span></button></header>
+      <nav class="library-filters" aria-label="Match status filters"><button type="button" data-library-filter="all">All <span id="libraryAllCount">0</span></button><button type="button" data-library-filter="live">Live <span id="libraryLiveCount">0</span></button><button type="button" data-library-filter="finished">Finished <span id="libraryFinishedCount">0</span></button></nav>
+      <div class="library-scroll" id="matchLibraryScroll">
+        <section class="library-list" id="matchLibraryList" role="listbox" aria-label="Matches" aria-live="polite" tabindex="0"></section>
+        <div class="library-legend" id="libraryLegend" hidden aria-label="Match status legend"><span><i class="status-dot live" aria-hidden="true"></i>Live</span><span><i class="status-dot finished" aria-hidden="true"></i>Finished</span></div>
+      </div>
       <input type="file" id="matchLibraryFile" accept=".json,application/json" hidden>
       <p class="library-status" id="matchLibraryStatus" role="status" aria-live="polite"></p>
+      <footer class="library-action-bar" aria-labelledby="libraryActionLabel"><span id="libraryActionLabel">OPEN SELECTED MATCH</span><button type="button" class="library-open-primary" id="libraryOpenCoach" data-library-open="coach" disabled aria-disabled="true"><svg aria-hidden="true" viewBox="0 0 28 24"><rect x="2" y="2" width="24" height="20"/><path d="M14 2v20M2 7h5v10H2m24-10h-5v10h5"/></svg><strong>Coach View</strong></button><div class="library-open-secondary"><button type="button" id="libraryOpenSpectator" data-library-open="spectator" disabled aria-disabled="true"><svg aria-hidden="true" viewBox="0 0 28 20"><path d="M1 10s5-8 13-8 13 8 13 8-5 8-13 8S1 10 1 10Z"/><circle cx="14" cy="10" r="3.5"/></svg><strong>Spectator</strong></button><button type="button" id="libraryOpenReports" data-library-open="report" disabled aria-disabled="true"><svg aria-hidden="true" viewBox="0 0 28 24"><path d="M4 22V12m10 10V3m10 19V8"/></svg><strong>Reports</strong></button></div></footer>
     </main>
   </div>
 </div>
 
 <dialog class="match-hub-dialog" id="matchHubDecision" aria-labelledby="matchHubDecisionTitle"><div class="mh-dialog-inner"><h2 id="matchHubDecisionTitle">Match already in progress</h2><p id="matchHubDecisionText"></p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubContinueCurrent">Continue current match</button><button type="button" id="matchHubSaveStart">Save current &amp; start another</button><button type="button" class="mh-danger" id="matchHubDiscardStart">Discard current &amp; start another</button><button type="button" class="mh-cancel" data-dialog-close>Cancel</button></div><p class="mh-dialog-note">VolleyLive stores one editable local match at a time. Saving or discarding the current match is required before another can start.</p></div></dialog>
 <dialog class="match-hub-dialog" id="matchHubDuplicate" aria-labelledby="matchHubDuplicateTitle"><div class="mh-dialog-inner"><h2 id="matchHubDuplicateTitle">Match already exists</h2><p id="matchHubDuplicateText"></p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubOpenExisting">Open existing</button><button type="button" id="matchHubImportCopy">Import as a copy</button><button type="button" class="mh-cancel" data-dialog-close>Cancel</button></div></div></dialog>
+<dialog class="match-hub-dialog library-info-sheet" id="matchInfoDialog" aria-labelledby="matchInfoTitle"><div class="mh-dialog-inner"><div class="library-info-handle" aria-hidden="true"></div><h2 id="matchInfoTitle">MATCH DETAILS</h2><dl id="matchInfoFields"></dl><div class="mh-dialog-actions"><button type="button" class="mh-primary" data-dialog-close>Close</button></div></div></dialog>
 <dialog class="match-hub-dialog" id="matchReportDialog" aria-labelledby="matchReportTitle"><div class="mh-dialog-inner"><h2 id="matchReportTitle">MATCH REPORTS</h2><p id="matchReportText">Select a match to prepare its reports.</p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchReportHtml">Export HTML report</button><button type="button" id="matchReportCsv">Export event CSV</button><button type="button" id="matchReportJson">Export official JSON</button><button type="button" class="mh-cancel" data-dialog-close>Close</button></div><p class="mh-dialog-note">Exports are generated locally and remain available offline.</p></div></dialog>
 <div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
   <div class="coach-shell">

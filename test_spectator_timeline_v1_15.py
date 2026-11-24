@@ -98,15 +98,21 @@ def open_spectator(browser, archive, viewport=None):
     return page, errors
 
 
-def test_spectator_view_valid_v21_goes_directly_to_timeline(browser):
+def test_match_library_import_opens_valid_v21_in_selected_spectator_view(browser):
     page = browser.new_page(viewport={"width": 1024, "height": 768})
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
     page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
-    page.locator("#homeFile").set_input_files(str(V2_FIXTURE))
-    page.wait_for_url("**/spectator.html#live-timeline")
+    page.locator("#homeInsights").click(); page.locator("#insightsMatchLibrary").click()
+    page.locator("#matchLibraryFile").set_input_files(str(V2_FIXTURE))
+    page.wait_for_function("document.querySelector('#libraryFinishedCount').textContent.trim() === '1'")
+    assert page.locator("#libraryFinishedCount").inner_text() == "1"
+    assert page.locator(".library-row.selected").count() == 1
+    page.locator("#libraryOpenSpectator").click()
+    page.wait_for_url("**/spectator.html#live-score")
+    page.locator('[data-tab="live-timeline"]').click()
     assert page.locator('[data-tab="live-timeline"]').get_attribute("aria-selected") == "true"
     assert page.locator(".tl-row").count() == 5
     assert page.locator(".replay-status").inner_text().strip() == "REPLAY D’ARCHIVE"
@@ -124,8 +130,11 @@ def test_t1_t2_t3_t4_delta_lanes_and_common_scale(browser):
     assert rows.nth(1).locator(".delta-lane.home .delta-bar").inner_text() == "+3"  # T2
     assert rows.nth(1).locator(".delta-lane.away .delta-bar").count() == 0
     assert rows.nth(2).locator(".delta-bar").count() == 0  # T3
-    assert rows.nth(0).locator(".delta-bar").get_attribute("style") == "width:100%"
-    assert rows.nth(1).locator(".delta-bar").get_attribute("style") == "width:50%"
+    assert rows.nth(0).locator(".delta-bar").get_attribute("style") is None
+    assert rows.nth(1).locator(".delta-bar").get_attribute("style") is None
+    widths = [rows.nth(i).locator(".delta-bar").bounding_box()["width"] for i in (0, 1)]
+    assert max(widths) - min(widths) < 1
+    assert all(abs(width - 38) < 1 for width in widths)
     lanes = ["away" if rows.nth(i).locator(".delta-lane.away .delta-bar").count() else "home" if rows.nth(i).locator(".delta-lane.home .delta-bar").count() else "tie" for i in range(4)]
     assert lanes == ["away", "home", "tie", "away"]  # T4
     assert not errors

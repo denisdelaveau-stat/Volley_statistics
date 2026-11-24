@@ -57,14 +57,14 @@ def test_write_and_read_navigation_have_distinct_non_semantic_accents(browser):
     page.close()
 
 
-def test_match_library_card_actions_fit_phone_and_tablet(browser):
+def test_match_library_rows_and_fixed_actions_fit_phone_and_tablet(browser):
     for viewport in ({"width": 390, "height": 844}, {"width": 768, "height": 1024}):
         page, errors = open_empty(browser, viewport)
         match = {"id":"visual","name":"Home_vs_Away","status":"paused","currentSet":1,"team":{"name":"Home","roster":[]},"opponent":{"name":"Away"},"startingLineup":{},"startingRotation":{},"firstRally":{},"format":{},"subs":[]}
         page.evaluate("m=>{localStorage.setItem('volleyCapture.match.v1',JSON.stringify(m));localStorage.setItem('volleyCapture.events.v1','[]');localStorage.setItem('volleyCapture.chartData.v1','[]')}", match)
         page.reload(); page.locator("#homeInsights").click(); page.locator("#insightsMatchLibrary").click()
-        assert_in_view(page, ".library-card")
-        assert page.locator(".library-actions button").evaluate_all("els => els.every(e => e.getBoundingClientRect().height >= 44)")
+        assert_in_view(page, ".library-row")
+        assert page.locator(".library-action-bar button").evaluate_all("els => els.every(e => e.getBoundingClientRect().height >= 48)")
         assert page.locator("#matchLibraryScreen").evaluate("e => e.scrollWidth <= e.clientWidth + 1")
         assert not errors
         page.close()

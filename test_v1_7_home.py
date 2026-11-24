@@ -29,7 +29,7 @@ def test_home_workspace_navigation_and_back_paths(browser):
     assert page.locator("#homeScreen .home-main").all_inner_texts() == [
         "SETUP & CAPTURE", "INSIGHTS & VIEWING", "SETTINGS"
     ]
-    assert page.locator("#appVersion").inner_text() == "v1.26.0"
+    assert page.locator("#appVersion").inner_text() == "v1.27.0"
 
     page.locator("#homeSetupCapture").click()
     assert page.locator("#setupCaptureTitle").inner_text() == "SETUP & CAPTURE"
@@ -92,7 +92,7 @@ def test_home_workspaces_library_and_landscape_are_responsive_with_touch_targets
         page.locator("#insightsMatchLibrary").click()
         library = page.locator("#matchLibraryScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
         assert library["scroll"] <= library["client"] + 1
-        for selector in ("#matchLibraryBack", "[data-library-filter=active]", "[data-library-filter=finished]", "[data-library-filter=imported]", "#matchLibraryImport"):
+        for selector in ("#matchLibraryBack", "[data-library-filter=all]", "[data-library-filter=live]", "[data-library-filter=finished]", "#matchLibraryImport"): 
             assert page.locator(selector).evaluate("e => e.getBoundingClientRect().height") >= 44
         assert not errors
         page.close()
