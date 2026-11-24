@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.26.0 — SPECTATOR VIEW selected-set navigation and alignment
+- Added one common current/previous-set selector across SCORES, TIMELINE, GRAPH, and RANKING.
+- Added one-click return to the current set and current-set default on every load.
+- Scoped RANKING to the selected set.
+- Applied green HOME and red AWAY colours to SCORE momentum cells and percentage bar.
+- Displayed complete TIMELINE player names, normalized compact connectors, and reduced row spacing.
+- Preserved score-adjacent delta bars and added dotted maximum-gap outlines with accessible labels.
+- Added responsive v1.26.0 functional and visual regression coverage.
+
 ## v1.25.0 — Setup & Capture / Insights & Viewing
 - Replaced the five-entry Home with two primary workspaces plus separate Settings.
 - Added shared Match Library filters for Active, Finished, and Imported matches.

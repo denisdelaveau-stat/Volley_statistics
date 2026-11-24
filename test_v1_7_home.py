@@ -1,40 +1,60 @@
-"""Home shell and dedicated Match Hub regression coverage for v1.24.0."""
+"""v1.26.0 Home, workspace hierarchy, and responsive navigation acceptance."""
 from helpers import APP_URI, ROOT, base_match
 
 
-def test_home_menu_opens_dedicated_match_hub_and_preserves_all_sections(browser):
-    assert (ROOT / "Font_app_ref.jpg").exists()
-    page = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
+def open_empty(browser, viewport=None):
+    page = browser.new_page(viewport=viewport or {"width": 390, "height": 844})
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
     page.evaluate("localStorage.clear(); sessionStorage.clear()")
     page.reload()
+    return page, errors
+
+
+def test_home_separates_write_and_read_workspaces_and_keeps_settings():
+    home = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert 'id="homeSetupCapture"' in home
+    assert 'id="homeInsights"' in home
+    assert 'id="homeSettings"' in home
+    assert "ADVANCED STATISTICS" not in home
+    assert 'id="homeStatistics"' not in home
+    assert not (ROOT / "statistics/index.html").exists()
+
+
+def test_home_workspace_navigation_and_back_paths(browser):
+    page, errors = open_empty(browser)
     assert "Font_app_ref.jpg" in page.locator("#homeScreen").evaluate("e => getComputedStyle(e).backgroundImage")
     assert page.locator("#homeTitle").inner_text() == "VolleyLive Insight"
-    assert page.locator("#matchHubScreen").is_hidden()
-    assert page.locator(".home-menu-card .home-main").all_inner_texts() == [
-        "MATCH HUB", "COACH VIEW", "TEAMS MANAGEMENT", "ADVANCED STATISTICS", "SETTINGS"
+    assert page.locator("#homeScreen .home-main").all_inner_texts() == [
+        "SETUP & CAPTURE", "INSIGHTS & VIEWING", "SETTINGS"
     ]
-    page.locator("#homeMatchHub").click()
-    assert page.locator("#homeScreen").is_hidden()
-    assert page.locator("#matchHubScreen").is_visible()
-    assert page.locator("#matchHubTitle").inner_text() == "MATCH HUB"
-    assert page.locator("#homeOpen .mh-title").inner_text() == "VIEW MATCH"
-    assert page.locator("#homeContinue").is_disabled()
+    assert page.locator("#appVersion").inner_text() == "v1.26.0"
+
+    page.locator("#homeSetupCapture").click()
+    assert page.locator("#setupCaptureTitle").inner_text() == "SETUP & CAPTURE"
+    assert page.locator("#setupCaptureScreen .navigation-mode").inner_text() == "WRITE ACCESS"
+    assert page.locator("#setupCaptureScreen .navigation-card strong").all_inner_texts() == ["MATCH CAPTURE", "TEAM MANAGEMENT"]
+    page.locator("#setupMatchCapture").click()
+    assert page.locator("#matchHubTitle").inner_text() == "MATCH CAPTURE"
+    assert page.locator(".match-hub-card .mh-title").all_inner_texts() == ["NEW MATCH", "CONTINUE CAPTURE"]
     page.locator("#matchHubBack").click()
+    page.locator("#setupCaptureBack").click()
+
+    page.locator("#homeInsights").click()
+    assert page.locator("#insightsTitle").inner_text() == "INSIGHTS & VIEWING"
+    assert page.locator("#insightsScreen .navigation-mode").inner_text() == "READ ONLY"
+    assert page.locator("#insightsScreen .navigation-card strong").all_inner_texts() == [
+        "MATCH LIBRARY", "COACH VIEW", "SPECTATOR VIEW", "MATCH REPORTS"
+    ]
+    page.locator("#insightsBack").click()
     assert page.locator("#homeScreen").is_visible()
-    assert page.evaluate("document.activeElement && document.activeElement.id") == "homeMatchHub"
     assert not errors
     page.close()
 
 
-def test_match_hub_continue_summary_uses_current_match(browser):
-    page = browser.new_page(viewport={"width": 390, "height": 844})
-    errors = []
-    page.on("pageerror", lambda error: errors.append(str(error)))
-    page.goto(APP_URI)
-    page.evaluate("localStorage.clear(); sessionStorage.clear()")
+def test_match_capture_continue_summary_uses_current_official_match(browser):
+    page, errors = open_empty(browser)
     match = base_match()
     match["updatedAt"] = "2026-11-23T18:30:00Z"
     page.evaluate(
@@ -48,33 +68,31 @@ def test_match_hub_continue_summary_uses_current_match(browser):
         match,
     )
     page.reload()
-    page.locator("#homeMatchHub").click()
+    page.locator("#homeSetupCapture").click()
+    page.locator("#setupMatchCapture").click()
     assert not page.locator("#homeContinue").is_disabled()
-    assert page.locator("#homeContinueInfo").inner_text() == "Resume your match in progress"
+    assert page.locator("#homeContinueInfo").inner_text() == "Resume official data entry"
     summary = page.locator("#matchHubActiveSummary").inner_text()
     assert "Antibes vs Nice" in summary and "Set 1" in summary and "1 – 0" in summary
     assert not errors
     page.close()
 
 
-def test_home_and_match_hub_are_responsive_without_horizontal_scroll(browser):
-    for viewport in ({"width": 320, "height": 568}, {"width": 390, "height": 844}, {"width": 768, "height": 1024}):
-        page = browser.new_page(viewport=viewport)
-        errors = []
-        page.on("pageerror", lambda error: errors.append(str(error)))
-        page.goto(APP_URI)
-        page.evaluate("localStorage.clear(); sessionStorage.clear()")
-        page.reload()
-        home_metrics = page.locator("#homeScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
-        assert home_metrics["scroll"] <= home_metrics["client"] + 1
-        assert page.locator(".home-menu-card").count() == 5
-        for selector in ("#homeMatchHub", "#homeCoach", "#homeTeams", "#homeStatistics", "#homeSettings"):
+def test_home_workspaces_library_and_landscape_are_responsive_with_touch_targets(browser):
+    viewports = ({"width": 390, "height": 844}, {"width": 768, "height": 1024}, {"width": 844, "height": 390})
+    for viewport in viewports:
+        page, errors = open_empty(browser, viewport)
+        home = page.locator("#homeScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
+        assert home["scroll"] <= home["client"] + 1
+        for selector in ("#homeSetupCapture", "#homeInsights", "#homeSettings"):
             assert page.locator(selector).evaluate("e => e.getBoundingClientRect().height") >= 44
-        page.locator("#homeMatchHub").click()
-        hub_metrics = page.locator("#matchHubScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
-        assert hub_metrics["scroll"] <= hub_metrics["client"] + 1
-        assert page.locator(".match-hub-card").count() == 3
-        for selector in ("#matchHubBack", "#homeNew", "#homeContinue", "#homeOpen", "#matchHubImport"):
+        page.locator("#homeInsights").click()
+        insights = page.locator("#insightsScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
+        assert insights["scroll"] <= insights["client"] + 1
+        page.locator("#insightsMatchLibrary").click()
+        library = page.locator("#matchLibraryScreen").evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
+        assert library["scroll"] <= library["client"] + 1
+        for selector in ("#matchLibraryBack", "[data-library-filter=active]", "[data-library-filter=finished]", "[data-library-filter=imported]", "#matchLibraryImport"):
             assert page.locator(selector).evaluate("e => e.getBoundingClientRect().height") >= 44
         assert not errors
         page.close()

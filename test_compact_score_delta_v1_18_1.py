@@ -118,10 +118,10 @@ def test_connectors_shrink_without_overlap_and_cards_keep_internal_geometry(brow
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         assert not errors
         page.close()
-    assert widths["1536x1024"] <= 112
-    assert widths["1024x768"] <= widths["1536x1024"]
-    assert widths["844x390"] < widths["1024x768"]
-    assert widths["390x844"] < widths["844x390"]
+    assert abs(widths["1536x1024"] - 48) < 1
+    assert abs(widths["1024x768"] - 48) < 1
+    assert abs(widths["844x390"] - 40) < 1
+    assert abs(widths["390x844"] - 40) < 1
 
 
 def test_badges_are_readable_accessible_and_mobile_content_can_be_reached(browser):
@@ -201,7 +201,7 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
 
 def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.24.0" in sw
+    assert "volley-live-capture-v1.26.0" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -210,7 +210,7 @@ def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"compact_timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_20_0.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_26_0.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

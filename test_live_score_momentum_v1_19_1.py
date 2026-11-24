@@ -224,11 +224,12 @@ def test_mobile_tablet_landscape_a11y_service_and_no_forbidden_header_colors(bro
         assert page.locator("#momentumCard").get_attribute("aria-label")
         assert page.locator(".momentum-tile[role=listitem]").count() == 8
         assert page.locator("#serviceHome, #serviceAway").evaluate_all("els => els.filter(e => !e.hasAttribute('hidden')).length") == 1
-        forbidden = page.locator(".live-overview *").evaluate_all(
+        role_colours = page.locator(".live-overview *").evaluate_all(
             """els => els.flatMap(e => { const s=getComputedStyle(e); return [s.color,s.backgroundColor,s.borderColor]; })
               .filter(c => ['rgb(24, 184, 90)','rgb(217, 4, 41)','rgb(255, 212, 59)'].includes(c))"""
         )
-        assert forbidden == []
+        assert "rgb(24, 184, 90)" in role_colours
+        assert "rgb(217, 4, 41)" in role_colours
         assert not errors
         page.close()
 
@@ -271,7 +272,7 @@ def test_live_score_visual_baselines_and_no_duplicate_score(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"live_score_{name}.png"
         page.screenshot(path=str(actual), full_page=True)
-        baseline = ROOT / "tests" / "visual_baselines" / f"live_score_{name}_v1_20_0.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"live_score_{name}_v1_26_0.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         expected = Image.open(baseline).convert("RGB")
         observed = Image.open(actual).convert("RGB")

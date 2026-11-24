@@ -25,6 +25,14 @@
     <button type="button" data-tab="ranking">RANKING</button>
   </nav>
 
+  <section class="spectator-livebar" aria-label="Navigation entre les sets">
+    <label for="evolutionSet">Set
+      <select id="evolutionSet" aria-label="Sélectionner un set"></select>
+    </label>
+    <strong id="liveSetStatus" class="live-set-status" role="status">DIRECT</strong>
+    <button id="returnToLive" class="return-to-live" type="button" hidden>Retour au direct</button>
+  </section>
+
   <main>
     <section class="spectator-panel live-score-panel" data-panel="live-score" hidden>
       <section class="live-overview" aria-label="Score et momentum du match">
@@ -88,10 +96,9 @@
     <section class="spectator-panel graph-panel" data-panel="live-graph" hidden aria-labelledby="liveGraphTitle">
       <h1 id="liveGraphTitle" class="visually-hidden">Score and Fault Evolution</h1>
       <div class="evolution-toolbar" aria-label="Contrôles de l’historique">
-        <label>Set<select id="evolutionSet" aria-label="Sélectionner un set"></select></label>
         <fieldset><legend>Ordre</legend><div class="segment"><button type="button" data-graph-order="oldestFirst">Ancien → récent</button><button type="button" data-graph-order="newestFirst">Récent → ancien</button></div></fieldset>
         <label>Rallyes visibles<select id="graphWindowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
-        <button id="returnLive" class="return-live" type="button" hidden>Retour au direct</button>
+        <button id="returnLive" class="return-live" type="button" hidden>Dernier point</button>
       </div>
       <div class="graph-board evolution-board">
         <div id="graphContent" class="evolution-scroll" tabindex="0" aria-label="Historique synchronisé du score et des fautes">

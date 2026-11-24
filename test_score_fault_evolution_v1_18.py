@@ -257,7 +257,7 @@ def test_visual_regression_score_fault_evolution_three_viewports(browser, tmp_pa
         page.wait_for_timeout(200)
         actual = tmp_path / f"score_fault_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / "tests" / "visual_baselines" / f"score_fault_{name}_v1_20_0.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"score_fault_{name}_v1_26_0.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

@@ -1,11 +1,10 @@
-/* VolleyLive spectator archive view v1.20.0 — Scores, Timeline, Graph and JSON-derived Ranking. */
+/* VolleyLive spectator view v1.26.0 — shared live-set navigation for Scores, Timeline, Graph and Ranking. */
 (function () {
   'use strict';
 
   var ARCHIVE_KEY = 'volleySpectator.archive.v1';
   var ORDER_KEY = 'volleySpectator.timeline.order';
   var WINDOW_KEY = 'volleySpectator.timeline.window';
-  var SET_KEY = 'volleySpectator.evolution.set';
   var raw = null;
   var model = null;
   var announcedLeader = null;
@@ -432,10 +431,11 @@
     if (['SV', 'SERVICE', 'SERVE'].indexOf(action) >= 0) return 'service';
     return null;
   }
-  function rankingSource(d) {
-    var players = {}, entries = [], format = detect(d);
+  function rankingSource(d, setNumber) {
+    var players = {}, entries = [], format = detect(d), rallySets = {};
     if (format === 'unified-v2') {
       var teams = teamV2(d);
+      (d.rallies || []).forEach(function (rally) { rallySets[rally.rallyId] = num(rally.setNumber, null); });
       (d.players || []).forEach(function (player) {
         if (player.teamId !== teams.homeId) return;
         players[player.playerId] = {
@@ -447,6 +447,8 @@
       });
       (d.events || []).forEach(function (event) {
         if (isVoided(event) || upper(event.eventType || 'ACTION') !== 'ACTION') return;
+        var eventSet = num(event.setNumber, rallySets[event.rallyId]);
+        if (setNumber != null && eventSet !== setNumber) return;
         var player = players[event.playerId], category = rankingCategoryForAction(event.actionType || event.action);
         if (!player || !category) return;
         entries.push({ player: player, category: category, outcome: normalizeResult(event.evaluation !== undefined ? event.evaluation : event.result) });
@@ -461,6 +463,7 @@
       });
       (d.events || []).forEach(function (event) {
         if (isVoided(event)) return;
+        if (setNumber != null && num(event.set, 1) !== setNumber) return;
         var player = players[String(event.player)], category = rankingCategoryForAction(event.action);
         if (!player || !category) return;
         entries.push({ player: player, category: category, outcome: normalizeResult(event.result !== undefined ? event.result : event.evaluation) });
@@ -502,7 +505,7 @@
   }
   function renderRanking() {
     var mode = $('rankingView').value, categoryValue = $('rankingCategory').value;
-    var source = raw ? rankingSource(raw) : { players: {}, entries: [] };
+    var source = raw ? rankingSource(raw, model && model.currentSet) : { players: {}, entries: [] };
     var categories = categoryValue === 'all' ? RANKING_CATEGORIES : RANKING_CATEGORIES.filter(function (category) { return category.key === categoryValue; });
     var playerCount = {}, relevantActions = 0;
     source.entries.forEach(function (entry) {
@@ -526,7 +529,8 @@
     var p = prefs(), rows = model.rallies.slice(), n = p.size === 'all' ? rows.length : num(p.size, 5);
     rows = rows.slice(Math.max(0, rows.length - n));
     if (p.order === 'newestFirst') rows.reverse();
-    return { rows: rows, p: p, scale: Math.max(5, rows.reduce(function (mx, r) { return Math.max(mx, Math.abs(r.score.away - r.score.home)); }, 0)) };
+    var maxGap = rows.reduce(function (mx, r) { return Math.max(mx, Math.abs(r.score.away - r.score.home)); }, 0);
+    return { rows: rows, p: p, maxGap: maxGap, scale: Math.max(5, maxGap) };
   }
   function eventCard(e) {
     if (!e) return '';
@@ -543,11 +547,12 @@
       '<div class="event-copy"><div class="event-name">' + esc(name) + '</div>' +
       (label ? '<div class="home-action ' + outcome + '">' + esc(label) + '</div>' : '') + '</div></article>';
   }
-  function renderRow(r, isLast, scale, order) {
+  function renderRow(r, isLast, scale, maxGap, order) {
     var d = r.score.away - r.score.home, side = d > 0 ? 'away' : d < 0 ? 'home' : '', value = Math.abs(d);
     var w = value ? Math.max(38, Math.round(value / scale * 100)) + '%' : '0';
-    var delta = side ? '<div class="delta-bar ' + side + '" style="width:' + w + '" role="img" aria-label="' +
-      (side === 'away' ? 'AWAY' : 'HOME') + ' mène de ' + value + ' points" title="' +
+    var isMaxGap = value > 0 && value === maxGap;
+    var delta = side ? '<div class="delta-bar ' + side + (isMaxGap ? ' max-gap' : '') + '" style="width:' + w + '" role="img" aria-label="' +
+      (side === 'away' ? 'AWAY' : 'HOME') + ' mène de ' + value + ' points' + (isMaxGap ? ', écart maximum du set' : '') + '" title="' +
       (side === 'away' ? 'AWAY' : 'HOME') + ' +' + value + ' (' + r.score.away + '–' + r.score.home + ')"><span class="delta-badge">+' + value + '</span></div>' : '';
     var accent = r.phase === 'SO' ? 'so' : r.winner === 'HOME' ? 'bp-home' : 'bp-away';
     var awayScoreClass = r.winner === 'AWAY' ? ' score-accent ' + accent : '';
@@ -648,6 +653,11 @@
     var options = (model.availableSets || []).map(function (setNo) { return '<option value="' + setNo + '">Set ' + setNo + '</option>'; }).join('');
     if (select.innerHTML !== options) select.innerHTML = options;
     if (model.currentSet != null) select.value = String(model.currentSet);
+    select.disabled = !model.availableSets.length;
+    var atLive = model.currentSet == null || model.currentSet === model.liveSet;
+    $('returnToLive').hidden = atLive || model.noMatch;
+    $('liveSetStatus').textContent = model.noMatch ? 'AUCUN MATCH' : atLive ? 'DIRECT · SET ' + model.liveSet : 'REPLAY · SET ' + model.currentSet;
+    $('liveSetStatus').classList.toggle('is-replay', !atLive && !model.noMatch);
   }
   function renderGraphs(v) {
     var empty = model.rallies.length === 0, scroll = $('graphContent'), previousScroll = scroll.scrollLeft;
@@ -699,7 +709,7 @@
       b.classList.toggle('active', choice === v.p.order); b.setAttribute('aria-pressed', choice === v.p.order ? 'true' : 'false');
     });
     document.querySelectorAll('[data-window-size]').forEach(function (select) { select.value = v.p.size; });
-    $('timelineList').innerHTML = v.rows.map(function (r) { return renderRow(r, last && r.id === last.id, v.scale, v.p.order); }).join('');
+    $('timelineList').innerHTML = v.rows.map(function (r) { return renderRow(r, last && r.id === last.id, v.scale, v.maxGap, v.p.order); }).join('');
     $('timelineEmpty').hidden = model.rallies.length !== 0;
     $('timelineEmpty').textContent = model.noMatch ? 'Aucun match chargé' : 'Le set n’a pas encore commencé';
     $('timelineWarning').hidden = !model.warnings.length; $('timelineWarning').textContent = model.warnings.join(' ');
@@ -721,7 +731,7 @@
     raw = d;
     localStorage.setItem(ARCHIVE_KEY, JSON.stringify(d));
     sessionStorage.setItem('volleyAnalysis.replay.v1', JSON.stringify(d));
-    model = build(d, selectedSetNumber);
+    model = build(d, null);
     selectedSetNumber = model.currentSet;
     render();
     return model;
@@ -730,8 +740,8 @@
   function init() {
     try {
       raw = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || 'null');
-      selectedSetNumber = num(localStorage.getItem(SET_KEY), null);
-      model = raw ? build(raw, selectedSetNumber) : emptyModel();
+      selectedSetNumber = null;
+      model = raw ? build(raw, null) : emptyModel();
       selectedSetNumber = model.currentSet;
       render();
     } catch (e) { fatal(e.message); return; }
@@ -747,10 +757,18 @@
     $('evolutionSet').addEventListener('change', function () {
       if (!raw) return;
       selectedSetNumber = num(this.value, model.liveSet);
-      localStorage.setItem(SET_KEY, String(selectedSetNumber));
       evolutionBrowsing = false;
       model = build(raw, selectedSetNumber);
       render();
+    });
+    $('returnToLive').addEventListener('click', function () {
+      if (!raw) return;
+      selectedSetNumber = model.liveSet;
+      evolutionBrowsing = false;
+      model = build(raw, selectedSetNumber);
+      render();
+      var activePanel = document.querySelector('[data-panel]:not([hidden])');
+      if (activePanel) activePanel.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     });
     $('graphContent').addEventListener('scroll', function () {
       if (model.finished || model.currentSet !== model.liveSet) return;
