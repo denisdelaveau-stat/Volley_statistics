@@ -33,8 +33,8 @@ def test_desktop_spine_is_home_left_mirrored_and_away_delta_hugs_score(browser):
         }"""
     )
     relative_spine = (geometry["spine"] - geometry["boardLeft"]) / geometry["boardWidth"]
-    assert 0.52 <= relative_spine <= 0.56
-    assert 5 <= geometry["barLeft"] - geometry["scoreRight"] <= 7
+    assert 0.49 <= relative_spine <= 0.51
+    assert abs(geometry["barLeft"] - geometry["scoreRight"]) < 1
     assert abs(geometry["barLeft"] - geometry["laneLeft"]) < 1
     assert not errors
     page.close()
@@ -57,7 +57,7 @@ def test_home_card_is_content_sized_with_balanced_side_padding(browser):
     assert abs(geometry["cardWidth"] - geometry["slotWidth"]) < 1
     assert abs(geometry["leftPad"] - geometry["rightPad"]) <= 1
     assert 14 <= geometry["leftPad"] <= 16
-    assert 5 <= geometry["connectorGap"] <= 7
+    assert abs(geometry["connectorGap"]) < 1
     assert not errors
     page.close()
 
@@ -69,7 +69,7 @@ def test_android_portrait_keeps_page_stable_and_timeline_scrollable(browser):
     board = page.locator(".timeline-board")
     dimensions = board.evaluate("e => ({client:e.clientWidth, scroll:e.scrollWidth})")
     assert dimensions["scroll"] > dimensions["client"]
-    assert page.locator(".home-slot").first.bounding_box()["x"] <= 60
+    assert page.locator(".event-card.home").first.bounding_box()["x"] <= 60
     board.evaluate("e => e.scrollLeft = e.scrollWidth")
     assert page.locator(".away-marker").first.bounding_box()["x"] < 412
     for selector in ("[data-order=oldestFirst]", "[data-order=newestFirst]", "#windowSize"):

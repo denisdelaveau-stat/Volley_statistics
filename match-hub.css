@@ -142,7 +142,7 @@
 @media(prefers-reduced-motion:reduce){.mh-skeleton{animation:none}.match-hub *,.home-menu *{scroll-behavior:auto!important;transition:none!important}}
 
 
-/* VolleyLive v1.26.0 — production/consumption navigation and shared Match Library */
+/* VolleyLive v1.26.1 — production/consumption navigation and shared Match Library */
 :root{
   --nav-cyan:#27d4f2;
   --nav-cyan-deep:#087aa6;

@@ -1,4 +1,4 @@
-"""Team Management coverage retained under Setup & Capture in v1.25.0."""
+"""Team Management coverage retained under Setup & Capture in v1.26.0."""
 from pathlib import Path
 
 from helpers import APP_URI
@@ -84,7 +84,7 @@ def test_offline_shell_includes_team_management_styles():
     service_worker = (ROOT / "sw.js").read_text()
     index = (ROOT / "index.html").read_text()
     css = (ROOT / "team-management.css").read_text()
-    assert "volley-live-capture-v1.25.0" in service_worker
+    assert "volley-live-capture-v1.26.1" in service_worker
     assert "team-management.css" in service_worker
     assert '<link rel="stylesheet" href="team-management.css">' in index
     assert "--tm-cyan:#12d7f2" in css

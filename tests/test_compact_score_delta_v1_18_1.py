@@ -75,13 +75,13 @@ def test_delta_bars_hug_score_and_share_vertical_centre(browser):
         score_centre = centre_y(row["score"])
         if row["awayBar"]:
             away_seen = True
-            assert 5 <= row["awayBar"]["left"] - row["score"]["right"] <= 7
+            assert abs(row["awayBar"]["left"] - row["score"]["right"]) < 1
             assert abs(row["awayBar"]["left"] - row["awayLane"]["left"]) < 1
             assert abs(centre_y(row["awayBar"]) - score_centre) < 1
             assert abs(centre_y(row["awayBadge"]) - score_centre) < 1
         if row["homeBar"]:
             home_seen = True
-            assert 5 <= row["score"]["left"] - row["homeBar"]["right"] <= 7
+            assert abs(row["score"]["left"] - row["homeBar"]["right"]) < 1
             assert abs(row["homeBar"]["right"] - row["homeLane"]["right"]) < 1
             assert abs(centre_y(row["homeBar"]) - score_centre) < 1
             assert abs(centre_y(row["homeBadge"]) - score_centre) < 1
@@ -99,10 +99,16 @@ def test_connectors_shrink_without_overlap_and_cards_keep_internal_geometry(brow
         widths[name] = rows[0]["awayConnector"]["width"]
         for row in rows:
             assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1
-            assert row["homeConnector"]["right"] <= row["homeLane"]["left"]
-            assert row["homeLane"]["right"] <= row["score"]["left"]
-            assert row["score"]["right"] <= row["awayLane"]["left"]
-            assert row["awayLane"]["right"] <= row["awayConnector"]["left"]
+            if row["homeLane"]["width"]:
+                assert row["homeConnector"]["right"] <= row["homeLane"]["left"]
+                assert row["homeLane"]["right"] <= row["score"]["left"]
+            else:
+                assert abs(row["homeConnector"]["right"] - row["score"]["left"]) < 1
+            if row["awayLane"]["width"]:
+                assert row["score"]["right"] <= row["awayLane"]["left"]
+                assert row["awayLane"]["right"] <= row["awayConnector"]["left"]
+            else:
+                assert abs(row["awayConnector"]["left"] - row["score"]["right"]) < 1
             if row["marker"]:
                 assert row["awayConnector"]["right"] <= row["marker"]["left"]
             if row["card"]:
@@ -118,10 +124,7 @@ def test_connectors_shrink_without_overlap_and_cards_keep_internal_geometry(brow
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         assert not errors
         page.close()
-    assert widths["1536x1024"] <= 112
-    assert widths["1024x768"] <= widths["1536x1024"]
-    assert widths["844x390"] < widths["1024x768"]
-    assert widths["390x844"] < widths["844x390"]
+    assert all(abs(width - 40) < 1 for width in widths.values())
 
 
 def test_badges_are_readable_accessible_and_mobile_content_can_be_reached(browser):
@@ -201,7 +204,7 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
 
 def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.25.0" in sw
+    assert "volley-live-capture-v1.26.1" in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 
@@ -210,7 +213,7 @@ def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"compact_timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_20_0.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"compact_timeline_{name}_v1_26_1.png"
         assert baseline.exists(), f"Missing visual baseline {baseline.name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")

@@ -95,7 +95,7 @@ def test_reference_action_geometry_compact_players_and_removed_exports(browser):
     assert "SETUP & CAPTURE" in page.locator("#homeSetupCapture").inner_text()
     assert "INSIGHTS & VIEWING" in page.locator("#homeInsights").inner_text()
     assert page.locator("#homeStatistics").count() == 0
-    assert page.locator("#appVersion").inner_text() == "v1.25.0"
+    assert page.locator("#appVersion").inner_text() == "v1.26.1"
     assert not errors
     page.close()
 

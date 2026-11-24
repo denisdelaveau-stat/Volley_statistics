@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.26.1 — SPECTATOR VIEW Timeline reference alignment
+- Kept complete player names on one line without truncation.
+- Normalized HOME and AWAY connectors to 40 px at every responsive breakpoint and removed intermediate layout gaps.
+- Replaced proportional delta bars with fixed 38 × 28 px squares that retain the real `+N` value and touch the score.
+- Reduced and centered HOME/AWAY Timeline header boxes to 50% of their previous width.
+- Added focused browser coverage and ten responsive v1.26.1 Timeline baselines.
+
 ## v1.26.0 — SPECTATOR VIEW selected-set navigation and alignment
 - Added one common current/previous-set selector across SCORES, TIMELINE, GRAPH, and RANKING.
 - Added one-click return to the current set and current-set default on every load.

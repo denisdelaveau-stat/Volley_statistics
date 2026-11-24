@@ -1,4 +1,4 @@
-/* VolleyLive spectator view v1.26.0 — shared live-set navigation for Scores, Timeline, Graph and Ranking. */
+/* VolleyLive spectator view v1.26.1 — spectator Timeline geometry aligned to the reference captures. */
 (function () {
   'use strict';
 
@@ -549,9 +549,8 @@
   }
   function renderRow(r, isLast, scale, maxGap, order) {
     var d = r.score.away - r.score.home, side = d > 0 ? 'away' : d < 0 ? 'home' : '', value = Math.abs(d);
-    var w = value ? Math.max(38, Math.round(value / scale * 100)) + '%' : '0';
     var isMaxGap = value > 0 && value === maxGap;
-    var delta = side ? '<div class="delta-bar ' + side + (isMaxGap ? ' max-gap' : '') + '" style="width:' + w + '" role="img" aria-label="' +
+    var delta = side ? '<div class="delta-bar ' + side + (isMaxGap ? ' max-gap' : '') + '" role="img" aria-label="' +
       (side === 'away' ? 'AWAY' : 'HOME') + ' mène de ' + value + ' points' + (isMaxGap ? ', écart maximum du set' : '') + '" title="' +
       (side === 'away' ? 'AWAY' : 'HOME') + ' +' + value + ' (' + r.score.away + '–' + r.score.home + ')"><span class="delta-badge">+' + value + '</span></div>' : '';
     var accent = r.phase === 'SO' ? 'so' : r.winner === 'HOME' ? 'bp-home' : 'bp-away';
@@ -562,17 +561,17 @@
     return '<div class="tl-row ' + (isLast ? 'is-last ' : '') + (r.invalid ? 'invalid-row ' : '') +
       (order === 'newestFirst' ? 'newest-first' : '') + '" data-rally="' + r.rally + '" data-code="' + r.phase +
       '" data-winner="' + r.winner + '" data-score-accent="' + accent + '" data-valid="' + (!r.invalid) + '">' +
-      '<div class="event-slot home-slot ' + (homeEvent ? 'has-event' : '') + '">' + homeEvent + '</div>' +
+      '<div class="timeline-side home"><div class="event-slot home-slot ' + (homeEvent ? 'has-event' : '') + '">' + homeEvent + '</div>' +
       '<div class="timeline-connector home"' + (homeEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
-      '<div class="delta-lane home">' + (side === 'home' ? delta : '') + '</div>' +
+      '<div class="delta-lane home">' + (side === 'home' ? delta : '') + '</div></div>' +
       '<div class="score-node"><div class="rally-caption"><span>Rallye ' + r.rally + '</span></div>' +
       '<div class="score-pill ' + (isLast ? 'latest' : '') + '"><span class="score-half home' + homeScoreClass + '">' + r.score.home +
       '</span><b>:</b><span class="score-half away' + awayScoreClass + '">' + r.score.away + '</span></div>' +
       (isLast ? '<span class="last-point">DERNIER POINT</span>' : '') +
       (r.invalid ? '<span class="invalid-note">DONNÉE À VÉRIFIER</span>' : '') + '</div>' +
-      '<div class="delta-lane away">' + (side === 'away' ? delta : '') + '</div>' +
+      '<div class="timeline-side away"><div class="delta-lane away">' + (side === 'away' ? delta : '') + '</div>' +
       '<div class="timeline-connector away"' + (awayEvent ? '' : ' hidden') + ' aria-hidden="true"></div>' +
-      '<div class="event-slot away-slot ' + (awayEvent ? 'has-event' : '') + '">' + awayEvent + '</div></div>';
+      '<div class="event-slot away-slot ' + (awayEvent ? 'has-event' : '') + '">' + awayEvent + '</div></div></div>';
   }
 
   function svgLine(x1, y1, x2, y2, className) {
@@ -710,6 +709,12 @@
     });
     document.querySelectorAll('[data-window-size]').forEach(function (select) { select.value = v.p.size; });
     $('timelineList').innerHTML = v.rows.map(function (r) { return renderRow(r, last && r.id === last.id, v.scale, v.maxGap, v.p.order); }).join('');
+    requestAnimationFrame(function () {
+      var board = document.querySelector('.timeline-board'), card = board && board.querySelector('.event-card.home');
+      if (!board || !card || board.scrollWidth <= board.clientWidth || board.scrollLeft > 1) return;
+      var boardBox = board.getBoundingClientRect(), cardBox = card.getBoundingClientRect();
+      board.scrollLeft = Math.max(0, cardBox.left - boardBox.left + board.scrollLeft - 20);
+    });
     $('timelineEmpty').hidden = model.rallies.length !== 0;
     $('timelineEmpty').textContent = model.noMatch ? 'Aucun match chargé' : 'Le set n’a pas encore commencé';
     $('timelineWarning').hidden = !model.warnings.length; $('timelineWarning').textContent = model.warnings.join(' ');

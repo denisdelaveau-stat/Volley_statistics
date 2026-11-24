@@ -50,13 +50,13 @@ def test_compact_delta_marker_sequence_and_equal_connectors(browser):
     for row in rows:
         assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1
         if row["marker"]:
-            assert 5 <= row["awayLane"]["left"] - row["score"]["right"] <= 7
-            assert 5 <= row["awayConnector"]["left"] - row["awayLane"]["right"] <= 7
-            assert 5 <= row["marker"]["left"] - row["awayConnector"]["right"] <= 7
+            assert abs(row["awayLane"]["left"] - row["score"]["right"]) < 1
+            assert abs(row["awayConnector"]["left"] - row["awayLane"]["right"]) < 1
+            assert abs(row["marker"]["left"] - row["awayConnector"]["right"]) < 1
         if row["card"]:
-            assert 5 <= row["homeConnector"]["left"] - row["card"]["right"] <= 7
-            assert 5 <= row["homeLane"]["left"] - row["homeConnector"]["right"] <= 7
-            assert 5 <= row["score"]["left"] - row["homeLane"]["right"] <= 7
+            assert abs(row["homeConnector"]["left"] - row["card"]["right"]) < 1
+            assert abs(row["homeLane"]["left"] - row["homeConnector"]["right"]) < 1
+            assert abs(row["score"]["left"] - row["homeLane"]["right"]) < 1
     assert not errors
     page.close()
 
@@ -66,7 +66,7 @@ def test_spine_stays_in_v1_16_2_left_shift_band(browser):
     board = page.locator(".timeline-board").bounding_box()
     score = page.locator(".score-node").first.bounding_box()
     relative = (score["x"] + score["width"] / 2 - board["x"]) / board["width"]
-    assert 0.52 <= relative <= 0.56
+    assert 0.49 <= relative <= 0.51
     assert not errors
     page.close()
 
@@ -75,7 +75,7 @@ def test_alignment_and_internal_scrolling_hold_at_three_viewports(browser):
     for name, viewport in VIEWPORTS.items():
         page, errors = open_spectator(browser, alignment_fixture(), viewport)
         page.wait_for_timeout(250)
-        expected_gap = 6
+        expected_gap = 0
         for row in geometry(page):
             assert abs(row["awayConnector"]["width"] - row["homeConnector"]["width"]) < 1, name
             if row["marker"]:
@@ -96,8 +96,8 @@ def test_visual_baselines_desktop_tablet_and_mobile(browser, tmp_path):
         page.wait_for_timeout(350)
         actual = tmp_path / f"timeline_{name}.png"
         page.screenshot(path=str(actual), full_page=False)
-        baseline = ROOT / f"tests/visual_baselines/away_alignment_{name}_v1_18_1.png"
-        assert baseline.exists(), f"Missing v1.18.1 visual baseline for {name}"
+        baseline = ROOT / f"tests/visual_baselines/away_alignment_{name}_v1_26_1.png"
+        assert baseline.exists(), f"Missing v1.26.1 visual baseline for {name}"
         observed = Image.open(actual).convert("RGB")
         expected = Image.open(baseline).convert("RGB")
         assert observed.size == expected.size == (viewport["width"], viewport["height"])

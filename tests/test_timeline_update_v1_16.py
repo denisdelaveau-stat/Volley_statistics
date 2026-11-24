@@ -93,13 +93,16 @@ def test_connector_delta_and_score_are_centred_in_compact_sequence(browser):
                    (g["pill"]["top"] + g["pill"]["bottom"]) / 2) < 1
         assert abs(g["awayConnector"]["width"] - g["homeConnector"]["width"]) < 1
         if g["away"]:
-            assert 5 <= g["awayLane"]["left"] - g["pill"]["right"] <= 7
-            assert 5 <= g["awayConnector"]["left"] - g["awayLane"]["right"] <= 7
-            assert 5 <= g["event"]["left"] - g["awayConnector"]["right"] <= 7
+            assert abs(g["awayLane"]["left"] - g["pill"]["right"]) < 1
+            assert abs(g["awayConnector"]["left"] - g["awayLane"]["right"]) < 1
+            assert abs(g["event"]["left"] - g["awayConnector"]["right"]) < 1
         else:
-            assert 5 <= g["homeConnector"]["left"] - g["event"]["right"] <= 7
-            assert 5 <= g["homeLane"]["left"] - g["homeConnector"]["right"] <= 7
-            assert 5 <= g["pill"]["left"] - g["homeLane"]["right"] <= 7
+            assert abs(g["homeConnector"]["left"] - g["event"]["right"]) < 1
+            if g["homeLane"]["width"]:
+                assert abs(g["homeLane"]["left"] - g["homeConnector"]["right"]) < 1
+                assert abs(g["pill"]["left"] - g["homeLane"]["right"]) < 1
+            else:
+                assert abs(g["pill"]["left"] - g["homeConnector"]["right"]) < 1
     assert not errors
     page.close()
 

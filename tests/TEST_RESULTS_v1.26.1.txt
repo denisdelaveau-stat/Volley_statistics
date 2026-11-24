@@ -1,0 +1,16 @@
+VolleyLive v1.26.1 final validation
+Date: 2026-11-24
+
+Automated tests
+- Command: pytest -q --disable-warnings
+- Result: 158 passed in 353.61s
+
+Syntax checks
+- node --check: match-hub.js, spectator.js, statistics/adapter.js, coach.js, sw.js
+- python3 -m py_compile tests/*.py
+- Result: passed
+
+Visual validation
+- 10 deterministic responsive Timeline baselines inspected.
+- Viewports: 1536x1024, 1024x768, 844x390, 412x915, 390x844 as applicable.
+- Reference requirements covered: one-line full player names, equal 40 px connectors, fixed 38 x 28 px delta squares touching score, and half-width HOME/AWAY header boxes.
