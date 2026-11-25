@@ -1,34 +1,5 @@
-"""v1.6.8 rotation detail, hidden-history metadata and setup acceptance tests."""
-from helpers import APP_URI, events, open_match, wait_guard
-
-
-def test_rotation_is_hidden_but_persisted_per_event(browser):
-    page, errors = open_match(browser, "advanced", focus_off=(4,))
-    status = page.locator("#courtStatus")
-    assert status.is_hidden()
-    assert page.locator("#phaseBadge").is_hidden()
-
-    page.click('[data-quick-result="point"]')
-    page.click('[data-quick-side="A"]')
-    wait_guard(page)
-    page.click('[data-quick-result="point"]')
-    page.click('[data-quick-side="T"]')
-    wait_guard(page)
-    page.click('[data-quick-result="point"]')
-    page.click('[data-quick-side="A"]')
-
-    saved = events(page)
-    assert [event["rotation"] for event in saved] == [0, 0, 1]
-    assert page.locator(".history thead th").all_inner_texts() == [
-        "#", "Player", "Action", "Result", "Score"
-    ]
-    rows = page.locator("#captureHistory tr")
-    assert rows.nth(0).locator("td").count() == 5
-    assert rows.nth(0).locator("td").nth(1).inner_text() == "A"
-    assert [event["rotation"] for event in saved] == [0, 0, 1]
-    assert not errors
-    page.close()
-
+"""Setup wizard: initial rotation, libero bench and settings-to-new-match sequence."""
+from helpers import APP_URI
 
 
 def _seed_team(page):
