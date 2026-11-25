@@ -1,10 +1,10 @@
 """v1.12 result-first HOME/AWAY capture acceptance."""
-from helpers import events, open_match, wait_guard
+from helpers import events, open_match, wait_guard, VERSION
 
 
 def test_basic_normative_result_bars(browser):
     page, errors = open_match(browser, "basic")
-    assert page.inner_text("#appVersion") == "v1.28.0"
+    assert page.inner_text("#appVersion") == f"v{VERSION}"
     assert all(page.locator(f'[data-quick-side="{side}"]').is_hidden() for side in ("T", "A"))
     assert page.locator("[data-quick-side]").all_text_contents() == ["HOME", "AWAY"]
     assert page.locator("[data-quick-result]").count() == 3

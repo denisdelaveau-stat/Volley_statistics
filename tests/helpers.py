@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP_URI = (ROOT / "index.html").as_uri()
 CHROMIUM = os.environ.get("CHROMIUM_PATH", "/opt/pw-browsers/chromium-1228/chrome-linux64/chrome")
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+CACHE_NAME = f"volley-live-capture-v{VERSION}"
 
 
 def base_match(level: str = "advanced", focus_off=(4,)) -> dict:

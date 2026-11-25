@@ -1,5 +1,5 @@
 """v1.26.0 Home, workspace hierarchy, and responsive navigation acceptance."""
-from helpers import APP_URI, ROOT, base_match
+from helpers import APP_URI, ROOT, base_match, VERSION
 
 
 def open_empty(browser, viewport=None):
@@ -29,7 +29,7 @@ def test_home_workspace_navigation_and_back_paths(browser):
     assert page.locator("#homeScreen .home-main").all_inner_texts() == [
         "SETUP & CAPTURE", "INSIGHTS & VIEWING", "SETTINGS"
     ]
-    assert page.locator("#appVersion").inner_text() == "v1.28.0"
+    assert page.locator("#appVersion").inner_text() == f"v{VERSION}"
 
     page.locator("#homeSetupCapture").click()
     assert page.locator("#setupCaptureTitle").inner_text() == "SETUP & CAPTURE"
