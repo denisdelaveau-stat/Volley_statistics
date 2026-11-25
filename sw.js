@@ -2,7 +2,7 @@
    Bump CACHE when any file changes so installed phones pick up the new version. */
 var CACHE = 'volley-live-capture-v1.28.0';
 var ASSETS = ['./', 'index.html', 'manifest.webmanifest',
-  'Font_app_ref.jpg', 'runtime-input.css', 'runtime-input.js', 'coach.css', 'match-hub.css', 'team-management.css', 'match-hub.js', 'coach-live-config.js', 'coach.js',
+  'Font_app_ref.jpg', 'runtime-input.css', 'runtime-input.js', 'coach.css', 'match-hub.css', 'team-management.css', 'team-management.js', 'settings.js', 'match-hub.js', 'coach-live-config.js', 'coach.js',
   'statistics/adapter.js', 'spectator.html', 'spectator.css', 'spectator-live-config.js', 'spectator.js',
   'statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json',
   'statistics/data/reference-fixture.js',

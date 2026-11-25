@@ -33,7 +33,7 @@ In this order:
 3. **REGISTERED TEAMS** (`#teamsBody`) with a counter (`#teamCount`, e.g. `3 TEAMS`). Each row opens the team for editing (click, `Enter` or `Space`, or `✎`); `×` deletes it after confirmation (`Delete registered team "<name>"?`).
 4. **IMPORT NEW TEAM** card (`#teamImport`) for CSV files, with the note: the first row must contain Numero, Nom and Poste.
 
-The back button (`#teamsBack`) returns to SETUP & CAPTURE.
+The back button (`#teamsBack`, `‹ SETUP`, `aria-label="Back to Setup and Capture"`) returns to SETUP & CAPTURE, consistent with the Match Hub back button.
 
 ## 4. Editor (`#teamEditor`)
 
@@ -72,11 +72,7 @@ Validation messages (shown in `#teamsMsg`):
 - Touch targets ≥ 44 px (Add Player is 48×48 px).
 - No horizontal overflow at 390×844 and 1024×768; overview cards are vertically ordered without overlap.
 
-## 7. Known inconsistency
-
-`#teamsBack` is labelled `HOME` / `Back to Home`, but it returns to SETUP & CAPTURE.
-
-## 8. Acceptance
+## 7. Acceptance
 
 1. A player is added only with a valid Numero, Nom and Poste; duplicate numbers are rejected.
 2. Sorting works on all three keys in both directions.
