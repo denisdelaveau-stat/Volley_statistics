@@ -1,6 +1,6 @@
 # Volley Live Capture — Functional Specification (capture core)
 
-> **Scope note (v1.28.0).** This document specifies the capture core introduced up to v1.6.10: match setup, scoring rules, the Basic / Intermediate / Advanced detail levels (still selectable in SETTINGS) and persistence. Later interfaces have dedicated specifications — see the interface index in `ARCHITECTURE.md`:
+> **Scope note (v1.28.0).** This document specifies the capture core introduced up to v1.6.10: match setup, scoring rules, the Advanced capture level only (the Basic and Intermediate levels and the detail-level setting were removed in v1.28.0; sections 4 and 5 are historical) and persistence. Later interfaces have dedicated specifications — see the interface index in `ARCHITECTURE.md`:
 > - Navigation, Home and Settings → `VolleyLive_Navigation_Home_Specification.md`
 > - Runtime input modes FOCUS / SPEED+ / FLOW → `specification_saisie_action.md`
 > - Match Capture hub → `VolleyLive_Match_Hub_Implementation_Specification.md`

@@ -12,6 +12,13 @@ def scoring_event(idx, winner, a, b):
     }
 
 
+def _point(page, author):
+    page.locator(f'[data-runtime-author="{author}"]').click()
+    page.locator('[data-runtime-action="attack"]').click()
+    page.locator('[data-runtime-result="point"]').click()
+    page.wait_for_timeout(600)
+
+
 def test_set_end_undo_and_exports(browser):
     seed, a, b = [], 0, 0
     for i in range(48):
@@ -20,19 +27,17 @@ def test_set_end_undo_and_exports(browser):
         else:
             b += 1; winner = "team2"
         seed.append(scoring_event(i + 1, winner, a, b))
-    page, errors = open_match(browser, "basic", events=seed)
+    page, errors = open_match(browser, events=seed)
     assert page.locator("#liveScore .digit-box").all_inner_texts() == ["24", "24"]
-    page.click('[data-quick-result="point"]')
-    page.click('[data-quick-side="T"]')
-    wait_guard(page)
-    page.click('[data-quick-result="point"]')
-    page.click('[data-quick-side="T"]')
+    _point(page, "3")
+    _point(page, "3")
     assert "locked" in page.get_attribute("#capturePanel", "class")
     assert "SET 1 FINISHED" in page.inner_text("#setOverTitle")
     count = len(events(page))
     page.evaluate("""() => {
-      document.querySelector('[data-quick-result="point"]').click();
-      document.querySelector('[data-quick-side="A"]').click();
+      document.querySelector('[data-runtime-author="A"]')?.click();
+      document.querySelector('[data-runtime-action="attack"]')?.click();
+      document.querySelector('[data-runtime-result="point"]')?.click();
     }""")
     assert len(events(page)) == count
 

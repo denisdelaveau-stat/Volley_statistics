@@ -3,7 +3,7 @@ from helpers import APP_URI, base_match
 
 
 def _seed(page):
-    match = base_match("advanced", focus_off=())
+    match = base_match(focus_off=())
     match["currentSet"] = 1
     events = [
         {"id": 1, "set": 1, "player": 3, "action": "reception", "result": "neutral", "winningTeam": None, "scoreA": 0, "scoreB": 0},
@@ -81,7 +81,7 @@ def test_coach_courts_use_shared_saturated_role_palette(browser):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(APP_URI)
-    match = base_match("advanced", focus_off=())
+    match = base_match(focus_off=())
     match["currentSet"] = 1
     # Put all five roster roles on the six-player court for palette validation.
     match["startingRotation"] = {"p1": 1, "p2": 7, "p3": 4, "p4": 3, "p5": 2, "p6": 5}

@@ -53,8 +53,7 @@ def test_settings_and_new_match_sequence(browser):
 
     page.click("#homeSettings")
     page.click('[data-setting-format="2"]')
-    page.select_option("#settingsLevel", "intermediate")
-    assert page.locator("#settingsLevel").evaluate("e => getComputedStyle(e).backgroundColor") == "rgb(254, 249, 195)"
+    assert page.locator("#settingsLevel").count() == 0
     page.click("#settingsSave")
     page.click("#settingsBack")
 
@@ -98,7 +97,7 @@ def test_settings_and_new_match_sequence(browser):
     page.click("#suNext")
 
     match = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1'))")
-    assert match["detailLevel"] == "intermediate"
+    assert match["detailLevel"] == "advanced"
     assert match["format"]["setsToWin"] == 2
     assert match["startingRotation"] == {"p1": 1, "p2": 3, "p3": 4, "p4": 7, "p5": 5, "p6": 6}
     assert match["startingLineup"]["libero"] == 2

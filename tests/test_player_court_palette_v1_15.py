@@ -29,7 +29,7 @@ def _contrast(a, b):
 
 
 def test_five_role_colors_are_saturated_and_wcag_aa(browser):
-    page, errors = open_match(browser, "advanced", focus_off=(), viewport={"width": 390, "height": 844})
+    page, errors = open_match(browser, focus_off=(), viewport={"width": 390, "height": 844})
     variables = page.evaluate(
         """names => Object.fromEntries(names.map(n => {
           const s=getComputedStyle(document.documentElement);

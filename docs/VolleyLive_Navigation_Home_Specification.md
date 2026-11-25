@@ -1,7 +1,7 @@
 # VolleyLive — Navigation, Home and Settings Specification
 
 Status: current as of v1.28.0. Source of truth: `index.html` (inline navigation controller), `settings.js` (Settings), `match-hub.js` (`displayScreen`).
-Acceptance tests: `tests/test_navigation_visual_v1_25.py`, `tests/test_v1_7_home.py`, `tests/test_basic_split.py`.
+Acceptance tests: `tests/test_navigation_visual_v1_25.py`, `tests/test_v1_7_home.py`, `tests/test_rotation_setup_v1_6_4.py`.
 
 ## 1. Purpose
 
@@ -33,7 +33,7 @@ Coach View, Spectator View and Match Reports are always reached through a match 
 | Brand | `#homeTitle` | `VolleyLive Insight`, tagline `Capture once. Use everywhere.` |
 | Write zone card | `#homeSetupCapture` | Kicker `WRITE ACCESS`, title `SETUP & CAPTURE`, subtitle `Prepare teams and record matches` |
 | Read zone card | `#homeInsights` | Kicker `READ ONLY`, title `INSIGHTS & VIEWING`, subtitle `View, analyse and share match data` |
-| Settings card | `#homeSettings` | `SETTINGS` · `MATCH FORMAT · CAPTURE DETAIL` |
+| Settings card | `#homeSettings` | `SETTINGS` · `MATCH FORMAT` |
 | iOS install hint | `#homeInstall` | Shown only when not running as an installed PWA |
 | Version | `#appVersion` | Must equal `VERSION` prefixed with `v` (e.g. `v1.28.0`) |
 
@@ -65,7 +65,6 @@ Stored in `localStorage['volleyCapture.settings.v1']`.
 | Setting | Values | Notes |
 |---|---|---|
 | Match format (`setsToWin`) | `2` = 2 WINNING SETS (best of 3, set 3 to 15) / `3` = 3 WINNING SETS (best of 5, set 5 to 15) | Default format for new matches |
-| Capture detail (`detailLevel`, `#settingsLevel`) | `basic` / `intermediate` / `advanced` | Basic: team result only · Intermediate: optional focus player · Advanced: player, action and result |
 
 Rules:
 - `SAVE SETTINGS` persists and shows `Settings saved.`; `← HOME` returns without saving.
