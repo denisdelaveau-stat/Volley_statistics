@@ -1,6 +1,6 @@
 # VolleyLive — Team Management Specification
 
-Status: current as of v1.24.0 (unchanged in v1.28.0). Source of truth: `index.html` (`#teamsScreen`, `TEAMS` controller), `team-management.css`.
+Status: current as of v1.28.0. Source of truth: `index.html` (`#teamsScreen` markup), `team-management.js` (controller), `team-management.css`.
 Acceptance tests: `tests/test_team_management_v1_24.py`.
 
 ## 1. Purpose

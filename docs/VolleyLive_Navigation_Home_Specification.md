@@ -1,6 +1,6 @@
 # VolleyLive — Navigation, Home and Settings Specification
 
-Status: current as of v1.28.0. Source of truth: `index.html` (inline navigation controller), `match-hub.js` (`displayScreen`).
+Status: current as of v1.28.0. Source of truth: `index.html` (inline navigation controller), `settings.js` (Settings), `match-hub.js` (`displayScreen`).
 Acceptance tests: `tests/test_navigation_visual_v1_25.py`, `tests/test_v1_7_home.py`, `tests/test_basic_split.py`.
 
 ## 1. Purpose
