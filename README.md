@@ -20,7 +20,7 @@ python3 serve_local.py
 ## Validate
 
 ```bash
-tests/run_v1_28_approved.sh
+bash tests/run_v1_28_approved.sh
 node --check runtime-input.js
 node --check match-hub.js
 node --check spectator.js
@@ -29,9 +29,20 @@ node --check coach.js
 node --check sw.js
 ```
 
+Requirements: Python 3 with `pytest`, `playwright` (Chromium), `numpy`, `pillow` and `python-docx`.
+
+## Repository layout
+
+- Application runtime files are at the repository root, plus `statistics/` (shared adapter and fixtures) and `icons/`.
+- `docs/` holds the specifications. `docs/ARCHITECTURE.md` maps every interface to its specification.
+- `tests/` holds the acceptance suite, visual baselines and the approved release gate.
+- `docs/archive/` keeps historical release notes, implementation reports, manifests and test results.
+
 ## Current release documents
 
 - `RELEASE_NOTES_v1.28.0.md`
 - `IMPLEMENTATION_REPORT_v1.28.0.md`
 - `COPY_INSTRUCTIONS_v1.28.0.md`
+- `SOURCE_MANIFEST_v1.28.0.txt`
 - `docs/VISUAL_VALIDATION_v1.28.0.md`
+- `tests/TEST_RESULTS_v1.28.0.txt`

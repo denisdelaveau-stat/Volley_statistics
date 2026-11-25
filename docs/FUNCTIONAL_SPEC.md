@@ -1,4 +1,14 @@
-# Volley Live Capture v1.6.10 — Functional Specification
+# Volley Live Capture — Functional Specification (capture core)
+
+> **Scope note (v1.28.0).** This document specifies the capture core introduced up to v1.6.10: match setup, scoring rules, the Basic / Intermediate / Advanced detail levels (still selectable in SETTINGS) and persistence. Later interfaces have dedicated specifications — see the interface index in `ARCHITECTURE.md`:
+> - Navigation, Home and Settings → `VolleyLive_Navigation_Home_Specification.md`
+> - Runtime input modes FOCUS / SPEED+ / FLOW → `specification_saisie_action.md`
+> - Match Capture hub → `VolleyLive_Match_Hub_Implementation_Specification.md`
+> - Team Management → `VolleyLive_Team_Management_Specification.md`
+> - Match Library and reports → `VolleyLive_Match_Library_Specification.md`
+> - Coach View → `VolleyLive_Coach_View_Specification.md`
+>
+> Where this document conflicts with a newer specification, the newer one wins. In particular, the Home screen in §2 step 1 has been replaced by the workspace navigation, and JSON opening now happens only in MATCH LIBRARY.
 
 ## 1. Purpose
 Touch-first volleyball match capture for iPhone/tablet with offline PWA operation, JSON persistence, HTML reporting, live statistics and three input-detail levels. This file is the implementation companion to `Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx`.

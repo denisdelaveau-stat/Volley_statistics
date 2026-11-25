@@ -26,10 +26,19 @@
   function text(value, fallback) { return value === undefined || value === null || value === '' ? fallback : String(value); }
   function number(value, fallback) { var n = Number(value); return Number.isFinite(n) ? n : fallback; }
   function upper(value) { return String(value || '').toUpperCase(); }
+  /* Shared domain rule used by statistics and spectator evolution views. */
+  function isFaultEvaluation(value) {
+    var v = String(value || '').toLowerCase();
+    return v === 'error' || v === 'fault';
+  }
+  function isFaultEvent(event) {
+    return !!event && upper(event.eventType || 'ACTION') === 'ACTION' &&
+      upper(event.status || 'ACTIVE') !== 'VOIDED' && isFaultEvaluation(event.evaluation !== undefined ? event.evaluation : event.result);
+  }
   function normalResult(value) {
     var v = String(value || '').toLowerCase();
     if (v === 'point' || v === 'kill' || v === 'ace') return 'point';
-    if (v === 'error' || v === 'fault') return 'error';
+    if (isFaultEvaluation(v)) return 'error';
     return 'continue';
   }
   function captureResult(value) {
@@ -293,5 +302,5 @@
     } catch(error){return null;}
   }
 
-  return {ACTION_CODES:ACTION_CODES,ROLE_CODES:ROLE_CODES,detectFormat:detectFormat,validate:validate,validateUnifiedV2:validateUnifiedV2,validateCaptureV1:validateCaptureV1,toReportData:toReportData,toCoachData:toCoachData,fromLocalStorage:fromLocalStorage,rotateClockwise:rotateClockwise};
+  return {ACTION_CODES:ACTION_CODES,ROLE_CODES:ROLE_CODES,detectFormat:detectFormat,validate:validate,validateUnifiedV2:validateUnifiedV2,validateCaptureV1:validateCaptureV1,toReportData:toReportData,toCoachData:toCoachData,fromLocalStorage:fromLocalStorage,rotateClockwise:rotateClockwise,isFaultEvaluation:isFaultEvaluation,isFaultEvent:isFaultEvent};
 });

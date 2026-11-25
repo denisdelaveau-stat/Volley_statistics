@@ -125,6 +125,6 @@ def test_coach_empty_state_and_match_library_zero_state(browser):
     page.locator("#homeInsights").click()
     page.locator("#insightsMatchLibrary").click()
     assert page.locator(".library-filters span").all_inner_texts() == ["0", "0", "0"]
-    assert "0 matches" in page.locator("#matchLibraryList").inner_text()
+    assert "No matches yet." in page.locator("#matchLibraryList").inner_text()
     assert not errors
     page.close()

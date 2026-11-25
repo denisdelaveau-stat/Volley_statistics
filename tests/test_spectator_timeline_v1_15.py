@@ -107,10 +107,10 @@ def test_match_library_import_opens_valid_v21_in_selected_spectator_view(browser
     page.reload()
     page.locator("#homeInsights").click(); page.locator("#insightsMatchLibrary").click()
     page.locator("#matchLibraryFile").set_input_files(str(V2_FIXTURE))
-    page.wait_for_function("document.querySelector('#libraryImportedCount').textContent.trim() === '1'")
-    assert page.locator("#libraryImportedCount").inner_text() == "1"
-    assert page.locator("#librarySelectedState").inner_text() == "IMPORTED"
-    page.locator('[data-library-action="spectator"]').click()
+    page.wait_for_function("document.querySelector('#libraryFinishedCount').textContent.trim() === '1'")
+    assert page.locator("#libraryFinishedCount").inner_text() == "1"
+    assert page.locator(".library-row.selected").count() == 1
+    page.locator("#libraryOpenSpectator").click()
     page.wait_for_url("**/spectator.html#live-score")
     page.locator('[data-tab="live-timeline"]').click()
     assert page.locator('[data-tab="live-timeline"]').get_attribute("aria-selected") == "true"
