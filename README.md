@@ -29,7 +29,17 @@ node --check coach.js
 node --check sw.js
 ```
 
-Requirements: Python 3 with `pytest`, `playwright` (Chromium), `numpy`, `pillow` and `python-docx`.
+Requirements: Python 3 with `pytest`, `playwright` (Chromium), `numpy`, `pillow`, `python-docx` and `jsonschema`. Set `CHROMIUM_PATH` to use a specific Chromium binary; otherwise Playwright's bundled Chromium is used. The same gate runs on every push via `.github/workflows/tests.yml`.
+
+Visual baselines in `tests/visual_baselines/` were captured with Linux Chromium; pixel comparisons can exceed their thresholds on other platforms because of font rasterisation.
+
+## Bump the version
+
+```bash
+python tools/bump_version.py 1.29.0
+```
+
+This updates `VERSION`, the service-worker cache name, the Home version label and this README. Tests read `VERSION`.
 
 ## Repository layout
 
