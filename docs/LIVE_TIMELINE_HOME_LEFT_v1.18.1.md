@@ -32,4 +32,4 @@ The spectator interface consistently places HOME on the left and AWAY on the rig
 - 844×390
 - 390×844
 
-Acceptance coverage is in `tests/test_compact_score_delta_v1_18_1.py`, with frozen baselines in `tests/visual_baselines/compact_timeline_*_v1_18_1.png`.
+Acceptance coverage is in `tests/test_compact_score_delta_v1_18_1.py`, with frozen baselines in `tests/visual_baselines/compact_timeline_*_v1_26_1.png` (re-frozen in v1.26.1).

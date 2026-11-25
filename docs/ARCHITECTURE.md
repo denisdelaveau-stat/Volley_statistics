@@ -1,33 +1,67 @@
-# Volley Live Capture v1.6.10 — Architecture
+# VolleyLive v1.28.0 — Architecture
 
 ## Components
-- `index.html`: setup wizard, capture UI, event/scoring engine, rotation/substitution, statistics and exports.
-- `sw.js`: versioned offline app-shell cache.
-- `manifest.webmanifest` and `icons/`: PWA metadata and Home-screen assets.
-- `tests/`: portable pytest/Playwright acceptance and regression suite.
-- localStorage: match and reusable setup persistence.
 
-## Data separation
-1. Match domain: match configuration, events and chart projection.
-2. Setup-library domain: reusable teams, starting sevens and initial rotations.
+| File | Role |
+|---|---|
+| `index.html` | Application shell: Home, workspace navigation, Settings, New Match wizard, Team Management, live capture, scoring engine, rotation/substitution, Match Hub and Match Library markup, Coach View container |
+| `runtime-input.js` / `runtime-input.css` | Shared runtime input controller for FOCUS, SPEED+ and FLOW (mode switching during capture, preferences, atomic Undo, double-tap guard) |
+| `match-hub.js` / `match-hub.css` | Match Capture hub (new/continue/conflict dialogs) and shared Match Library (selection, JSON import, reports, view routing). Exposes `window.VolleyMatchHub` / `window.VolleyMatchLibrary` |
+| `team-management.css` | Team Management styling (controller is inline in `index.html`) |
+| `coach.js` / `coach.css` / `coach-live-config.js` | Read-only Coach View (`window.VolleyCoach`) and its configurable status thresholds |
+| `spectator.html` / `spectator.js` / `spectator.css` / `spectator-live-config.js` | Read-only Spectator View: LIVE SCORE, TIMELINE, GRAPH, RANKING |
+| `statistics/adapter.js` | Shared normalisation/validation boundary (`window.VolleyStatsAdapter`: `validate`, `fromLocalStorage`, `toCoachData`) |
+| `statistics/data/` | Reference fixtures (unified v2.1) used by viewers and tests |
+| `sw.js` | Versioned offline app-shell cache (`volley-live-capture-v<VERSION>`) |
+| `manifest.webmanifest`, `icons/` | PWA metadata and Home-screen assets |
+| `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` |
 
-NEW MATCH resets the active match without deleting reusable setup templates.
+## Interfaces and their specifications
+
+| Interface | Specification |
+|---|---|
+| Home, SETUP & CAPTURE, INSIGHTS & VIEWING, Settings | `VolleyLive_Navigation_Home_Specification.md` |
+| Match Capture hub | `VolleyLive_Match_Hub_Implementation_Specification.md` |
+| New Match wizard, capture rules, scoring | `FUNCTIONAL_SPEC.md`, `IMPLEMENTATION_SPEC.md` |
+| Live capture runtime modes (FOCUS / SPEED+ / FLOW) | `specification_saisie_action.md` |
+| Team Management | `VolleyLive_Team_Management_Specification.md` |
+| Match Library and Match Reports | `VolleyLive_Match_Library_Specification.md` |
+| Coach View | `VolleyLive_Coach_View_Specification.md` |
+| Spectator — LIVE SCORE / momentum | `VolleyLive_Live_Header_Momentum_Spec.md` |
+| Spectator — TIMELINE | `Live_Timeline_Spectator_View_Spec.md` (+ layout contracts `LIVE_TIMELINE_*`) |
+| Spectator — GRAPH | `VolleyLive_Score_Fault_Evolution_View_Specification_v1.0.md` |
+| Spectator — RANKING | `ADVANCED_STATISTICS_RANKING_v1.20.0.md` (ranking sections) |
+| Statistics metrics and UI principles | `VolleyLive_Statistics_Implementation_Specification.md`, `Volley_Live_Live_Statistics_UI_Specification_v1.1.md` |
+| Match JSON data interface | `VolleyLive_Unified_JSON_Format_Specification.md`, `volley-live.match.schema.v2.1.json` |
+| iOS installation | `IOS_IMPLEMENTATION_SPEC.md`, `INSTALL_IPHONE.md` |
+
+Historical release notes, implementation reports, manifests and test results are kept in `docs/archive/`.
+
+## Storage
+
+| Key | Owner | Content |
+|---|---|---|
+| `volleyCapture.match.v1`, `volleyCapture.events.v1`, `volleyCapture.chartData.v1`, `volleyCapture.stage` | capture | The single editable official match |
+| `volleyCapture.library.v1` | Team Management / New Match | Reusable teams |
+| `volleyCapture.settings.v1` | Settings | Match format and detail level |
+| `volleyCapture.runtimeInput.preferences.v1` | runtime input | Last runtime mode and preferences |
+| `volleyMatchHub.history.v1` | Match Library | Finished and imported matches (max 100) |
+| `vl.library.filter`, `vl.library.selectedId` | Match Library | Persisted filter and selected match |
+| `volleyAnalysis.replay.v1` (session) | Match Library → Coach | Selected read-only document |
+| `volleySpectator.archive.v1` | Match Library → Spectator | Selected read-only document |
+
+## Write / read separation
+
+Only NEW MATCH / CONTINUE CAPTURE write to `volleyCapture.match/events/chartData`. Match Library, Coach View, Spectator View and Match Reports read a selected document and never modify the active match.
 
 ## Event-derived state
-Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally integer rotation is snapshotted onto each new event so later statistics do not need to infer historical state. v1.6.8 hides time and rotation from live History without removing either event field. The portable file stays at format version 1.
 
-## Capture layers
-1. Court renderer owns player, Focus, service, rotation, libero and substitution state.
-2. v1.6 result bars and Advanced grid translate user intent into `(player, action, result)`.
-3. The existing commit engine derives `winningTeam`, `pointOrigin`, pre-rally `rotation`, score and persisted event fields.
-4. Derived views re-render from the event log.
+Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally rotation is snapshotted onto each event. v1.28 adds canonical runtime fields without breaking the historical event schema; the portable capture file stays at format version 1 and unified documents use schema 2.1.
 
 ## Dependency chain
+
 Team → Starting 7 → Rotation. Loaded downstream objects are validated against their upstream dependency; missing numbers are reported and never silently substituted.
 
+## Icon pipeline
 
-## v1.6.8 presentation assets
-UI Modification 6 remains inside the single-file capture shell. The realistic net is CSS-only and uses a transparent field so the page background remains visible. Advanced action labels contain text only; no player-silhouette assets are generated or loaded. PWA icon files are generated from the supplied 1254×1254 artwork and cached with the app shell.
-
-## v1.6.10 icon pipeline
-The supplied 1254 × 1254 artwork is converted to an opaque RGB master. The complete pre-rendered 96 px rounded-corner/rim region is cropped away before Lanczos regeneration of the 180, 32, 192 and 512 px outputs. Operating systems apply launcher masks.
+The supplied 1254 × 1254 artwork (`icons/IMG_5596.PNG`) is converted to an opaque RGB master; the pre-rendered rounded-corner region is cropped before Lanczos regeneration of the 180, 32, 192 and 512 px outputs.

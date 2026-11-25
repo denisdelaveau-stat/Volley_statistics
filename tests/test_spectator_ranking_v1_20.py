@@ -131,7 +131,7 @@ def test_v1_20_visual_baselines_for_ranking(browser, tmp_path):
         page.wait_for_timeout(250)
         actual = tmp_path / f"ranking_{name}.png"
         page.screenshot(path=str(actual), full_page=True)
-        baseline = ROOT / "tests" / "visual_baselines" / f"ranking_{name}_v1_20_0.png"
+        baseline = ROOT / "tests" / "visual_baselines" / f"ranking_{name}_v1_26_0.png"
         assert baseline.exists(), f"Missing {baseline.name}"
         observed, expected = Image.open(actual).convert("RGB"), Image.open(baseline).convert("RGB")
         assert observed.size == expected.size

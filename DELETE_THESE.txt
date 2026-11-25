@@ -1,1 +1,0 @@
-No files need deletion when updating from v1.12.6.

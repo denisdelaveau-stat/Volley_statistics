@@ -1,4 +1,16 @@
-# VolleyLive v1.25.0 validation plan
+# VolleyLive v1.26.0 validation plan
+
+## SPECTATOR VIEW v1.26.0
+
+| ID | Requirement |
+|---|---|
+| SPT-01 | SCORES, TIMELINE, GRAPH, and RANKING share the selected set |
+| SPT-02 | Initial load selects the current set and includes its last point; reload does not restore a stale historical set |
+| SPT-03 | Previous sets are selectable and Retour au direct restores the current set in one action |
+| SPT-04 | RANKING uses only official events from the selected set |
+| SPT-05 | HOME SCORE momentum cells/bar are green and AWAY cells/bar are red |
+| SPT-06 | TIMELINE player names are complete; connector lengths are equal/compact; action rows have reduced spacing |
+| SPT-07 | Delta bars remain score-adjacent and maximum score gaps have a dotted accessible outline |
 
 ## Navigation and access modes
 
@@ -52,7 +64,7 @@
 ## Release gate
 
 - JavaScript syntax checks pass.
-- Every service-worker asset exists; cache is `volley-live-capture-v1.25.0`.
-- Full automated suite passes: 152 tests.
-- Delta applied to a clean v1.24.0 tree is byte-identical to the complete v1.25.0 tree.
+- Every service-worker asset exists; cache is `volley-live-capture-v1.26.0`.
+- Full automated suite passes: 156 tests.
+- Delta applied to a clean v1.25.0 tree is byte-identical to the complete v1.26.0 tree.
 - Complete package, delta package, and artifact SHA-256 manifests are generated and independently rechecked.
