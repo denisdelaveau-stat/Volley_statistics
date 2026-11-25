@@ -1,3 +1,5 @@
+> **Superseded.** This document is superseded by [`VolleyLive_Spectator_Ranking_Specification.md`](VolleyLive_Spectator_Ranking_Specification.md). The Advanced Statistics page described below was removed in v1.25.0; it is kept for history only.
+
 # Advanced Statistics and SPECTATOR VIEW Ranking — v1.20.0
 
 ## Home
