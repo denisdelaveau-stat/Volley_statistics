@@ -12,14 +12,14 @@ VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 CACHE_NAME = f"volley-live-capture-v{VERSION}"
 
 
-def base_match(level: str = "advanced", focus_off=(4,)) -> dict:
+def base_match(focus_off=(4,)) -> dict:
     positions = ("setter", "libero", "oh", "mb", "oh", "mb", "opp", "oh")
     return {
         "id": "test_match",
         "name": "Antibes_vs_Nice_test",
         "status": "in_progress",
         "createdAt": "2026-11-16T12:00:00Z",
-        "detailLevel": level,
+        "detailLevel": "advanced",
         "team": {
             "name": "Antibes",
             "players": list(range(1, 9)),
@@ -51,13 +51,13 @@ def base_match(level: str = "advanced", focus_off=(4,)) -> dict:
     }
 
 
-def open_match(browser, level="advanced", focus_off=(4,), events=None, viewport=None):
+def open_match(browser, focus_off=(4,), events=None, viewport=None):
     page = browser.new_page(viewport=viewport or {"width": 390, "height": 844}, device_scale_factor=2)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.on("dialog", lambda dialog: dialog.accept())
     page.goto(APP_URI)
-    match = base_match(level, focus_off)
+    match = base_match(focus_off)
     page.evaluate(
         """payload => {
           localStorage.clear();

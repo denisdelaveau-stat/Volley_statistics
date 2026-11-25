@@ -4,7 +4,9 @@
 
 | File | Role |
 |---|---|
-| `index.html` | Application shell: Home, workspace navigation, New Match wizard, live capture, scoring engine, rotation/substitution, Match Hub and Match Library markup, Coach View container. Exposes shared shell helpers as `window.VolleyShell` |
+| `index.html` | Application shell markup: Home, workspace navigation, New Match wizard, live capture, Match Hub and Match Library markup, Coach View container. Loads the modules below. Exposes shared shell helpers as `window.VolleyShell` |
+| `css/index-*.css` | Shell styling extracted from `index.html`: theme, capture layout, focus mode, result grammar |
+| `js/index-*.js` | Capture engine extracted from `index.html`: `index-capture-engine.js` (set and match rules, pure rotation engine), `index-capture-tools.js` (score progression and lead charts, SVG drawing), `index-navigation-new-match.js` (shared shell helpers and the New Match wizard), `index-pwa.js` (offline cache and install hint), `index-basic-capture.js` (Basic and Intermediate split-button input), `index-normative-capture.js` (Advanced position-aware action grid and guarded commit) |
 | `team-management.js` / `team-management.css` | Team Management controller (`window.VolleyTeams`) and styling |
 | `settings.js` | Settings controller |
 | `runtime-input.js` / `runtime-input.css` | Shared runtime input controller for FOCUS, SPEED+ and FLOW (mode switching during capture, preferences, atomic Undo, double-tap guard) |
@@ -45,7 +47,7 @@ Historical release notes, implementation reports, manifests and test results are
 |---|---|---|
 | `volleyCapture.match.v1`, `volleyCapture.events.v1`, `volleyCapture.chartData.v1`, `volleyCapture.stage` | capture | The single editable official match |
 | `volleyCapture.library.v1` | Team Management / New Match | Reusable teams |
-| `volleyCapture.settings.v1` | Settings | Match format and detail level |
+| `volleyCapture.settings.v1` | Settings | Match format |
 | `volleyCapture.runtimeInput.preferences.v1` | runtime input | Last runtime mode and preferences |
 | `volleyMatchHub.history.v1` | Match Library | Finished and imported matches (max 100) |
 | `vl.library.filter`, `vl.library.selectedId` | Match Library | Persisted filter and selected match |

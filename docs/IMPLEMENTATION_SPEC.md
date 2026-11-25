@@ -12,7 +12,7 @@ Single-page HTML/CSS/vanilla JavaScript application. Match, event, chart and reu
 
 ## Capture implementation
 The v1.6 block in `index.html` delegates all normative result controls from the capture panel:
-- `.vlc-result-bar`: shared Basic/Intermediate/Advanced TEAM/ADVERSE grammar.
+- `.vlc-result-bar`: shared TEAM/ADVERSE grammar used by the single Advanced capture level.
 - `[data-vlc-result="error|point"]`: full-area result zones.
 - `[data-adv-row]`: six fixed Advanced action rows.
 - `[data-adv-result="error|point|neutral"]`: combined Advanced result controls.
@@ -76,7 +76,7 @@ No migration is required. Portable match JSON remains format version 1, and exis
 ## v1.6.9 Modification UI 7 implementation
 - `.score-live.board` uses a single 5 px flex gap for every adjacent score block. Set badges are 32 px high, score panels have a 58 px minimum width, and the service line remains inside each `.score-side`.
 - `.vlc-net::before`, `.vlc-net::after`, `.su-net::before` and `.su-net::after` are 28 px high and start at `top: -5px`, aligning their outer bounds with the net's 5 px top tape and 28 px border-box.
-- Intermediate and Advanced `.vlc-result-bar.team` rows receive a 2 px dashed top border plus 8 px spacing; Basic mode is excluded.
+- The `.vlc-result-bar.team` rows receive a 2 px dashed top border plus 8 px spacing.
 - The service-worker cache ID is `volley-live-capture-v1.6.9`.
 
 ## v1.6.10 icon correction

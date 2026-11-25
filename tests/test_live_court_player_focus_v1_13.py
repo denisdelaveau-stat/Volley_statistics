@@ -32,7 +32,7 @@ def _open_with_raw(browser, raw, viewport=None):
 
 
 def _status_match():
-    match = base_match("advanced", focus_off=())
+    match = base_match(focus_off=())
     match["currentSet"] = 1
     events = []
     score_a = score_b = 0

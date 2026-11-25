@@ -43,7 +43,7 @@ def test_no_automatic_reference_fixture_loading_and_no_advanced_route():
 
 def test_coach_court_is_compact_without_legend_at_phone_and_tablet(browser):
     from helpers import base_match
-    match = base_match("advanced", focus_off=())
+    match = base_match(focus_off=())
     match["currentSet"] = 1
     event = {"id": 1, "set": 1, "player": 3, "action": "attack", "result": "point", "winningTeam": "team1", "scoreA": 1, "scoreB": 0}
     for width, height in ((390, 844), (1024, 900)):

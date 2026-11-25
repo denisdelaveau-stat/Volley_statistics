@@ -29,7 +29,9 @@ def test_saturated_role_palette_and_coach_setup_background(browser):
 
 def test_theme_css_preserves_orange_courts_and_coloured_actions():
     from pathlib import Path
-    html = (Path(__file__).resolve().parents[1] / 'index.html').read_text(encoding='utf-8')
+    root = Path(__file__).resolve().parents[1]
+    html = (root / 'index.html').read_text(encoding='utf-8') + ''.join(
+        p.read_text(encoding='utf-8') for p in sorted((root / 'css').glob('index-*.css')))
     assert '#setupScreen .su-card{background:rgba(10,43,75,.9)' in html
     assert '#setupScreen .rotation-picker{background:#102f50' in html
     assert '#setupScreen .su-card input[type=text],#setupScreen .su-select{background:#123b60' in html

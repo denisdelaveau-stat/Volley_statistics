@@ -13,7 +13,7 @@ def open_runtime(browser, mode="FOCUS", viewport=None):
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.on("dialog", lambda dialog: dialog.accept())
     page.goto(APP_URI)
-    match = base_match("advanced", ())
+    match = base_match(())
     page.evaluate(
         """payload => {
           localStorage.clear();
