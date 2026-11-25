@@ -1,7 +1,7 @@
 """Team Management coverage retained under Setup & Capture in v1.26.0."""
 from pathlib import Path
 
-from helpers import APP_URI
+from helpers import APP_URI, CACHE_NAME
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +28,10 @@ def test_team_management_shell_matches_requested_information_architecture(browse
     assert page.locator("#teamImport").is_visible()
     assert "Numero, Nom, Poste" in page.locator("#teamImport").inner_text()
     assert page.locator("#teamCsvFile").get_attribute("accept") == ".csv,text/csv"
+    assert page.locator("#teamsBack").get_attribute("aria-label") == "Back to Setup and Capture"
+    page.click("#teamsBack")
+    assert page.locator("#setupCaptureScreen").is_visible()
+    assert page.evaluate("document.activeElement.id") == "setupTeamManagement"
     assert not errors
     page.close()
 
@@ -84,7 +88,7 @@ def test_offline_shell_includes_team_management_styles():
     service_worker = (ROOT / "sw.js").read_text()
     index = (ROOT / "index.html").read_text()
     css = (ROOT / "team-management.css").read_text()
-    assert "volley-live-capture-v1.28.0" in service_worker
+    assert CACHE_NAME in service_worker
     assert "team-management.css" in service_worker
     assert '<link rel="stylesheet" href="team-management.css">' in index
     assert "--tm-cyan:#12d7f2" in css
