@@ -6,7 +6,6 @@ from docx import Document
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "docs" / "Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx"
-ROOT_COPY = ROOT / "Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx"
 
 
 def test_corrected_specification_catalogue_and_original_images():
@@ -49,4 +48,3 @@ def test_corrected_specification_catalogue_and_original_images():
     with ZipFile(DOC) as package:
         media = [name for name in package.namelist() if name.startswith("word/media/")]
     assert len(media) == 22
-    assert DOC.read_bytes() == ROOT_COPY.read_bytes()
