@@ -6,6 +6,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageStat
 
 from test_spectator_timeline_v1_15 import archive_v2, open_spectator
+from helpers import CACHE_NAME
 
 ROOT = Path(__file__).resolve().parents[1]
 VIEWPORTS = {
@@ -204,7 +205,7 @@ def test_home_left_header_timeline_graph_and_score_semantics_are_preserved(brows
 
 def test_offline_cache_and_four_visual_baselines(browser, tmp_path):
     sw = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.28.0" in sw
+    assert CACHE_NAME in sw
     for asset in ("spectator.html", "spectator.css", "spectator.js"):
         assert asset in sw
 

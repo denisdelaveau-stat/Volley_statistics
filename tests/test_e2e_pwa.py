@@ -1,6 +1,6 @@
 """Cross-feature regression checks for score, set lock, Undo, report and cache version."""
 from pathlib import Path
-from helpers import ROOT, events, open_match, wait_guard
+from helpers import ROOT, events, open_match, wait_guard, CACHE_NAME
 
 
 def scoring_event(idx, winner, a, b):
@@ -49,7 +49,7 @@ def test_set_end_undo_and_exports(browser):
 
 def test_pwa_cache_version_and_shell_assets():
     service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
-    assert "volley-live-capture-v1.28.0" in service_worker
+    assert CACHE_NAME in service_worker
     assert "coach.css" in service_worker
     assert "coach.js" in service_worker
     assert "As_cannes_vs_Frejus_2026-11-15.fixture.v2.json" in service_worker
