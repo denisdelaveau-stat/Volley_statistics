@@ -30,14 +30,14 @@
 | Match Library and Match Reports | `VolleyLive_Match_Library_Specification.md` |
 | Coach View | `VolleyLive_Coach_View_Specification.md` |
 | Spectator — LIVE SCORE / momentum | `VolleyLive_Live_Header_Momentum_Spec.md` |
-| Spectator — TIMELINE | `Live_Timeline_Spectator_View_Spec.md` (+ layout contracts `LIVE_TIMELINE_*`) |
+| Spectator — TIMELINE | `VolleyLive_Spectator_Timeline_Specification.md` |
 | Spectator — GRAPH | `VolleyLive_Score_Fault_Evolution_View_Specification_v1.0.md` |
-| Spectator — RANKING | `ADVANCED_STATISTICS_RANKING_v1.20.0.md` (ranking sections) |
+| Spectator — RANKING | `VolleyLive_Spectator_Ranking_Specification.md` |
 | Statistics metrics and UI principles | `VolleyLive_Statistics_Implementation_Specification.md`, `Volley_Live_Live_Statistics_UI_Specification_v1.1.md` |
 | Match JSON data interface | `VolleyLive_Unified_JSON_Format_Specification.md`, `volley-live.match.schema.v2.1.json` |
 | iOS installation | `IOS_IMPLEMENTATION_SPEC.md`, `INSTALL_IPHONE.md` |
 
-Historical release notes, implementation reports, manifests and test results are kept in `docs/archive/`.
+Historical release notes, implementation reports, manifests and test results are kept in `docs/archive/`; superseded specifications are in `docs/archive/superseded-specs/`.
 
 ## Storage
 
