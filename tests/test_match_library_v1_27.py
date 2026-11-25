@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from playwright.sync_api import expect
 from helpers import APP_URI, base_match
 
 
@@ -125,18 +126,18 @@ def test_import_validation_duplicate_and_read_only_metadata_remain_available(bro
     page, errors = open_empty(browser)
     open_library(page)
     page.locator("#matchLibraryFile").set_input_files({"name": "bad.json", "mimeType": "application/json", "buffer": b"{bad"})
-    assert "Invalid JSON syntax" in page.locator("#matchLibraryStatus").inner_text()
+    expect(page.locator("#matchLibraryStatus")).to_contain_text("Invalid JSON syntax")
 
     raw = archive("import-ok", "Imported", "Opponent", "2026-11-23T10:00:00Z")
     payload = json.dumps(raw).encode()
     page.locator("#matchLibraryFile").set_input_files({"name": "valid.json", "mimeType": "application/json", "buffer": payload})
-    assert "read-only mode" in page.locator("#matchLibraryStatus").inner_text()
+    expect(page.locator("#matchLibraryStatus")).to_contain_text("read-only mode")
     assert page.locator("#libraryFinishedCount").inner_text() == "1"
     assert page.locator(".library-row.selected").count() == 1
     assert page.evaluate("JSON.parse(localStorage.getItem('vl.library.filter'))") == "all"
 
     page.locator("#matchLibraryFile").set_input_files({"name": "valid.json", "mimeType": "application/json", "buffer": payload})
-    assert "already in the library" in page.locator("#matchLibraryStatus").inner_text()
+    expect(page.locator("#matchLibraryStatus")).to_contain_text("already in the library")
     assert page.locator("#matchHubDuplicate").is_visible()
     assert page.locator("#matchHubImportCopy").is_visible()
     assert not errors
