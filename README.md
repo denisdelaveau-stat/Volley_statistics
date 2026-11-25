@@ -41,6 +41,16 @@ python tools/bump_version.py 1.29.0
 
 This updates `VERSION`, the service-worker cache name, the Home version label and this README. Tests read `VERSION`.
 
+## Regenerate the source manifest
+
+```bash
+git add -A
+python tools/generate_manifest.py          # writes SOURCE_MANIFEST_v<VERSION>.txt
+python tools/generate_manifest.py --check  # fails if the manifest is stale
+```
+
+Hashes are computed from the git index, so they do not depend on local line endings.
+
 ## Repository layout
 
 - Application runtime files are at the repository root, plus `statistics/` (shared adapter and fixtures) and `icons/`.

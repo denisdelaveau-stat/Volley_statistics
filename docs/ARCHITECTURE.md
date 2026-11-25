@@ -4,17 +4,19 @@
 
 | File | Role |
 |---|---|
-| `index.html` | Application shell: Home, workspace navigation, Settings, New Match wizard, Team Management, live capture, scoring engine, rotation/substitution, Match Hub and Match Library markup, Coach View container |
+| `index.html` | Application shell: Home, workspace navigation, New Match wizard, live capture, scoring engine, rotation/substitution, Match Hub and Match Library markup, Coach View container. Exposes shared shell helpers as `window.VolleyShell` |
+| `team-management.js` / `team-management.css` | Team Management controller (`window.VolleyTeams`) and styling |
+| `settings.js` | Settings controller |
 | `runtime-input.js` / `runtime-input.css` | Shared runtime input controller for FOCUS, SPEED+ and FLOW (mode switching during capture, preferences, atomic Undo, double-tap guard) |
 | `match-hub.js` / `match-hub.css` | Match Capture hub (new/continue/conflict dialogs) and shared Match Library (selection, JSON import, reports, view routing). Exposes `window.VolleyMatchHub` / `window.VolleyMatchLibrary` |
-| `team-management.css` | Team Management styling (controller is inline in `index.html`) |
 | `coach.js` / `coach.css` / `coach-live-config.js` | Read-only Coach View (`window.VolleyCoach`) and its configurable status thresholds |
 | `spectator.html` / `spectator.js` / `spectator.css` / `spectator-live-config.js` | Read-only Spectator View: LIVE SCORE, TIMELINE, GRAPH, RANKING |
 | `statistics/adapter.js` | Shared normalisation/validation boundary (`window.VolleyStatsAdapter`: `validate`, `fromLocalStorage`, `toCoachData`) |
 | `statistics/data/` | Reference fixtures (unified v2.1) used by viewers and tests |
 | `sw.js` | Versioned offline app-shell cache (`volley-live-capture-v<VERSION>`) |
 | `manifest.webmanifest`, `icons/` | PWA metadata and Home-screen assets |
-| `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` |
+| `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` (run by `.github/workflows/tests.yml`) |
+| `tools/` | `bump_version.py` (release version) and `generate_manifest.py` (source manifest) |
 
 ## Interfaces and their specifications
 
