@@ -189,7 +189,7 @@ def test_responsive_internal_scrolling_accessibility_and_offline_cache(browser):
         assert asset in sw
 
 def test_update10_visual_baselines_at_three_viewports(browser, tmp_path):
-    data = json.loads(V2_FIXTURE.read_text())
+    data = json.loads(V2_FIXTURE.read_text(encoding="utf-8"))
     for name, viewport in VIEWPORTS.items():
         page, errors = open_spectator(browser, data, viewport)
         page.wait_for_timeout(350)

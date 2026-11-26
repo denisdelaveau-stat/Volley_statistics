@@ -134,7 +134,7 @@ def test_undo_rebuilds_without_stale_points_and_missing_classification_is_neutra
 
 
 def test_official_json_integration_scores_faults_all_sets_and_reopen_stability(browser):
-    data = json.loads(V2_FIXTURE.read_text())
+    data = json.loads(V2_FIXTURE.read_text(encoding="utf-8"))
     page, errors = open_graph(browser, data)
     set_defs = {int(s["setNumber"]): s for s in data["sets"]}
     assert page.locator("#evolutionSet option").count() == len(set_defs)
@@ -207,7 +207,7 @@ def test_empty_one_rally_accessibility_keyboard_touch_and_reduced_motion(browser
     assert all(ratio >= 4.5 for ratio in ratios)
     page.locator("#evolutionSet").focus()
     assert page.evaluate("document.activeElement.id") == "evolutionSet"
-    css = (ROOT / "spectator.css").read_text()
+    css = (ROOT / "spectator.css").read_text(encoding="utf-8")
     assert "prefers-reduced-motion: reduce" in css
     assert not errors and not one_errors
     page.close()
@@ -239,7 +239,7 @@ def test_history_browse_return_live_and_live_replay_data_parity(browser):
 
 
 def test_timeline_selector_performance_target(browser):
-    data = json.loads(V2_FIXTURE.read_text())
+    data = json.loads(V2_FIXTURE.read_text(encoding="utf-8"))
     page, errors = open_graph(browser, data)
     average_ms = page.evaluate(
         """d => { const start=performance.now(); for(let i=0;i<100;i++) VolleySpectator.buildViewModel(d); return (performance.now()-start)/100; }""",

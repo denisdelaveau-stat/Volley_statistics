@@ -246,7 +246,7 @@ def test_return_home_invalid_archive_tablet_and_accessibility(browser):
 
 
 def test_spectator_visual_geometry_1536x1024_and_contrast(browser, tmp_path):
-    page, errors = open_spectator(browser, json.loads(V2_FIXTURE.read_text()), viewport={"width": 1536, "height": 1024})
+    page, errors = open_spectator(browser, json.loads(V2_FIXTURE.read_text(encoding="utf-8")), viewport={"width": 1536, "height": 1024})
     page.wait_for_timeout(300)  # settle the 200 ms row-entry animation before pixel comparison
     actual = tmp_path / "spectator.png"
     page.screenshot(path=str(actual), full_page=False)

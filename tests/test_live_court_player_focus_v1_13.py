@@ -8,8 +8,8 @@ from pathlib import Path
 from helpers import APP_URI, base_match
 
 ROOT = Path(__file__).resolve().parents[1]
-V2_FIXTURE = json.loads((ROOT / "statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json").read_text())
-V1_REFERENCE = json.loads((ROOT / "tests/data/As_cannes_vs_Frejus_2026-11-15.capture.v1.json").read_text())
+V2_FIXTURE = json.loads((ROOT / "statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json").read_text(encoding="utf-8"))
+V1_REFERENCE = json.loads((ROOT / "tests/data/As_cannes_vs_Frejus_2026-11-15.capture.v1.json").read_text(encoding="utf-8"))
 
 
 def _open_with_raw(browser, raw, viewport=None):

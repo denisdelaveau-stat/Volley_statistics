@@ -47,7 +47,8 @@ def poisoned(document):
     return doc
 
 
-def open_page(browser, uri, storage):
+def open_page(browser, uri, storage, stage=None):
+    """Opens ``uri`` with ``storage`` in localStorage; ``stage='capture'`` skips the Home screen like a reload."""
     page = browser.new_page(viewport={"width": 1280, "height": 900})
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -55,12 +56,13 @@ def open_page(browser, uri, storage):
     page.add_init_script(TRAP)
     page.goto(uri)
     page.evaluate(
-        """storage => {
+        """([storage, stage]) => {
           localStorage.clear();
           sessionStorage.clear();
           Object.entries(storage).forEach(([key, value]) => localStorage.setItem(key, JSON.stringify(value)));
+          if (stage) sessionStorage.setItem('volleyCapture.stage', stage);
         }""",
-        storage,
+        [storage, stage],
     )
     page.reload()
     page.wait_for_timeout(300)
@@ -76,10 +78,13 @@ def escaped_count(page):
 
 
 def click_if_present(page, selector):
+    """Clicks the first visible match of ``selector``; some controls are hidden depending on layout and data."""
     locator = page.locator(selector)
-    if locator.count():
-        locator.first.click()
-        page.wait_for_timeout(120)
+    for index in range(locator.count()):
+        if locator.nth(index).is_visible():
+            locator.nth(index).click()
+            page.wait_for_timeout(120)
+            return
 
 
 def test_capture_screen_escapes_names(browser):
@@ -88,6 +93,7 @@ def test_capture_screen_escapes_names(browser):
         browser,
         APP_URI,
         {"volleyCapture.match.v1": capture["match"], "volleyCapture.events.v1": capture.get("events", [])},
+        stage="capture",
     )
     click_if_present(page, '#capturePanel [data-player]:not([data-player="A"])')
     click_if_present(page, "#historyToggle")
@@ -104,6 +110,7 @@ def test_coach_view_escapes_names(browser):
         browser,
         APP_URI,
         {"volleyCapture.match.v1": capture["match"], "volleyCapture.events.v1": capture.get("events", [])},
+        stage="capture",
     )
     page.evaluate("VolleyCoach.open()")
     for tab in ("overview", "rotations", "players", "live-court", "player-focus"):
