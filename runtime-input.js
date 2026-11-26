@@ -40,6 +40,9 @@
     error: '',
     feedback: '',
   };
+  // Substitution sheet (FIVB Rule 15, js/index-substitution-rules.js): out = player chosen to leave, error = refusal.
+  var Subs = window.VolleySubstitutions;
+  var subState = { out: null, error: '' };
   var prefs = readPrefs();
   state.mode = prefs.runtimeMode;
   document.documentElement.classList.add('runtime-capture-active');
@@ -411,7 +414,11 @@
       esc(state.error) +
       '</p><div class="runtime-footer"><div class="runtime-last"><b>' +
       esc(lastEvent()) +
-      '</b></div><button type="button" class="runtime-undo" data-runtime-undo' +
+      '</b></div>' +
+      (Subs
+        ? '<button type="button" class="runtime-sub-open" data-runtime-sub-open aria-haspopup="dialog">⇄ Remplacement</button>'
+        : '') +
+      '<button type="button" class="runtime-undo" data-runtime-undo' +
       (events().length ? '' : ' disabled') +
       '>↶ Annuler</button></div><div class="runtime-feedback" id="runtimeFeedback" role="status" aria-live="polite">' +
       esc(state.feedback) +
@@ -469,6 +476,11 @@
     overlay.hidden = true;
     overlay.innerHTML = prefsHtml();
     document.body.appendChild(overlay);
+    var subs = document.createElement('div');
+    subs.className = 'runtime-prefs runtime-subs';
+    subs.id = 'runtimeSubs';
+    subs.hidden = true;
+    document.body.appendChild(subs);
   }
   function render() {
     var root = document.getElementById('runtimeInputRoot');
@@ -651,6 +663,197 @@
     if (button) button.focus();
   }
 
+  // ---- substitutions (FIVB Rule 15) ----
+  function rotationState() {
+    return window.VolleyRotation.replay(M, currentSetEvents());
+  }
+  // Keeps the stored type of a player number (numbers in the roster, strings in data attributes).
+  function rosterValue(value) {
+    var p = player(value);
+    return p ? p.number : value;
+  }
+  function playerLabel(number) {
+    var p = player(number) || { number: number, name: '', position: '' },
+      r = role(p);
+    return (
+      '<span class="number">#' +
+      esc(number) +
+      '</span><span class="role">' +
+      esc(ROLE_LABEL[r] || String(r || '').toUpperCase()) +
+      '</span><span class="name">' +
+      esc(p.name || '') +
+      '</span>'
+    );
+  }
+  function subsBlocked() {
+    var su = window.VolleySets ? window.VolleySets.summary(M, events()) : null;
+    if (su && (su.matchWinner || (su.current && su.current.winner)))
+      return 'Set terminé : passez au set suivant pour effectuer un remplacement.';
+    if (Subs.rallyInProgress(currentSetEvents()))
+      return 'Remplacement impossible pendant un échange (règle 15.11.1.1). Terminez l’échange d’abord.';
+    return '';
+  }
+  function subsOutStep(st, setNo) {
+    var zones = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
+    return (
+      '<p class="runtime-subs-step">Joueur qui sort</p><div class="runtime-sub-grid">' +
+      zones
+        .map(function (z) {
+          var n = st.rot[z];
+          if (n == null) return '';
+          var o = Subs.options(M, Number(M.currentSet || 1), st.rot, n),
+            possible = o.regular.length > 0 || o.exceptional.length > 0,
+            withLibero = st.liberoFor != null && String(st.liberoFor) === String(n);
+          return (
+            '<button type="button" class="runtime-sub-player" data-sub-out="' +
+            esc(n) +
+            '"' +
+            (possible ? '' : ' disabled') +
+            '>' +
+            playerLabel(n) +
+            '<small>' +
+            esc(z.toUpperCase()) +
+            (withLibero ? ' · remplacé par le libéro' : '') +
+            (possible ? '' : ' · aucun remplaçant autorisé') +
+            '</small></button>'
+          );
+        })
+        .join('') +
+      '</div>'
+    );
+  }
+  function subsInStep(st, setNo) {
+    var out = subState.out,
+      o = Subs.options(M, setNo, st.rot, out),
+      exceptional = !o.regular.length && o.exceptional.length > 0,
+      list = exceptional ? o.exceptional : o.regular;
+    return (
+      '<p class="runtime-subs-step">Sort : #' +
+      esc(out) +
+      ' — joueur qui entre</p>' +
+      (exceptional
+        ? '<p class="runtime-subs-warning">Aucun remplacement régulier possible. Remplacement exceptionnel (blessure ou maladie, règle 15.7) : le joueur #' +
+          esc(out) +
+          ' ne pourra plus revenir dans le match.</p>'
+        : '') +
+      (list.length
+        ? '<div class="runtime-sub-grid">' +
+          list
+            .map(function (n) {
+              return (
+                '<button type="button" class="runtime-sub-player" data-sub-in="' +
+                esc(n) +
+                '"' +
+                (exceptional ? ' data-sub-exceptional' : '') +
+                '>' +
+                playerLabel(n) +
+                '</button>'
+              );
+            })
+            .join('') +
+          '</div>'
+        : '<p class="runtime-subs-warning">Aucun joueur ne peut entrer à la place du #' + esc(out) + '.</p>') +
+      (o.refused.length
+        ? '<details class="runtime-subs-refused"><summary>Joueurs non autorisés (' +
+          o.refused.length +
+          ')</summary><ul>' +
+          o.refused
+            .map(function (r) {
+              return '<li><b>#' + esc(r.number) + '</b> ' + esc(r.reason) + '</li>';
+            })
+            .join('') +
+          '</ul></details>'
+        : '') +
+      '<button type="button" class="runtime-subs-back" data-sub-back>← Changer le joueur qui sort</button>'
+    );
+  }
+  function subsHtml() {
+    var setNo = Number(M.currentSet || 1),
+      h = Subs.history(M, setNo),
+      blocked = subsBlocked(),
+      st = rotationState(),
+      body = blocked
+        ? '<p class="runtime-subs-warning">' + esc(blocked) + '</p>'
+        : subState.out == null
+          ? subsOutStep(st, setNo)
+          : subsInStep(st, setNo);
+    return (
+      '<div class="runtime-prefs-card runtime-subs-card" role="dialog" aria-modal="true" aria-labelledby="runtimeSubsTitle"><h2 id="runtimeSubsTitle">Remplacement</h2><p>Set ' +
+      setNo +
+      ' · ' +
+      h.regular +
+      '/' +
+      Subs.REGULAR_LIMIT +
+      ' remplacements' +
+      (h.exceptional ? ' · ' + h.exceptional + ' exceptionnel' + (h.exceptional > 1 ? 's' : '') : '') +
+      ' · règle 15 FIVB</p>' +
+      (subState.error ? '<p class="runtime-subs-error" role="alert">' + esc(subState.error) + '</p>' : '') +
+      body +
+      '<button type="button" class="runtime-prefs-close" data-sub-close>FERMER</button></div>'
+    );
+  }
+  function renderSubs() {
+    var sheet = document.getElementById('runtimeSubs');
+    if (!sheet || sheet.hidden) return;
+    sheet.innerHTML = subsHtml();
+  }
+  function openSubs() {
+    if (!Subs || state.pending) return;
+    subState.out = null;
+    subState.error = '';
+    var sheet = document.getElementById('runtimeSubs');
+    sheet.hidden = false;
+    renderSubs();
+    var first = sheet.querySelector('button:not([disabled])');
+    if (first) first.focus();
+  }
+  function closeSubs() {
+    var sheet = document.getElementById('runtimeSubs');
+    if (sheet) sheet.hidden = true;
+    var button = panel.querySelector('[data-runtime-sub-open]');
+    if (button) button.focus();
+  }
+  // Checks the substitution again (rules can change between rendering and tapping) and records it.
+  function substitute(outValue, inValue, exceptional) {
+    var setNo = Number(M.currentSet || 1),
+      out = rosterValue(outValue),
+      incoming = rosterValue(inValue),
+      st = rotationState(),
+      o = Subs.options(M, setNo, st.rot, out),
+      allowed = exceptional ? o.exceptional : o.regular,
+      reason =
+        subsBlocked() ||
+        (allowed.some(function (n) {
+          return String(n) === String(incoming);
+        })
+          ? ''
+          : (exceptional ? '' : Subs.regularRefusal(M, setNo, st.rot, out, incoming)) ||
+            'Remplacement non autorisé par la règle 15.');
+    if (reason) {
+      subState.error = reason;
+      renderSubs();
+      return false;
+    }
+    var built = Subs.build(M, setNo, currentSetEvents(), scoreNow(), out, incoming, {
+      eventId: uniqueEventId(),
+      exceptional: !!exceptional,
+    });
+    M.subs = M.subs || [];
+    M.subs.push(built.sub);
+    writeObject(window.VolleyDomain.STORAGE.captureMatch, M);
+    if (typeof window.VLCLogSubstitution === 'function') window.VLCLogSubstitution(built.event);
+    else {
+      var list = events();
+      list.push(built.event);
+      writeObject(EVENTS_KEY, list);
+    }
+    state.feedback = '⇄ #' + incoming + ' remplace #' + out + (exceptional ? ' (exceptionnel)' : '');
+    closeSubs();
+    clear(true);
+    render();
+    return true;
+  }
+
   /* The legacy court renderer owns detached nodes after the runtime shell is installed.
      Keep only its score-service responsibility so commits cannot fail after persistence. */
   window.updateCourt = function (list) {
@@ -696,7 +899,33 @@
       changePlayer();
       return;
     }
+    if (target.hasAttribute('data-runtime-sub-open')) {
+      openSubs();
+      return;
+    }
     if (target.hasAttribute('data-runtime-undo')) undo();
+  });
+  document.getElementById('runtimeSubs').addEventListener('click', function (event) {
+    var target = event.target.closest('button');
+    if (!target || target.disabled) return;
+    if (target.hasAttribute('data-sub-close')) {
+      closeSubs();
+      return;
+    }
+    if (target.hasAttribute('data-sub-back')) {
+      subState.out = null;
+      subState.error = '';
+      renderSubs();
+      return;
+    }
+    if (target.dataset.subOut != null) {
+      subState.out = rosterValue(target.dataset.subOut);
+      subState.error = '';
+      renderSubs();
+      return;
+    }
+    if (target.dataset.subIn != null)
+      substitute(subState.out, target.dataset.subIn, target.hasAttribute('data-sub-exceptional'));
   });
   document.getElementById('runtimePrefs').addEventListener('click', function (event) {
     var target = event.target.closest('button');
@@ -719,8 +948,12 @@
   });
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
-      var overlay = document.getElementById('runtimePrefs');
-      if (!overlay.hidden) {
+      var overlay = document.getElementById('runtimePrefs'),
+        sheet = document.getElementById('runtimeSubs');
+      if (sheet && !sheet.hidden) {
+        event.preventDefault();
+        closeSubs();
+      } else if (!overlay.hidden) {
         event.preventDefault();
         closeOptions();
       } else if (state.author) {
@@ -753,5 +986,8 @@
     results: RESULTS.slice(),
     commit: commit,
     undo: undo,
+    openSubstitution: openSubs,
+    // Records a substitution after checking FIVB Rule 15; returns false (with the reason in the sheet) when refused.
+    substitute: substitute,
   };
 })();

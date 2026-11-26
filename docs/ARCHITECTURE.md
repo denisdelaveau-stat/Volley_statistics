@@ -84,6 +84,19 @@ Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the 
 - Not modelled: the second Libero and Libero re-designation (19.1.1, 19.4). The data has one Libero per match.
 - Enforced by `tests/unit/rotation.test.js`, `tests/unit/libero-fivb.test.js` (property test over simulated sets, every starting rotation, middle blockers opposite or adjacent) and `tests/unit/court-consistency.test.js` (engine and adapter agree at every event).
 
+## Substitution rules
+
+`js/index-substitution-rules.js` (`VolleySubstitutions`, pure) checks every substitution against the FIVB Official Volleyball Rules 2025-2028, Rule 15. The capture screen opens it from the « ⇄ Remplacement » button of `runtime-input.js`:
+
+- at most six regular substitutions per set (15.1);
+- the Libero is never part of a substitution (15.5.1);
+- a starting player leaves once per set and comes back once, only in place of his/her substitute (15.6.1);
+- a substitute enters once per set and is only replaced by the starting player he/she replaced (15.6.2);
+- an exceptional substitution (injury, illness) is offered only when no regular one is possible. It is recorded with `exceptional: true` and does not count in the six. The replaced player cannot come back in the match (15.7);
+- only registered, present players (15.9.1); no substitution during a rally (15.11.1.1).
+
+A substitution is stored as a `match.subs` entry (`set`, `at` = number of events of the set before it, `out`, `in`, `eventId`) and a `SUBSTITUTION` event, through `VLCLogSubstitution`. Undo removes both. Starting players are `match.startingRotation` (the app uses one starting line-up for every set). Enforced by `tests/unit/substitution-rules.test.js` and `tests/test_substitutions.py`.
+
 ## Dependency chain
 
 Team → Starting 7 → Rotation. Loaded downstream objects are validated against their upstream dependency; missing numbers are reported and never silently substituted.

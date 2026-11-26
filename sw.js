@@ -29,6 +29,7 @@ var ASSETS = [
   'js/shared-domain.js',
   'js/index-match-rules.js',
   'js/index-rotation.js',
+  'js/index-substitution-rules.js',
   'js/index-capture-engine.js',
   'js/index-chart-common.js',
   'js/index-chart-progression.js',
