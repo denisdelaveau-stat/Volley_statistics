@@ -85,9 +85,9 @@ def test_csv_import_maps_french_headers_and_roles(browser):
 
 
 def test_offline_shell_includes_team_management_styles():
-    service_worker = (ROOT / "sw.js").read_text()
-    index = (ROOT / "index.html").read_text()
-    css = (ROOT / "team-management.css").read_text()
+    service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
+    index = (ROOT / "index.html").read_text(encoding="utf-8")
+    css = (ROOT / "team-management.css").read_text(encoding="utf-8")
     assert CACHE_NAME in service_worker
     assert "team-management.css" in service_worker
     assert '<link rel="stylesheet" href="team-management.css">' in index
