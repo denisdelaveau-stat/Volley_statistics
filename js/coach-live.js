@@ -394,7 +394,7 @@
           return (+e.set || 1) === setNo;
         });
       [4, 3, 2, 5, 6, 1].forEach(function (pos) {
-        var p = playerInfo(m, cur.rot['p' + pos]),
+        var p = playerInfo(m, cur.court['p' + pos]),
           s = livePlayerStats(
             p,
             setEvents,
@@ -763,7 +763,7 @@
       cur = currentState(C.data.match, C.data.rallies, setNo),
       position = 0;
     POS.some(function (z) {
-      if (String(cur.rot[z]) === String(p.number)) {
+      if (String(cur.court[z]) === String(p.number)) {
         position = +z.slice(1);
         return true;
       }

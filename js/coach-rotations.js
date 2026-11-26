@@ -63,7 +63,10 @@
         rows.filter(function (x) {
           return x.key === C.rotation;
         })[0] || rows[0],
-      rot = rotationTo(m, C.rotation),
+      // Displayed line-up of the selected rotation, libero included (P1 only when the phase filter is reception).
+      rot = window.VolleyRotation.onCourt(m, rotationTo(m, C.rotation), {
+        serving: C.phase === 'receive' ? 'B' : 'A',
+      }),
       best = rows.slice().sort(function (a, b) {
         return b.diff - a.diff || b.total - a.total;
       })[0],

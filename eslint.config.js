@@ -28,7 +28,15 @@ const projectGlobals = {
 
 module.exports = [
   {
-    ignores: ['node_modules/**', 'docs/**', 'tests/**', 'TO_DO/**', 'statistics/data/**', 'icons/**'],
+    ignores: [
+      'node_modules/**',
+      'docs/**',
+      'tests/data/**',
+      'tests/visual_baselines/**',
+      'TO_DO/**',
+      'statistics/data/**',
+      'icons/**',
+    ],
   },
   js.configs.recommended,
   {
@@ -53,6 +61,11 @@ module.exports = [
   {
     files: ['sw.js'],
     languageOptions: { globals: { ...globals.serviceworker } },
+  },
+  {
+    // Unit tests run in Node (node:test) and load the browser scripts in a vm context.
+    files: ['tests/unit/**/*.js'],
+    languageOptions: { sourceType: 'commonjs', globals: { ...globals.node } },
   },
   {
     files: ['eslint.config.js'],

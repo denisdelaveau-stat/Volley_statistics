@@ -35,7 +35,7 @@
       sc = scoreNow(),
       ss = setSummary(m, C.data.rallies),
       cur = currentState(m, C.data.rallies, +m.currentSet || 1),
-      rot = cur.rot;
+      rot = cur.court;
     var sov = pct(mt.so.n, mt.so.d),
       bpv = pct(mt.bp.n, mt.bp.d),
       aev = mt.att.d ? Math.round((mt.att.n * 100) / mt.att.d) : null,

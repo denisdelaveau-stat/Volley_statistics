@@ -22,6 +22,7 @@
 | `sw.js` | Versioned offline app-shell cache (`volley-live-capture-v<VERSION>`) |
 | `manifest.webmanifest`, `icons/` | PWA metadata and Home-screen assets |
 | `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` (run by `.github/workflows/tests.yml`) |
+| `tests/unit/` | `node:test` unit tests of the pure modules (rotation and libero rules, set and match rules, adapter, engine/adapter consistency); `npm run test:unit`, run by CI. `load-browser-scripts.js` loads the classic browser scripts in an isolated `vm` context |
 | `tools/` | `bump_version.py` (release version) and `generate_manifest.py` (source manifest) |
 | `package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Development tooling only (the app has no build step): `npm run lint` (ESLint), `npm run format` / `npm run format:check` (Prettier, JavaScript only; HTML and CSS stay hand-formatted because tests assert exact markup and minified CSS). CI runs both |
 
@@ -66,6 +67,22 @@ Only NEW MATCH / CONTINUE CAPTURE write to `volleyCapture.match/events/chartData
 ## Event-derived state
 
 Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally rotation is snapshotted onto each event. v1.28 adds canonical runtime fields without breaking the historical event schema; the portable capture file stays at format version 1 and unified documents use schema 2.1.
+
+## Rotation and libero rules
+
+Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the capture screen and the Coach View; `statistics/adapter.js` applies the same rules for the Spectator matrix (it must also run standalone in Node).
+
+- Rotation: clockwise P2 → P1 → P6 → P5 → P4 → P3, only on a side-out (our team wins a rally the opponent served).
+- Libero / middle-blocker permutation, FIVB Official Volleyball Rules 2025-2028, Rule 19:
+  - the Libero replaces a back-row player (19.3.1.1): here the middle blocker, the usual tactical choice;
+  - back row only (19.3.1.2): P6 or P5, or P1 while our team receives, because the Libero cannot serve (19.3.1.3);
+  - one Libero on court (19.1.3);
+  - at least one completed rally between two Libero replacements, none during a rally (19.3.2.1, 19.3.2.4);
+  - the Libero can only be replaced by the regular player it replaced (19.3.2.2).
+- `trace()` applies the Libero rules rally after rally (`liberoFor`, the player the Libero replaces). Without that history (a theoretical rotation in the Coach View Rotations tab, or the explicit v2 context), the first middle blocker in an allowed zone is replaced.
+- Middle blockers come from the starting line-up (`mb1`, `mb2`) and follow substitutions. When the line-up does not name them (v2 documents), they are the roster players with position MB.
+- Not modelled: the second Libero and Libero re-designation (19.1.1, 19.4). The data has one Libero per match.
+- Enforced by `tests/unit/rotation.test.js`, `tests/unit/libero-fivb.test.js` (property test over simulated sets, every starting rotation, middle blockers opposite or adjacent) and `tests/unit/court-consistency.test.js` (engine and adapter agree at every event).
 
 ## Dependency chain
 

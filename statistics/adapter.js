@@ -441,19 +441,53 @@
     });
     return z ? 'P' + z.slice(1) : 'P?';
   }
-  function onCourtV1(lineup, roster, liberoNumber, phase) {
-    var actual = clone(lineup),
-      roles = {};
-    roster.forEach(function (p) {
-      roles[String(p.number)] = p.role;
-    });
-    if (liberoNumber !== undefined && liberoNumber !== null) {
-      var candidates = phase === 'S' ? ['p6', 'p5'] : ['p6', 'p5', 'p1'];
-      var replace = candidates.find(function (z) {
-        return roles[String(actual[z])] === 'MB';
+  // Middle blockers tracked for the libero, as in js/index-rotation.js: the starting line-up when it names them,
+  // otherwise the roster players whose role is MB. A middle blocker playing another slot after a substitution
+  // (for example in place of the opposite) is not one of them.
+  function middleBlockersV1(raw, roster) {
+    var lineup = (raw.match && raw.match.startingLineup) || {};
+    if (lineup.mb1 != null || lineup.mb2 != null) return [lineup.mb1, lineup.mb2];
+    return roster
+      .filter(function (p) {
+        return p.role === 'MB';
+      })
+      .map(function (p) {
+        return p.number;
       });
-      if (replace) actual[replace] = liberoNumber;
+  }
+  // A substitution that takes a middle blocker out makes the incoming player the tracked middle blocker.
+  function applyMiddleBlockerSubstitution(middleBlockers, sub) {
+    return middleBlockers.map(function (mb) {
+      return mb != null && String(mb) === String(sub.out) ? number(sub.in, sub.in) : mb;
+    });
+  }
+  // Libero rule shared with js/index-rotation.js: it replaces the middle blocker in P6 or P5, and also in P1 while
+  // our team receives (phase 'R').
+  // Libero decision for one rally, same FIVB Rule 19 logic as nextLiberoFor() in js/index-rotation.js: the Libero
+  // stays with the player it replaced while that player is in P6/P5 (or P1 while receiving, phase 'R'); when that
+  // player must come back, no other replacement happens before the next rally. Returns the replaced player or null.
+  function nextLiberoForV1(liberoFor, lineup, middleBlockers, liberoNumber, phase) {
+    if (liberoNumber === undefined || liberoNumber === null) return null;
+    var allowed = phase === 'S' ? ['p6', 'p5'] : ['p6', 'p5', 'p1'];
+    function zoneOf(player) {
+      return ZONES.find(function (z) {
+        return player != null && String(lineup[z]) === String(player);
+      });
     }
+    if (liberoFor != null) return allowed.indexOf(zoneOf(liberoFor)) > -1 ? liberoFor : null;
+    var zone = allowed.find(function (z) {
+      return middleBlockers.some(function (mb) {
+        return mb != null && String(mb) === String(lineup[z]);
+      });
+    });
+    return zone ? lineup[zone] : null;
+  }
+  function onCourtV1(lineup, liberoFor, liberoNumber) {
+    var actual = clone(lineup);
+    if (liberoFor != null)
+      ZONES.forEach(function (z) {
+        if (String(actual[z]) === String(liberoFor)) actual[z] = liberoNumber;
+      });
     return ZONES.map(function (z) {
       return actual[z];
     }).filter(function (v, i, a) {
@@ -530,20 +564,22 @@
             .sort(function (a, b) {
               return number(a.at, 0) - number(b.at, 0);
             }),
-          applied = 0;
+          applied = 0,
+          middleBlockers = middleBlockersV1(raw, roster),
+          liberoNumber = raw.match.startingLineup && raw.match.startingLineup.libero,
+          liberoFor = null;
         previousResult = null;
         groups[setNumber].forEach(function (rally) {
           totalRallies++;
           while (applied < setSubs.length && number(setSubs[applied].at, Infinity) <= rally.firstSetIndex) {
-            applySubstitutions(lineup, [setSubs[applied]]);
+            var sub = setSubs[applied];
+            applySubstitutions(lineup, [sub]);
+            middleBlockers = applyMiddleBlockerSubstitution(middleBlockers, sub);
+            if (liberoFor != null && String(liberoFor) === String(sub.out)) liberoFor = number(sub.in, sub.in);
             applied++;
           }
-          var courtNumbers = onCourtV1(
-              lineup,
-              roster,
-              raw.match.startingLineup && raw.match.startingLineup.libero,
-              phase
-            ),
+          liberoFor = nextLiberoForV1(liberoFor, lineup, middleBlockers, liberoNumber, phase);
+          var courtNumbers = onCourtV1(lineup, liberoFor, liberoNumber),
             court = {};
           players.forEach(function (p) {
             court[p] =
