@@ -12,7 +12,6 @@ const projectGlobals = {
   VolleyStats: 'readonly',
   VolleyRotation: 'readonly',
   VolleyReport: 'readonly',
-  VolleyFocus: 'readonly',
   VolleyShell: 'readonly',
   VolleyStatsAdapter: 'readonly',
   VolleySubstitutions: 'readonly',

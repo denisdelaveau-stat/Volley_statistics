@@ -39,7 +39,6 @@ var ASSETS = [
   'js/index-report.js',
   'js/index-navigation-new-match.js',
   'js/index-pwa.js',
-  'js/index-normative-capture.js',
   'statistics/adapter.js',
   'spectator.html',
   'spectator.css',

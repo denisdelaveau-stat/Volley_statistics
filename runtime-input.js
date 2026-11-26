@@ -462,14 +462,6 @@
           esc(M.currentSet || 1) +
           '</span><button type="button" class="runtime-options-button" data-runtime-options aria-label="Options de saisie">☰</button></div>'
       );
-    var oldChip = document.getElementById('pickChip'),
-      oldBack = document.getElementById('captureBack');
-    if (oldChip) oldChip.hidden = true;
-    if (oldBack) oldBack.hidden = true;
-    ['subToggle', 'subHint', 'subLog'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.hidden = true;
-    });
     var overlay = document.createElement('div');
     overlay.className = 'runtime-prefs';
     overlay.id = 'runtimePrefs';
@@ -854,8 +846,9 @@
     return true;
   }
 
-  /* The legacy court renderer owns detached nodes after the runtime shell is installed.
-     Keep only its score-service responsibility so commits cannot fail after persistence. */
+  /* Called by js/index-capture-tools.js after each change (window.updateCourt): shows the serving team on the score
+     board. The court itself is part of the runtime shell (render()). Errors are swallowed so that a commit can never
+     fail after its event has been saved. */
   window.updateCourt = function (list) {
     if (!window.VolleyRotation || !M.startingRotation) return;
     try {
@@ -868,6 +861,7 @@
   };
   ensureStructure();
   render();
+  window.updateCourt();
   panel.addEventListener('click', function (event) {
     var target = event.target.closest('button');
     if (!target) return;

@@ -39,78 +39,14 @@
     } catch (e) {
       EVENTS = [];
     }
-    var choice = { player: null, action: null, result: null },
-      step = 'player';
-    var ORDER = {
-      setter: ['set', 'service', 'block', 'defense', 'attack', 'reception'],
-      oh: ['reception', 'attack', 'defense', 'service', 'block', 'set'],
-      mb: ['block', 'attack', 'service', 'defense', 'set', 'reception'],
-      opp: ['attack', 'block', 'service', 'defense', 'reception', 'set'],
-      libero: ['reception', 'defense', 'set', 'service', 'attack', 'block'],
-      adv: ['adverse'],
-    };
-    var ALAB = {
-        reception: 'Reception',
-        defense: 'Defense',
-        set: 'Set (pass)',
-        attack: 'Attack',
-        block: 'Block',
-        service: 'Service',
-        adverse: 'Opponent action',
-        team: 'Team',
-        generic: 'Generic',
-      },
-      RLAB = Object.assign({}, window.VolleyDomain.ROLE_NAMES, { adv: 'Opponent' });
-    var chip = document.getElementById('pickChip'),
-      backBtn = document.getElementById('captureBack');
+    // Action being committed; set by window.__vlc.commit (runtime-input.js owns the input UI).
+    var choice = { player: null, action: null, result: null };
     function rosterInfo(n) {
       var r = (window.VOLLEY_MATCH && VOLLEY_MATCH.team && VOLLEY_MATCH.team.roster) || [];
       for (var i = 0; i < r.length; i++) {
         if (r[i].number === Number(n)) return r[i];
       }
       return null;
-    }
-    function roleOfPlayer(p) {
-      if (p === 'A') return 'adv';
-      var i = rosterInfo(p);
-      return i && i.position && ORDER[i.position] ? i.position : null;
-    }
-    function orderActions() {
-      var list = document.getElementById('actionList'),
-        role = roleOfPlayer(choice.player),
-        ord = ORDER[role] || ['reception', 'defense', 'set', 'attack', 'block', 'service'];
-      Array.prototype.forEach.call(list.querySelectorAll('[data-action]'), function (b) {
-        b.hidden = ord.indexOf(b.getAttribute('data-action')) < 0;
-      });
-      ord.forEach(function (k, i) {
-        var b = list.querySelector('[data-action="' + k + '"]');
-        b.classList.toggle('top', i === 0);
-        list.appendChild(b);
-      });
-    }
-    function updateChip() {
-      if (choice.player === null) {
-        chip.hidden = true;
-        backBtn.hidden = true;
-        return;
-      }
-      var i = rosterInfo(choice.player),
-        role = roleOfPlayer(choice.player),
-        who =
-          choice.player === 'A'
-            ? 'ADVERSE'
-            : choice.player === 'T'
-              ? window.VOLLEY_MATCH.team.name || 'Team A'
-              : '#' + choice.player + (i && i.name ? ' ' + i.name : '') + (role ? ' \u00B7 ' + RLAB[role] : '');
-      chip.innerHTML =
-        '<span>' +
-        esc(who) +
-        '</span>' +
-        (choice.action
-          ? '<span class="arrow">\u2192</span><span class="act">' + esc(ALAB[choice.action]) + '</span>'
-          : '');
-      chip.hidden = false;
-      backBtn.hidden = false;
     }
     var status = document.getElementById('captureStatus'),
       hist = document.getElementById('captureHistory'),
@@ -287,13 +223,6 @@
           saveMatch();
         }
       }
-    }
-    function showStep(name) {
-      step = name;
-      document.querySelectorAll('#capturePanel .step').forEach(function (x) {
-        x.classList.toggle('active', x.getAttribute('data-step') === name);
-      });
-      updateChip();
     }
     var deleteLockedUntil = 0,
       deleteTimer = null,
@@ -511,42 +440,8 @@
         });
       persist();
       choice = { player: null, action: null, result: null };
-      showStep('player');
       render();
     }
-    document.querySelectorAll('[data-player]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        if (b.classList.contains('nofocus')) return;
-        var pv = b.getAttribute('data-player');
-        choice.player = pv;
-        choice.action = null;
-        orderActions();
-        showStep('action');
-      });
-    });
-    document.querySelectorAll('[data-action]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        if (choice.player === null) return;
-        choice.action = b.getAttribute('data-action');
-        showStep('result');
-      });
-    });
-    document.querySelectorAll('[data-result]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        if (choice.player === null || !choice.action) return;
-        choice.result = b.getAttribute('data-result');
-        commit(choice.player);
-      });
-    });
-    backBtn.addEventListener('click', function () {
-      if (step === 'result') {
-        choice.action = null;
-        showStep('action');
-      } else if (step === 'action') {
-        choice = { player: null, action: null, result: null };
-        showStep('player');
-      }
-    });
     function removeSubstitutionForEvent(e) {
       if (!MATCH || !e || (e.type !== 'SUBSTITUTION' && e.eventType !== 'SUBSTITUTION' && e.action !== 'substitution'))
         return false;
@@ -585,7 +480,6 @@
       else if (e.result !== 'neutral') DATA.pop();
       persist();
       choice = { player: null, action: null, result: null };
-      showStep('player');
       render();
       return true;
     }
