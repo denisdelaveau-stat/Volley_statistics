@@ -24,7 +24,7 @@
   var esc = window.VolleyDom.esc;
   function eventCount() {
     try {
-      var x = JSON.parse(localStorage.getItem('volleyCapture.events.v1') || '[]');
+      var x = JSON.parse(localStorage.getItem(window.VolleyDomain.STORAGE.captureEvents) || '[]');
       return Array.isArray(x) ? x.length : 0;
     } catch (e) {
       return 0;

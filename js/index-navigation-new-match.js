@@ -1,10 +1,10 @@
 (function () {
-  var KE = 'volleyCapture.events.v1',
-    KD = 'volleyCapture.chartData.v1',
-    KM = 'volleyCapture.match.v1',
-    STAGE = 'volleyCapture.stage';
-  var LIBK = 'volleyCapture.library.v1',
-    SETK = 'volleyCapture.settings.v1';
+  var KE = window.VolleyDomain.STORAGE.captureEvents,
+    KD = window.VolleyDomain.STORAGE.captureChartData,
+    KM = window.VolleyDomain.STORAGE.captureMatch,
+    STAGE = window.VolleyDomain.STORAGE.captureStage;
+  var LIBK = window.VolleyDomain.STORAGE.teamLibrary,
+    SETK = window.VolleyDomain.STORAGE.settings;
   var $ = function (id) {
       return document.getElementById(id);
     },
@@ -77,7 +77,7 @@
   function roleClass(pos) {
     return 'role-' + (pos || '');
   }
-  var PLAB = { setter: 'SET', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'LIB' };
+  var PLAB = window.VolleyDomain.ROLE_CODES;
   function teamRows(name, d) {
     var out = [];
     ((d && d.roster) || []).forEach(function (n) {

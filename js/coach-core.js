@@ -1,11 +1,11 @@
 /* Volley Live Coach UI — shared core: storage keys, state, data loading, rally model, metrics, shared cards and empty states */
 (function () {
   'use strict';
-  var KM = 'volleyCapture.match.v1',
-    KE = 'volleyCapture.events.v1',
-    KR = 'volleyAnalysis.replay.v1',
-    KRS = 'volleyAnalysis.replay.source.v1',
-    KU = 'volleyAnalysis.unloaded.v1';
+  var KM = window.VolleyDomain.STORAGE.captureMatch,
+    KE = window.VolleyDomain.STORAGE.captureEvents,
+    KR = window.VolleyDomain.STORAGE.analysisReplay,
+    KRS = window.VolleyDomain.STORAGE.analysisReplaySource,
+    KU = window.VolleyDomain.STORAGE.analysisUnloaded;
   var screen = document.getElementById('coachScreen'),
     content = document.getElementById('coachContent');
   if (!screen || !content) return;
@@ -23,8 +23,11 @@
     data: null,
     sourceToken: null,
   };
-  var POS = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
-  var NEXT = { p2: 'p1', p1: 'p6', p6: 'p5', p5: 'p4', p4: 'p3', p3: 'p2' };
+  // Rotation rules come from the shared engine (js/index-rotation.js), the same as the capture screen.
+  var Rotation = window.VolleyRotation;
+  var POS = window.VolleyDomain.court.POS,
+    rotate = window.VolleyDomain.court.rotate,
+    initialServing = Rotation.initialServing;
   var ROLE = { setter: 'Passeur', oh: 'Réceptionneuse-attaquante', mb: 'Centrale', opp: 'Pointue', libero: 'Libéro' };
   var ROLE_SHORT = { setter: 'S', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'L' };
   var esc = window.VolleyDom.esc;
@@ -59,13 +62,6 @@
       return p.present !== false;
     });
   }
-  function rotate(rot) {
-    var n = {};
-    Object.keys(NEXT).forEach(function (k) {
-      n[NEXT[k]] = rot[k];
-    });
-    return n;
-  }
   function setterNumber(match) {
     return (
       (match && match.startingLineup && match.startingLineup.setter) ||
@@ -93,36 +89,6 @@
       guard = 0;
     while (setterZone(match, r) !== target && guard++ < 6) r = rotate(r);
     return r;
-  }
-  function applySubstitution(rot, sub) {
-    var zone = '';
-    POS.some(function (k) {
-      if (String(rot[k]) === String(sub.out)) {
-        zone = k;
-        return true;
-      }
-      return false;
-    });
-    if (zone) rot[zone] = sub.in;
-    return rot;
-  }
-  function applySubsThrough(match, rot, setNo, eventCount) {
-    (match.subs || [])
-      .filter(function (s) {
-        return (+s.set || 1) === setNo && (+s.at || 0) <= eventCount;
-      })
-      .sort(function (a, b) {
-        return (+a.at || 0) - (+b.at || 0);
-      })
-      .forEach(function (s) {
-        applySubstitution(rot, s);
-      });
-    return rot;
-  }
-  function initialServing(match, setNo) {
-    var s = match.firstRally && match.firstRally.antibesState === 'reception' ? 'B' : 'A';
-    if (setNo % 2 === 0) s = s === 'A' ? 'B' : 'A';
-    return s;
   }
 
   function emptyData() {
@@ -228,23 +194,12 @@
         return a - b;
       })
       .forEach(function (setNo) {
-        var serving = initialServing(match, setNo),
-          rot = clone(match.startingRotation || {}),
+        var steps = Rotation.trace(match, sets[setNo], setNo).steps,
           pending = [],
           rallyLineup = null;
-        var subs = (match.subs || [])
-            .filter(function (s) {
-              return (+s.set || 1) === setNo;
-            })
-            .sort(function (a, b) {
-              return (+a.at || 0) - (+b.at || 0);
-            }),
-          subIndex = 0;
         sets[setNo].forEach(function (e, eventIndex) {
-          while (subIndex < subs.length && (+subs[subIndex].at || 0) === eventIndex) {
-            applySubstitution(rot, subs[subIndex]);
-            subIndex++;
-          }
+          var rot = steps[eventIndex].rot,
+            serving = steps[eventIndex].serving;
           if (!pending.length) rallyLineup = clone(rot);
           pending.push(e);
           if (!e.winningTeam) return;
@@ -267,10 +222,6 @@
           ordered.push(r);
           pending = [];
           rallyLineup = null;
-          if (e.winningTeam === 'team1') {
-            if (serving === 'B') rot = rotate(rot);
-            serving = 'A';
-          } else if (e.winningTeam === 'team2') serving = 'B';
         });
       });
     return ordered;
@@ -286,36 +237,11 @@
       if (last && last.phase === 'receive' && last.winner === 'team1') rot = rotate(rot);
       return { serving: serving, rot: rot, rotation: setterZone(match, rot) };
     }
-    var serving = initialServing(match, setNo),
-      rot = clone(match.startingRotation || {}),
-      setEvents = (C.data.events || []).filter(function (e) {
+    var setEvents = (C.data.events || []).filter(function (e) {
         return (+e.set || 1) === setNo;
       }),
-      eventIndex = 0,
-      subs = (match.subs || [])
-        .filter(function (s) {
-          return (+s.set || 1) === setNo;
-        })
-        .sort(function (a, b) {
-          return (+a.at || 0) - (+b.at || 0);
-        }),
-      subIndex = 0;
-    setEvents.forEach(function (e) {
-      while (subIndex < subs.length && (+subs[subIndex].at || 0) === eventIndex) {
-        applySubstitution(rot, subs[subIndex]);
-        subIndex++;
-      }
-      eventIndex++;
-      if (e.winningTeam === 'team1') {
-        if (serving === 'B') rot = rotate(rot);
-        serving = 'A';
-      } else if (e.winningTeam === 'team2') serving = 'B';
-    });
-    while (subIndex < subs.length && (+subs[subIndex].at || 0) <= eventIndex) {
-      applySubstitution(rot, subs[subIndex]);
-      subIndex++;
-    }
-    return { serving: serving, rot: rot, rotation: setterZone(match, rot) };
+      state = Rotation.trace(match, setEvents, setNo);
+    return { serving: state.serving, rot: state.rot, rotation: setterZone(match, state.rot) };
   }
   function setSummary(match, rallies) {
     if (match.demoSetWins) return { a: match.demoSetWins.a, b: match.demoSetWins.b };
@@ -708,7 +634,6 @@
   P.screen = screen;
   P.C = C;
   P.POS = POS;
-  P.NEXT = NEXT;
   P.ROLE = ROLE;
   P.ROLE_SHORT = ROLE_SHORT;
   P.esc = esc;
@@ -723,8 +648,6 @@
   P.setterNumber = setterNumber;
   P.setterZone = setterZone;
   P.rotationTo = rotationTo;
-  P.applySubstitution = applySubstitution;
-  P.applySubsThrough = applySubsThrough;
   P.initialServing = initialServing;
   P.emptyData = emptyData;
   P.replayRaw = replayRaw;

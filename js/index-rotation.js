@@ -1,57 +1,75 @@
+/* VolleyLive rotation engine (pure functions): window.VolleyRotation.
+   Single source of the rotation rules for the capture screen and the Coach View.
+   Rules: clockwise rotation P2>P1>P6>P5>P4>P3>P2, only when our team wins a rally while the opponent was serving
+   (side-out). Libero: back row only, never serves (replaces the middle blocker in P6/P5) and leaves when that
+   middle blocker's slot reaches P4. */
 (function () {
-  // ---------- ROTATION ENGINE (pure functions) ----------
-  // Rules: clockwise rotation P2>P1>P6>P5>P4>P3>P2, only when our team wins a rally
-  // while the opponent was serving (side-out). Libero: back row only, never serves
-  // (replaces the central in P6/P5) and leaves when that central's slot reaches P4.
-  var POS = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
-  var NEXT = { p2: 'p1', p1: 'p6', p6: 'p5', p5: 'p4', p4: 'p3', p3: 'p2' };
-  var LIBERO_ZONES = ['p6', 'p5'];
-  function rotate(r) {
-    var n = {};
-    Object.keys(NEXT).forEach(function (k) {
-      n[NEXT[k]] = r[k];
-    });
-    return n;
+  'use strict';
+  var court = window.VolleyDomain.court;
+  var POS = court.POS,
+    LIBERO_ZONES = court.LIBERO_ZONES,
+    rotate = court.rotate;
+
+  // Player numbers may be stored as numbers or strings (imported files): compare them as text.
+  function sameNumber(a, b) {
+    return a != null && b != null && String(a) === String(b);
   }
-  // Substitutions: match.subs=[{set,at,out,in,ts}] ; 'at' = number of events of that set before the change.
-  function applySub(st, sb) {
-    var z = null;
-    POS.forEach(function (k) {
-      if (st.rot[k] === sb.out) z = k;
+  // Team A serves first in set 1 unless it starts in reception; the first serve alternates from set to set.
+  function initialServing(match, setNo) {
+    var serving = match.firstRally && match.firstRally.antibesState === 'reception' ? 'B' : 'A';
+    if (setNo % 2 === 0) serving = serving === 'A' ? 'B' : 'A';
+    return serving;
+  }
+  // Substitutions: match.subs=[{set,at,out,in,ts}]; 'at' = number of events of that set before the change.
+  function setSubs(match, setNo) {
+    return (match.subs || []).filter(function (sub) {
+      return (+sub.set || 1) === setNo;
     });
-    if (z) {
-      st.rot[z] = sb['in'];
-      var i = st.mbs.indexOf(sb.out);
-      if (i > -1) st.mbs[i] = sb['in'];
-    } else if (sb.out === st.lib) {
-      st.lib = sb['in'];
+  }
+  function applySub(state, sub) {
+    var zone = null;
+    POS.forEach(function (k) {
+      if (sameNumber(state.rot[k], sub.out)) zone = k;
+    });
+    if (zone) {
+      state.rot[zone] = sub['in'];
+      state.mbs.forEach(function (mb, i) {
+        if (sameNumber(mb, sub.out)) state.mbs[i] = sub['in'];
+      });
+    } else if (sameNumber(sub.out, state.lib)) {
+      state.lib = sub['in'];
     }
   }
-  function replay(match, evs) {
-    var rot = {};
+
+  // Replays one set. steps[i] is the state (rotation, serving team) when event i is logged, after the substitutions
+  // made before it. The other fields are the state after the last event.
+  function trace(match, evs, setNo) {
+    setNo = setNo || match.currentSet || 1;
+    var lineup = match.startingLineup || {},
+      start = match.startingRotation || {},
+      rot = {};
     POS.forEach(function (k) {
-      rot[k] = match.startingRotation[k];
+      rot[k] = start[k];
     });
-    var cs = match.currentSet || 1,
-      subs = (match.subs || []).filter(function (x) {
-        return x.set === cs;
-      });
-    var st = { rot: rot, mbs: [match.startingLineup.mb1, match.startingLineup.mb2], lib: match.startingLineup.libero };
+    var subs = setSubs(match, setNo),
+      ordered = subs.slice().sort(function (a, b) {
+        return (+a.at || 0) - (+b.at || 0);
+      }),
+      state = { rot: rot, mbs: [lineup.mb1, lineup.mb2], lib: lineup.libero },
+      serving = initialServing(match, setNo),
+      rotations = 0,
+      steps = [];
     function subsAt(i) {
-      subs.forEach(function (x) {
-        if (x.at === i) applySub(st, x);
+      ordered.forEach(function (sub) {
+        if ((+sub.at || 0) === i) applySub(state, sub);
       });
-      rot = st.rot;
     }
-    var serving = match.firstRally && match.firstRally.antibesState === 'reception' ? 'B' : 'A',
-      rotations = 0;
-    if ((match.currentSet || 1) % 2 === 0) serving = serving === 'A' ? 'B' : 'A'; // first serve alternates from set to set
     (evs || []).forEach(function (e, i) {
       subsAt(i);
+      steps.push({ rot: Object.assign({}, state.rot), serving: serving });
       if (e.winningTeam === 'team1') {
         if (serving === 'B') {
-          rot = rotate(rot);
-          st.rot = rot;
+          state.rot = rotate(state.rot);
           serving = 'A';
           rotations++;
         }
@@ -60,8 +78,22 @@
       }
     });
     subsAt((evs || []).length);
-    return { rot: rot, serving: serving, rotations: rotations, mbs: st.mbs, lib: st.lib, subs: subs };
+    return {
+      steps: steps,
+      rot: state.rot,
+      serving: serving,
+      rotations: rotations,
+      mbs: state.mbs,
+      lib: state.lib,
+      subs: subs,
+    };
   }
+  // State after the events of the current set (match.currentSet).
+  function replay(match, evs) {
+    var t = trace(match, evs);
+    return { rot: t.rot, serving: t.serving, rotations: t.rotations, mbs: t.mbs, lib: t.lib, subs: t.subs };
+  }
+  // Court as displayed: the libero replaces the middle blocker standing in P6 or P5.
   function courtFrom(match, rot, stt) {
     var c = {},
       lib = (stt && stt.lib) || match.startingLineup.libero,
@@ -81,5 +113,13 @@
     c.bench = bench;
     return c;
   }
-  window.VolleyRotation = { rotate: rotate, replay: replay, court: courtFrom, POS: POS, LIBERO_ZONES: LIBERO_ZONES };
+  window.VolleyRotation = {
+    rotate: rotate,
+    replay: replay,
+    trace: trace,
+    initialServing: initialServing,
+    court: courtFrom,
+    POS: POS,
+    LIBERO_ZONES: LIBERO_ZONES,
+  };
 })();

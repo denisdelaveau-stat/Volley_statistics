@@ -2,9 +2,9 @@
 (function () {
   'use strict';
 
-  var ARCHIVE_KEY = 'volleySpectator.archive.v1';
-  var ORDER_KEY = 'volleySpectator.timeline.order';
-  var WINDOW_KEY = 'volleySpectator.timeline.window';
+  var ARCHIVE_KEY = window.VolleyDomain.STORAGE.spectatorArchive;
+  var ORDER_KEY = window.VolleyDomain.STORAGE.spectatorTimelineOrder;
+  var WINDOW_KEY = window.VolleyDomain.STORAGE.spectatorTimelineWindow;
   var state = { raw: null, model: null, evolutionBrowsing: false };
 
   var I18N = {
