@@ -1,0 +1,14 @@
+# Prettier formats JavaScript only.
+# HTML and CSS stay hand-formatted: several tests assert minified CSS and exact markup strings.
+node_modules/
+docs/
+tests/
+TO_DO/
+icons/
+statistics/data/
+*.html
+*.css
+*.md
+*.json
+*.webmanifest
+*.yml

@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var P = window.VolleySpectatorParts, st = P.state;
-  var I18N = P.I18N, $ = P.$, esc = P.esc, num = P.num, role = P.role;
+  var I18N = P.I18N, $ = P.$, esc = P.esc, num = P.num;
 
   function svgLine(x1, y1, x2, y2, className) {
     return '<line class="' + className + '" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"></line>';

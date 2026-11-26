@@ -22,6 +22,12 @@ jobs:
             node --check "$f"
           done
 
+      - name: Install lint tooling
+        run: npm ci
+
+      - name: ESLint
+        run: npx eslint .
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

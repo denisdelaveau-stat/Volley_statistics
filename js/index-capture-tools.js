@@ -390,7 +390,7 @@ function renderErrorCharts(events){
       attScope=b.dataset.scope;document.querySelectorAll('#attSection [data-scope]').forEach(function(x){x.classList.toggle('on',x===b)});renderAttackers()})});
     function exportReport(){
       if(!MATCH){status.textContent='No match to report.';return}
-      var name=String(MATCH.name||'match').trim().replace(/[\\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').slice(0,80)+'_report.html';
+      var name=String(MATCH.name||'match').trim().replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').slice(0,80)+'_report.html';
       var blob=new Blob([window.VolleyReport.build(MATCH,EVENTS)],{type:'text/html'});
       try{var file=new File([blob],name,{type:'text/html'});if(navigator.canShare&&navigator.canShare({files:[file]})&&/iPhone|iPad|iPod/.test(navigator.userAgent)){navigator.share({files:[file],title:name}).catch(function(){});document.getElementById('fileStatus').textContent='Report: '+name;return}}catch(x){}
       var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},1500);

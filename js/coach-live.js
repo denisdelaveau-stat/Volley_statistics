@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   var P=window.VolleyCoachParts;if(!P)return;
-  var C=P.C,POS=P.POS,ROLE_SHORT=P.ROLE_SHORT,esc=P.esc,pct=P.pct,playerInfo=P.playerInfo,teamPlayers=P.teamPlayers,currentState=P.currentState,metrics=P.metrics,status=P.status,scoreNow=P.scoreNow,normalizedRole=P.normalizedRole,currentCourtNumbers=P.currentCourtNumbers,actionLabel=P.actionLabel,content=P.content;
+  var C=P.C,POS=P.POS,ROLE_SHORT=P.ROLE_SHORT,esc=P.esc,pct=P.pct,playerInfo=P.playerInfo,teamPlayers=P.teamPlayers,currentState=P.currentState,metrics=P.metrics,scoreNow=P.scoreNow,normalizedRole=P.normalizedRole,currentCourtNumbers=P.currentCourtNumbers,actionLabel=P.actionLabel,content=P.content;
   function render(){return P.render.apply(this,arguments)}
   /* --- v1.13.0 LIVE COURT / PLAYER FOCUS --- */
   var LIVE_CFG=window.VolleyCoachConfig||{};
