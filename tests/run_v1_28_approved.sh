@@ -21,6 +21,7 @@ pytest -q \
  tests/test_spectator_ranking_v1_20.py \
  tests/test_spectator_timeline_v1_15.py \
  tests/test_spectator_view_v1_26.py \
+ tests/test_substitutions.py \
  tests/test_spectator_view_v1_26_1.py \
  tests/test_team_management_v1_24.py \
  tests/test_timeline_alignment_v1_16_2.py \
