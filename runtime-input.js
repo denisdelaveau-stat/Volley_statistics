@@ -5,8 +5,8 @@
     H = window.__vlc,
     panel = document.getElementById('capturePanel');
   if (!M || !H || !panel) return;
-  var SETTINGS_KEY = 'volleyCapture.runtimeInput.preferences.v1',
-    EVENTS_KEY = 'volleyCapture.events.v1';
+  var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
+    EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
   var MODES = ['FOCUS', 'SPEED', 'FLOW'];
   var ACTIONS = [
     { id: 'service', code: 'SERVE', label: 'SERVICE', family: 'serve' },
@@ -29,7 +29,7 @@
     libero: ['reception', 'defense', 'freeball'],
     setter: ['service', 'set', 'defense'],
   };
-  var ROLE_LABEL = { setter: 'SET', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'LIB' };
+  var ROLE_LABEL = window.VolleyDomain.ROLE_CODES;
   var state = {
     mode: 'FOCUS',
     stage: 'player',

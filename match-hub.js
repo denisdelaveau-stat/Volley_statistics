@@ -1,17 +1,17 @@
 /* VolleyLive navigation, Match Capture and shared Match Library v1.27.0 */
 (function () {
   'use strict';
-  var KE = 'volleyCapture.events.v1',
-    KD = 'volleyCapture.chartData.v1',
-    KM = 'volleyCapture.match.v1';
-  var KH = 'volleyMatchHub.history.v1',
-    KS = 'vl.library.selectedId',
-    KSO = 'volleyMatchLibrary.selected.v1',
-    KF = 'vl.library.filter',
-    STAGE = 'volleyCapture.stage';
-  var KR = 'volleyAnalysis.replay.v1',
-    KRS = 'volleyAnalysis.replay.source.v1',
-    KU = 'volleyAnalysis.unloaded.v1';
+  var KE = window.VolleyDomain.STORAGE.captureEvents,
+    KD = window.VolleyDomain.STORAGE.captureChartData,
+    KM = window.VolleyDomain.STORAGE.captureMatch;
+  var KH = window.VolleyDomain.STORAGE.matchHistory,
+    KS = window.VolleyDomain.STORAGE.librarySelectedId,
+    KSO = window.VolleyDomain.STORAGE.matchLibrarySelected,
+    KF = window.VolleyDomain.STORAGE.libraryFilter,
+    STAGE = window.VolleyDomain.STORAGE.captureStage;
+  var KR = window.VolleyDomain.STORAGE.analysisReplay,
+    KRS = window.VolleyDomain.STORAGE.analysisReplaySource,
+    KU = window.VolleyDomain.STORAGE.analysisUnloaded;
   var MAX_FILE_BYTES = 10 * 1024 * 1024,
     ACTIVE = { live: 1, paused: 1, in_progress: 1 };
   var $ = function (id) {
@@ -731,8 +731,8 @@
   function openSpectator(sum, tab) {
     if (!sum) return;
     persistSelected(sum);
-    localStorage.setItem('volleySpectator.archive.v1', JSON.stringify(sum.raw));
-    localStorage.setItem('volleySpectator.archiveName.v1', sum.sourceName || 'match.json');
+    localStorage.setItem(window.VolleyDomain.STORAGE.spectatorArchive, JSON.stringify(sum.raw));
+    localStorage.setItem(window.VolleyDomain.STORAGE.spectatorArchiveName, sum.sourceName || 'match.json');
     sessionStorage.setItem(KR, JSON.stringify(sum.raw));
     sessionStorage.setItem(KRS, sum.sourceName || 'match.json');
     location.href = 'spectator.html#' + (tab || 'live-score');

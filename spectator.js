@@ -86,7 +86,7 @@
     if (!v.valid) throw new Error(v.errors.join(' '));
     st.raw = d;
     localStorage.setItem(ARCHIVE_KEY, JSON.stringify(d));
-    sessionStorage.setItem('volleyAnalysis.replay.v1', JSON.stringify(d));
+    sessionStorage.setItem(window.VolleyDomain.STORAGE.analysisReplay, JSON.stringify(d));
     st.model = build(d, null);
     selectedSetNumber = st.model.currentSet;
     render();

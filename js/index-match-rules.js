@@ -13,7 +13,7 @@
         set: 'Set',
         freeball: 'Free ball',
       };
-    var RN = { setter: 'Setter', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'Libero' };
+    var RN = window.VolleyDomain.ROLE_NAMES;
     var esc = window.VolleyDom.esc;
     function info(mm, n) {
       var r = (mm && mm.team && mm.team.roster) || [];

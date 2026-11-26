@@ -22,8 +22,8 @@
     historyArrow.textContent = open ? '▲' : '▼';
   });
   var DATA = [];
-  var STORAGE_DATA = 'volleyCapture.chartData.v1',
-    STORAGE_EVENTS = 'volleyCapture.events.v1';
+  var STORAGE_DATA = window.VolleyDomain.STORAGE.captureChartData,
+    STORAGE_EVENTS = window.VolleyDomain.STORAGE.captureEvents;
   try {
     var storedData = JSON.parse(localStorage.getItem(STORAGE_DATA) || 'null');
     if (Array.isArray(storedData))
@@ -36,7 +36,7 @@
   var PN = { 1: 'Setter', 2: 'Libero', 3: '', 4: 'MB', 5: 'OH', 6: 'OH', 7: 'OPP' };
   (function () {
     var m = window.VOLLEY_MATCH,
-      RN = { setter: 'Setter', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'Libero' },
+      RN = window.VolleyDomain.ROLE_NAMES,
       PAL = [
         '#6A1B9A',
         '#00ACC1',
@@ -1164,7 +1164,7 @@
         team: 'Team',
         generic: 'Generic',
       },
-      RLAB = { setter: 'Setter', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'Libero', adv: 'Opponent' };
+      RLAB = Object.assign({}, window.VolleyDomain.ROLE_NAMES, { adv: 'Opponent' });
     var chip = document.getElementById('pickChip'),
       backBtn = document.getElementById('captureBack');
     function rosterInfo(n) {
@@ -1221,7 +1221,7 @@
       score = document.getElementById('liveScore');
     var MATCH = window.VOLLEY_MATCH,
       VS = window.VolleySets,
-      KM_ = 'volleyCapture.match.v1';
+      KM_ = window.VolleyDomain.STORAGE.captureMatch;
     function curSet() {
       return (MATCH && MATCH.currentSet) || 1;
     }
@@ -1549,8 +1549,7 @@
       var runtimeContext = window.VLC_RUNTIME_CONTEXT || {},
         runtimePlayer = playerValue === 'A' || playerValue === 'T' ? null : rosterInfo(playerValue),
         runtimeRole = runtimePlayer
-          ? { setter: 'SET', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'LIB' }[runtimePlayer.position] ||
-            String(runtimePlayer.position || '').toUpperCase()
+          ? window.VolleyDomain.ROLE_CODES[runtimePlayer.position] || String(runtimePlayer.position || '').toUpperCase()
           : 'OPPONENT',
         runtimeAction =
           {
@@ -1709,7 +1708,7 @@
       saveMatch();
       DATA.length = 0;
       persist();
-      sessionStorage.setItem('volleyCapture.stage', 'capture');
+      sessionStorage.setItem(window.VolleyDomain.STORAGE.captureStage, 'capture');
       location.reload();
     });
     if (MATCH) {

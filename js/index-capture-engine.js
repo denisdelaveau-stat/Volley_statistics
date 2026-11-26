@@ -1,7 +1,7 @@
 (function () {
   var m = null;
   try {
-    m = JSON.parse(localStorage.getItem('volleyCapture.match.v1') || 'null');
+    m = JSON.parse(localStorage.getItem(window.VolleyDomain.STORAGE.captureMatch) || 'null');
   } catch (e) {}
   window.VOLLEY_MATCH = m;
   var nums = m && m.team && m.team.players && m.team.players.length ? m.team.players.slice() : [1, 2, 3, 4, 5, 6, 7];
@@ -23,7 +23,7 @@
   ].forEach(function (x) {
     if (LU[x[0]]) roleOf[LU[x[0]]] = x[1];
   });
-  var RL = { setter: 'SET', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'LIB' };
+  var RL = window.VolleyDomain.ROLE_CODES;
   window.updateScoreService = function (side) {
     var board = document.getElementById('liveScore');
     if (!board) return;
@@ -261,7 +261,7 @@
       if (n >= 6 && !confirm('6 substitutions already used in this set. Record anyway?')) return;
       var evs = [];
       try {
-        evs = JSON.parse(localStorage.getItem('volleyCapture.events.v1') || '[]');
+        evs = JSON.parse(localStorage.getItem(window.VolleyDomain.STORAGE.captureEvents) || '[]');
       } catch (e) {}
       var at = evs.filter(function (e) {
         return (e.set || 1) === cs;
@@ -310,13 +310,13 @@
         ts: subEvent.timestamp,
       });
       if (!roleOf[inNum]) roleOf[inNum] = (info[inNum] && POSROLE[info[inNum].position]) || roleOf[outNum];
-      localStorage.setItem('volleyCapture.match.v1', JSON.stringify(m));
+      localStorage.setItem(window.VolleyDomain.STORAGE.captureMatch, JSON.stringify(m));
       sheet.hidden = true;
       setMode(false);
       if (window.VLCLogSubstitution) window.VLCLogSubstitution(subEvent);
       else {
         evs.push(subEvent);
-        localStorage.setItem('volleyCapture.events.v1', JSON.stringify(evs));
+        localStorage.setItem(window.VolleyDomain.STORAGE.captureEvents, JSON.stringify(evs));
         window.updateCourt(evs);
       }
       var stt = document.getElementById('captureStatus');
@@ -350,8 +350,8 @@
           if (same) {
             var r = sb.splice(i, 1)[0];
             evs.pop();
-            localStorage.setItem('volleyCapture.match.v1', JSON.stringify(m));
-            localStorage.setItem('volleyCapture.events.v1', JSON.stringify(evs));
+            localStorage.setItem(window.VolleyDomain.STORAGE.captureMatch, JSON.stringify(m));
+            localStorage.setItem(window.VolleyDomain.STORAGE.captureEvents, JSON.stringify(evs));
             window.updateCourt(evs);
             return r;
           }

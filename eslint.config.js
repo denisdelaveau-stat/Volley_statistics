@@ -7,6 +7,7 @@ const globals = require('globals');
 const projectGlobals = {
   VOLLEY_MATCH: 'writable',
   VolleyDom: 'readonly',
+  VolleyDomain: 'readonly',
   VolleySets: 'readonly',
   VolleyStats: 'readonly',
   VolleyRotation: 'readonly',
