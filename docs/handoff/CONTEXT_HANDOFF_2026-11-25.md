@@ -1,6 +1,22 @@
-# Handoff — VolleyLive refactoring (2026-11-25)
+# Handoff — VolleyLive refactoring (2026-11-25, updated 2026-11-26)
 
 Purpose: let another machine or another assistant resume the work without the chat history.
+
+## 0. Update 2026-11-26 (read first)
+
+| Commit | Content | CI |
+|---|---|---|
+| `5743927` | Point 1 done: `js/index-capture-engine.js` split into `js/index-match-rules.js` (`VolleySets`, `VolleyStats`) and `js/index-rotation.js` (`VolleyRotation`); the engine keeps court rendering, focus and substitution mode | green |
+| `066a17c` | Point 2 (Spectator): `spectator.js` split into `js/spectator-core.js`, `-live-score.js`, `-ranking.js`, `-timeline.js`, `-graph.js`; shared private namespace `window.VolleySpectatorParts` (mutable state in `.state`) | green |
+| next commit | Point 2 (Coach): `coach.js` split into `js/coach-core.js`, `-rotations.js`, `-overview.js`, `-players.js`, `-live.js`; shared private namespace `window.VolleyCoachParts` (state object `C`) | check |
+
+- Point 4 (docs) is up to date for these splits in `docs/ARCHITECTURE.md`.
+- Public globals (`VolleySets`, `VolleyStats`, `VolleyRotation`, `VolleySpectator`, `VolleyCoach`) are unchanged.
+- Method used for each split: code moved verbatim by line range (only imports/exports and state access change), then an old-vs-new comparison in headless Chrome on the reference fixtures (identical DOM and API output, no JS errors), then the CI gate.
+- Cross-module calls that point to a module loaded later use a deferred wrapper (`function render(){return P.render.apply(this,arguments)}`); the later module must export the function to the shared namespace.
+- The Windows machine used on 2026-11-26 has neither Python nor Node and no `gh`: CI status was read from the public GitHub API; the manifest was regenerated with an equivalent shell loop (`git cat-file blob :<path> | sha256sum`, paths sorted with `LC_ALL=C`).
+- Git has no identity configured on that machine; commits used the same author as the earlier ones via `git -c user.name=... -c user.email=...`.
+- Remaining: point 3 (Prettier/ESLint, needs Node), the Mobile Coach View OPP rotation spec, and the new specs added to `TO_DO/` after this handoff (Coach Intelligence, Capture 2 portrait, Matrix full capture, Physical gamepad input, Timeout card, Match report generation, End-of-set summary, Match summary JSON, Consolidated report, Real-time sharing).
 
 ## 1. Repository and branch
 
@@ -42,10 +58,10 @@ The script lists all 29 test files explicitly. It must be regenerated when test 
 
 | # | Point | State |
 |---|---|---|
-| 1 | Split capture engine into modules | Partial: report extracted (`47f124c`). Rules, rotation, rendering and input not split. |
-| 2 | Split `spectator.js` and `coach.js` by view | Not started |
+| 1 | Split capture engine into modules | Done: report (`47f124c`), rules and rotation (`5743927`). Court rendering and substitution mode stay in `index-capture-engine.js`. |
+| 2 | Split `spectator.js` and `coach.js` by view | Done (2026-11-26): Spectator `066a17c`, Coach in the following commit |
 | 3 | Formatting and lint | Not started. Node.js is not installed on the Windows machine; Prettier and ESLint not run. |
-| 4 | Update docs for modules | Partial: `docs/ARCHITECTURE.md` lists `css/` and `js/` modules; update after points 1 and 2. |
+| 4 | Update docs for modules | Done for points 1 and 2 in `docs/ARCHITECTURE.md` |
 | — | Mobile Coach View OPP rotation feature | Requirement only, in `TO_DO/`. Not implemented; not yet checked against `coach.js`. |
 
 ## 6. Decisions taken
@@ -80,12 +96,12 @@ python -m venv .venv-tests
 
 ## 9. Next steps (recommended order)
 
-1. Check CI for `47f124c` and `fdc9a72`. If red, fix before any new refactoring.
-2. Point 1: extract the set and match result rules from `js/index-capture-engine.js` into a separate module, keeping the same global names. Validate with the 32 targeted tests, then the full gate.
-3. Point 2: split coach and spectator code by view, starting with the Spectator timeline (the heaviest).
-4. Point 4: update `docs/ARCHITECTURE.md` and the specs after each split.
-5. Point 3 last, once Node.js is available for Prettier and ESLint.
-6. Mobile Coach View OPP rotation (`TO_DO/`): compare the spec with `coach.js` first, then plan the implementation.
+Steps 1 to 4 of the original list (CI check, point 1, point 2, docs) are done; see section 0.
+
+1. Check CI for the Coach split commit. If red, fix before anything else.
+2. Point 3, once Node.js is available for Prettier and ESLint. Formatting rewrites whole files: do it in a dedicated commit, separate from any behaviour change.
+3. Mobile Coach View OPP rotation (`TO_DO/`): compare the spec with `js/coach-live.js` and `js/coach-core.js` first, then plan the implementation.
+4. Triage the other `TO_DO/` specs and agree an order with the product owner.
 
 ## 10. Where the other context lives
 

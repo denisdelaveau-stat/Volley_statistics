@@ -2,7 +2,7 @@
    Bump CACHE when any file changes so installed phones pick up the new version. */
 var CACHE = 'volley-live-capture-v1.28.0';
 var ASSETS = ['./', 'index.html', 'manifest.webmanifest',
-  'Font_app_ref.jpg', 'runtime-input.css', 'runtime-input.js', 'coach.css', 'match-hub.css', 'team-management.css', 'team-management.js', 'settings.js', 'match-hub.js', 'coach-live-config.js', 'coach.js',
+  'Font_app_ref.jpg', 'runtime-input.css', 'runtime-input.js', 'coach.css', 'match-hub.css', 'team-management.css', 'team-management.js', 'settings.js', 'match-hub.js', 'coach-live-config.js', 'js/coach-core.js', 'js/coach-rotations.js', 'js/coach-overview.js', 'js/coach-players.js', 'js/coach-live.js', 'coach.js',
   'css/index-theme.css', 'css/index-capture-layout.css', 'css/index-focus.css', 'css/index-result-grammar.css',
   'js/index-match-rules.js', 'js/index-rotation.js', 'js/index-capture-engine.js','js/index-capture-tools.js', 'js/index-report.js', 'js/index-navigation-new-match.js', 'js/index-pwa.js', 'js/index-normative-capture.js',
   'statistics/adapter.js', 'spectator.html', 'spectator.css', 'spectator-live-config.js', 'js/spectator-core.js', 'js/spectator-live-score.js', 'js/spectator-ranking.js', 'js/spectator-timeline.js', 'js/spectator-graph.js', 'spectator.js',
