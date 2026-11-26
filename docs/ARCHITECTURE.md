@@ -5,6 +5,7 @@
 | File | Role |
 |---|---|
 | `index.html` | Application shell markup: Home, workspace navigation, New Match wizard, live capture, Match Hub and Match Library markup, Coach View container. Loads the modules below. Exposes shared shell helpers as `window.VolleyShell` |
+| `js/shared-dom.js` | Shared DOM helpers loaded first by `index.html` and `spectator.html`: `window.VolleyDom.esc()`. Rule: every non-constant value inserted with `innerHTML` / `insertAdjacentHTML` goes through `esc()` (or use `textContent`). Enforced by `tests/test_html_escaping.py` |
 | `css/index-*.css` | Shell styling extracted from `index.html`: theme, capture layout, focus mode, result grammar |
 | `js/index-*.js` | Capture engine extracted from `index.html`, loaded in this order: `index-match-rules.js` (pure set and match rules and attacker statistics: `window.VolleySets`, `window.VolleyStats`), `index-rotation.js` (pure rotation, libero and substitution replay: `window.VolleyRotation`), `index-capture-engine.js` (live court rendering, focus, substitution mode; loads the active match as `window.VOLLEY_MATCH`), `index-report.js` (match report builder: `window.VolleyReport`), `index-capture-tools.js` (score progression and lead charts, SVG drawing), `index-navigation-new-match.js` (shared shell helpers and the New Match wizard), `index-pwa.js` (offline cache and install hint), `index-normative-capture.js` (Advanced position-aware action grid and guarded commit) |
 | `team-management.js` / `team-management.css` | Team Management controller (`window.VolleyTeams`) and styling |

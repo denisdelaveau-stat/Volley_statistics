@@ -9,11 +9,7 @@
   ((m && m.team && m.team.roster) || []).forEach(function (r) {
     info[r.number] = r;
   });
-  function esc(t) {
-    return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
+  var esc = window.VolleyDom.esc;
   var LU = (m && m.startingLineup) || {},
     roleOf = {};
   [
