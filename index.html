@@ -162,19 +162,7 @@
 <section class="capture" id="capturePanel" aria-label="Live action capture">
   <div class="capture-head"><h2 id="captureTitle" hidden>Live input</h2><div class="score-line"><div class="score-live board tie" id="liveScore" role="status" aria-live="polite"><span class="set-badge set-badge-a" aria-label="Sets won by left team">0</span><span class="score-side side-a"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by right team">0</span></div></div><div class="sets-line" id="setsLine" hidden></div></div>
   <div class="set-over" id="setOver" hidden><h3 id="setOverTitle"></h3><p id="setOverText"></p><button type="button" id="nextSetBtn">START SET 2 →</button></div>
-  <div class="pick-chip" id="pickChip" hidden></div>
-  <div class="steps">
-<div class="step active" data-step="player"><p class="step-title">1. Player</p><div class="touch-grid players">
-      <button type="button" class="touch" data-player="1">1</button><button type="button" class="touch" data-player="2">2</button><button type="button" class="touch" data-player="3">3</button><button type="button" class="touch" data-player="4">4</button><button type="button" class="touch" data-player="5">5</button><button type="button" class="touch" data-player="6">6</button><button type="button" class="touch adversary-btn" data-player="A">ADVERSE</button>
-    </div></div>
-    <div class="step" data-step="action"><p class="step-title">2. Action</p><div class="touch-grid actions-col" id="actionList">
-      <button type="button" class="touch" data-action="reception" data-tag="RCV">Reception</button><button type="button" class="touch" data-action="defense" data-tag="DEF">Defense</button><button type="button" class="touch" data-action="set" data-tag="SET">Set (pass)</button><button type="button" class="touch" data-action="attack" data-tag="ATT">Attack</button><button type="button" class="touch" data-action="block" data-tag="BLK">Block</button><button type="button" class="touch" data-action="service" data-tag="SRV">Service</button><button type="button" class="touch" data-action="adverse" hidden>Action</button>
-    </div></div>
-    <div class="step" data-step="result"><p class="step-title">3. Result</p><div class="touch-grid result">
-      <button type="button" class="touch neutral" data-result="neutral">Neutral</button><button type="button" class="touch point" data-result="point">Point</button><button type="button" class="touch error" data-result="error">Error</button>
-    </div></div>
-  </div>
-  <div class="capture-tools"><button type="button" id="captureBack" class="back-only" hidden>← CHANGE</button></div>
+  <div class="steps"></div>
   <div class="capture-status" id="captureStatus" aria-live="polite"></div>
   <button type="button" id="historyToggle" class="stats-toggle history-toggle" aria-expanded="false" aria-controls="historyPanel">HISTORY <span id="historyArrow">▼</span></button>
   <div id="historyPanel" class="history-panel" hidden><div class="history-wrap"><table class="history"><thead><tr><th>#</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div></div>
@@ -219,7 +207,6 @@
 
 <!-- ===== v1.6.4 : normative capture UI and position-aware Advanced grid ===== -->
 <link rel="stylesheet" href="css/index-result-grammar.css">
-<script src="js/index-normative-capture.js"></script>
 <!-- ===== end v1.6.4 ===== -->
 
 <script src="statistics/adapter.js"></script>
