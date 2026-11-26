@@ -1,11 +1,12 @@
 {
   "name": "volley-live",
   "private": true,
-  "description": "Development tooling for VolleyLive (formatting and lint). The app itself has no build step.",
+  "description": "Development tooling for VolleyLive (formatting, lint and unit tests). The app itself has no build step.",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:unit": "node --test tests/unit/"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

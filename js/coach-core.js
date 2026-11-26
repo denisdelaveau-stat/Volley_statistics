@@ -235,13 +235,24 @@
         rot = last && last.lineup ? clone(last.lineup) : clone(match.startingRotation || {}),
         serving = last ? (last.winner === 'team1' ? 'A' : 'B') : initialServing(match, setNo);
       if (last && last.phase === 'receive' && last.winner === 'team1') rot = rotate(rot);
-      return { serving: serving, rot: rot, rotation: setterZone(match, rot) };
+      return {
+        serving: serving,
+        rot: rot,
+        rotation: setterZone(match, rot),
+        court: Rotation.onCourt(match, rot, { serving: serving }),
+      };
     }
     var setEvents = (C.data.events || []).filter(function (e) {
         return (+e.set || 1) === setNo;
       }),
       state = Rotation.trace(match, setEvents, setNo);
-    return { serving: state.serving, rot: state.rot, rotation: setterZone(match, state.rot) };
+    // rot: rotation slots (setter zone, rotation analysis); court: players on court, libero included (display).
+    return {
+      serving: state.serving,
+      rot: state.rot,
+      rotation: setterZone(match, state.rot),
+      court: Rotation.onCourt(match, state.rot, state),
+    };
   }
   function setSummary(match, rallies) {
     if (match.demoSetWins) return { a: match.demoSetWins.a, b: match.demoSetWins.b };

@@ -31,7 +31,7 @@
     var m = C.data.match,
       st = currentState(m, C.data.rallies, +m.currentSet || 1);
     return POS.map(function (z) {
-      return st.rot[z];
+      return st.court[z];
     }).filter(function (x) {
       return x != null;
     });
