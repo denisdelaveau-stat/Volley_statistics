@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var P = window.VolleySpectatorParts, st = P.state;
-  var ORDER_KEY = P.ORDER_KEY, WINDOW_KEY = P.WINDOW_KEY, esc = P.esc, num = P.num, role = P.role, roleClass = P.roleClass, actionLabel = P.actionLabel;
+  var ORDER_KEY = P.ORDER_KEY, WINDOW_KEY = P.WINDOW_KEY, esc = P.esc, num = P.num, roleClass = P.roleClass, actionLabel = P.actionLabel;
 
   function prefs() {
     var order = localStorage.getItem(ORDER_KEY), size = localStorage.getItem(WINDOW_KEY);

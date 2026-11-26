@@ -1,8 +1,8 @@
 /* VolleyLive spectator view — LIVE SCORE: scoreboard and momentum. */
 (function () {
   'use strict';
-  var P = window.VolleySpectatorParts, st = P.state;
-  var $ = P.$, esc = P.esc, num = P.num, upper = P.upper, role = P.role, isVoided = P.isVoided, monogram = P.monogram;
+  var P = window.VolleySpectatorParts;
+  var $ = P.$, esc = P.esc, num = P.num, upper = P.upper, isVoided = P.isVoided, monogram = P.monogram;
   var announcedLeader = null;
   var momentumCfg = Object.assign({ windowSize: 8, minPoints: 4, advantageThreshold: 0.70 },
     (window.VolleySpectatorConfig && window.VolleySpectatorConfig.momentum) || {});

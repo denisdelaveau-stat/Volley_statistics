@@ -29,7 +29,7 @@
   document.documentElement.classList.add('runtime-capture-active');
   document.documentElement.setAttribute('data-runtime-mode',state.mode);
 
-  function esc(value){return String(value==null?'':value).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
+  function esc(value){return String(value==null?'':value).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function readObject(key,fallback){try{var value=JSON.parse(localStorage.getItem(key)||'null');return value&&typeof value==='object'?value:fallback}catch(error){return fallback}}
   function writeObject(key,value){localStorage.setItem(key,JSON.stringify(value))}
   function defaultMode(){return window.matchMedia&&window.matchMedia('(max-width:620px)').matches?'FOCUS':'SPEED'}

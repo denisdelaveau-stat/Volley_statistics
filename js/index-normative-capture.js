@@ -8,7 +8,7 @@
   var g=playerStep.querySelector('.touch-grid.players'),head=panel.querySelector('.capture-head'),chip=document.getElementById('pickChip'),back=document.getElementById('captureBack');
   var actor=null,action=null,pendingResult=null,guardUntil=0,guardTimer=null,LOCK_MS=450;
   window.VLC_TAP_LOCK_MS=LOCK_MS;window.VLC_TAPS_BLOCKED=window.VLC_TAPS_BLOCKED||0;
-  function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function eventCount(){try{var x=JSON.parse(localStorage.getItem('volleyCapture.events.v1')||'[]');return Array.isArray(x)?x.length:0}catch(e){return 0}}
   function isGuarded(){return Date.now()<guardUntil}
   function armGuard(){guardUntil=Date.now()+LOCK_MS;panel.classList.add('result-guard');clearTimeout(guardTimer);guardTimer=setTimeout(function(){panel.classList.remove('result-guard');refresh()},LOCK_MS)}

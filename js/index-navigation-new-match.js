@@ -2,10 +2,10 @@
   var KE='volleyCapture.events.v1',KD='volleyCapture.chartData.v1',KM='volleyCapture.match.v1',STAGE='volleyCapture.stage';
   var LIBK='volleyCapture.library.v1',SETK='volleyCapture.settings.v1';
   var $=function(id){return document.getElementById(id)},home=$('homeScreen'),setupCaptureScreen=$('setupCaptureScreen'),insightsScreen=$('insightsScreen'),matchHubScreen=$('matchHubScreen'),matchLibraryScreen=$('matchLibraryScreen'),setup=$('setupScreen'),teams=$('teamsScreen'),settings=$('settingsScreen');
-  function esc(t){return String(t==null?'':t).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}
+  function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
   function defName(team,opp){return (team||'Team_A')+'_vs_'+(opp||'Opponent')+'_'+today()}
-  function fileName(n){return String(n||'match').trim().replace(/[\\/:*?\"<>|]+/g,'').replace(/\s+/g,'_').slice(0,80)+'.json'}
+  function fileName(n){return String(n||'match').trim().replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').slice(0,80)+'.json'}
   window.defName=function(){return defName(S.teamName,S.opp)};window.fileName=fileName;
   function libGet(){try{var l=JSON.parse(localStorage.getItem(LIBK)||'{}');return {team:l.team||{},lineup:l.lineup||{},rot:l.rot||{}}}catch(e){return {team:{},lineup:{},rot:{}}}}
   function libPut(l){localStorage.setItem(LIBK,JSON.stringify(l))}
