@@ -68,6 +68,19 @@ Only NEW MATCH / CONTINUE CAPTURE write to `volleyCapture.match/events/chartData
 
 Score, set/match winner, service, rotation, charts and reports are rebuilt from accepted events. The pre-rally rotation is snapshotted onto each event. v1.28 adds canonical runtime fields without breaking the historical event schema; the portable capture file stays at format version 1 and unified documents use schema 2.1.
 
+## Capture screen contract (`window.VolleyCapture`)
+
+The capture scripts share one documented object instead of ad-hoc globals. It is created by `js/index-capture-engine.js`:
+
+| Member | Set by | Used by |
+|---|---|---|
+| `match` | `index-capture-engine.js` (active match from storage, or `null`) | charts, `index-capture-tools.js`, `runtime-input.js` |
+| `updateScoreService(side)` | `index-capture-engine.js` | `runtime-input.js` |
+| `commit(player, action, result)`, `logSubstitution(event)`, `deleteLastAction()`, `buildReport()`, `deletesBlocked` | `index-capture-tools.js` | `runtime-input.js`, tests |
+| `refreshCourt(events)`, `runtimeContext` | `runtime-input.js` | `index-capture-tools.js` |
+
+`window.VolleyShell.saveMatchJson()` (from `index-navigation-new-match.js`) saves the active match as JSON; the Match Hub uses it.
+
 ## Rotation and libero rules
 
 Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the capture screen and the Coach View; `statistics/adapter.js` applies the same rules for the Spectator matrix (it must also run standalone in Node).

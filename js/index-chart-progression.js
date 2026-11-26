@@ -24,7 +24,7 @@
     svg.innerHTML = '';
     document.getElementById('legend').innerHTML = '';
     document.getElementById('players').innerHTML = '';
-    var MM = window.VOLLEY_MATCH,
+    var MM = window.VolleyCapture.match,
       NUMS =
         MM && MM.team && MM.team.players && MM.team.players.length ? MM.team.players.slice() : [1, 2, 3, 4, 5, 6, 7];
     var pt = document.getElementById('progTitle');
@@ -384,7 +384,7 @@
     } else apply(); // default: all indicators selected (use Clear all or the checkboxes to hide some)
     // ---- per-attacker chart: cumulative points + differential (points - errors) on the same graph
     var ATT = (function () {
-      var m = window.VOLLEY_MATCH;
+      var m = window.VolleyCapture.match;
       if (!m || !m.team || !m.team.roster) return [5, 6, 7];
       return m.team.roster
         .filter(function (r) {
