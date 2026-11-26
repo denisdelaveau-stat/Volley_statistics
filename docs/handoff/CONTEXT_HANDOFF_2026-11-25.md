@@ -9,7 +9,32 @@ Purpose: let another machine or another assistant resume the work without the ch
 | `5743927` | Point 1 done: `js/index-capture-engine.js` split into `js/index-match-rules.js` (`VolleySets`, `VolleyStats`) and `js/index-rotation.js` (`VolleyRotation`); the engine keeps court rendering, focus and substitution mode | green |
 | `066a17c` | Point 2 (Spectator): `spectator.js` split into `js/spectator-core.js`, `-live-score.js`, `-ranking.js`, `-timeline.js`, `-graph.js`; shared private namespace `window.VolleySpectatorParts` (mutable state in `.state`) | green |
 | `923fe34` | Point 2 (Coach): `coach.js` split into `js/coach-core.js`, `-rotations.js`, `-overview.js`, `-players.js`, `-live.js`; shared private namespace `window.VolleyCoachParts` (state object `C`) | green |
-| next 2 commits | Point 3: (a) ESLint + Prettier tooling (`package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore`), lint fixes, ESLint step in CI; (b) Prettier formatting of all JavaScript, `prettier --check` step in CI | check |
+| `859ce79`, `7d3cb8d` | Point 3: (a) ESLint + Prettier tooling (`package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore`), lint fixes, ESLint step in CI; (b) Prettier formatting of all JavaScript, `prettier --check` step in CI | green |
+
+### Audit of 2026-11-26 and follow-up (all green in CI)
+
+| Commit | Content |
+|---|---|
+| `3f731e9`, `0a7e0ed` | HTML injection fixed in the capture screen; one shared `VolleyDom.esc()` (`js/shared-dom.js`); `tests/test_html_escaping.py` |
+| `bdc8400` | `js/shared-domain.js` (`VolleyDomain`: storage keys, role labels, court geometry); one rotation engine (`VolleyRotation.trace()`) for capture and Coach View |
+| `a55e379` | One libero rule everywhere (capture, Coach View, Spectator matrix), FIVB Rule 19, applied rally after rally; unit tests `tests/unit/` (`npm run test:unit`, run by CI) |
+| `e42fb33` | Capture charts split out of `js/index-capture-tools.js` into `js/index-chart-*.js` (`VolleyCaptureCharts`) |
+| `90ef86f` | Substitutions restored in the capture screen (they could not be recorded since v1.28), FIVB Rule 15 (`js/index-substitution-rules.js`, `tests/test_substitutions.py`) |
+| `f245c1e` | Dead capture UI layers removed (`js/index-normative-capture.js`, legacy court and substitution sheet of the engine, legacy step markup) |
+| `f9ecb63` | Capture ad-hoc globals replaced by the documented `window.VolleyCapture` contract |
+
+Rules and contracts are documented in `docs/ARCHITECTURE.md` (sections "Capture screen contract", "Rotation and libero rules", "Substitution rules").
+
+### Points to verify later
+
+- **Capture screen charts (decided 2026-11-26: keep for now).** `css/index-result-grammar.css` hides the whole statistics panel of the capture screen (`#statsToggle,#statsPanel{display:none!important}`). The panel holds the score progression, point origin pies, error charts and attacker cards (`js/index-chart-*.js` and `renderAttackers` in `js/index-capture-tools.js`). They are still recomputed and redrawn after every action, about 1,000 lines of work that nobody sees. The chart data (`volleyCapture.chartData.v1`) must stay either way: it is exported with the match and read by the Match Hub and `statistics/adapter.js`. Options: remove the drawing code (if these statistics now live in the Coach and Spectator views), show the panel again, or keep as is.
+- Starting players are taken from `match.startingRotation` for every set (substitution rules, Rule 15): a different line-up per set needs a data-format change.
+- Second libero and libero re-designation (FIVB 19.1.1, 19.4) are not modelled: one libero per match in the data.
+
+### Remaining audit steps
+
+- Step 5, hygiene: 16 empty `catch` blocks, mixed French/English UI text without an i18n layer, stale version numbers in file headers, README out of date, duplicate root files (`COPY_INSTRUCTIONS*.md`, `RELEASE_NOTES*.md`), `Font_app_ref.jpg` (1.5 MB, cached offline), `statistics/adapter.js` loaded twice by `index.html`, 8 ESLint warnings.
+- Step 6, later: tests that assert minified CSS prevent CSS formatting; tests organised by feature instead of by version.
 
 - Point 4 (docs) is up to date for these splits in `docs/ARCHITECTURE.md`.
 - Public globals (`VolleySets`, `VolleyStats`, `VolleyRotation`, `VolleySpectator`, `VolleyCoach`) are unchanged.
@@ -26,7 +51,7 @@ Purpose: let another machine or another assistant resume the work without the ch
 - Remote: `https://github.com/denisdelaveau-stat/Volley_statistics.git`
 - Working branch: `refactoring` (pushed, tracks `origin/refactoring`). `main` is untouched.
 - Pull request #2 targets `main` and runs the `Tests` workflow.
-- Latest commit at handoff: `fdc9a72` (TO_DO folder). Before it: `47f124c`, `9756ba7`.
+- Latest commit at handoff: `fdc9a72` (TO_DO folder). Latest commit after the 2026-11-26 work: see section 0.
 
 ## 2. Commit history of this session (oldest first, branch `refactoring`)
 
