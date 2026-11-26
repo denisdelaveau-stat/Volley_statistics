@@ -83,9 +83,9 @@ def test_only_latest_row_is_deletable_and_double_delete_is_guarded(browser):
     assert rows.count() == 2
     assert rows.nth(0).locator("[data-delete-last]").count() == 1
     assert rows.nth(1).locator("[data-delete-last]").count() == 0
-    page.evaluate("window.VLCDeleteLastAction(); window.VLCDeleteLastAction();")
+    page.evaluate("VolleyCapture.deleteLastAction(); VolleyCapture.deleteLastAction();")
     assert len(events(page)) == 1
-    assert page.evaluate("window.VLC_HISTORY_DELETES_BLOCKED") >= 1
+    assert page.evaluate("VolleyCapture.deletesBlocked") >= 1
     assert not errors
     page.close()
 

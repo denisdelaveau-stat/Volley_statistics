@@ -1,10 +1,10 @@
 /* VolleyLive v1.28.0 — common runtime input controller for FOCUS, SPEED+ and FLOW. */
 (function () {
   'use strict';
-  var M = window.VOLLEY_MATCH,
-    H = window.__vlc,
+  var VC = window.VolleyCapture,
+    M = VC && VC.match,
     panel = document.getElementById('capturePanel');
-  if (!M || !H || !panel) return;
+  if (!M || !VC.commit || !panel) return;
   var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
     EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
   var MODES = ['FOCUS', 'SPEED', 'FLOW'];
@@ -593,16 +593,16 @@
     var beforeCount = events().length,
       beforeScore = scoreNow(),
       eventId = uniqueEventId();
-    window.VLC_RUNTIME_CONTEXT = { eventId: eventId, inputMode: state.mode };
+    VC.runtimeContext = { eventId: eventId, inputMode: state.mode };
     try {
-      H.commit(state.author, state.action, result);
+      VC.commit(state.author, state.action, result);
     } catch (error) {
       state.pending = false;
       state.error = 'Enregistrement impossible : ' + ((error && error.message) || 'erreur inconnue');
       render();
       return;
     } finally {
-      window.VLC_RUNTIME_CONTEXT = null;
+      VC.runtimeContext = null;
     }
     if (events().length !== beforeCount + 1) {
       state.pending = false;
@@ -624,12 +624,12 @@
   }
   function undo() {
     if (state.pending || Date.now() < state.lockedUntil) return;
-    if (typeof window.VLCDeleteLastAction !== 'function') {
+    if (typeof VC.deleteLastAction !== 'function') {
       state.error = 'Annulation indisponible.';
       render();
       return;
     }
-    var ok = window.VLCDeleteLastAction();
+    var ok = VC.deleteLastAction();
     if (ok) {
       clear(true);
       state.feedback = 'Dernier événement annulé';
@@ -833,7 +833,7 @@
     M.subs = M.subs || [];
     M.subs.push(built.sub);
     writeObject(window.VolleyDomain.STORAGE.captureMatch, M);
-    if (typeof window.VLCLogSubstitution === 'function') window.VLCLogSubstitution(built.event);
+    if (typeof VC.logSubstitution === 'function') VC.logSubstitution(built.event);
     else {
       var list = events();
       list.push(built.event);
@@ -846,22 +846,22 @@
     return true;
   }
 
-  /* Called by js/index-capture-tools.js after each change (window.updateCourt): shows the serving team on the score
+  /* Called by js/index-capture-tools.js after each change (VolleyCapture.refreshCourt): shows the serving team on the score
      board. The court itself is part of the runtime shell (render()). Errors are swallowed so that a commit can never
      fail after its event has been saved. */
-  window.updateCourt = function (list) {
+  VC.refreshCourt = function (list) {
     if (!window.VolleyRotation || !M.startingRotation) return;
     try {
       var set = (list || events()).filter(function (e) {
           return Number(e.set || 1) === Number(M.currentSet || 1);
         }),
         replay = window.VolleyRotation.replay(M, set);
-      if (window.updateScoreService) window.updateScoreService(replay.serving);
+      VC.updateScoreService(replay.serving);
     } catch (error) {}
   };
   ensureStructure();
   render();
-  window.updateCourt();
+  VC.refreshCourt();
   panel.addEventListener('click', function (event) {
     var target = event.target.closest('button');
     if (!target) return;

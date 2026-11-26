@@ -45,9 +45,9 @@ def test_set_end_undo_and_exports(browser):
     page.click("[data-delete-last]")
     assert len(events(page)) == count - 1
     assert "locked" not in page.get_attribute("#capturePanel", "class")
-    report = page.evaluate("window.buildMatchReport()")
+    report = page.evaluate("VolleyCapture.buildReport()")
     assert "Antibes vs Nice" in report and "Action log" in report and "25 : 24" in report
-    assert page.evaluate("typeof window.saveMatchJson") == "function"
+    assert page.evaluate("typeof VolleyShell.saveMatchJson") == "function"
     assert not errors
     page.close()
 

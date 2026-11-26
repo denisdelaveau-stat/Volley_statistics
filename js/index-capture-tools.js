@@ -23,6 +23,7 @@
     historyPanel.hidden = !open;
     historyArrow.textContent = open ? '▲' : '▼';
   });
+  var VC = window.VolleyCapture;
   var Charts = window.VolleyCaptureCharts;
   var DATA = Charts.DATA,
     STORAGE_DATA = Charts.STORAGE_DATA,
@@ -39,10 +40,10 @@
     } catch (e) {
       EVENTS = [];
     }
-    // Action being committed; set by window.__vlc.commit (runtime-input.js owns the input UI).
+    // Action being committed; set by VolleyCapture.commit (runtime-input.js owns the input UI).
     var choice = { player: null, action: null, result: null };
     function rosterInfo(n) {
-      var r = (window.VOLLEY_MATCH && VOLLEY_MATCH.team && VOLLEY_MATCH.team.roster) || [];
+      var r = (VC.match && VC.match.team && VC.match.team.roster) || [];
       for (var i = 0; i < r.length; i++) {
         if (r[i].number === Number(n)) return r[i];
       }
@@ -51,7 +52,7 @@
     var status = document.getElementById('captureStatus'),
       hist = document.getElementById('captureHistory'),
       score = document.getElementById('liveScore');
-    var MATCH = window.VOLLEY_MATCH,
+    var MATCH = VC.match,
       VS = window.VolleySets,
       KM_ = window.VolleyDomain.STORAGE.captureMatch;
     function curSet() {
@@ -145,14 +146,12 @@
       }, 1500);
       document.getElementById('fileStatus').textContent = 'Report: ' + name;
     }
-    window.buildMatchReport = function () {
+    VC.buildReport = function () {
       return window.VolleyReport.build(MATCH, EVENTS);
     };
-    window.__vlc = {
-      commit: function (p, a, r) {
-        choice = { player: p, action: a, result: r };
-        commit(p);
-      },
+    VC.commit = function (p, a, r) {
+      choice = { player: p, action: a, result: r };
+      commit(p);
     };
     function renderSets() {
       var line = document.getElementById('setsLine'),
@@ -227,8 +226,6 @@
     var deleteLockedUntil = 0,
       deleteTimer = null,
       DELETE_LOCK_MS = 450;
-    window.VLC_HISTORY_DELETE_LOCK_MS = DELETE_LOCK_MS;
-    window.VLC_HISTORY_DELETES_BLOCKED = window.VLC_HISTORY_DELETES_BLOCKED || 0;
     function isDeleteLocked() {
       return Date.now() < deleteLockedUntil;
     }
@@ -317,7 +314,7 @@
         : 'Ready for a new action.';
       updateOriginPies(EVENTS);
       renderErrorCharts(EVENTS);
-      if (window.updateCourt) window.updateCourt(EVENTS);
+      if (VC.refreshCourt) VC.refreshCourt(EVENTS);
       drawProgression();
     }
     function persist(msg) {
@@ -325,7 +322,7 @@
       localStorage.setItem(STORAGE_EVENTS, JSON.stringify(EVENTS));
       if (msg) status.textContent = msg;
     }
-    window.VLCLogSubstitution = function (ev) {
+    VC.logSubstitution = function (ev) {
       EVENTS.push(ev);
       persist();
       render();
@@ -371,7 +368,7 @@
       }
       if (winningTeam === 'team1') a++;
       else if (winningTeam === 'team2') b++;
-      var runtimeContext = window.VLC_RUNTIME_CONTEXT || {},
+      var runtimeContext = VC.runtimeContext || {},
         runtimePlayer = playerValue === 'A' || playerValue === 'T' ? null : rosterInfo(playerValue),
         runtimeRole = runtimePlayer
           ? window.VolleyDomain.ROLE_CODES[runtimePlayer.position] || String(runtimePlayer.position || '').toUpperCase()
@@ -393,8 +390,8 @@
         id: EVENTS.length + 1,
         eventId:
           runtimeContext.eventId || 'evt_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9),
-        set: (window.VOLLEY_MATCH && VOLLEY_MATCH.currentSet) || 1,
-        setNumber: (window.VOLLEY_MATCH && VOLLEY_MATCH.currentSet) || 1,
+        set: (VC.match && VC.match.currentSet) || 1,
+        setNumber: (VC.match && VC.match.currentSet) || 1,
         timestamp: new Date().toISOString(),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         authorSide: playerValue === 'A' ? 'AWAY' : 'HOME',
@@ -460,7 +457,7 @@
     }
     function deleteLastAction() {
       if (isDeleteLocked()) {
-        window.VLC_HISTORY_DELETES_BLOCKED++;
+        VC.deletesBlocked++;
         return false;
       }
       if (!EVENTS.length) {
@@ -490,7 +487,7 @@
       event.stopPropagation();
       deleteLastAction();
     });
-    window.VLCDeleteLastAction = deleteLastAction;
+    VC.deleteLastAction = deleteLastAction;
     document.getElementById('nextSetBtn').addEventListener('click', function () {
       var su = VS.summary(MATCH, EVENTS);
       if (!su.current || !su.current.winner || su.matchWinner) return;

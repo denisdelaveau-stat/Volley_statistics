@@ -1085,7 +1085,7 @@
     });
     $('matchHubSaveStart').addEventListener('click', function () {
       try {
-        if (window.saveMatchJson) window.saveMatchJson();
+        if (window.VolleyShell && window.VolleyShell.saveMatchJson) window.VolleyShell.saveMatchJson();
         var raw = archiveCurrent();
         if (raw) upsertHistory(raw, 'Saved local match', null, 'finished');
       } catch (e) {}

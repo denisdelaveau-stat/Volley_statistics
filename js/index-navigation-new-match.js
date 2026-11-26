@@ -33,10 +33,6 @@
         .slice(0, 80) + '.json'
     );
   }
-  window.defName = function () {
-    return defName(S.teamName, S.opp);
-  };
-  window.fileName = fileName;
   function libGet() {
     try {
       var l = JSON.parse(localStorage.getItem(LIBK) || '{}');
@@ -139,7 +135,6 @@
     }, 1500);
     return name;
   }
-  window.saveMatchJson = saveJson;
   var sj = $('captureSaveJson');
   if (sj)
     sj.addEventListener('click', function () {
@@ -223,6 +218,8 @@
     settingsPut: settingsPut,
     show: show,
     updateHome: updateHome,
+    // Saves the active match as a JSON file (also used by the Match Hub).
+    saveMatchJson: saveJson,
     teamRows: teamRows,
     PLAB: PLAB,
     screens: { home: home, setupCaptureScreen: setupCaptureScreen, teams: teams, settings: settings },

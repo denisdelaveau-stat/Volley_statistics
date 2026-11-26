@@ -5,7 +5,7 @@ const globals = require('globals');
 
 // Globals defined by one script and read by others. Keep this list in sync with docs/ARCHITECTURE.md.
 const projectGlobals = {
-  VOLLEY_MATCH: 'writable',
+  VolleyCapture: 'readonly',
   VolleyDom: 'readonly',
   VolleyDomain: 'readonly',
   VolleySets: 'readonly',

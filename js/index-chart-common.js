@@ -15,7 +15,7 @@
   var PC = { 1: '#6A1B9A', 2: '#00ACC1', 3: '#FB8C00', 4: '#1E88E5', 5: '#EC407A', 6: '#FDD835', 7: '#6D4C41' };
   var PN = { 1: 'Setter', 2: 'Libero', 3: '', 4: 'MB', 5: 'OH', 6: 'OH', 7: 'OPP' };
   (function () {
-    var m = window.VOLLEY_MATCH,
+    var m = window.VolleyCapture.match,
       RN = window.VolleyDomain.ROLE_NAMES,
       PAL = [
         '#6A1B9A',
