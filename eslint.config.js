@@ -18,6 +18,7 @@ const projectGlobals = {
   VolleyTeams: 'readonly',
   VolleyMatchHub: 'readonly',
   VolleyMatchLibrary: 'readonly',
+  VolleyCaptureCharts: 'readonly',
   VolleyCoach: 'readonly',
   VolleyCoachConfig: 'readonly',
   VolleyCoachParts: 'readonly',
