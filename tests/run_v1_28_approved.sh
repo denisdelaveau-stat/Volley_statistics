@@ -7,6 +7,7 @@ pytest -q \
  tests/test_document_spec_v1_6_5.py \
  tests/test_empty_analysis_state_v1_12_5.py \
  tests/test_history_delete_v1_28.py \
+ tests/test_html_escaping.py \
  tests/test_icon_v1_6_10.py \
  tests/test_library_v1_6_0.py \
  tests/test_live_court_player_focus_v1_13.py \

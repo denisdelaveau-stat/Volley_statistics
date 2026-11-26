@@ -1,4 +1,6 @@
 (function () {
+  // Player names, team names and event fields come from user input or imported files: escape them in HTML.
+  var esc = window.VolleyDom.esc;
   var statsToggle = document.getElementById('statsToggle');
   var statsPanel = document.getElementById('statsPanel');
   var statsArrow = document.getElementById('statsArrow');
@@ -229,10 +231,12 @@
     function reason(p) {
       if (p.c === 'T') return p.w === 'A' ? 'Point by team A' : 'Point on team A error';
       if (p.w === 'A')
-        return p.c === 0 ? 'Point on team B error' : 'Point by player ' + p.c + (PN[p.c] ? ' (' + PN[p.c] + ')' : '');
+        return p.c === 0
+          ? 'Point on team B error'
+          : 'Point by player ' + esc(p.c) + (PN[p.c] ? ' (' + esc(PN[p.c]) + ')' : '');
       return p.c === 0
         ? 'Positive action by team B'
-        : 'Point on team A error by player ' + p.c + (PN[p.c] ? ' (' + PN[p.c] + ')' : '');
+        : 'Point on team A error by player ' + esc(p.c) + (PN[p.c] ? ' (' + esc(PN[p.c]) + ')' : '');
     }
     var hl = el('rect', {
       x: 0,
@@ -270,11 +274,11 @@
         var d = DV[i];
         tip.innerHTML =
           '<b>P' +
-          p.n +
+          esc(p.n) +
           '</b> &nbsp; A ' +
-          p.a +
+          esc(p.a) +
           ' : ' +
-          p.b +
+          esc(p.b) +
           ' B &nbsp; (lead ' +
           (d > 0 ? '+' : '') +
           d +
@@ -407,7 +411,7 @@
         '><span class="sw" style="background:' +
         c.col +
         '"></span>' +
-        c.name;
+        esc(c.name);
       lb.querySelector('input').addEventListener('change', function (e) {
         on[c.id] = e.target.checked;
         apply();
@@ -556,8 +560,8 @@
           '" stroke-width="3"' +
           (st.dash ? ' stroke-dasharray="' + st.dash + '"' : '') +
           '/></svg> Player ' +
-          k +
-          (PN[k] ? ' (' + PN[k] + ')' : '') +
+          esc(k) +
+          (PN[k] ? ' (' + esc(PN[k]) + ')' : '') +
           '</span>';
       });
       cd.appendChild(lg);
@@ -677,8 +681,8 @@
         '<span class="sw" style="background:' +
         col +
         '"></span>Player ' +
-        k +
-        (PN[k] ? ' (' + PN[k] + ')' : '') +
+        esc(k) +
+        (PN[k] ? ' (' + esc(PN[k]) + ')' : '') +
         ' - points scored: ' +
         cum[k][N - 1] +
         ' | errors: ' +
@@ -767,13 +771,13 @@
           m.setAttribute('r', m.getAttribute('data-r') * 1.4);
           tp.innerHTML =
             '<b>P' +
-            p.n +
+            esc(p.n) +
             '</b> &nbsp; A ' +
-            p.a +
+            esc(p.a) +
             ' : ' +
-            p.b +
+            esc(p.b) +
             ' B<br>Player ' +
-            k +
+            esc(k) +
             (kind === 'err' ? ' error' : ' scores') +
             '<br>Points ' +
             cum[k][i] +
@@ -1204,9 +1208,11 @@
               : '#' + choice.player + (i && i.name ? ' ' + i.name : '') + (role ? ' \u00B7 ' + RLAB[role] : '');
       chip.innerHTML =
         '<span>' +
-        who +
+        esc(who) +
         '</span>' +
-        (choice.action ? '<span class="arrow">\u2192</span><span class="act">' + ALAB[choice.action] + '</span>' : '');
+        (choice.action
+          ? '<span class="arrow">\u2192</span><span class="act">' + esc(ALAB[choice.action]) + '</span>'
+          : '');
       chip.hidden = false;
       backBtn.hidden = false;
     }
@@ -1415,19 +1421,19 @@
       if (isLatest) tr.className = 'history-latest';
       tr.innerHTML =
         '<td>' +
-        e.id +
+        esc(e.id) +
         '</td><td>' +
-        e.player +
+        esc(e.player) +
         '</td><td>' +
-        e.action +
+        esc(e.action) +
         '</td><td><span class="result-badge result-' +
         rk +
         '">' +
         rl +
         '</span></td><td><div class="history-score-cell"><span>' +
-        e.scoreA +
+        esc(e.scoreA) +
         ' : ' +
-        e.scoreB +
+        esc(e.scoreB) +
         '</span>' +
         (isLatest
           ? '<button type="button" class="history-delete" data-delete-last aria-label="Delete last action" title="Delete last action"' +
@@ -1444,21 +1450,21 @@
       score.classList.add(sc.a > sc.b ? 'lead' : sc.a < sc.b ? 'trail' : 'tie');
       score.innerHTML =
         '<span class="set-badge set-badge-a" aria-label="Sets won by ' +
-        tn('team1') +
+        esc(tn('team1')) +
         '">' +
-        suHead.wonA +
+        esc(suHead.wonA) +
         '</span><span class="score-side side-a"><span class="digit-box" aria-label="' +
-        tn('team1') +
+        esc(tn('team1')) +
         ' score">' +
-        sc.a +
+        esc(sc.a) +
         '</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box" aria-label="' +
-        tn('team2') +
+        esc(tn('team2')) +
         ' score">' +
-        sc.b +
+        esc(sc.b) +
         '</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by ' +
-        tn('team2') +
+        esc(tn('team2')) +
         '">' +
-        suHead.wonB +
+        esc(suHead.wonB) +
         '</span>';
       score.title =
         tn('team1') + ' ' + sc.a + ' : ' + sc.b + ' ' + tn('team2') + ' · Sets ' + suHead.wonA + ' : ' + suHead.wonB;
@@ -1478,11 +1484,11 @@
           });
       status.innerHTML = EVENTS.length
         ? '<span class="last-event">Last:</span> #' +
-          EVENTS[EVENTS.length - 1].player +
+          esc(EVENTS[EVENTS.length - 1].player) +
           ' ' +
-          EVENTS[EVENTS.length - 1].action +
+          esc(EVENTS[EVENTS.length - 1].action) +
           ' / ' +
-          EVENTS[EVENTS.length - 1].result
+          esc(EVENTS[EVENTS.length - 1].result)
         : 'Ready for a new action.';
       updateOriginPies(EVENTS);
       renderErrorCharts(EVENTS);

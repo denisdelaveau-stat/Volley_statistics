@@ -45,11 +45,7 @@
   document.documentElement.classList.add('runtime-capture-active');
   document.documentElement.setAttribute('data-runtime-mode', state.mode);
 
-  function esc(value) {
-    return String(value == null ? '' : value).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
+  var esc = window.VolleyDom.esc;
   function readObject(key, fallback) {
     try {
       var value = JSON.parse(localStorage.getItem(key) || 'null');

@@ -21,11 +21,7 @@
     LOCK_MS = 450;
   window.VLC_TAP_LOCK_MS = LOCK_MS;
   window.VLC_TAPS_BLOCKED = window.VLC_TAPS_BLOCKED || 0;
-  function esc(t) {
-    return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
+  var esc = window.VolleyDom.esc;
   function eventCount() {
     try {
       var x = JSON.parse(localStorage.getItem('volleyCapture.events.v1') || '[]');

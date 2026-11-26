@@ -27,11 +27,7 @@
   var NEXT = { p2: 'p1', p1: 'p6', p6: 'p5', p5: 'p4', p4: 'p3', p3: 'p2' };
   var ROLE = { setter: 'Passeur', oh: 'Réceptionneuse-attaquante', mb: 'Centrale', opp: 'Pointue', libero: 'Libéro' };
   var ROLE_SHORT = { setter: 'S', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'L' };
-  function esc(v) {
-    return String(v == null ? '' : v).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-    });
-  }
+  var esc = window.VolleyDom.esc;
   function read(k, fallback) {
     try {
       var x = JSON.parse(localStorage.getItem(k) || 'null');

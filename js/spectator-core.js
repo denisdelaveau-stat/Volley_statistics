@@ -22,11 +22,7 @@
   function $(id) {
     return document.getElementById(id);
   }
-  function esc(v) {
-    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
+  var esc = window.VolleyDom.esc;
   function num(v, d) {
     v = Number(v);
     return Number.isFinite(v) ? v : d;

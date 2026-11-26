@@ -14,11 +14,7 @@
         freeball: 'Free ball',
       };
     var RN = { setter: 'Setter', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'Libero' };
-    function esc(t) {
-      return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
-      });
-    }
+    var esc = window.VolleyDom.esc;
     function info(mm, n) {
       var r = (mm && mm.team && mm.team.roster) || [];
       for (var i = 0; i < r.length; i++) if (r[i].number === n) return r[i];

@@ -45,11 +45,7 @@
   function storageSet(key, value) {
     localStorage.setItem(key, JSON.stringify(value));
   }
-  function esc(value) {
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
+  var esc = window.VolleyDom.esc;
   function text(value) {
     return String(value == null ? '' : value).trim();
   }

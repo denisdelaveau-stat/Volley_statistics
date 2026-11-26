@@ -25,6 +25,7 @@ var ASSETS = [
   'css/index-capture-layout.css',
   'css/index-focus.css',
   'css/index-result-grammar.css',
+  'js/shared-dom.js',
   'js/index-match-rules.js',
   'js/index-rotation.js',
   'js/index-capture-engine.js',
