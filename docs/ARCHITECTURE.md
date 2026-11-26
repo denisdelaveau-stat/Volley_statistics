@@ -12,7 +12,8 @@
 | `runtime-input.js` / `runtime-input.css` | Shared runtime input controller for FOCUS, SPEED+ and FLOW (mode switching during capture, preferences, atomic Undo, double-tap guard) |
 | `match-hub.js` / `match-hub.css` | Match Capture hub (new/continue/conflict dialogs) and shared Match Library (selection, JSON import, reports, view routing). Exposes `window.VolleyMatchHub` / `window.VolleyMatchLibrary` |
 | `coach.js` / `coach.css` / `coach-live-config.js` | Read-only Coach View (`window.VolleyCoach`) and its configurable status thresholds |
-| `spectator.html` / `spectator.js` / `spectator.css` / `spectator-live-config.js` | Read-only Spectator View: LIVE SCORE, TIMELINE, GRAPH, RANKING |
+| `spectator.html` / `spectator.js` / `spectator.css` / `spectator-live-config.js` | Read-only Spectator View: LIVE SCORE, TIMELINE, GRAPH, RANKING. `spectator.js` holds the page controller (render, tabs, storage sync) and the public `window.VolleySpectator` API |
+| `js/spectator-*.js` | Spectator modules, loaded in this order before `spectator.js` and sharing the private `window.VolleySpectatorParts` namespace: `spectator-core.js` (storage keys, shared `state`, helpers, v1/v2 view-model builders), `spectator-live-score.js` (scoreboard and momentum), `spectator-ranking.js`, `spectator-timeline.js` (timeline rows and window preferences), `spectator-graph.js` (score and fault evolution charts) |
 | `statistics/adapter.js` | Shared normalisation/validation boundary (`window.VolleyStatsAdapter`: `validate`, `fromLocalStorage`, `toCoachData`) |
 | `statistics/data/` | Reference fixtures (unified v2.1) used by viewers and tests |
 | `sw.js` | Versioned offline app-shell cache (`volley-live-capture-v<VERSION>`) |
