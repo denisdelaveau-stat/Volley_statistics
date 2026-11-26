@@ -14,17 +14,17 @@
         efficiencyMinimumAttempts: 6,
         errors: 4,
         errorsEfficiencyBelow: 25,
-        rollingDrop: 30
+        rollingDrop: 30,
       },
       watch: {
         errorStreak: 2,
         efficiencyBelow: 30,
         efficiencyMinimumAttempts: 5,
         receptionPoorRate: 40,
-        rollingDrop: 15
+        rollingDrop: 15,
       },
       trendDelta: 10,
-      recoveryPositiveActions: 2
+      recoveryPositiveActions: 2,
     },
     outcome: {
       point: 'positive',
@@ -38,9 +38,9 @@
       error: 'negative',
       fault: 'negative',
       blocked: 'negative',
-      negative: 'negative'
+      negative: 'negative',
     },
     roleOrder: ['setter', 'oh', 'mb', 'opp', 'libero'],
-    skillOrder: ['attack', 'block', 'reception', 'defense', 'service', 'set', 'freeball']
+    skillOrder: ['attack', 'block', 'reception', 'defense', 'service', 'set', 'freeball'],
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
