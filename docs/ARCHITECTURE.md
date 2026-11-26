@@ -21,6 +21,7 @@
 | `manifest.webmanifest`, `icons/` | PWA metadata and Home-screen assets |
 | `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` (run by `.github/workflows/tests.yml`) |
 | `tools/` | `bump_version.py` (release version) and `generate_manifest.py` (source manifest) |
+| `package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Development tooling only (the app has no build step): `npm run lint` (ESLint), `npm run format` / `npm run format:check` (Prettier, JavaScript only; HTML and CSS stay hand-formatted because tests assert exact markup and minified CSS). CI runs both |
 
 ## Interfaces and their specifications
 
