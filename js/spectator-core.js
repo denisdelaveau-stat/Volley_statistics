@@ -1,6 +1,7 @@
 /* VolleyLive spectator view — shared core: storage keys, state, helpers and view-model builders. */
 (function () {
   'use strict';
+  var t = window.VolleyI18n.t;
 
   var ARCHIVE_KEY = window.VolleyDomain.STORAGE.spectatorArchive;
   var ORDER_KEY = window.VolleyDomain.STORAGE.spectatorTimelineOrder;
@@ -8,13 +9,13 @@
   var state = { raw: null, model: null, evolutionBrowsing: false };
 
   var I18N = {
-    scorePositive: 'HOME devant',
-    scoreZero: 'Égalité',
-    scoreNegative: 'AWAY devant',
-    faultPositive: 'HOME : plus de fautes',
-    faultZero: 'Égalité',
-    faultNegative: 'AWAY : plus de fautes',
-    pointsPlayed: 'Points joués',
+    scorePositive: t('spectator.homeAhead'),
+    scoreZero: t('spectator.tie'),
+    scoreNegative: t('spectator.awayAhead'),
+    faultPositive: t('spectator.homeMoreFaults'),
+    faultZero: t('spectator.tie'),
+    faultNegative: t('spectator.awayMoreFaults'),
+    pointsPlayed: t('spectator.pointsPlayed'),
     sideOut: 'Side-out',
     breakPoint: 'Break Point',
   };
@@ -51,18 +52,18 @@
   function actionLabel(skill) {
     var s = upper(skill);
     var labels = {
-      SERVICE: 'SERVICE',
-      SERVE: 'SERVICE',
-      ATTACK: 'ATTAQUE',
-      BLOCK: 'CONTRE',
-      RECEPTION: 'RÉCEPTION',
-      DEFENSE: 'DÉFENSE',
-      DEFENCE: 'DÉFENSE',
-      DIG: 'DÉFENSE',
-      SET: 'PASSE',
-      SETTER: 'PASSE',
-      FREEBALL: 'RELANCE',
-      FREE_BALL: 'RELANCE',
+      SERVICE: t('spectator.skillService'),
+      SERVE: t('spectator.skillService'),
+      ATTACK: t('spectator.skillAttack'),
+      BLOCK: t('spectator.skillBlock'),
+      RECEPTION: t('spectator.skillReception'),
+      DEFENSE: t('spectator.skillDefense'),
+      DEFENCE: t('spectator.skillDefense'),
+      DIG: t('spectator.skillDefense'),
+      SET: t('spectator.skillSet'),
+      SETTER: t('spectator.skillSet'),
+      FREEBALL: t('spectator.skillFreeball'),
+      FREE_BALL: t('spectator.skillFreeball'),
     };
     return labels[s] || (s && s !== 'GENERIC' && s !== 'TEAM' ? s.replace(/_/g, ' ') : '');
   }
@@ -158,7 +159,7 @@
     });
     return { away: a, home: h };
   }
-  function terminalV2(d, r, byEvent, players, t, winner) {
+  function terminalV2(d, r, byEvent, players, teams, winner) {
     var e = byEvent[r.terminalEventId];
     if (isVoided(e)) e = null;
     var list = (d.events || [])
@@ -180,7 +181,7 @@
           .pop() || list[list.length - 1];
     }
     if (!e) return null;
-    var side = sideForTeamId(e.teamId, t);
+    var side = sideForTeamId(e.teamId, teams);
     if (!side) return null;
     var outcome = normalizeResult(e.evaluation);
     if (side === 'AWAY') outcome = winner === 'AWAY' ? 'point' : 'error';
@@ -196,13 +197,13 @@
     };
   }
   function modelV2(d, requestedSet) {
-    var t = teamV2(d),
+    var teams = teamV2(d),
       players = {},
       match = d.match || {};
     (d.players || []).forEach(function (p) {
       players[p.playerId] = {
         number: p.number,
-        name: p.name || 'Joueur ' + p.number,
+        name: p.name || t('spectator.playerN', { n: p.number }),
         role: role(p.role || p.position),
         teamId: p.teamId,
       };
@@ -243,10 +244,10 @@
       cumulativeAwayFaults = 0;
     var rallies = selected.map(function (r) {
       var score = r.scoreAfter || {};
-      var winner = sideForTeamId(r.winnerTeamId, t);
-      var serving = sideForTeamId(r.servingTeamId, t);
+      var winner = sideForTeamId(r.winnerTeamId, teams);
+      var serving = sideForTeamId(r.servingTeamId, teams);
       var phase = winner && serving ? (winner === serving ? 'BP' : 'SO') : null;
-      var event = winner ? terminalV2(d, r, byEvent, players, t, winner) : null;
+      var event = winner ? terminalV2(d, r, byEvent, players, teams, winner) : null;
       var invalid = false;
       if (
         String(match.detailLevel || '').toLowerCase() === 'basic' ||
@@ -255,13 +256,13 @@
         event = null;
       if (event && ['SERVICE', 'SERVE'].indexOf(upper(event.skill)) >= 0 && event.teamId !== r.servingTeamId) {
         invalid = true;
-        warnings.push('Rallye ' + r.rallyNumber + ' : action de service rejetée pour l’équipe non au service.');
+        warnings.push(t('spectator.rejectedServe', { n: r.rallyNumber }));
       }
       var homeFaultIncrement = 0,
         awayFaultIncrement = 0;
       (eventsByRally[r.rallyId] || []).forEach(function (faultEvent) {
         if (!isFaultEvent(faultEvent)) return;
-        var faultSide = sideForTeamId(faultEvent.teamId, t);
+        var faultSide = sideForTeamId(faultEvent.teamId, teams);
         if (faultSide === 'HOME') homeFaultIncrement++;
         if (faultSide === 'AWAY') awayFaultIncrement++;
       });
@@ -310,15 +311,17 @@
     var sw = setsWonV2(d);
     var servingSide = null;
     if (state === 'IN_PROGRESS' || state === 'NOT_STARTED') {
-      servingSide = rallies.length ? rallies[rallies.length - 1].winner : sideForTeamId(setDef.initialServingTeamId, t);
+      servingSide = rallies.length
+        ? rallies[rallies.length - 1].winner
+        : sideForTeamId(setDef.initialServingTeamId, teams);
     }
     return {
       format: 'v2.1',
       name: match.name || 'Match',
-      homeName: t.home.name || 'HOME',
-      awayName: t.away.name || 'AWAY',
-      homeLogo: logoOf(t.home),
-      awayLogo: logoOf(t.away),
+      homeName: teams.home.name || 'HOME',
+      awayName: teams.away.name || 'AWAY',
+      homeLogo: logoOf(teams.home),
+      awayLogo: logoOf(teams.away),
       currentSet: current,
       liveSet: liveSet,
       availableSets: availableSets,
@@ -362,7 +365,7 @@
     ((m.team || {}).roster || []).forEach(function (p) {
       roster[String(p.number)] = {
         number: p.number,
-        name: p.name || 'Joueur ' + p.number,
+        name: p.name || t('spectator.playerN', { n: p.number }),
         role: role(p.position || p.role),
       };
     });
