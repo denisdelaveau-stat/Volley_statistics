@@ -159,13 +159,13 @@
     <main id="coachContent"></main>
   </div>
 </div>
-<section class="capture" id="capturePanel" aria-label="Live action capture">
+<section class="capture" id="capturePanel" aria-label="Saisie des actions en direct" data-i18n-attr="aria-label:capture.panelLabel">
   <div class="capture-head"><h2 id="captureTitle" hidden>Live input</h2><div class="score-line"><div class="score-live board tie" id="liveScore" role="status" aria-live="polite"><span class="set-badge set-badge-a" aria-label="Sets won by left team">0</span><span class="score-side side-a"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box">0</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by right team">0</span></div></div><div class="sets-line" id="setsLine" hidden></div></div>
   <div class="set-over" id="setOver" hidden><h3 id="setOverTitle"></h3><p id="setOverText"></p><button type="button" id="nextSetBtn">START SET 2 →</button></div>
   <div class="steps"></div>
   <div class="capture-status" id="captureStatus" aria-live="polite"></div>
-  <button type="button" id="historyToggle" class="stats-toggle history-toggle" aria-expanded="false" aria-controls="historyPanel">HISTORY <span id="historyArrow">▼</span></button>
-  <div id="historyPanel" class="history-panel" hidden><div class="history-wrap"><table class="history"><thead><tr><th>#</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div></div>
+  <button type="button" id="historyToggle" class="stats-toggle history-toggle" aria-expanded="false" aria-controls="historyPanel"><span data-i18n="capture.history">HISTORIQUE</span> <span id="historyArrow">▼</span></button>
+  <div id="historyPanel" class="history-panel" hidden><div class="history-wrap"><table class="history"><thead><tr><th>#</th><th data-i18n="capture.colPlayer">Joueur</th><th data-i18n="capture.colAction">Action</th><th data-i18n="capture.colResult">Résultat</th><th data-i18n="capture.colScore">Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div></div>
 </section>
 <button type="button" id="statsToggle" class="stats-toggle" aria-expanded="false" aria-controls="statsPanel" hidden aria-hidden="true" tabindex="-1">STATISTICS <span id="statsArrow">▼</span></button>
 <div id="statsPanel" class="stats-panel" hidden aria-hidden="true">

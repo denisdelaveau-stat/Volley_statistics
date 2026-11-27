@@ -34,7 +34,7 @@ def test_delete_home_point_restores_empty_score_and_history(browser):
     assert _score(page) == ["1", "0"]
     _delete_last(page)
     assert events(page) == [] and _score(page) == ["0", "0"]
-    assert page.locator("#captureHistory .history-empty").inner_text() == "No action recorded."
+    assert page.locator("#captureHistory .history-empty").inner_text() == "Aucune action enregistrée."
     assert page.locator("[data-delete-last]").count() == 0
     assert not errors
     page.close()

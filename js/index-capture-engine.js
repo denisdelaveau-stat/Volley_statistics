@@ -29,7 +29,10 @@
     runtimeContext: null,
   };
   if (m) {
-    document.getElementById('captureTitle').textContent =
-      m.team.name + ' vs ' + m.opponent.name + ' · Set ' + m.currentSet;
+    document.getElementById('captureTitle').textContent = window.VolleyI18n.t('capture.title', {
+      team: m.team.name,
+      opponent: m.opponent.name,
+      set: m.currentSet,
+    });
   }
 })();
