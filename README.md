@@ -1,15 +1,6 @@
 # VolleyLive v1.28.0
 
-Offline-first volleyball capture, coach, spectator, library and reporting application.
-
-## v1.28.0 highlights
-
-- FOCUS, SPEED+ and FLOW can be switched directly during live capture.
-- Mode switching preserves the match, score, event history, selected author and selected action.
-- Runtime mode selection is intentionally absent from SETTINGS.
-- All modes use the same fixed action grid and immediate result commit.
-- Canonical runtime fields are added without breaking the historical event schema.
-- Opponent A, atomic Undo, double-tap protection, role preferences, haptics and responsive layouts are covered.
+Offline-first volleyball capture, coach, spectator, library and reporting application. It is a progressive web app made of classic browser scripts: there is no build step.
 
 ## Run locally
 
@@ -17,52 +8,52 @@ Offline-first volleyball capture, coach, spectator, library and reporting applic
 python3 serve_local.py
 ```
 
-## Validate
+## Structure
+
+- `index.html`: Home, setup, live capture, Match Hub and Match Library, Coach View. `spectator.html`: Spectator View.
+- `js/`: application modules (shared helpers and domain, capture, charts, Coach and Spectator views). Root `*.js` files are page controllers.
+- `statistics/`: shared data adapter (validation and conversions) and reference fixtures.
+- `docs/ARCHITECTURE.md`: module map, load order, shared contracts, storage keys, and the rotation, libero (FIVB Rule 19) and substitution (FIVB Rule 15) rules. Start there.
+- `tests/`: Playwright acceptance suite and approved gate. `tests/unit/` holds the `node:test` unit tests of the pure modules.
+- `tools/`: release version bump and source manifest.
+- `docs/archive/`: release history and superseded specifications. `TO_DO/`: requirements not implemented yet.
+
+## Develop and validate
+
+JavaScript tooling (Node.js 20 or later):
+
+```bash
+npm ci
+npm run lint          # ESLint, no warning allowed
+npm run format        # Prettier (JavaScript only; HTML and CSS are hand-formatted)
+npm run format:check
+npm run test:unit     # node:test unit tests (tests/unit)
+```
+
+Acceptance gate (Python 3 with `pytest`, `playwright` (Chromium), `numpy`, `pillow`, `python-docx` and `jsonschema`):
 
 ```bash
 bash tests/run_v1_28_approved.sh
-node --check runtime-input.js
-node --check match-hub.js
-node --check spectator.js
-node --check statistics/adapter.js
-node --check coach.js
-node --check sw.js
 ```
 
-Requirements: Python 3 with `pytest`, `playwright` (Chromium), `numpy`, `pillow`, `python-docx` and `jsonschema`. Set `CHROMIUM_PATH` to use a specific Chromium binary; otherwise Playwright's bundled Chromium is used. The same gate runs on every push via `.github/workflows/tests.yml`.
+CI (`.github/workflows/tests.yml`) runs the syntax check, ESLint, Prettier, the unit tests and the acceptance gate on every pull request and every push to `main`. Run `npm run format` before committing JavaScript changes.
 
-Visual baselines in `tests/visual_baselines/` were captured with Linux Chromium; pixel comparisons can exceed their thresholds on other platforms because of font rasterisation.
+Set `CHROMIUM_PATH` to use a specific Chromium binary; otherwise Playwright's bundled Chromium is used. Visual baselines in `tests/visual_baselines/` were captured with Linux Chromium. On other platforms, six pixel comparisons can exceed their thresholds because of font rendering; CI on Linux is the reference.
 
-## Bump the version
+## Rules for contributors
+
+- Every non-constant value inserted with `innerHTML` goes through `VolleyDom.esc()`, or use `textContent` (`tests/test_html_escaping.py`).
+- Storage keys and shared role labels come from `VolleyDomain`. Read stored JSON with `VolleyDomain.readStored()`, which reports corrupted values instead of hiding them.
+- Rotation, libero and substitution rules live only in `js/index-rotation.js` and `js/index-substitution-rules.js`, with their unit tests.
+- Each new `js/` or `css/` file must be added to `ASSETS` in `sw.js`, or offline use breaks.
+
+## Release
 
 ```bash
-python tools/bump_version.py 1.29.0
-```
-
-This updates `VERSION`, the service-worker cache name, the Home version label and this README. Tests read `VERSION`.
-
-## Regenerate the source manifest
-
-```bash
+python tools/bump_version.py 1.29.0   # VERSION, service-worker cache, Home version label, this README
 git add -A
-python tools/generate_manifest.py          # writes SOURCE_MANIFEST_v<VERSION>.txt
-python tools/generate_manifest.py --check  # fails if the manifest is stale
+python tools/generate_manifest.py     # writes SOURCE_MANIFEST_v<VERSION>.txt (hashes from the git index)
+python tools/generate_manifest.py --check
 ```
 
-Hashes are computed from the git index, so they do not depend on local line endings.
-
-## Repository layout
-
-- Application runtime files are at the repository root, plus `statistics/` (shared adapter and fixtures) and `icons/`.
-- `docs/` holds the specifications. `docs/ARCHITECTURE.md` maps every interface to its specification.
-- `tests/` holds the acceptance suite, visual baselines and the approved release gate.
-- `docs/archive/` keeps historical release notes, implementation reports, manifests and test results.
-
-## Current release documents
-
-- `RELEASE_NOTES_v1.28.0.md`
-- `IMPLEMENTATION_REPORT_v1.28.0.md`
-- `COPY_INSTRUCTIONS_v1.28.0.md`
-- `SOURCE_MANIFEST_v1.28.0.txt`
-- `docs/VISUAL_VALIDATION_v1.28.0.md`
-- `tests/TEST_RESULTS_v1.28.0.txt`
+Release documents of the current version: `RELEASE_NOTES.md`, `COPY_INSTRUCTIONS.md`, `CHANGELOG.md`, `SOURCE_MANIFEST_v1.28.0.txt`. Earlier versions are in `docs/archive/release-history/`.

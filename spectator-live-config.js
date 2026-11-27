@@ -1,4 +1,4 @@
-/* VolleyLive spectator Live configuration v1.20.0. Match values never belong in this file. */
+/* VolleyLive spectator Live configuration. Match values never belong in this file. */
 (function (root) {
   'use strict';
   root.VolleySpectatorConfig = {

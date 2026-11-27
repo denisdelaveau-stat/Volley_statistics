@@ -88,18 +88,10 @@
     });
   }
   function buildMatchFile() {
-    var m = null,
-      e = [],
-      d = [];
-    try {
-      m = JSON.parse(localStorage.getItem(KM) || 'null');
-    } catch (x) {}
-    try {
-      e = JSON.parse(localStorage.getItem(KE) || '[]');
-    } catch (x) {}
-    try {
-      d = JSON.parse(localStorage.getItem(KD) || '[]');
-    } catch (x) {}
+    var read = window.VolleyDomain.readStored,
+      m = read(KM, null),
+      e = read(KE, []),
+      d = read(KD, []);
     var p = d.length ? d[d.length - 1] : { a: 0, b: 0 };
     return {
       format: 'volley-live-capture',
@@ -122,7 +114,9 @@
         navigator.share({ files: [file], title: name }).catch(function () {});
         return name;
       }
-    } catch (x) {}
+    } catch (x) {
+      // Web Share unavailable or refused: fall back to the download below.
+    }
     var u = URL.createObjectURL(blob),
       a = document.createElement('a');
     a.href = u;
@@ -142,18 +136,10 @@
       $('fileStatus').textContent = 'Saved file: ' + n;
     });
   function updateHome() {
-    var ev = [],
-      dt = [],
-      match = null;
-    try {
-      ev = JSON.parse(localStorage.getItem(KE) || '[]');
-    } catch (e) {}
-    try {
-      dt = JSON.parse(localStorage.getItem(KD) || '[]');
-    } catch (e) {}
-    try {
-      match = JSON.parse(localStorage.getItem(KM) || 'null');
-    } catch (e) {}
+    var read = window.VolleyDomain.readStored,
+      ev = read(KE, []),
+      dt = read(KD, []),
+      match = read(KM, null);
     var c = $('homeContinue'),
       info = $('homeContinueInfo');
     c.disabled = !match;
@@ -244,9 +230,6 @@
     ROLE_POS = { setter: 'setter', oh1: 'oh', oh2: 'oh', mb1: 'mb', mb2: 'mb', opp: 'opp', libero: 'libero' },
     ROLE_LABEL = { setter: 'SETTER', oh1: 'OH 1', mb1: 'MB 1', opp: 'OPP', oh2: 'OH 2', mb2: 'MB 2', libero: 'LIBÉRO' };
   var COURT = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
-  function selectedTeam() {
-    return libGet().team[S.teamKey];
-  }
   function loadSetupTeam(key) {
     var d = libGet().team[key];
     S.teamKey = key;
@@ -455,15 +438,15 @@
     if (S.step === 1) {
       $('suTitle').textContent = 'SELECT TEAM';
       $('suSub').textContent = 'Confirme les joueurs présents et active le focus.';
-      var err = rosterError(),
-        h =
-          '<div class="su-card"><div class="roster-toolbar"><label class="field-label" for="rosterSort">Trier par</label><select id="rosterSort" class="su-select"><option value="number"' +
-          (S.sort === 'number' ? ' selected' : '') +
-          '>Numéro de maillot</option><option value="position"' +
-          (S.sort === 'position' ? ' selected' : '') +
-          '>Poste</option><option value="name"' +
-          (S.sort === 'name' ? ' selected' : '') +
-          '>Nom</option></select></div><div class="roster-court"><div class="roster-grid">';
+      var err = rosterError();
+      h =
+        '<div class="su-card"><div class="roster-toolbar"><label class="field-label" for="rosterSort">Trier par</label><select id="rosterSort" class="su-select"><option value="number"' +
+        (S.sort === 'number' ? ' selected' : '') +
+        '>Numéro de maillot</option><option value="position"' +
+        (S.sort === 'position' ? ' selected' : '') +
+        '>Poste</option><option value="name"' +
+        (S.sort === 'name' ? ' selected' : '') +
+        '>Nom</option></select></div><div class="roster-court"><div class="roster-grid">';
       sortedRoster().forEach(function (r) {
         h += rosterCard(r);
       });
@@ -478,9 +461,9 @@
     $('suSub').textContent = 'Sélectionne les joueurs de la rotation puis le premier rôle du match.';
     clearInvalidAssignments();
     var rr = rotation(),
-      rotationNumber = +S.setterZone.slice(1),
-      h =
-        '<section class="rotation-setup"><div class="setup-rotation-tabs" role="tablist" aria-label="Position initiale du passeur">';
+      rotationNumber = +S.setterZone.slice(1);
+    h =
+      '<section class="rotation-setup"><div class="setup-rotation-tabs" role="tablist" aria-label="Position initiale du passeur">';
     for (var z = 1; z <= 6; z++)
       h +=
         '<button type="button" data-setter-zone="p' +

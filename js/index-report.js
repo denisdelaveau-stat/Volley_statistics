@@ -172,7 +172,6 @@
     h +=
       '<h2>Action log</h2><div class="tw"><table><tr><th>#</th><th>Set</th><th>Time</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr>';
     EVENTS.forEach(function (x) {
-      var r = x.player === 'A' ? null : VSt.info(MATCH, x.player);
       h +=
         '<tr><td>' +
         x.id +

@@ -1,4 +1,4 @@
-/* Volley Live Coach UI v1.13.0 — LIVE COURT, PLAYER FOCUS and shared pastel role palette */
+/* VolleyLive Coach View controller: render, open/close, event wiring and the public window.VolleyCoach API. Views live in js/coach-*.js. */
 (function () {
   'use strict';
   var P = window.VolleyCoachParts;

@@ -59,7 +59,6 @@
       if (!(c.id in on)) on[c.id] = true;
     });
     var W = 1200,
-      H = 724,
       L = 60,
       R = 24,
       T = 20;
@@ -551,8 +550,8 @@
           var v = i < 0 ? 0 : series[k][i];
           (groups[v] = groups[v] || []).push(k);
         });
-        for (var v in groups) {
-          var g = groups[v];
+        for (var value in groups) {
+          var g = groups[value];
           g.forEach(function (k, j) {
             off[k][i + 1] = (j - (g.length - 1) / 2) * DG;
           });

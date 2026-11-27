@@ -1,4 +1,4 @@
-/* VolleyLive spectator view v1.26.1 — spectator Timeline geometry aligned to the reference captures. */
+/* VolleyLive Spectator View controller: render, tabs, storage sync and the public window.VolleySpectator API. Views live in js/spectator-*.js. */
 (function () {
   'use strict';
 
