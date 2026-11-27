@@ -55,8 +55,6 @@ French is the default language; English is chosen in Settings (page reloaded). H
 
 ### Points to verify later
 
-- Coach View back button shows "‹← ACCUEIL" (two arrows, in both languages): the text already has "←" and the CSS seems to add "‹". Cosmetic, older than the translation.
-- The back button "‹ SETUP" / "‹ PRÉPARATION" wraps on 390 px phones (older than the translation).
 
 - Point 4 (docs) is up to date for these splits in `docs/ARCHITECTURE.md`.
 - Public globals (`VolleySets`, `VolleyStats`, `VolleyRotation`, `VolleySpectator`, `VolleyCoach`) are unchanged.
