@@ -1,4 +1,5 @@
 /* VolleyLive rotation engine (pure functions): window.VolleyRotation.
+   Spec: docs/specs/DOM-ROTATION.md, docs/specs/DOM-LIBERO.md.
    Single source of the rotation rules for the capture screen and the Coach View.
    Rotation: clockwise P2>P1>P6>P5>P4>P3>P2, only when our team wins a rally while the opponent was serving
    (side-out).

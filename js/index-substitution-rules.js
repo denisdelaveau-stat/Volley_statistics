@@ -1,4 +1,5 @@
 /* VolleyLive substitution rules (pure functions): window.VolleySubstitutions.
+   Spec: docs/specs/DOM-SUBS.md, docs/specs/DOM-LIBERO.md (libero changes).
    FIVB Official Volleyball Rules 2025-2028, Rule 15:
    - 15.1    at most six (regular) substitutions per team and per set;
    - 15.5.1  the Libero (and the player it replaces) is never part of a regular substitution;

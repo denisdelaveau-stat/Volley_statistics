@@ -6,7 +6,7 @@
 |---|---|
 | `index.html` | Application shell markup: Home, workspace navigation, New Match wizard, live capture, Match Hub and Match Library markup, Coach View container. Loads the modules below. Exposes shared shell helpers as `window.VolleyShell` |
 | `js/shared-dom.js` | Shared DOM helpers loaded first by `index.html` and `spectator.html`: `window.VolleyDom.esc()`. Rule: every non-constant value inserted with `innerHTML` / `insertAdjacentHTML` goes through `esc()` (or use `textContent`). Enforced by `tests/shared/test_html_escaping.py` |
-| `js/shared-domain.js` | Shared domain constants loaded right after `shared-dom.js`: `window.VolleyDomain.STORAGE` (every localStorage / sessionStorage key), `ROLE_CODES` / `ROLE_NAMES` (capture role labels) `court` (`POS`, `NEXT`, `LIBERO_ZONES`, `rotate()`, `zoneOf()`) and `lineup` (`ROTATION_ROLES`, `rotationFromRoles()`, `forSet()`: the starting line-up of a set, see "Starting line-up per set"). Frozen objects. `readStored(key, fallback)` reads stored JSON and reports unreadable values in the console. Rule: never write a storage key or one of these role maps as a literal elsewhere. `statistics/adapter.js` keeps its own copies because it also runs standalone in Node |
+| `js/shared-domain.js` | Shared domain constants loaded right after `shared-dom.js`: `window.VolleyDomain.STORAGE` (every localStorage / sessionStorage key), `ROLE_CODES` / `ROLE_NAMES` (capture role labels) `court` (`POS`, `NEXT`, `LIBERO_ZONES`, `rotate()`, `zoneOf()`) and `lineup` (`ROTATION_ROLES`, `rotationFromRoles()`, `forSet()`: the starting line-up of a set, see `docs/specs/DOM-LINEUP.md`). Frozen objects. `readStored(key, fallback)` reads stored JSON and reports unreadable values in the console. Rule: never write a storage key or one of these role maps as a literal elsewhere. `statistics/adapter.js` keeps its own copies because it also runs standalone in Node |
 | `js/i18n/fr.js`, `js/i18n/en.js`, `js/shared-i18n.js` | Translations (`window.VolleyI18n`). French is the default language; English is chosen in Settings (stored under `VolleyDomain.STORAGE.language`, page reloaded). Code uses `VolleyI18n.t('key', params)`; static HTML uses `data-i18n="key"` (text) and `data-i18n-attr="aria-label:key"`, translated by `VolleyI18n.apply()`, which each page calls once its markup is parsed and before its app scripts render. `statistics/adapter.js` returns the key instead of the text outside the browser (Node unit tests). `tests/unit/i18n.test.js` checks that both dictionaries have the same keys and placeholders, that every key used in the code exists and that no key is orphaned |
 | `css/index-*.css` | Shell styling extracted from `index.html`: theme, capture layout, focus mode, result grammar |
 | `js/index-*.js` | Capture engine extracted from `index.html`, loaded in this order: `index-match-rules.js` (pure set and match rules and attacker statistics: `window.VolleySets`, `window.VolleyStats`), `index-rotation.js` (pure rotation, libero and substitution replay: `window.VolleyRotation`; the single source of the rotation rules, also used by the Coach View through `trace()` and `replay()`), `index-capture-engine.js` (capture bootstrap: loads the active match as `window.VOLLEY_MATCH`, capture title, serving team on the score board via `window.updateScoreService`), `index-report.js` (match report builder: `window.VolleyReport`), `index-capture-tools.js` (capture screen controller: history panel, action commit, persistence, history, sets, undo; it also keeps the chart data `volleyCapture.chartData.v1`, one point per scoring rally of the current set, saved with the match and read by the Match Hub and `statistics/adapter.js`; no chart is drawn on the capture screen, statistics are in the Coach and Spectator views), `index-navigation-new-match.js` (shared shell helpers and the New Match wizard), `index-pwa.js` (offline cache and install hint) |
@@ -82,41 +82,12 @@ The capture scripts share one documented object instead of ad-hoc globals. It is
 
 `window.VolleyShell.saveMatchJson()` (from `index-navigation-new-match.js`) saves the active match as JSON; the Match Hub uses it.
 
-## Starting line-up per set
+## Domain rules
 
-FIVB 7.3.2: the coach hands in a line-up sheet before each set, so the starting players and the rotation order may change. Set 1 is `match.startingLineup` (roles: `setter`, `oh1`, `mb1`, `opposite`, `oh2`, `mb2`, `libero`) and `match.startingRotation` (`p1`..`p6`), written by the New Match wizard. A later set has `match.setLineups[n] = {startingLineup, startingRotation}`. `VolleyDomain.lineup.forSet(match, n)` returns the line-up of set `n`; a set without its own line-up keeps the line-up of the previous set, so matches recorded before per-set line-ups replay unchanged. `statistics/adapter.js` has the same rule (`lineupForSetV1`). The rotation engine, the substitution rules (starters of the set), the Coach View (setter, rotations) and the Spectator matrix use it.
-
-When a set ends, « DÉMARRER LE SET N » opens the set line-up sheet (`js/index-set-lineup.js`, `VolleySetLineup`), filled with the previous set's line-up: setter starting zone and one player per role; the rotation is derived as in the wizard (`rotationFromRoles`: setter, OH1, MB1, opposite, OH2, MB2 from the setter's zone). Six different present players, no libero (19.1); the acting libero is chosen among the designated liberos. Enforced by `tests/unit/set-lineup.test.js`, `tests/unit/court-consistency.test.js` and `tests/capture/test_set_lineup.py`.
-
-## Rotation and libero rules
-
-Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the capture screen and the Coach View; `statistics/adapter.js` applies the same rules for the Spectator matrix (it must also run standalone in Node).
-
-- Rotation: clockwise P2 → P1 → P6 → P5 → P4 → P3, only on a side-out (our team wins a rally the opponent served).
-- Libero / middle-blocker permutation, FIVB Official Volleyball Rules 2025-2028, Rule 19:
-  - the Libero replaces a back-row player (19.3.1.1): here the middle blocker, the usual tactical choice;
-  - back row only (19.3.1.2): P6 or P5, or P1 while our team receives, because the Libero cannot serve (19.3.1.3);
-  - one Libero on court (19.1.3);
-  - at least one completed rally between two Libero replacements, none during a rally (19.3.2.1, 19.3.2.4);
-  - the Libero can only be replaced by the regular player it replaced (19.3.2.2).
-- `trace()` applies the Libero rules rally after rally (`liberoFor`, the player the Libero replaces). Without that history (a theoretical rotation in the Coach View Rotations tab, or the explicit v2 context), the first middle blocker in an allowed zone is replaced.
-- Each set starts from its own line-up (`VolleyDomain.lineup.forSet`). Middle blockers come from the starting line-up of the set (`mb1`, `mb2`) and follow substitutions. When the line-up does not name them (v2 documents), they are the roster players with position MB.
-- Two Liberos (19.1.1): the designated Liberos are the Libero of the line-ups and the roster players registered as Libero. Each set line-up names its acting Libero (or none). Replacing the acting Libero by the other one (« ⇄ Remplacement » sheet) is a Libero replacement, not a substitution (19.3.2): never during a rally, and only with a completed rally since the previous Libero replacement, a Libero coming in or going out at this break included (19.3.2.1; `VolleySubstitutions.liberoSwap()`). It is stored as a `match.subs` entry with `libero: true`; `trace()` and the adapter switch the acting Libero, every `trace()` step records it (`lib`).
-- Libero unable to play (19.4: injury, illness, expulsion), « Libéro indisponible » in the same sheet, between rallies: the other Libero takes over; without one, the coach re-designates as Libero, for the rest of the match, a player who is not on court and is not the player the Libero replaced (`VolleySubstitutions.liberoUnable()`). Stored as a Libero entry with `unable: true` (and `redesignated: true`). The Libero declared unable cannot play again in the match (`unableLiberos()`): not offered as a swap nor in the next set line-ups; a re-designated player counts as a Libero (excluded from substitutions). Enforced by `tests/unit/libero-swap.test.js`, `tests/unit/libero-redesignation.test.js`, `tests/capture/test_libero_swap.py` and `tests/capture/test_libero_redesignation.py`.
-- Enforced by `tests/unit/rotation.test.js`, `tests/unit/libero-fivb.test.js` (property test over simulated sets, every starting rotation, middle blockers opposite or adjacent) and `tests/unit/court-consistency.test.js` (engine and adapter agree at every event).
-
-## Substitution rules
-
-`js/index-substitution-rules.js` (`VolleySubstitutions`, pure) checks every substitution against the FIVB Official Volleyball Rules 2025-2028, Rule 15. The capture screen opens it from the « ⇄ Remplacement » button of `runtime-input.js`:
-
-- at most six regular substitutions per set (15.1);
-- the Libero is never part of a substitution (15.5.1); a Libero replacement (`libero: true`, see "Rotation and libero rules") is not counted;
-- a starting player leaves once per set and comes back once, only in place of his/her substitute (15.6.1);
-- a substitute enters once per set and is only replaced by the starting player he/she replaced (15.6.2);
-- an exceptional substitution (injury, illness) is offered only when no regular one is possible. It is recorded with `exceptional: true` and does not count in the six. The replaced player cannot come back in the match (15.7);
-- only registered, present players (15.9.1); no substitution during a rally (15.11.1.1).
-
-A substitution is stored as a `match.subs` entry (`set`, `at` = number of events of the set before it, `out`, `in`, `eventId`) and a `SUBSTITUTION` event, through `VLCLogSubstitution`. Undo removes both. Starting players are the starting rotation of the set (`VolleyDomain.lineup.forSet`). Every libero designated in a set line-up is excluded from substitutions. Enforced by `tests/unit/substitution-rules.test.js` and `tests/capture/test_substitutions.py`.
+The volleyball rules are specified in `docs/specs/` (one specification per rule set, numbered requirements traced to
+the tests): DOM-MATCH (sets, scoring, end of match), DOM-LINEUP (starting line-up per set), DOM-ROTATION (rotation and
+service), DOM-LIBERO (liberos), DOM-SUBS (substitutions), DOM-STATS (indicators). Index and conventions:
+`docs/specs/README.md`.
 
 ## Dependency chain
 

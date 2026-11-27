@@ -13,7 +13,8 @@ python3 serve_local.py
 - `index.html`: Home, setup, live capture, Match Hub and Match Library, Coach View. `spectator.html`: Spectator View.
 - `js/`: application modules (shared helpers and domain, capture, charts, Coach and Spectator views). Root `*.js` files are page controllers.
 - `statistics/`: shared data adapter (validation and conversions) and reference fixtures.
-- `docs/ARCHITECTURE.md`: module map, load order, shared contracts, storage keys, and the rotation, libero (FIVB Rule 19) and substitution (FIVB Rule 15) rules. Start there.
+- `docs/ARCHITECTURE.md`: module map, load order, shared contracts and storage keys. Start there.
+- `docs/specs/`: the specifications, one per interface, feature or rule set (FIVB rules: DOM-MATCH, DOM-LINEUP, DOM-ROTATION, DOM-LIBERO, DOM-SUBS), on one template, with numbered requirements traced to the tests; `tests/unit/specs.test.js` checks them. Index and conventions: `docs/specs/README.md`.
 - `tests/`: Playwright acceptance suite and approved gate. `tests/unit/` holds the `node:test` unit tests of the pure modules.
 - `tools/`: release version bump and source manifest.
 - `docs/archive/`: release history and superseded specifications. `TO_DO/`: requirements not implemented yet.
