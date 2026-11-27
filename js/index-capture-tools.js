@@ -1,18 +1,7 @@
-/* VolleyLive capture screen controller: collapsible panels, action input, persistence, history, sets and undo.
-   Charts live in js/index-chart-*.js (window.VolleyCaptureCharts). */
+/* VolleyLive capture screen controller: history panel, action input, persistence, history, sets and undo. */
 (function () {
   // Player names, team names and event fields come from user input or imported files: escape them in HTML.
   var esc = window.VolleyDom.esc;
-  var statsToggle = document.getElementById('statsToggle');
-  var statsPanel = document.getElementById('statsPanel');
-  var statsArrow = document.getElementById('statsArrow');
-  statsToggle.addEventListener('click', function () {
-    var open = statsToggle.getAttribute('aria-expanded') === 'true';
-    open = !open;
-    statsToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    statsPanel.hidden = !open;
-    statsArrow.textContent = open ? '▲' : '▼';
-  });
   var historyToggle = document.getElementById('historyToggle');
   var historyPanel = document.getElementById('historyPanel');
   var historyArrow = document.getElementById('historyArrow');
@@ -25,13 +14,17 @@
   });
   var VC = window.VolleyCapture;
   var i18n = window.VolleyI18n;
-  var Charts = window.VolleyCaptureCharts;
-  var DATA = Charts.DATA,
-    STORAGE_DATA = Charts.STORAGE_DATA,
-    STORAGE_EVENTS = Charts.STORAGE_EVENTS,
-    drawProgression = Charts.drawProgression,
-    updateOriginPies = Charts.updateOriginPies,
-    renderErrorCharts = Charts.renderErrorCharts;
+  // Chart data (volleyCapture.chartData.v1): one point per scoring rally of the current set. Nothing is drawn on this
+  // screen; the data is saved with the match and read by the Match Hub and statistics/adapter.js.
+  var STORAGE_DATA = window.VolleyDomain.STORAGE.captureChartData,
+    STORAGE_EVENTS = window.VolleyDomain.STORAGE.captureEvents,
+    storedData = window.VolleyDomain.readStored(STORAGE_DATA, null),
+    DATA = Array.isArray(storedData)
+      ? storedData.map(function (p) {
+          if (p && p.c === 'A') p.c = 0;
+          return p;
+        })
+      : [];
   // ---- tablet capture, persistence and export ----
   (function captureModule() {
     var EVENTS = [];
@@ -92,27 +85,6 @@
         ? (MATCH && MATCH.team.name) || i18n.t('common.teamA')
         : (MATCH && MATCH.opponent.name) || i18n.t('common.teamB');
     }
-    var attScope = 'set';
-    function renderAttackers() {
-      var g = document.getElementById('attGrid');
-      if (!g || !MATCH) return;
-      var evs =
-        attScope === 'set'
-          ? EVENTS.filter(function (e) {
-              return (e.set || 1) === curSet();
-            })
-          : EVENTS;
-      g.innerHTML = window.VolleyStats.cards(MATCH, evs);
-    }
-    document.querySelectorAll('#attSection [data-scope]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        attScope = b.dataset.scope;
-        document.querySelectorAll('#attSection [data-scope]').forEach(function (x) {
-          x.classList.toggle('on', x === b);
-        });
-        renderAttackers();
-      });
-    });
     VC.buildReport = function () {
       return window.VolleyReport.build(MATCH, EVENTS);
     };
@@ -264,7 +236,6 @@
         tn('team1') + ' ' + sc.a + ' : ' + sc.b + ' ' + tn('team2') + ' · Sets ' + suHead.wonA + ' : ' + suHead.wonB;
       hist.innerHTML = '';
       renderSets();
-      renderAttackers();
       if (!EVENTS.length) {
         var empty = document.createElement('tr');
         empty.className = 'history-empty';
@@ -286,10 +257,7 @@
           ' / ' +
           esc(EVENTS[EVENTS.length - 1].result)
         : esc(i18n.t('capture.ready'));
-      updateOriginPies(EVENTS);
-      renderErrorCharts(EVENTS);
       if (VC.refreshCourt) VC.refreshCourt(EVENTS);
-      drawProgression();
     }
     function persist(msg) {
       localStorage.setItem(STORAGE_DATA, JSON.stringify(DATA));
