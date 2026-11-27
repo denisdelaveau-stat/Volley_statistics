@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1e2a4a">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>Volley Live Capture</title>
-<link rel="stylesheet" href="css/index-theme.css"><link rel="stylesheet" href="coach.css"><link rel="stylesheet" href="match-hub.css"><link rel="stylesheet" href="team-management.css"><link rel="stylesheet" href="runtime-input.css"><script src="js/shared-dom.js"></script><script src="js/shared-domain.js"></script><script src="statistics/adapter.js"></script><script type="text/plain" id="attCss">.att-section{margin:14px 0}
+<link rel="stylesheet" href="css/index-theme.css"><link rel="stylesheet" href="coach.css"><link rel="stylesheet" href="match-hub.css"><link rel="stylesheet" href="team-management.css"><link rel="stylesheet" href="runtime-input.css"><script src="js/shared-dom.js"></script><script src="js/shared-domain.js"></script><script src="js/i18n/fr.js"></script><script src="js/i18n/en.js"></script><script src="js/shared-i18n.js"></script><script src="statistics/adapter.js"></script><script type="text/plain" id="attCss">.att-section{margin:14px 0}
 .att-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .att-head h3{margin:0;font-size:18px}
 .att-scope{display:flex;gap:6px}
@@ -66,9 +66,9 @@
   </div>
 </div>
 <div id="settingsScreen" class="app-overlay" hidden>
-  <div class="screen-head"><h2>Settings</h2><p class="screen-sub">Default match format.</p></div>
+  <div class="screen-head"><h2 data-i18n="settings.title">Réglages</h2><p class="screen-sub" data-i18n="settings.subtitle">Format de match par défaut et langue.</p></div>
   <div class="screen-body" id="settingsBody"></div><div class="su-msg" id="settingsMsg"></div>
-  <div class="screen-actions"><button type="button" class="btn-back" id="settingsBack">← HOME</button><button type="button" class="btn-save" id="settingsSave">SAVE SETTINGS</button></div>
+  <div class="screen-actions"><button type="button" class="btn-back" id="settingsBack" data-i18n="settings.back">← ACCUEIL</button><button type="button" class="btn-save" id="settingsSave" data-i18n="settings.save">ENREGISTRER</button></div>
 </div>
 <div id="homeScreen" role="dialog" aria-labelledby="homeTitle">
   <div class="home-spacer" aria-hidden="true"></div>

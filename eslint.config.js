@@ -8,6 +8,8 @@ const projectGlobals = {
   VolleyCapture: 'readonly',
   VolleyDom: 'readonly',
   VolleyDomain: 'readonly',
+  VolleyI18n: 'readonly',
+  VolleyI18nMessages: 'writable',
   VolleySets: 'readonly',
   VolleyStats: 'readonly',
   VolleyRotation: 'readonly',
