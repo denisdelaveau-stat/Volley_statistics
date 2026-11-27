@@ -44,6 +44,7 @@ Set `CHROMIUM_PATH` to use a specific Chromium binary; otherwise Playwright's bu
 
 - Every non-constant value inserted with `innerHTML` goes through `VolleyDom.esc()`, or use `textContent` (`tests/test_html_escaping.py`).
 - Storage keys and shared role labels come from `VolleyDomain`. Read stored JSON with `VolleyDomain.readStored()`, which reports corrupted values instead of hiding them.
+- User-visible text goes through `VolleyI18n.t()` (or `data-i18n` in HTML), with the French and English texts in `js/i18n/fr.js` and `js/i18n/en.js`. `npm run test:unit` fails if a key is missing in one language.
 - Rotation, libero and substitution rules live only in `js/index-rotation.js` and `js/index-substitution-rules.js`, with their unit tests.
 - Each new `js/` or `css/` file must be added to `ASSETS` in `sw.js`, or offline use breaks.
 

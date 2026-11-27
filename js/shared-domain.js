@@ -24,6 +24,7 @@
     spectatorArchiveName: 'volleySpectator.archiveName.v1',
     spectatorTimelineOrder: 'volleySpectator.timeline.order',
     spectatorTimelineWindow: 'volleySpectator.timeline.window',
+    language: 'volleyLive.language.v1',
   });
 
   // Role labels used by the capture screens (the Coach View has its own French labels).

@@ -6,7 +6,12 @@ const vm = require('node:vm');
 const ROOT = path.resolve(__dirname, '..', '..');
 
 function loadBrowserScripts(...files) {
-  const context = vm.createContext({ console });
+  return loadBrowserScriptsWith({}, ...files);
+}
+
+// Same as loadBrowserScripts, with extra globals (for example a fake document or localStorage).
+function loadBrowserScriptsWith(globals, ...files) {
+  const context = vm.createContext({ console, ...globals });
   context.window = context;
   for (const file of files) {
     const source = fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -26,4 +31,4 @@ function plain(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-module.exports = { loadBrowserScripts, fixture, plain, ROOT };
+module.exports = { loadBrowserScripts, loadBrowserScriptsWith, fixture, plain, ROOT };
