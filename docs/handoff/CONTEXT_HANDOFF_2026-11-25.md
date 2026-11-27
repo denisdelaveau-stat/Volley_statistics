@@ -1,4 +1,4 @@
-# Handoff — VolleyLive refactoring (2026-11-25, updated 2026-11-26)
+# Handoff — VolleyLive refactoring (2026-11-25, updated 2026-11-27)
 
 Purpose: let another machine or another assistant resume the work without the chat history.
 
@@ -31,10 +31,33 @@ Rules and contracts are documented in `docs/ARCHITECTURE.md` (sections "Capture 
 - Starting players are taken from `match.startingRotation` for every set (substitution rules, Rule 15): a different line-up per set needs a data-format change.
 - Second libero and libero re-designation (FIVB 19.1.1, 19.4) are not modelled: one libero per match in the data.
 
-### Remaining audit steps
+### Remaining audit step
 
-- Step 5, hygiene: 16 empty `catch` blocks, mixed French/English UI text without an i18n layer, stale version numbers in file headers, README out of date, duplicate root files (`COPY_INSTRUCTIONS*.md`, `RELEASE_NOTES*.md`), `Font_app_ref.jpg` (1.5 MB, cached offline), `statistics/adapter.js` loaded twice by `index.html`, 8 ESLint warnings.
 - Step 6, later: tests that assert minified CSS prevent CSS formatting; tests organised by feature instead of by version.
+
+### Interface translation FR/EN (2026-11-27, all green in CI)
+
+French is the default language; English is chosen in Settings (page reloaded). How it works: `docs/ARCHITECTURE.md` (i18n row) and the contributor rules of `README.md`.
+
+| Commit | Content |
+|---|---|
+| `a35dd97` | Step 5 hygiene done: no silent errors, strict lint (0 warnings), lighter assets, up-to-date docs |
+| `a3d6a59` | Lot 1: translation layer (`js/shared-i18n.js`, `js/i18n/fr.js`, `js/i18n/en.js`), language choice in Settings, `tests/unit/i18n.test.js`, `tests/test_i18n.py` |
+| `fa04e4b`, `d56a72a`, `c2aa42a` | Lots 2–4: Home, navigation, Team Management, New Match wizard, capture screen, Match Hub, Match Library, reports |
+| `44b3d33` | Intermittent Linux CI failures fixed (see "Known pitfalls" below); static text translated by an explicit `VolleyI18n.apply()` before the app scripts |
+| `b0f8959`, `794e4ad` | Lot 5: Coach View, including LIVE COURT and PLAYER FOCUS |
+| `a9109c2` | Lot 6: Spectator View and the match file messages of `statistics/adapter.js` |
+
+- Test language: `tests/conftest.py` gives each test module the language of its assertions (`UI_LANGUAGE = "en"` at the top of a module, French otherwise; `None` for `tests/test_i18n.py`). French writes nothing; another language is written to localStorage after the first navigation and before each reload. **Never** from `page.add_init_script`: a localStorage access at document start made the data a test writes just before a reload get lost, intermittently, on the Linux CI only (different tests failed on each run).
+- Failing tests are published as CI annotations (`tools/ci_annotate_failures.py`), readable through the public API `/repos/<owner>/<repo>/check-runs/<job id>/annotations` without authentication.
+- Kept as they are in both languages: product names (VolleyLive, LIVE COURT, PLAYER FOCUS), stat codes (PTS, ERR, EFF, SO, BP, KILL...), HOME/AWAY.
+- Hidden capture charts (`js/index-chart-*.js`, attacker cards) are not translated: see the first point below.
+
+### Points to verify later
+
+- **Spectator View labels already in English** (SCORES, TIMELINE, GRAPH, RANKING, Roster Ranking, Highlight/Lowlight/Delta, ranking categories, "Score and Fault Evolution") are the same in both languages. Translating them into French changes the screenshots that the visual-baseline tests compare: the baselines must then be regenerated on Linux (the CI reference), not on Windows.
+- Coach View back button shows "‹← ACCUEIL" (two arrows, in both languages): the text already has "←" and the CSS seems to add "‹". Cosmetic, older than the translation.
+- The back button "‹ SETUP" / "‹ PRÉPARATION" wraps on 390 px phones (older than the translation).
 
 - Point 4 (docs) is up to date for these splits in `docs/ARCHITECTURE.md`.
 - Public globals (`VolleySets`, `VolleyStats`, `VolleyRotation`, `VolleySpectator`, `VolleyCoach`) are unchanged.
@@ -107,6 +130,8 @@ The script lists all 29 test files explicitly. It must be regenerated when test 
 - **Regex block removal** with `re.S` can span more lines than intended. Verify with a `difflib` comparison against `git show HEAD:<file>` before committing.
 - **Global bindings:** `js/*.js` modules are classic scripts sharing `window`. Load order in `index.html` matters (`index-report.js` before `index-capture-tools.js`).
 - **Cache list:** every new `css/` or `js/` file must be added to `ASSETS` in `sw.js`, or offline use breaks.
+- **Tests and localStorage:** never touch localStorage from `page.add_init_script` (it runs at document start on every navigation): on the Linux CI, data written by a test just before `page.reload()` was then lost intermittently. Write test data with `page.evaluate`, then reload.
+- **Translations and rendering order:** a page calls `VolleyI18n.apply()` once its markup is parsed and before its app scripts (`index.html`, `spectator.html`); otherwise the static French/English text would overwrite what the scripts already rendered. Keep French text identical when touching the Spectator View, or its Linux visual baselines change.
 - **Manifest:** run `python tools/generate_manifest.py` after `git add -A`, then commit the manifest. `--check` detects a stale one.
 
 ## 8. Local environment (not in the repository)
