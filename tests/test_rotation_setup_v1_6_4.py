@@ -64,10 +64,10 @@ def test_settings_and_new_match_sequence(browser):
     page.select_option("#suTeamSelect", "Antibes U18")
     page.fill("#suOpp", "Nice")
     assert "Antibes U18_vs_Nice" in page.locator("#suName").input_value()
-    assert page.locator("#suNext").inner_text() == "VALIDE"
+    assert page.locator("#suNext").inner_text() == "VALIDER"
     page.click("#suNext")
 
-    assert page.locator("#suS1").inner_text() == "2 SELECT TEAM"
+    assert page.locator("#suS1").inner_text() == "2 ÉQUIPE"
     assert page.locator("#suS1").get_attribute("class") == "on"
     assert page.locator(".roster-player").count() == 8
     assert page.locator("[data-present]").count() == 8
@@ -79,7 +79,7 @@ def test_settings_and_new_match_sequence(browser):
 
     assert page.locator('[data-setter-zone="p1"]').get_attribute("class") == "active"
     assert page.locator(".rotation-slot").count() == 6
-    assert page.locator(".rotation-slot-role").all_inner_texts() == ["OPP", "MB 1", "OH 1", "OH 2", "MB 2", "SETTER"]
+    assert page.locator(".rotation-slot-role").all_inner_texts() == ["OPP", "MB 1", "OH 1", "OH 2", "MB 2", "PASSEUR"]
     assert page.locator(".rotation-slot.filled").count() == 0
     assert page.locator(".rotation-slot.setter-empty").count() == 1
 
@@ -93,7 +93,7 @@ def test_settings_and_new_match_sequence(browser):
     assert page.locator("#suNext").is_hidden()
     page.click('[data-first="reception"]')
     assert page.locator("#suNext").is_visible()
-    assert page.locator("#suNext").inner_text() == "START MATCH"
+    assert page.locator("#suNext").inner_text() == "DÉMARRER LE MATCH"
     page.click("#suNext")
 
     match = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1'))")

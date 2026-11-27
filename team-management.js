@@ -4,6 +4,7 @@
   if (!shell) return;
   var $ = shell.$,
     esc = shell.esc,
+    t = window.VolleyI18n.t,
     libGet = shell.libGet,
     libPut = shell.libPut,
     show = shell.show,
@@ -33,9 +34,11 @@
     return out || 'T';
   }
   function tmDate(value) {
-    if (!value) return 'Saved team';
+    if (!value) return t('teams.savedTeam');
     var d = new Date(value);
-    return isNaN(d.getTime()) ? 'Saved team' : 'Updated ' + d.toLocaleDateString();
+    return isNaN(d.getTime())
+      ? t('teams.savedTeam')
+      : t('teams.updatedOn', { date: d.toLocaleDateString(window.VolleyI18n.lang()) });
   }
   function renderTeamOverview() {
     var library = libGet(),
@@ -43,10 +46,14 @@
         return a.localeCompare(b);
       }),
       body = $('teamsBody');
-    $('teamCount').textContent = names.length + ' TEAM' + (names.length === 1 ? '' : 'S');
+    $('teamCount').textContent = t(names.length === 1 ? 'teams.countOne' : 'teams.countMany', { count: names.length });
     if (!names.length) {
       body.innerHTML =
-        '<div class="tm-empty"><strong>No registered teams</strong><span>Create a new team or import a CSV roster.</span></div>';
+        '<div class="tm-empty"><strong>' +
+        esc(t('teams.emptyTitle')) +
+        '</strong><span>' +
+        esc(t('teams.emptyHint')) +
+        '</span></div>';
       return;
     }
     body.innerHTML = names
@@ -56,26 +63,24 @@
         return (
           '<div class="tm-team-row" role="button" tabindex="0" data-team-open="' +
           esc(name) +
-          '" aria-label="Edit ' +
-          esc(name) +
+          '" aria-label="' +
+          esc(t('teams.editNamed', { name: name })) +
           '"><span class="tm-team-badge" aria-hidden="true">' +
           esc(tmInitials(name)) +
           '</span><span class="tm-team-copy"><strong>' +
           esc(name) +
           '</strong><small>' +
-          count +
-          ' player' +
-          (count === 1 ? '' : 's') +
+          esc(t(count === 1 ? 'teams.playersOne' : 'teams.playersMany', { count: count })) +
           ' · ' +
           esc(tmDate(d.savedAt)) +
           '</small></span><span class="tm-team-tools"><button type="button" data-team-edit="' +
           esc(name) +
-          '" aria-label="Edit ' +
-          esc(name) +
+          '" aria-label="' +
+          esc(t('teams.editNamed', { name: name })) +
           '">✎</button><button type="button" class="tm-delete" data-team-delete="' +
           esc(name) +
-          '" aria-label="Delete ' +
-          esc(name) +
+          '" aria-label="' +
+          esc(t('teams.deleteNamed', { name: name })) +
           '">×</button></span></div>'
         );
       })
@@ -116,7 +121,11 @@
     }
     if (!rows.length) {
       list.innerHTML =
-        '<div class="tm-empty"><strong>No players yet</strong><span>Enter Numero, Nom and Poste, then select Add player.</span></div>';
+        '<div class="tm-empty"><strong>' +
+        esc(t('teams.noPlayers')) +
+        '</strong><span>' +
+        esc(t('teams.noPlayersHint')) +
+        '</span></div>';
       return;
     }
     list.innerHTML = rows
@@ -128,16 +137,16 @@
           esc(r.number) +
           '</span><span class="tm-player-name"><strong>' +
           esc(r.name) +
-          '</strong><small>Jersey #' +
-          esc(r.number) +
+          '</strong><small>' +
+          esc(t('teams.jersey', { number: r.number })) +
           '</small></span><span class="tm-role-pill ' +
           tmRoleClass(r.pos) +
           '">' +
           esc(PLAB[r.pos] || String(r.pos || '').toUpperCase()) +
           '</span><button type="button" class="tm-remove-player" data-team-remove="' +
           esc(r.number) +
-          '" aria-label="Remove ' +
-          esc(r.name) +
+          '" aria-label="' +
+          esc(t('teams.removeNamed', { name: r.name })) +
           '">×</button></div>'
         );
       })
@@ -166,10 +175,8 @@
     $('teamOverview').hidden = true;
     $('teamEditor').hidden = false;
     $('teamName').value = TS.name;
-    $('teamEditorTitle').textContent = selected ? 'Edit team' : 'New team';
-    $('teamEditorSub').textContent = selected
-      ? 'Update the roster and save your changes.'
-      : 'Name the team, then add its players.';
+    $('teamEditorTitle').textContent = selected ? t('teams.editorEdit') : t('teams.editorNew');
+    $('teamEditorSub').textContent = selected ? t('teams.editorEditHint') : t('teams.editorNewHint');
     $('teamPlayerNumber').value = '';
     $('teamPlayerName').value = '';
     $('teamPlayerPosition').value = '';
@@ -192,17 +199,17 @@
       name = $('teamPlayerName').value.trim(),
       pos = $('teamPlayerPosition').value;
     if (!Number.isInteger(number) || number < 1 || number > 99) {
-      tmMessage('Numero must be a whole number from 1 to 99.', 'error');
+      tmMessage(t('teams.errorNumber'), 'error');
       $('teamPlayerNumber').focus();
       return;
     }
     if (!name) {
-      tmMessage('Enter the player name.', 'error');
+      tmMessage(t('teams.errorName'), 'error');
       $('teamPlayerName').focus();
       return;
     }
     if (!pos) {
-      tmMessage('Choose the player position.', 'error');
+      tmMessage(t('teams.errorPosition'), 'error');
       $('teamPlayerPosition').focus();
       return;
     }
@@ -211,12 +218,12 @@
         return +r.number === number;
       })
     ) {
-      tmMessage('Player numbers must be unique.', 'error');
+      tmMessage(t('teams.errorUnique'), 'error');
       $('teamPlayerNumber').focus();
       return;
     }
     if (TS.rows.length >= 40) {
-      tmMessage('Maximum 40 players.', 'error');
+      tmMessage(t('teams.errorMax'), 'error');
       return;
     }
     TS.rows.push({ number: number, name: name, pos: pos });
@@ -224,36 +231,36 @@
     $('teamPlayerName').value = '';
     $('teamPlayerPosition').value = '';
     renderTeamRoster();
-    tmMessage(name + ' added to the roster.', 'success');
+    tmMessage(t('teams.playerAdded', { name: name }), 'success');
     $('teamPlayerNumber').focus();
   }
   function saveTeam() {
     TS.name = $('teamName').value.trim();
     if (!TS.name) {
-      tmMessage('Enter a team name.', 'error');
+      tmMessage(t('teams.errorTeamName'), 'error');
       $('teamName').focus();
       return;
     }
     if (!TS.rows.length) {
-      tmMessage('Add at least one player.', 'error');
+      tmMessage(t('teams.errorNoPlayer'), 'error');
       return;
     }
     var seen = {};
     for (var i = 0; i < TS.rows.length; i++) {
       var r = TS.rows[i];
       if (seen[r.number]) {
-        tmMessage('Player numbers must be unique.', 'error');
+        tmMessage(t('teams.errorUnique'), 'error');
         return;
       }
       seen[r.number] = 1;
       if (!r.name.trim() || !r.pos) {
-        tmMessage('Every player needs Numero, Nom and Poste.', 'error');
+        tmMessage(t('teams.errorIncomplete'), 'error');
         return;
       }
     }
     var l = libGet(),
       existing = l.team[TS.name];
-    if (existing && TS.selected !== TS.name && !confirm('Replace the registered team "' + TS.name + '"?')) return;
+    if (existing && TS.selected !== TS.name && !confirm(t('teams.confirmReplace', { name: TS.name }))) return;
     var info = {};
     TS.rows.forEach(function (r) {
       info[r.number] = { name: r.name.trim(), pos: r.pos };
@@ -269,7 +276,7 @@
     };
     libPut(l);
     TS.selected = TS.name;
-    tmMessage('Saved: ' + TS.name, 'success');
+    tmMessage(t('teams.saved', { name: TS.name }), 'success');
     setTimeout(showTeamOverview, 450);
   }
   function normalizeCsvHeader(value) {
@@ -336,7 +343,7 @@
           lines = text.split('\n').filter(function (line) {
             return line.trim();
           });
-        if (lines.length < 2) throw new Error('The CSV must contain a header and at least one player.');
+        if (lines.length < 2) throw new Error(t('teams.csvEmpty'));
         var first = lines[0],
           counts = {
             ',': (first.match(/,/g) || []).length,
@@ -353,7 +360,7 @@
         if (ni < 0) ni = headers.indexOf('number');
         if (namei < 0) namei = headers.indexOf('name');
         if (pi < 0) pi = headers.indexOf('position');
-        if (ni < 0 || namei < 0 || pi < 0) throw new Error('Required headers: Numero, Nom, Poste.');
+        if (ni < 0 || namei < 0 || pi < 0) throw new Error(t('teams.csvHeaders'));
         var rows = [],
           seen = {};
         for (var i = 1; i < lines.length; i++) {
@@ -362,26 +369,26 @@
             name = String(cells[namei] || '').trim(),
             pos = normalizeRole(cells[pi]);
           if (!Number.isInteger(number) || number < 1 || number > 99)
-            throw new Error('Line ' + (i + 1) + ': invalid Numero.');
-          if (!name) throw new Error('Line ' + (i + 1) + ': missing Nom.');
-          if (!pos) throw new Error('Line ' + (i + 1) + ': unsupported Poste "' + String(cells[pi] || '') + '".');
-          if (seen[number]) throw new Error('Line ' + (i + 1) + ': duplicate Numero ' + number + '.');
+            throw new Error(t('teams.csvInvalidNumber', { line: i + 1 }));
+          if (!name) throw new Error(t('teams.csvMissingName', { line: i + 1 }));
+          if (!pos) throw new Error(t('teams.csvBadPosition', { line: i + 1, value: String(cells[pi] || '') }));
+          if (seen[number]) throw new Error(t('teams.csvDuplicate', { line: i + 1, number: number }));
           seen[number] = 1;
           rows.push({ number: number, name: name, pos: pos });
         }
-        if (rows.length > 40) throw new Error('Maximum 40 players.');
+        if (rows.length > 40) throw new Error(t('teams.errorMax'));
         var teamName = file.name
           .replace(/\.csv$/i, '')
           .replace(/[_-]+/g, ' ')
           .trim();
         openTeamEditor(teamName, rows);
-        tmMessage(rows.length + ' players imported. Review the roster, then save the team.', 'success');
+        tmMessage(t('teams.csvImported', { count: rows.length }), 'success');
       } catch (error) {
-        alert('CSV import failed: ' + error.message);
+        alert(t('teams.csvFailed', { reason: error.message }));
       }
     };
     reader.onerror = function () {
-      alert('CSV import failed: the file could not be read.');
+      alert(t('teams.csvFailed', { reason: t('teams.csvUnreadable') }));
     };
     reader.readAsText(file);
   }
@@ -425,7 +432,7 @@
     if (del) {
       e.stopPropagation();
       var name = del.dataset.teamDelete;
-      if (confirm('Delete registered team "' + name + '"?')) {
+      if (confirm(t('teams.confirmDelete', { name: name }))) {
         var l = libGet();
         delete l.team[name];
         libPut(l);
@@ -466,7 +473,7 @@
         return +r.number !== number;
       });
       renderTeamRoster();
-      tmMessage('Player removed.', 'info');
+      tmMessage(t('teams.playerRemoved'), 'info');
     }
   });
   window.VolleyTeams = { open: openTeams };

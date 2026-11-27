@@ -35,32 +35,32 @@
 <link rel="stylesheet" href="css/index-focus.css">
 </head><body>
 <div id="setupScreen" class="app-overlay" hidden>
-  <div class="screen-head"><h2 id="suTitle">New match</h2><p class="screen-sub" id="suSub"></p></div>
-  <div class="su-steps" hidden><span id="suS0">1 MATCH</span><span id="suS1">2 SELECT TEAM</span><span id="suS2">3 ROTATION</span></div>
+  <div class="screen-head"><h2 id="suTitle" data-i18n="wizard.title">Nouveau match</h2><p class="screen-sub" id="suSub"></p></div>
+  <div class="su-steps" hidden><span id="suS0" data-i18n="wizard.step1">1 MATCH</span><span id="suS1" data-i18n="wizard.step2">2 ÉQUIPE</span><span id="suS2" data-i18n="wizard.step3">3 ROTATION</span></div>
   <div class="screen-body" id="suBody"></div><div class="su-msg" id="suMsg"></div>
-  <div class="screen-actions"><button type="button" class="btn-back" id="suBack">← BACK</button><button type="button" class="btn-next" id="suNext">NEXT →</button></div>
+  <div class="screen-actions"><button type="button" class="btn-back" id="suBack" data-i18n="common.back">← RETOUR</button><button type="button" class="btn-next" id="suNext" data-i18n="common.next">SUIVANT →</button></div>
 </div>
 <div id="teamsScreen" class="app-overlay team-management-screen" hidden aria-labelledby="teamsTitle">
   <div class="team-management-shell">
-    <header class="tm-topbar"><button type="button" class="tm-back" id="teamsBack" aria-label="Back to Setup and Capture">‹ <span>SETUP</span></button><div class="tm-brand">VolleyLive <b>Insight</b></div><span class="tm-spacer" aria-hidden="true"></span></header>
+    <header class="tm-topbar"><button type="button" class="tm-back" id="teamsBack" aria-label="Retour à Préparation et saisie" data-i18n-attr="aria-label:nav.backToSetup">‹ <span data-i18n="nav.setup">PRÉPARATION</span></button><div class="tm-brand">VolleyLive <b>Insight</b></div><span class="tm-spacer" aria-hidden="true"></span></header>
     <main class="team-management">
-      <header class="tm-heading"><h2 id="teamsTitle">TEAM <span>MANAGEMENT</span></h2><p>Build, organize and reuse your team rosters.</p></header>
-      <section class="tm-overview" id="teamOverview" aria-label="Team library">
-        <button type="button" class="tm-new-card" id="teamNew"><span class="tm-action-icon" aria-hidden="true">＋</span><span><strong>NEW TEAM</strong><small>Create a team and add players</small></span><span class="tm-chevron" aria-hidden="true">›</span></button>
-        <div class="tm-section-head"><h3>REGISTERED TEAMS</h3><span class="tm-count" id="teamCount">0 TEAMS</span></div>
+      <header class="tm-heading"><h2 id="teamsTitle"><span class="tm-title-lead" data-i18n="teams.titleLead">GESTION</span> <span data-i18n="teams.titleAccent">DES ÉQUIPES</span></h2><p data-i18n="teams.subtitle">Créez, organisez et réutilisez vos effectifs.</p></header>
+      <section class="tm-overview" id="teamOverview" aria-label="Bibliothèque d’équipes" data-i18n-attr="aria-label:teams.libraryLabel">
+        <button type="button" class="tm-new-card" id="teamNew"><span class="tm-action-icon" aria-hidden="true">＋</span><span><strong data-i18n="teams.newTeam">NOUVELLE ÉQUIPE</strong><small data-i18n="teams.newTeamHint">Créez une équipe et ajoutez ses joueurs</small></span><span class="tm-chevron" aria-hidden="true">›</span></button>
+        <div class="tm-section-head"><h3 data-i18n="teams.registered">ÉQUIPES ENREGISTRÉES</h3><span class="tm-count" id="teamCount">0 TEAMS</span></div>
         <div class="tm-team-list" id="teamsBody"></div>
-        <div class="tm-section-head"><h3>IMPORT NEW TEAM</h3><span class="tm-count">CSV</span></div>
-        <button type="button" class="tm-import-card" id="teamImport"><span class="tm-import-icon" aria-hidden="true">⇧</span><span><strong>Import new team</strong><small>Numero, Nom, Poste</small></span><span class="tm-chevron" aria-hidden="true">›</span></button>
+        <div class="tm-section-head"><h3 data-i18n="teams.importTitle">IMPORTER UNE ÉQUIPE</h3><span class="tm-count">CSV</span></div>
+        <button type="button" class="tm-import-card" id="teamImport"><span class="tm-import-icon" aria-hidden="true">⇧</span><span><strong data-i18n="teams.import">Importer une équipe</strong><small>Numero, Nom, Poste</small></span><span class="tm-chevron" aria-hidden="true">›</span></button>
         <input type="file" id="teamCsvFile" accept=".csv,text/csv" hidden>
-        <p class="tm-file-note">The first row must contain Numero, Nom and Poste. Imported players are reviewed before the team is saved.</p>
+        <p class="tm-file-note" data-i18n="teams.csvNote">La première ligne doit contenir Numero, Nom et Poste. Les joueurs importés sont vérifiés avant l’enregistrement de l’équipe.</p>
       </section>
       <section class="tm-editor" id="teamEditor" hidden aria-labelledby="teamEditorTitle">
-        <div class="tm-editor-head"><button type="button" id="teamEditorBack" aria-label="Back to registered teams">‹</button><div><h3 id="teamEditorTitle">New team</h3><p id="teamEditorSub">Name the team, then add its players.</p></div></div>
-        <div class="tm-card tm-panel"><label class="tm-label" for="teamName">Team name</label><input class="tm-input" type="text" id="teamName" maxlength="80" autocomplete="off" placeholder="e.g. AS Cannes"><p class="tm-help">This name is shown in match setup and Coach View.</p></div>
-        <div class="tm-card tm-panel"><div class="tm-player-form"><div class="tm-field"><label class="tm-label" for="teamPlayerNumber">Numero</label><input class="tm-input" type="number" id="teamPlayerNumber" min="1" max="99" inputmode="numeric" placeholder="7"></div><div class="tm-field"><label class="tm-label" for="teamPlayerName">Nom</label><input class="tm-input" type="text" id="teamPlayerName" maxlength="80" autocomplete="off" placeholder="Player name"></div><div class="tm-field tm-position-field"><label class="tm-label" for="teamPlayerPosition">Poste</label><select class="tm-select" id="teamPlayerPosition"><option value="">Choose</option><option value="setter">SET</option><option value="oh">OH</option><option value="mb">MB</option><option value="opp">OPP</option><option value="libero">LIB</option></select></div><button type="button" class="tm-add-player" id="teamAdd" aria-label="Add player">＋</button></div><p class="tm-help">Validate Numero, Nom and Poste to add the player to the roster.</p></div>
-        <div class="tm-card tm-panel"><div class="tm-roster-head"><h4>PLAYERS <span id="teamRosterCount">· 0</span></h4><div class="tm-sort" aria-label="Sort players"><button type="button" class="active" data-team-sort="number">NUMBER</button><button type="button" data-team-sort="name">NAME</button><button type="button" data-team-sort="pos">POSITION</button></div></div><div class="tm-roster-list" id="teamRoster"></div></div>
+        <div class="tm-editor-head"><button type="button" id="teamEditorBack" aria-label="Retour aux équipes enregistrées" data-i18n-attr="aria-label:teams.backToList">‹</button><div><h3 id="teamEditorTitle" data-i18n="teams.editorNew">Nouvelle équipe</h3><p id="teamEditorSub" data-i18n="teams.editorNewHint">Nommez l’équipe, puis ajoutez ses joueurs.</p></div></div>
+        <div class="tm-card tm-panel"><label class="tm-label" for="teamName" data-i18n="teams.name">Nom de l’équipe</label><input class="tm-input" type="text" id="teamName" maxlength="80" autocomplete="off" placeholder="ex. AS Cannes" data-i18n-attr="placeholder:teams.namePlaceholder"><p class="tm-help" data-i18n="teams.nameHelp">Ce nom apparaît dans la préparation du match et dans la vue coach.</p></div>
+        <div class="tm-card tm-panel"><div class="tm-player-form"><div class="tm-field"><label class="tm-label" for="teamPlayerNumber" data-i18n="teams.number">Numéro</label><input class="tm-input" type="number" id="teamPlayerNumber" min="1" max="99" inputmode="numeric" placeholder="7"></div><div class="tm-field"><label class="tm-label" for="teamPlayerName" data-i18n="teams.playerName">Nom</label><input class="tm-input" type="text" id="teamPlayerName" maxlength="80" autocomplete="off" placeholder="Nom du joueur" data-i18n-attr="placeholder:teams.playerNamePlaceholder"></div><div class="tm-field tm-position-field"><label class="tm-label" for="teamPlayerPosition" data-i18n="teams.position">Poste</label><select class="tm-select" id="teamPlayerPosition"><option value="" data-i18n="teams.choosePosition">Choisir</option><option value="setter">SET</option><option value="oh">OH</option><option value="mb">MB</option><option value="opp">OPP</option><option value="libero">LIB</option></select></div><button type="button" class="tm-add-player" id="teamAdd" aria-label="Ajouter le joueur" data-i18n-attr="aria-label:teams.addPlayer">＋</button></div><p class="tm-help" data-i18n="teams.addHelp">Renseignez le numéro, le nom et le poste pour ajouter le joueur à l’effectif.</p></div>
+        <div class="tm-card tm-panel"><div class="tm-roster-head"><h4><span data-i18n="teams.players">JOUEURS</span> <span id="teamRosterCount">· 0</span></h4><div class="tm-sort" aria-label="Trier les joueurs" data-i18n-attr="aria-label:teams.sortLabel"><button type="button" class="active" data-team-sort="number" data-i18n="teams.sortNumber">NUMÉRO</button><button type="button" data-team-sort="name" data-i18n="teams.sortName">NOM</button><button type="button" data-team-sort="pos" data-i18n="teams.sortPosition">POSTE</button></div></div><div class="tm-roster-list" id="teamRoster"></div></div>
         <p class="tm-status" id="teamsMsg" role="status" aria-live="polite"></p>
-        <div class="tm-actions"><button type="button" class="tm-cancel" id="teamCancel">CANCEL</button><button type="button" class="tm-save" id="teamsSave">SAVE TEAM</button></div>
+        <div class="tm-actions"><button type="button" class="tm-cancel" id="teamCancel" data-i18n="common.cancelUpper">ANNULER</button><button type="button" class="tm-save" id="teamsSave" data-i18n="teams.save">ENREGISTRER L’ÉQUIPE</button></div>
       </section>
     </main>
   </div>
@@ -72,38 +72,38 @@
 </div>
 <div id="homeScreen" role="dialog" aria-labelledby="homeTitle">
   <div class="home-spacer" aria-hidden="true"></div>
-  <div class="home-brand"><h1 id="homeTitle">VolleyLive <span>Insight</span></h1><p>Capture once. Use everywhere.</p></div>
-  <main class="home-actions home-content home-zones" aria-label="Application sections">
-    <button type="button" class="home-btn home-zone-card home-zone-setup" id="homeSetupCapture"><span class="home-zone-icon" aria-hidden="true">⌁</span><span class="home-zone-copy"><span class="home-zone-kicker">WRITE ACCESS</span><span class="home-main">SETUP &amp; CAPTURE</span><small>Prepare teams and record matches</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
-    <button type="button" class="home-btn home-zone-card home-zone-insights" id="homeInsights"><span class="home-zone-icon" aria-hidden="true">◉</span><span class="home-zone-copy"><span class="home-zone-kicker">READ ONLY</span><span class="home-main">INSIGHTS &amp; VIEWING</span><small>View, analyse and share match data</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
-    <button type="button" class="home-btn home-menu-card home-settings" id="homeSettings"><span class="home-menu-icon" aria-hidden="true">⚙</span><span class="home-copy"><span class="home-main">SETTINGS</span><small>MATCH FORMAT</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+  <div class="home-brand"><h1 id="homeTitle">VolleyLive <span>Insight</span></h1><p data-i18n="home.tagline">Saisir une fois. Utiliser partout.</p></div>
+  <main class="home-actions home-content home-zones" aria-label="Sections de l’application" data-i18n-attr="aria-label:home.sectionsLabel">
+    <button type="button" class="home-btn home-zone-card home-zone-setup" id="homeSetupCapture"><span class="home-zone-icon" aria-hidden="true">⌁</span><span class="home-zone-copy"><span class="home-zone-kicker" data-i18n="nav.writeAccess">ACCÈS EN ÉCRITURE</span><span class="home-main" data-i18n="nav.setupCapture">PRÉPARATION &amp; SAISIE</span><small data-i18n="nav.setupCaptureHint">Préparez les équipes et saisissez les matchs</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-zone-card home-zone-insights" id="homeInsights"><span class="home-zone-icon" aria-hidden="true">◉</span><span class="home-zone-copy"><span class="home-zone-kicker" data-i18n="nav.readOnly">LECTURE SEULE</span><span class="home-main" data-i18n="nav.insights">ANALYSE &amp; CONSULTATION</span><small data-i18n="nav.insightsHint">Consultez, analysez et partagez les données de match</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
+    <button type="button" class="home-btn home-menu-card home-settings" id="homeSettings"><span class="home-menu-icon" aria-hidden="true">⚙</span><span class="home-copy"><span class="home-main" data-i18n="home.settings">RÉGLAGES</span><small data-i18n="home.settingsHint">FORMAT DE MATCH · LANGUE</small></span><span class="home-chevron" aria-hidden="true">›</span></button>
   </main>
-  <div id="homeInstall" hidden>To use it offline on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</div>
+  <div id="homeInstall" hidden><span data-i18n="home.installTap">Pour l’utiliser hors ligne sur iPhone, touchez</span> <b data-i18n="home.installShare">Partager</b><span data-i18n="home.installThen">, puis</span> <b data-i18n="home.installAdd">Sur l’écran d’accueil</b>.</div>
   <div class="home-version" id="appVersion">v1.28.0</div>
 </div>
 
 <div id="setupCaptureScreen" class="app-overlay navigation-screen" hidden aria-labelledby="setupCaptureTitle">
   <div class="navigation-shell">
-    <header class="navigation-topbar"><button type="button" id="setupCaptureBack" aria-label="Back to Home">‹ <span>HOME</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
+    <header class="navigation-topbar"><button type="button" id="setupCaptureBack" aria-label="Retour à l’accueil" data-i18n-attr="aria-label:nav.backHome">‹ <span data-i18n="nav.home">ACCUEIL</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
     <main class="navigation-panel navigation-write">
-      <header class="navigation-heading"><div><span class="navigation-mode">WRITE ACCESS</span><h2 id="setupCaptureTitle">SETUP &amp; CAPTURE</h2><p>Prepare teams and record matches</p></div></header>
-      <button type="button" class="navigation-card" id="setupMatchCapture"><span class="navigation-icon" aria-hidden="true">⌁</span><span><strong>MATCH CAPTURE</strong><small>New match · Continue capture</small></span><b aria-hidden="true">›</b></button>
-      <button type="button" class="navigation-card" id="setupTeamManagement"><span class="navigation-icon" aria-hidden="true">♟</span><span><strong>TEAM MANAGEMENT</strong><small>New team · Registered teams · Import team CSV</small></span><b aria-hidden="true">›</b></button>
-      <aside class="navigation-principle"><strong>OFFICIAL DATA WORKSPACE</strong><span>Score, service, rotation and events can only be changed in Match Capture.</span></aside>
+      <header class="navigation-heading"><div><span class="navigation-mode" data-i18n="nav.writeAccess">ACCÈS EN ÉCRITURE</span><h2 id="setupCaptureTitle" data-i18n="nav.setupCapture">PRÉPARATION &amp; SAISIE</h2><p data-i18n="nav.setupCaptureHint">Préparez les équipes et saisissez les matchs</p></div></header>
+      <button type="button" class="navigation-card" id="setupMatchCapture"><span class="navigation-icon" aria-hidden="true">⌁</span><span><strong data-i18n="nav.matchCapture">SAISIE DE MATCH</strong><small data-i18n="nav.matchCaptureHint">Nouveau match · Reprendre la saisie</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="setupTeamManagement"><span class="navigation-icon" aria-hidden="true">♟</span><span><strong data-i18n="nav.teamManagement">GESTION DES ÉQUIPES</strong><small data-i18n="nav.teamManagementHint">Nouvelle équipe · Équipes enregistrées · Import CSV</small></span><b aria-hidden="true">›</b></button>
+      <aside class="navigation-principle"><strong data-i18n="nav.officialWorkspace">ESPACE DES DONNÉES OFFICIELLES</strong><span data-i18n="nav.officialWorkspaceHint">Le score, le service, la rotation et les événements ne se modifient que dans la saisie de match.</span></aside>
     </main>
   </div>
 </div>
 
 <div id="insightsScreen" class="app-overlay navigation-screen" hidden aria-labelledby="insightsTitle">
   <div class="navigation-shell">
-    <header class="navigation-topbar"><button type="button" id="insightsBack" aria-label="Back to Home">‹ <span>HOME</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
+    <header class="navigation-topbar"><button type="button" id="insightsBack" aria-label="Retour à l’accueil" data-i18n-attr="aria-label:nav.backHome">‹ <span data-i18n="nav.home">ACCUEIL</span></button><div class="navigation-brand">VolleyLive <b>Insight</b></div></header>
     <main class="navigation-panel navigation-read">
-      <header class="navigation-heading"><div><span class="navigation-mode">READ ONLY</span><h2 id="insightsTitle">INSIGHTS &amp; VIEWING</h2><p>View, analyse and share match data</p></div></header>
-      <button type="button" class="navigation-card" id="insightsMatchLibrary" data-library-mode="library"><span class="navigation-icon" aria-hidden="true">▤</span><span><strong>MATCH LIBRARY</strong><small>Active · Finished · Imported · Import match JSON</small></span><b aria-hidden="true">›</b></button>
-      <button type="button" class="navigation-card" id="insightsCoach" data-library-mode="coach"><span class="navigation-icon" aria-hidden="true">◉</span><span><strong>COACH VIEW</strong><small>Live court · Player focus · Team and player analysis</small></span><b aria-hidden="true">›</b></button>
-      <button type="button" class="navigation-card" id="insightsSpectator" data-library-mode="spectator"><span class="navigation-icon" aria-hidden="true">◎</span><span><strong>SPECTATOR VIEW</strong><small>Scores · Timeline · Graph · Ranking</small></span><b aria-hidden="true">›</b></button>
-      <button type="button" class="navigation-card" id="insightsReports" data-library-mode="reports"><span class="navigation-icon" aria-hidden="true">⇩</span><span><strong>MATCH REPORTS</strong><small>HTML report · CSV events · Official JSON</small></span><b aria-hidden="true">›</b></button>
-      <aside class="navigation-principle"><strong>READ-ONLY WORKSPACE</strong><span>No score, service, rotation or event can be changed from these views.</span></aside>
+      <header class="navigation-heading"><div><span class="navigation-mode" data-i18n="nav.readOnly">LECTURE SEULE</span><h2 id="insightsTitle" data-i18n="nav.insights">ANALYSE &amp; CONSULTATION</h2><p data-i18n="nav.insightsHint">Consultez, analysez et partagez les données de match</p></div></header>
+      <button type="button" class="navigation-card" id="insightsMatchLibrary" data-library-mode="library"><span class="navigation-icon" aria-hidden="true">▤</span><span><strong data-i18n="nav.matchLibrary">BIBLIOTHÈQUE DE MATCHS</strong><small data-i18n="nav.matchLibraryHint">En cours · Terminés · Importés · Import JSON</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="insightsCoach" data-library-mode="coach"><span class="navigation-icon" aria-hidden="true">◉</span><span><strong data-i18n="nav.coachView">VUE COACH</strong><small data-i18n="nav.coachViewHint">Terrain en direct · Focus joueur · Analyse équipe et joueurs</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="insightsSpectator" data-library-mode="spectator"><span class="navigation-icon" aria-hidden="true">◎</span><span><strong data-i18n="nav.spectatorView">VUE SPECTATEUR</strong><small data-i18n="nav.spectatorViewHint">Score · Fil du match · Graphique · Classement</small></span><b aria-hidden="true">›</b></button>
+      <button type="button" class="navigation-card" id="insightsReports" data-library-mode="reports"><span class="navigation-icon" aria-hidden="true">⇩</span><span><strong data-i18n="nav.matchReports">RAPPORTS DE MATCH</strong><small data-i18n="nav.matchReportsHint">Rapport HTML · Événements CSV · JSON officiel</small></span><b aria-hidden="true">›</b></button>
+      <aside class="navigation-principle"><strong data-i18n="nav.readOnlyWorkspace">ESPACE EN LECTURE SEULE</strong><span data-i18n="nav.readOnlyWorkspaceHint">Aucun score, service, rotation ou événement ne peut être modifié depuis ces vues.</span></aside>
     </main>
   </div>
 </div>

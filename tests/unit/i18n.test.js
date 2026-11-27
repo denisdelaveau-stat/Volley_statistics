@@ -54,16 +54,21 @@ function sourceFiles() {
   })('');
   return out;
 }
+// keys: keys used directly (t('key'), data-i18n, data-i18n-attr), which must all exist.
+// literals: every 'word.word' string literal of the code, which marks a key as used (for example a key chosen with
+// a ternary: t(n === 1 ? 'teams.countOne' : 'teams.countMany')).
 function usedKeys() {
-  const keys = new Set();
+  const keys = new Set(),
+    literals = new Set();
   for (const file of sourceFiles()) {
     const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
     for (const m of src.matchAll(/\bt\(\s*'([\w.]+)'/g)) keys.add(m[1]);
     for (const m of src.matchAll(/data-i18n="([\w.]+)"/g)) keys.add(m[1]);
     for (const m of src.matchAll(/data-i18n-attr="([^"]+)"/g))
       m[1].split(';').forEach((pair) => keys.add(pair.split(':')[1].trim()));
+    for (const m of src.matchAll(/'([a-z]+\.[A-Za-z0-9.]+)'/g)) literals.add(m[1]);
   }
-  return keys;
+  return { keys, literals };
 }
 
 test('both dictionaries have the same keys, no empty text and the same placeholders', () => {
@@ -80,11 +85,13 @@ test('both dictionaries have the same keys, no empty text and the same placehold
 test('every key used in the code exists, and every key is used', () => {
   const { VolleyI18nMessages: M } = load();
   const defined = new Set(Object.keys(M.fr));
-  const used = usedKeys();
+  const { keys, literals } = usedKeys();
   // A key ending with a dot is a prefix completed at run time (see DYNAMIC_PREFIXES).
-  const missing = [...used].filter((k) => !defined.has(k) && !k.endsWith('.'));
+  const missing = [...keys].filter((k) => !defined.has(k) && !k.endsWith('.'));
   assert.deepEqual(missing, [], 'keys used in the code but missing from the dictionaries');
-  const orphans = [...defined].filter((k) => !used.has(k) && !DYNAMIC_PREFIXES.some((p) => k.startsWith(p)));
+  const orphans = [...defined].filter(
+    (k) => !keys.has(k) && !literals.has(k) && !DYNAMIC_PREFIXES.some((p) => k.startsWith(p))
+  );
   assert.deepEqual(orphans, [], 'keys defined but never used');
 });
 

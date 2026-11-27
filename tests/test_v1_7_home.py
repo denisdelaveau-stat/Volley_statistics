@@ -1,6 +1,8 @@
 """v1.26.0 Home, workspace hierarchy, and responsive navigation acceptance."""
 from helpers import APP_URI, ROOT, base_match, VERSION
 
+UI_LANGUAGE = "en"  # assertions below use the English interface
+
 
 def open_empty(browser, viewport=None):
     page = browser.new_page(viewport=viewport or {"width": 390, "height": 844})

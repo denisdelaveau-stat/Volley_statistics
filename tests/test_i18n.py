@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from helpers import APP_URI
 
+UI_LANGUAGE = None  # this module tests the language choice itself
+
 
 def open_settings(page):
     page.click("#homeSettings")
