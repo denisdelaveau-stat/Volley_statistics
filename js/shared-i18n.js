@@ -3,7 +3,9 @@
      to French, then to the key itself (and reports the missing key once in the console). The result is plain text:
      escape it with VolleyDom.esc() before inserting it with innerHTML.
    - static HTML: data-i18n="key" sets textContent; data-i18n-attr="aria-label:key;title:key" sets attributes.
-     apply(root) translates them; it runs on the whole page when the DOM is ready.
+     apply(root) translates them. A page calls VolleyI18n.apply() once its markup is parsed and before its app
+     scripts render anything (otherwise the static text would overwrite what they render); when it does not, the
+     whole page is translated when the DOM is ready.
    - language: French by default; the choice made in Settings is stored (VolleyDomain.STORAGE.language). */
 (function () {
   'use strict';
@@ -42,8 +44,10 @@
     return true;
   }
 
+  var applied = false;
   function apply(root) {
     var scope = root || document;
+    if (scope === document) applied = true;
     scope.querySelectorAll('[data-i18n]').forEach(function (el) {
       el.textContent = t(el.getAttribute('data-i18n'));
     });
@@ -60,7 +64,7 @@
   document.documentElement.lang = current;
   if (document.readyState === 'loading')
     document.addEventListener('DOMContentLoaded', function () {
-      apply(document);
+      if (!applied) apply(document);
     });
   else apply(document);
 
