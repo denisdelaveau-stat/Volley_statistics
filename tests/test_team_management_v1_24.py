@@ -1,7 +1,7 @@
 """Team Management coverage retained under Setup & Capture in v1.26.0."""
 from pathlib import Path
 
-from helpers import APP_URI, CACHE_NAME
+from helpers import APP_URI, CACHE_NAME, compact_css
 
 UI_LANGUAGE = "en"  # assertions below use the English interface
 
@@ -93,5 +93,5 @@ def test_offline_shell_includes_team_management_styles():
     assert CACHE_NAME in service_worker
     assert "team-management.css" in service_worker
     assert '<link rel="stylesheet" href="team-management.css">' in index
-    assert "--tm-cyan:#12d7f2" in css
+    assert compact_css("--tm-cyan:#12d7f2") in compact_css(css)
     assert ".tm-new-card" in css
