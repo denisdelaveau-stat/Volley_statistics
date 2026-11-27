@@ -17,6 +17,7 @@
     teams = $('teamsScreen'),
     settings = $('settingsScreen');
   var esc = window.VolleyDom.esc;
+  var i18n = window.VolleyI18n;
   function today() {
     var d = new Date();
     return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
@@ -133,7 +134,7 @@
   if (sj)
     sj.addEventListener('click', function () {
       var n = saveJson();
-      $('fileStatus').textContent = 'Saved file: ' + n;
+      $('fileStatus').textContent = i18n.t('common.savedFile', { name: n });
     });
   function updateHome() {
     var read = window.VolleyDomain.readStored,
@@ -144,20 +145,20 @@
       info = $('homeContinueInfo');
     c.disabled = !match;
     if (!match) {
-      info.textContent = 'NO SAVED MATCH';
+      info.textContent = i18n.t('hub.noSavedMatch');
       return;
     }
     var p = dt.length ? dt[dt.length - 1] : { a: 0, b: 0 };
     info.textContent =
       (match.name ? match.name + ' · ' : '') +
-      (match.team.name || 'Team A') +
+      (match.team.name || i18n.t('common.teamA')) +
       ' vs ' +
-      (match.opponent.name || 'Team B') +
-      ' · SET ' +
-      (match.currentSet || 1) +
+      (match.opponent.name || i18n.t('common.teamB')) +
       ' · ' +
-      ev.length +
-      ' EVENTS · ' +
+      i18n.t('common.setN', { set: match.currentSet || 1 }) +
+      ' · ' +
+      i18n.t('common.eventsCount', { count: ev.length }) +
+      ' · ' +
       (p.a || 0) +
       ':' +
       (p.b || 0);
@@ -228,7 +229,15 @@
   };
   var ROLE_KEYS = ['setter', 'oh1', 'mb1', 'opp', 'oh2', 'mb2', 'libero'],
     ROLE_POS = { setter: 'setter', oh1: 'oh', oh2: 'oh', mb1: 'mb', mb2: 'mb', opp: 'opp', libero: 'libero' },
-    ROLE_LABEL = { setter: 'SETTER', oh1: 'OH 1', mb1: 'MB 1', opp: 'OPP', oh2: 'OH 2', mb2: 'MB 2', libero: 'LIBÉRO' };
+    ROLE_LABEL = {
+      setter: i18n.t('wizard.roleSetter'),
+      oh1: 'OH 1',
+      mb1: 'MB 1',
+      opp: 'OPP',
+      oh2: 'OH 2',
+      mb2: 'MB 2',
+      libero: i18n.t('wizard.roleLibero'),
+    };
   var COURT = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
   function loadSetupTeam(key) {
     var d = libGet().team[key];
@@ -272,7 +281,7 @@
     var present = S.roster.filter(function (r) {
       return r.present;
     });
-    if (present.length < 7) return 'Sélectionne au moins 7 joueurs présents.';
+    if (present.length < 7) return i18n.t('wizard.errorMinPlayers');
     var need = { setter: 1, oh: 2, mb: 2, opp: 1, libero: 1 },
       missing = [];
     Object.keys(need).forEach(function (pos) {
@@ -281,20 +290,20 @@
       }).length;
       if (count < need[pos]) missing.push((PLAB[pos] || pos) + ' × ' + need[pos]);
     });
-    return missing.length ? 'Postes manquants : ' + missing.join(', ') + '.' : '';
+    return missing.length ? i18n.t('wizard.errorMissingPositions', { list: missing.join(', ') }) : '';
   }
   function lineupError() {
     var missing = ROLE_KEYS.filter(function (k) {
       return !S.assign[k];
     });
     return missing.length
-      ? 'Sélectionne : ' +
-          missing
+      ? i18n.t('wizard.errorMissingRoles', {
+          list: missing
             .map(function (k) {
               return ROLE_LABEL[k];
             })
-            .join(', ') +
-          '.'
+            .join(', '),
+        })
       : '';
   }
   function rotation() {
@@ -333,12 +342,16 @@
       i +
       '"' +
       (r.present ? ' checked' : '') +
-      '> Présent</label><label><input type="checkbox" data-focus="' +
+      '> ' +
+      esc(i18n.t('wizard.present')) +
+      '</label><label><input type="checkbox" data-focus="' +
       i +
       '"' +
       (r.focus ? ' checked' : '') +
       (r.present ? '' : ' disabled') +
-      '> Focus</label></div></article>'
+      '> ' +
+      esc(i18n.t('wizard.focus')) +
+      '</label></div></article>'
     );
   }
   function rotationSlot(zone, role, n) {
@@ -354,22 +367,26 @@
       '" data-rotation-role="' +
       role +
       '" aria-label="' +
-      (filled ? 'Modifier ' + esc(q.name) : 'Sélectionner ' + ROLE_LABEL[role]) +
+      esc(
+        filled ? i18n.t('wizard.editNamed', { name: q.name }) : i18n.t('wizard.selectRole', { role: ROLE_LABEL[role] })
+      ) +
       '"><span class="rotation-circle">' +
       (filled ? n : '&nbsp;') +
       '</span><span class="rotation-slot-name">' +
       (filled ? esc(q.name) : '&nbsp;') +
       '</span><span class="rotation-slot-role">' +
-      ROLE_LABEL[role] +
+      esc(ROLE_LABEL[role]) +
       '</span></button>'
     );
   }
   function playerPicker(role) {
     var choices = compatible(role),
       h =
-        '<div class="rotation-picker"><div class="rotation-picker-head"><span>Sélectionne ' +
-        ROLE_LABEL[role] +
-        '</span><button type="button" class="rotation-picker-close" data-close-picker aria-label="Fermer">×</button></div><div class="rotation-picker-grid">';
+        '<div class="rotation-picker"><div class="rotation-picker-head"><span>' +
+        esc(i18n.t('wizard.selectRole', { role: ROLE_LABEL[role] })) +
+        '</span><button type="button" class="rotation-picker-close" data-close-picker aria-label="' +
+        esc(i18n.t('common.close')) +
+        '">×</button></div><div class="rotation-picker-grid">';
     choices.forEach(function (r) {
       var inUse = Object.keys(S.assign).some(function (k) {
         return k !== role && S.assign[k] === r.number;
@@ -404,66 +421,92 @@
     msg.textContent = '';
     next.hidden = false;
     if (S.step === 0) {
-      $('suTitle').textContent = 'Sélectionne ton équipe';
-      $('suSub').textContent = 'Prépare le nouveau match.';
+      $('suTitle').textContent = i18n.t('wizard.chooseTeam');
+      $('suSub').textContent = i18n.t('wizard.chooseTeamSub');
       var opts =
-        '<option value="">— sélectionne une équipe —</option>' +
+        '<option value="">' +
+        esc(i18n.t('wizard.chooseTeamOption')) +
+        '</option>' +
         names
           .map(function (n) {
             return '<option value="' + esc(n) + '"' + (S.teamKey === n ? ' selected' : '') + '>' + esc(n) + '</option>';
           })
           .join('');
       var h =
-        '<div class="setup-intro"><div class="su-card"><div class="setup-intro-title">Sélectionne ton équipe</div><select id="suTeamSelect" class="su-select"' +
+        '<div class="setup-intro"><div class="su-card"><div class="setup-intro-title">' +
+        esc(i18n.t('wizard.chooseTeam')) +
+        '</div><select id="suTeamSelect" class="su-select"' +
         (names.length ? '' : ' disabled') +
         '>' +
         opts +
         '</select>' +
         (names.length
           ? ''
-          : '<div class="su-hint">Aucune équipe configurée. Crée d’abord une équipe.</div><button type="button" class="add-player" id="suOpenTeams">OPEN TEAM MANAGEMENT</button>') +
+          : '<div class="su-hint">' +
+            esc(i18n.t('wizard.noTeam')) +
+            '</div><button type="button" class="add-player" id="suOpenTeams">' +
+            esc(i18n.t('wizard.openTeams')) +
+            '</button>') +
         '</div>';
       if (S.teamKey)
         h +=
-          '<div class="su-card"><label class="field-label" for="suOpp">Nom de l\'adversaire</label><input type="text" id="suOpp" autocomplete="off" placeholder="Nom de l\'adversaire" value="' +
+          '<div class="su-card"><label class="field-label" for="suOpp">' +
+          esc(i18n.t('wizard.opponent')) +
+          '</label><input type="text" id="suOpp" autocomplete="off" placeholder="' +
+          esc(i18n.t('wizard.opponent')) +
+          '" value="' +
           esc(S.opp) +
-          '"><label class="field-label" for="suName">Match name</label><input type="text" id="suName" value="' +
+          '"><label class="field-label" for="suName">' +
+          esc(i18n.t('wizard.matchName')) +
+          '</label><input type="text" id="suName" value="' +
           esc(S.name) +
-          '"><div class="su-hint">Le nom du match est généré automatiquement et reste modifiable.</div></div>';
+          '"><div class="su-hint">' +
+          esc(i18n.t('wizard.matchNameHint')) +
+          '</div></div>';
       body.innerHTML = h + '</div>';
-      next.textContent = 'VALIDE';
+      next.textContent = i18n.t('wizard.validate');
       next.disabled = !S.teamKey || !S.opp.trim();
       return;
     }
     if (S.step === 1) {
-      $('suTitle').textContent = 'SELECT TEAM';
-      $('suSub').textContent = 'Confirme les joueurs présents et active le focus.';
+      $('suTitle').textContent = i18n.t('wizard.selectPlayersTitle');
+      $('suSub').textContent = i18n.t('wizard.selectPlayersSub');
       var err = rosterError();
       h =
-        '<div class="su-card"><div class="roster-toolbar"><label class="field-label" for="rosterSort">Trier par</label><select id="rosterSort" class="su-select"><option value="number"' +
+        '<div class="su-card"><div class="roster-toolbar"><label class="field-label" for="rosterSort">' +
+        esc(i18n.t('wizard.sortBy')) +
+        '</label><select id="rosterSort" class="su-select"><option value="number"' +
         (S.sort === 'number' ? ' selected' : '') +
-        '>Numéro de maillot</option><option value="position"' +
+        '>' +
+        esc(i18n.t('wizard.sortNumber')) +
+        '</option><option value="position"' +
         (S.sort === 'position' ? ' selected' : '') +
-        '>Poste</option><option value="name"' +
+        '>' +
+        esc(i18n.t('teams.position')) +
+        '</option><option value="name"' +
         (S.sort === 'name' ? ' selected' : '') +
-        '>Nom</option></select></div><div class="roster-court"><div class="roster-grid">';
+        '>' +
+        esc(i18n.t('teams.playerName')) +
+        '</option></select></div><div class="roster-court"><div class="roster-grid">';
       sortedRoster().forEach(function (r) {
         h += rosterCard(r);
       });
       h += '</div></div></div>';
       body.innerHTML = h;
-      next.textContent = 'NEXT →';
+      next.textContent = i18n.t('common.next');
       next.disabled = !!err;
       if (err) msg.textContent = err;
       return;
     }
-    $('suTitle').textContent = 'Initial rotation';
-    $('suSub').textContent = 'Sélectionne les joueurs de la rotation puis le premier rôle du match.';
+    $('suTitle').textContent = i18n.t('wizard.rotationTitle');
+    $('suSub').textContent = i18n.t('wizard.rotationSub');
     clearInvalidAssignments();
     var rr = rotation(),
       rotationNumber = +S.setterZone.slice(1);
     h =
-      '<section class="rotation-setup"><div class="setup-rotation-tabs" role="tablist" aria-label="Position initiale du passeur">';
+      '<section class="rotation-setup"><div class="setup-rotation-tabs" role="tablist" aria-label="' +
+      esc(i18n.t('wizard.setterZoneLabel')) +
+      '">';
     for (var z = 1; z <= 6; z++)
       h +=
         '<button type="button" data-setter-zone="p' +
@@ -476,8 +519,10 @@
         z +
         '</button>';
     h +=
-      '</div><div class="rotation-board"><div class="rotation-board-head"><strong>Organisation actuelle</strong><span class="rotation-badge">Rotation ' +
-      rotationNumber +
+      '</div><div class="rotation-board"><div class="rotation-board-head"><strong>' +
+      esc(i18n.t('wizard.currentLineup')) +
+      '</strong><span class="rotation-badge">' +
+      esc(i18n.t('wizard.rotationN', { n: rotationNumber })) +
       '</span></div><div class="setup-orange-court"><div class="setup-rotation-grid">';
     COURT.forEach(function (zone) {
       h += rotationSlot(zone, rr.roles[zone], rr.numbers[zone]);
@@ -490,21 +535,29 @@
       '<div class="libero-setup"><button type="button" class="libero-picker-button libero-seat role-libero' +
       (S.assign.libero ? ' selected' : ' empty') +
       '" data-rotation-role="libero" aria-label="' +
-      (S.assign.libero ? 'Modifier le libéro' : 'Sélectionner le libéro') +
+      esc(i18n.t(S.assign.libero ? 'wizard.editLibero' : 'wizard.selectLibero')) +
       '"><span class="libero-bench"><span class="libero-circle">' +
       (S.assign.libero ? S.assign.libero : 'L') +
       '</span></span><span class="libero-seat-name">' +
-      (S.assign.libero ? esc(liberoName) : 'SÉLECTIONNER LE LIBÉRO') +
-      '</span><small>LIBÉRO</small></button></div>';
+      (S.assign.libero ? esc(liberoName) : esc(i18n.t('wizard.selectLiberoUpper'))) +
+      '</span><small>' +
+      esc(i18n.t('wizard.roleLibero')) +
+      '</small></button></div>';
     if (S.pickerRole === 'libero') h += playerPicker('libero');
     h +=
-      '</div><div class="su-card first-rally-card"><label class="field-label">Premier rôle du match</label><div class="su-grid su-slots"><button type="button" class="su-btn' +
+      '</div><div class="su-card first-rally-card"><label class="field-label">' +
+      esc(i18n.t('wizard.firstPhase')) +
+      '</label><div class="su-grid su-slots"><button type="button" class="su-btn' +
       (S.first === 'reception' ? ' sel' : '') +
-      '" data-first="reception">RÉCEPTION</button><button type="button" class="su-btn' +
+      '" data-first="reception">' +
+      esc(i18n.t('wizard.reception')) +
+      '</button><button type="button" class="su-btn' +
       (S.first === 'service' ? ' sel' : '') +
-      '" data-first="service">SERVICE</button></div></div></section>';
+      '" data-first="service">' +
+      esc(i18n.t('wizard.service')) +
+      '</button></div></div></section>';
     body.innerHTML = h;
-    next.textContent = 'START MATCH';
+    next.textContent = i18n.t('wizard.start');
     next.hidden = !S.first;
     var le = lineupError();
     next.disabled = !!le;
@@ -606,11 +659,11 @@
       S.opp = (($('suOpp') && $('suOpp').value) || S.opp).trim();
       S.name = (($('suName') && $('suName').value) || S.name || defName(S.teamName, S.opp)).trim();
       if (!S.teamKey) {
-        $('suMsg').textContent = 'Sélectionne une équipe.';
+        $('suMsg').textContent = i18n.t('wizard.errorTeam');
         return;
       }
       if (!S.opp) {
-        $('suMsg').textContent = "Entre le nom de l'adversaire.";
+        $('suMsg').textContent = i18n.t('wizard.errorOpponent');
         return;
       }
       S.step = 1;
@@ -631,7 +684,7 @@
     }
     var le = lineupError();
     if (le || !S.first) {
-      $('suMsg').textContent = le || 'Sélectionne RÉCEPTION ou SERVICE.';
+      $('suMsg').textContent = le || i18n.t('wizard.errorFirst');
       return;
     }
     var rr = rotation(),

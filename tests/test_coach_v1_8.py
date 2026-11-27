@@ -32,7 +32,7 @@ def test_coach_navigation_live_data_and_player_detail(browser):
     page.goto(APP_URI)
     _seed(page)
 
-    assert page.locator("#insightsCoach strong").inner_text() == "COACH VIEW"
+    assert page.locator("#insightsCoach strong").inner_text() == "VUE COACH"
     page.evaluate("window.VolleyCoach.open()")
     assert page.locator("#coachScreen").is_visible()
     assert page.locator("#coachContent .coach-title").inner_text().startswith("Vue coach")

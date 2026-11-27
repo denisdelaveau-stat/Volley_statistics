@@ -3,6 +3,8 @@ from pathlib import Path
 
 from helpers import APP_URI, CACHE_NAME
 
+UI_LANGUAGE = "en"  # assertions below use the English interface
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,7 +42,7 @@ def test_add_validate_sort_save_and_reopen_team(browser):
     page, errors = open_team_management(browser)
     page.click("#teamNew")
     page.click("#teamAdd")
-    assert "Numero must be" in page.locator("#teamsMsg").inner_text()
+    assert "The number must be" in page.locator("#teamsMsg").inner_text()
 
     players = [(12, "Zoé Martin", "oh"), (3, "Alice Bernard", "setter"), (8, "Marc Durand", "mb")]
     for number, name, position in players:
