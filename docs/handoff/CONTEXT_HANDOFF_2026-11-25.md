@@ -50,12 +50,11 @@ French is the default language; English is chosen in Settings (page reloaded). H
 
 - Test language: `tests/conftest.py` gives each test module the language of its assertions (`UI_LANGUAGE = "en"` at the top of a module, French otherwise; `None` for `tests/test_i18n.py`). French writes nothing; another language is written to localStorage after the first navigation and before each reload. **Never** from `page.add_init_script`: a localStorage access at document start made the data a test writes just before a reload get lost, intermittently, on the Linux CI only (different tests failed on each run).
 - Failing tests are published as CI annotations (`tools/ci_annotate_failures.py`), readable through the public API `/repos/<owner>/<repo>/check-runs/<job id>/annotations` without authentication.
-- Kept as they are in both languages: product names (VolleyLive, LIVE COURT, PLAYER FOCUS), stat codes (PTS, ERR, EFF, SO, BP, KILL...), HOME/AWAY.
+- Kept as they are in both languages (decided 2026-11-27: some English terms are fine in the French interface): product names (VolleyLive, LIVE COURT, PLAYER FOCUS), stat codes (PTS, ERR, EFF, SO, BP, KILL...), HOME/AWAY, and the Spectator View labels already in English (SCORES, TIMELINE, GRAPH, RANKING, Roster Ranking, Highlight/Lowlight/Delta, ranking categories). Translating those labels later would change the screenshots of the visual-baseline tests, to be regenerated on Linux (the CI reference), not on Windows.
 - Hidden capture charts (`js/index-chart-*.js`, attacker cards) are not translated: see the first point below.
 
 ### Points to verify later
 
-- **Spectator View labels already in English** (SCORES, TIMELINE, GRAPH, RANKING, Roster Ranking, Highlight/Lowlight/Delta, ranking categories, "Score and Fault Evolution") are the same in both languages. Translating them into French changes the screenshots that the visual-baseline tests compare: the baselines must then be regenerated on Linux (the CI reference), not on Windows.
 - Coach View back button shows "‹← ACCUEIL" (two arrows, in both languages): the text already has "←" and the CSS seems to add "‹". Cosmetic, older than the translation.
 - The back button "‹ SETUP" / "‹ PRÉPARATION" wraps on 390 px phones (older than the translation).
 
