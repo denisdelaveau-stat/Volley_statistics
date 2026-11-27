@@ -23,7 +23,7 @@ Purpose: let another machine or another assistant resume the work without the ch
 | `f245c1e` | Dead capture UI layers removed (`js/index-normative-capture.js`, legacy court and substitution sheet of the engine, legacy step markup) |
 | `f9ecb63` | Capture ad-hoc globals replaced by the documented `window.VolleyCapture` contract |
 
-Rules and contracts are documented in `docs/ARCHITECTURE.md` (sections "Capture screen contract", "Rotation and libero rules", "Substitution rules").
+Contracts are documented in `docs/ARCHITECTURE.md` (section "Capture screen contract"); the volleyball rules in `docs/specs/` (DOM-MATCH, DOM-LINEUP, DOM-ROTATION, DOM-LIBERO, DOM-SUBS, DOM-STATS).
 
 ### Points to verify later
 

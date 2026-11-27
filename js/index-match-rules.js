@@ -1,3 +1,5 @@
+/* VolleyLive set and match rules (window.VolleySets) and report statistics (window.VolleyStats).
+   Spec: docs/specs/DOM-MATCH.md, docs/specs/DOM-STATS.md. */
 (function () {
   // ---- set & match rules (derived from events only) ----
   window.VolleyStats = (function () {

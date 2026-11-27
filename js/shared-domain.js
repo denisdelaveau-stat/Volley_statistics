@@ -47,6 +47,7 @@
     return next;
   }
 
+  // Line-up rules (spec: docs/specs/DOM-LINEUP.md).
   // Rotation order of the line-up roles from the setter's zone, as the New Match wizard places them: the setter, then
   // OH1, MB1, opposite, OH2 and MB2 in the following zones (P1 -> P2 -> ... -> P6 -> P1).
   var ROTATION_ROLES = Object.freeze(['setter', 'oh1', 'mb1', 'opposite', 'oh2', 'mb2']);
