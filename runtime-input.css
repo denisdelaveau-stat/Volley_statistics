@@ -931,14 +931,16 @@ html.runtime-capture-active .score-line {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 10px;
 }
-.set-lineup-roles label {
+.set-lineup-roles label,
+.set-lineup-card .set-lineup-libero {
   display: grid;
   gap: 4px;
   color: #a9c9de;
   font-size: 12px;
   font-weight: 800;
 }
-.set-lineup-roles select {
+.set-lineup-roles select,
+.set-lineup-libero select {
   min-height: 44px;
   border: 1px solid #3f84b3;
   border-radius: 9px;
@@ -949,8 +951,7 @@ html.runtime-capture-active .score-line {
   padding: 6px 8px;
 }
 .set-lineup-card .set-lineup-libero {
-  margin: 12px 0 0;
-  color: #dbe9f4;
+  margin-top: 10px;
 }
 .set-lineup-card .set-lineup-error {
   margin: 10px 0 0;

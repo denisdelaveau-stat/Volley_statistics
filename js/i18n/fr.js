@@ -793,4 +793,14 @@ window.VolleyI18nMessages.fr = {
   'lineup.errorMissing': 'Choisissez un joueur pour chaque poste.',
   'lineup.errorTwice': 'Un joueur ne peut occuper qu’un seul poste.',
   'lineup.errorNotEligible': 'Seuls les joueurs présents, hors libéro, peuvent commencer le set.',
+  // Second libero (FIVB 19.1.1, 19.3.2)
+  'lineup.libero': 'Libéro',
+  'lineup.noLibero': 'Aucun',
+  'subs.liberoTitle': 'Libéro en jeu : #{libero}',
+  'subs.liberoSwapFor': 'remplace le libéro #{out}',
+  'subs.liberoSwapDone': 'Libéro #{in} à la place de #{out}',
+  'subs.refuseNoSecondLibero': 'Pas d’autre libéro disponible (règle 19.1.1).',
+  'subs.refuseLiberoRally':
+    'Un remplacement de libéro vient d’avoir lieu : attendez la fin d’un rallye (règle 19.3.2.1).',
+  'report.liberoSwap': 'remplacement de libéro',
 };

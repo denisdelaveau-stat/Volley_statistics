@@ -113,3 +113,27 @@ test('they agree when set 2 has its own line-up (FIVB 7.3.2), for every setter z
   }
   assert.ok(compared > 500, 'events compared: ' + compared);
 });
+
+test('they agree when the second libero replaces the first one (19.3.2), at every legal break of set 1', () => {
+  const raw = fixture('tests/data/As_cannes_vs_Frejus_2026-11-15.capture.v1.json');
+  const { VolleySubstitutions: S } = loadBrowserScripts(
+    'js/shared-domain.js',
+    'js/index-rotation.js',
+    'js/index-substitution-rules.js'
+  );
+  raw.match.team.roster.push({ number: 30, name: 'Second libero', position: 'libero', present: true });
+  const first = raw.match.startingLineup.libero;
+  const set1 = raw.events.filter((e) => (e.set || 1) === 1);
+  let breaks = 0,
+    compared = 0;
+  for (let at = 0; at <= set1.length; at++) {
+    if (at > 0 && !set1[at - 1].winningTeam) continue; // only between rallies
+    if (S.liberoSwap(raw.match, 1, set1.slice(0, at)).refusal) continue;
+    const variant = JSON.parse(JSON.stringify(raw));
+    variant.match.subs = (variant.match.subs || []).concat([{ set: 1, at, out: first, in: 30, libero: true }]);
+    compared += compareEngineAndAdapter(variant, 'libero swap at ' + at);
+    breaks++;
+  }
+  assert.ok(breaks > 5, 'legal breaks tested: ' + breaks);
+  assert.ok(compared > 500, 'events compared: ' + compared);
+});

@@ -738,9 +738,39 @@
     if (Subs.rallyInProgress(currentSetEvents())) return t('subs.blockedRally');
     return '';
   }
+  // Second libero (FIVB 19.1.1): the acting libero may be replaced by the other one between two rallies (19.3.2).
+  // Shown only when the team has another libero present.
+  function liberoSwapBlock(setNo) {
+    var sw = Subs.liberoSwap(M, setNo, currentSetEvents());
+    if (sw.current == null || !sw.candidates.length) return '';
+    return (
+      '<div class="runtime-libero-swap"><p class="runtime-subs-step">' +
+      esc(t('subs.liberoTitle', { libero: sw.current })) +
+      '</p>' +
+      (sw.refusal ? '<p class="runtime-subs-warning">' + esc(t(sw.refusal)) + '</p>' : '') +
+      '<div class="runtime-sub-grid">' +
+      sw.candidates
+        .map(function (n) {
+          return (
+            '<button type="button" class="runtime-sub-player" data-libero-swap="' +
+            esc(n) +
+            '"' +
+            (sw.refusal ? ' disabled' : '') +
+            '>' +
+            playerLabel(n) +
+            '<small>' +
+            esc(t('subs.liberoSwapFor', { out: sw.current })) +
+            '</small></button>'
+          );
+        })
+        .join('') +
+      '</div></div>'
+    );
+  }
   function subsOutStep(st, setNo) {
     var zones = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
     return (
+      liberoSwapBlock(setNo) +
       '<p class="runtime-subs-step">' +
       esc(t('subs.playerOut')) +
       '</p><div class="runtime-sub-grid">' +
@@ -863,6 +893,43 @@
     var button = panel.querySelector('[data-runtime-sub-open]');
     if (button) button.focus();
   }
+  // Checks the libero replacement again and records it (a match.subs entry with libero: true and its event).
+  function swapLibero(inValue) {
+    var setNo = Number(M.currentSet || 1),
+      incoming = rosterValue(inValue),
+      sw = Subs.liberoSwap(M, setNo, currentSetEvents()),
+      key =
+        sw.refusal ||
+        (sw.candidates.some(function (n) {
+          return String(n) === String(incoming);
+        })
+          ? ''
+          : 'subs.notAllowed'),
+      reason = subsBlocked() || (key ? t(key) : '');
+    if (reason) {
+      subState.error = reason;
+      renderSubs();
+      return false;
+    }
+    var built = Subs.build(M, setNo, currentSetEvents(), scoreNow(), sw.current, incoming, {
+      eventId: uniqueEventId(),
+      libero: true,
+    });
+    M.subs = M.subs || [];
+    M.subs.push(built.sub);
+    writeObject(window.VolleyDomain.STORAGE.captureMatch, M);
+    if (typeof VC.logSubstitution === 'function') VC.logSubstitution(built.event);
+    else {
+      var list = events();
+      list.push(built.event);
+      writeObject(EVENTS_KEY, list);
+    }
+    state.feedback = t('subs.liberoSwapDone', { in: incoming, out: sw.current });
+    closeSubs();
+    clear(true);
+    render();
+    return true;
+  }
   // Checks the substitution again (rules can change between rendering and tapping) and records it.
   function substitute(outValue, inValue, exceptional) {
     var setNo = Number(M.currentSet || 1),
@@ -975,6 +1042,10 @@
       subState.out = rosterValue(target.dataset.subOut);
       subState.error = '';
       renderSubs();
+      return;
+    }
+    if (target.dataset.liberoSwap != null) {
+      swapLibero(target.dataset.liberoSwap);
       return;
     }
     if (target.dataset.subIn != null)

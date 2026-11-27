@@ -789,4 +789,13 @@ window.VolleyI18nMessages.en = {
   'lineup.errorMissing': 'Choose a player for each role.',
   'lineup.errorTwice': 'A player can only take one role.',
   'lineup.errorNotEligible': 'Only present players, liberos excepted, can start the set.',
+  // Second libero (FIVB 19.1.1, 19.3.2)
+  'lineup.libero': 'Libero',
+  'lineup.noLibero': 'None',
+  'subs.liberoTitle': 'Acting libero: #{libero}',
+  'subs.liberoSwapFor': 'replaces libero #{out}',
+  'subs.liberoSwapDone': 'Libero #{in} in for #{out}',
+  'subs.refuseNoSecondLibero': 'No other libero available (rule 19.1.1).',
+  'subs.refuseLiberoRally': 'A libero replacement has just taken place: wait for a completed rally (rule 19.3.2.1).',
+  'report.liberoSwap': 'libero replacement',
 };

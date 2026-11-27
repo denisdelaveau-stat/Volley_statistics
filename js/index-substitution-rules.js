@@ -12,7 +12,11 @@
    - 15.9.1  a substitution involving a player who is not registered is illegal;
    - 15.11.1.1 no substitution during a rally (checked by the caller: rallyInProgress()).
    Starting players are the starting rotation of the set (VolleyDomain.lineup.forSet: FIVB 7.3.2, one line-up sheet
-   per set). */
+   per set).
+   Liberos, Rule 19: a team designates up to two liberos (19.1.1): the libero of the line-ups and the roster players
+   registered as libero. One acting libero on court (19.1.3). Replacing the acting libero by the other one is a libero
+   replacement (19.3.2): it is not a substitution, needs a completed rally since the previous libero replacement
+   (19.3.2.1) and never happens during a rally. It is stored as a match.subs entry with libero: true. */
 (function () {
   'use strict';
   var REGULAR_LIMIT = 6;
@@ -88,6 +92,7 @@
       if (s.exceptional) h.barred[String(s.out)] = true;
     });
     setSubs(match, setNo).forEach(function (s) {
+      if (s.libero) return; // a libero replacement is not a substitution (19.3.2)
       if (s.exceptional) {
         h.exceptional++;
         h.substituteEntered[String(s['in'])] = h.substituteEntered[String(s['in'])] || s.out;
@@ -161,6 +166,37 @@
     return { regular: regular, exceptional: exceptional, refused: refused, history: h };
   }
 
+  // Replacement of the acting libero by the other designated libero, between two rallies (19.3.2). Returns the acting
+  // libero, the liberos who may replace it and, when it is not allowed now, the reason (a translation key).
+  function liberoSwap(match, setNo, setEvents) {
+    var events = setEvents || [],
+      t = window.VolleyRotation.trace(match, events, setNo),
+      current = t.lib,
+      present = registered(match),
+      candidates = liberos(match).filter(function (n) {
+        return !same(n, current) && contains(present, n);
+      }),
+      refusal = null;
+    if (current == null || !candidates.length) refusal = 'subs.refuseNoSecondLibero';
+    else if (rallyInProgress(events)) refusal = 'subs.blockedRally';
+    else {
+      // Events after the last completed rally (the break): substitution events recorded during this break.
+      var breakStart = 0;
+      events.forEach(function (e, i) {
+        if (e.winningTeam) breakStart = i + 1;
+      });
+      var swappedHere = setSubs(match, setNo).some(function (s) {
+          return s.libero && (+s.at || 0) >= breakStart;
+        }),
+        before = breakStart ? t.steps[breakStart - 1].liberoFor : null,
+        replacedHere = breakStart > 0 && String(before) !== String(t.liberoFor);
+      // 19.3.2.1: a libero replacement (the libero coming in or going out at this break, or another libero swap)
+      // already took place since the last completed rally.
+      if (swappedHere || replacedHere) refusal = 'subs.refuseLiberoRally';
+    }
+    return { current: current, candidates: candidates, refusal: refusal };
+  }
+
   // A rally is in progress when the last event of the set is an action that did not end the rally.
   function rallyInProgress(setEvents) {
     var last = (setEvents || [])[setEvents.length - 1];
@@ -213,6 +249,10 @@
       sub.exceptional = true;
       event.exceptional = true;
     }
+    if (opts.libero) {
+      sub.libero = true;
+      event.libero = true;
+    }
     return { sub: sub, event: event };
   }
 
@@ -224,6 +264,7 @@
     regularRefusal: regularRefusal,
     options: options,
     rallyInProgress: rallyInProgress,
+    liberoSwap: liberoSwap,
     build: build,
   };
 })();
