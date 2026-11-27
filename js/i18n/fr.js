@@ -803,4 +803,18 @@ window.VolleyI18nMessages.fr = {
   'subs.refuseLiberoRally':
     'Un remplacement de libéro vient d’avoir lieu : attendez la fin d’un rallye (règle 19.3.2.1).',
   'report.liberoSwap': 'remplacement de libéro',
+  // Libero unable to play and re-designation (FIVB 19.4)
+  'subs.refuseNoLibero': 'Aucun libéro en jeu.',
+  'subs.refuseNoRedesignation':
+    'Aucun joueur ne peut être re-désigné libéro : il doit être présent et hors du terrain.',
+  'subs.unableOpen': 'Libéro #{libero} indisponible (blessure, expulsion)…',
+  'subs.unableTitle': 'Libéro #{libero} indisponible',
+  'subs.unableWarning': 'Règle 19.4 : le libéro #{libero} ne pourra plus jouer de tout le match.',
+  'subs.unableTakeOver': 'prend le relais',
+  'subs.redesignateHint': 'devient libéro',
+  'subs.unableBack': 'Retour',
+  'subs.unableDone': 'Libéro #{out} indisponible : #{in} devient le libéro',
+  'subs.redesignateDone': 'Libéro #{out} indisponible : #{in} re-désigné libéro jusqu’à la fin du match',
+  'report.liberoUnable': 'libéro indisponible',
+  'report.liberoRedesignated': 'libéro re-désigné',
 };

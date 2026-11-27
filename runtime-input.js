@@ -43,7 +43,7 @@
   };
   // Substitution sheet (FIVB Rule 15, js/index-substitution-rules.js): out = player chosen to leave, error = refusal.
   var Subs = window.VolleySubstitutions;
-  var subState = { out: null, error: '' };
+  var subState = { out: null, error: '', unable: false };
   var prefs = readPrefs();
   state.mode = prefs.runtimeMode;
   document.documentElement.classList.add('runtime-capture-active');
@@ -738,33 +738,74 @@
     if (Subs.rallyInProgress(currentSetEvents())) return t('subs.blockedRally');
     return '';
   }
-  // Second libero (FIVB 19.1.1): the acting libero may be replaced by the other one between two rallies (19.3.2).
-  // Shown only when the team has another libero present.
+  // Liberos (FIVB Rule 19): the acting libero may be replaced by the other libero between two rallies (19.3.2), or
+  // declared unable to play (19.4: injury, illness, expulsion). Shown whenever a libero is acting.
   function liberoSwapBlock(setNo) {
     var sw = Subs.liberoSwap(M, setNo, currentSetEvents());
-    if (sw.current == null || !sw.candidates.length) return '';
+    if (sw.current == null) return '';
     return (
       '<div class="runtime-libero-swap"><p class="runtime-subs-step">' +
       esc(t('subs.liberoTitle', { libero: sw.current })) +
       '</p>' +
-      (sw.refusal ? '<p class="runtime-subs-warning">' + esc(t(sw.refusal)) + '</p>' : '') +
-      '<div class="runtime-sub-grid">' +
-      sw.candidates
-        .map(function (n) {
-          return (
-            '<button type="button" class="runtime-sub-player" data-libero-swap="' +
-            esc(n) +
-            '"' +
-            (sw.refusal ? ' disabled' : '') +
-            '>' +
-            playerLabel(n) +
-            '<small>' +
-            esc(t('subs.liberoSwapFor', { out: sw.current })) +
-            '</small></button>'
-          );
-        })
-        .join('') +
-      '</div></div>'
+      (sw.candidates.length && sw.refusal ? '<p class="runtime-subs-warning">' + esc(t(sw.refusal)) + '</p>' : '') +
+      (sw.candidates.length
+        ? '<div class="runtime-sub-grid">' +
+          sw.candidates
+            .map(function (n) {
+              return (
+                '<button type="button" class="runtime-sub-player" data-libero-swap="' +
+                esc(n) +
+                '"' +
+                (sw.refusal ? ' disabled' : '') +
+                '>' +
+                playerLabel(n) +
+                '<small>' +
+                esc(t('subs.liberoSwapFor', { out: sw.current })) +
+                '</small></button>'
+              );
+            })
+            .join('') +
+          '</div>'
+        : '') +
+      '<button type="button" class="runtime-subs-back runtime-libero-unable-open" data-libero-unable-open>' +
+      esc(t('subs.unableOpen', { libero: sw.current })) +
+      '</button></div>'
+    );
+  }
+  // Step shown after « Libéro indisponible »: the other libero takes over, or a player is re-designated (19.4).
+  function liberoUnableStep(setNo) {
+    var u = Subs.liberoUnable(M, setNo, currentSetEvents()),
+      list = u.liberos.length ? u.liberos : u.players,
+      attr = u.liberos.length ? 'data-libero-unable' : 'data-libero-redesignate',
+      hint = u.liberos.length ? 'subs.unableTakeOver' : 'subs.redesignateHint';
+    return (
+      '<p class="runtime-subs-step">' +
+      esc(t('subs.unableTitle', { libero: u.current })) +
+      '</p><p class="runtime-subs-warning">' +
+      esc(t('subs.unableWarning', { libero: u.current })) +
+      '</p>' +
+      (u.refusal
+        ? '<p class="runtime-subs-warning">' + esc(t(u.refusal)) + '</p>'
+        : '<div class="runtime-sub-grid">' +
+          list
+            .map(function (n) {
+              return (
+                '<button type="button" class="runtime-sub-player" ' +
+                attr +
+                '="' +
+                esc(n) +
+                '">' +
+                playerLabel(n) +
+                '<small>' +
+                esc(t(hint)) +
+                '</small></button>'
+              );
+            })
+            .join('') +
+          '</div>') +
+      '<button type="button" class="runtime-subs-back" data-sub-back>' +
+      esc(t('subs.unableBack')) +
+      '</button>'
     );
   }
   function subsOutStep(st, setNo) {
@@ -851,9 +892,11 @@
       st = rotationState(),
       body = blocked
         ? '<p class="runtime-subs-warning">' + esc(blocked) + '</p>'
-        : subState.out == null
-          ? subsOutStep(st, setNo)
-          : subsInStep(st, setNo);
+        : subState.unable
+          ? liberoUnableStep(setNo)
+          : subState.out == null
+            ? subsOutStep(st, setNo)
+            : subsInStep(st, setNo);
     return (
       '<div class="runtime-prefs-card runtime-subs-card" role="dialog" aria-modal="true" aria-labelledby="runtimeSubsTitle"><h2 id="runtimeSubsTitle">' +
       esc(t('subs.title')) +
@@ -880,6 +923,7 @@
   function openSubs() {
     if (!Subs || state.pending) return;
     subState.out = null;
+    subState.unable = false;
     subState.error = '';
     var sheet = document.getElementById('runtimeSubs');
     sheet.hidden = false;
@@ -893,14 +937,18 @@
     var button = panel.querySelector('[data-runtime-sub-open]');
     if (button) button.focus();
   }
-  // Checks the libero replacement again and records it (a match.subs entry with libero: true and its event).
-  function swapLibero(inValue) {
+  // Checks a libero change again and records it (a match.subs entry with libero: true and its event). mode: 'swap'
+  // (the other libero, 19.3.2), 'unable' (the acting libero cannot play, the other libero takes over, 19.4) or
+  // 'redesignate' (the acting libero cannot play, a player becomes libero for the rest of the match, 19.4).
+  function changeLibero(inValue, mode) {
     var setNo = Number(M.currentSet || 1),
       incoming = rosterValue(inValue),
-      sw = Subs.liberoSwap(M, setNo, currentSetEvents()),
+      list = currentSetEvents(),
+      rule = mode === 'swap' ? Subs.liberoSwap(M, setNo, list) : Subs.liberoUnable(M, setNo, list),
+      allowed = mode === 'swap' ? rule.candidates : mode === 'unable' ? rule.liberos : rule.players,
       key =
-        sw.refusal ||
-        (sw.candidates.some(function (n) {
+        rule.refusal ||
+        (allowed.some(function (n) {
           return String(n) === String(incoming);
         })
           ? ''
@@ -911,20 +959,26 @@
       renderSubs();
       return false;
     }
-    var built = Subs.build(M, setNo, currentSetEvents(), scoreNow(), sw.current, incoming, {
+    var built = Subs.build(M, setNo, list, scoreNow(), rule.current, incoming, {
       eventId: uniqueEventId(),
       libero: true,
+      unable: mode !== 'swap',
+      redesignated: mode === 'redesignate',
     });
     M.subs = M.subs || [];
     M.subs.push(built.sub);
     writeObject(window.VolleyDomain.STORAGE.captureMatch, M);
     if (typeof VC.logSubstitution === 'function') VC.logSubstitution(built.event);
     else {
-      var list = events();
-      list.push(built.event);
-      writeObject(EVENTS_KEY, list);
+      var all = events();
+      all.push(built.event);
+      writeObject(EVENTS_KEY, all);
     }
-    state.feedback = t('subs.liberoSwapDone', { in: incoming, out: sw.current });
+    state.feedback = t(
+      mode === 'swap' ? 'subs.liberoSwapDone' : mode === 'unable' ? 'subs.unableDone' : 'subs.redesignateDone',
+      { in: incoming, out: rule.current }
+    );
+    subState.unable = false;
     closeSubs();
     clear(true);
     render();
@@ -1034,6 +1088,7 @@
     }
     if (target.hasAttribute('data-sub-back')) {
       subState.out = null;
+      subState.unable = false;
       subState.error = '';
       renderSubs();
       return;
@@ -1044,8 +1099,22 @@
       renderSubs();
       return;
     }
+    if (target.hasAttribute('data-libero-unable-open')) {
+      subState.unable = true;
+      subState.error = '';
+      renderSubs();
+      return;
+    }
     if (target.dataset.liberoSwap != null) {
-      swapLibero(target.dataset.liberoSwap);
+      changeLibero(target.dataset.liberoSwap, 'swap');
+      return;
+    }
+    if (target.dataset.liberoUnable != null) {
+      changeLibero(target.dataset.liberoUnable, 'unable');
+      return;
+    }
+    if (target.dataset.liberoRedesignate != null) {
+      changeLibero(target.dataset.liberoRedesignate, 'redesignate');
       return;
     }
     if (target.dataset.subIn != null)
