@@ -25,8 +25,8 @@ jobs:
       - name: Install lint tooling
         run: npm ci
 
-      - name: ESLint
-        run: npx eslint .
+      - name: ESLint (no warnings allowed)
+        run: npm run lint
 
       - name: Prettier (JavaScript)
         run: npx prettier --check .

@@ -46,8 +46,29 @@
     return next;
   }
 
+  // Reads a JSON value from storage (localStorage by default). Returns fallback when the key is missing, and also
+  // when the value cannot be read, but then says so in the console: corrupted data must not disappear silently.
+  function readStored(key, fallback, storage) {
+    var raw;
+    try {
+      raw = (storage || window.localStorage).getItem(key);
+    } catch (error) {
+      console.warn('VolleyLive: storage unavailable while reading ' + key, error);
+      return fallback;
+    }
+    if (raw == null || raw === '') return fallback;
+    try {
+      var value = JSON.parse(raw);
+      return value == null ? fallback : value;
+    } catch (error) {
+      console.warn('VolleyLive: unreadable stored value for ' + key + ', using the default value', error);
+      return fallback;
+    }
+  }
+
   window.VolleyDomain = Object.freeze({
     STORAGE: STORAGE,
+    readStored: readStored,
     ROLE_CODES: ROLE_CODES,
     ROLE_NAMES: ROLE_NAMES,
     court: Object.freeze({ POS: POS, NEXT: NEXT, LIBERO_ZONES: LIBERO_ZONES, rotate: rotate }),

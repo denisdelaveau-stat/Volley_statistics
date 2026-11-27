@@ -1,4 +1,4 @@
-/* VolleyLive navigation, Match Capture and shared Match Library v1.27.0 */
+/* VolleyLive navigation, Match Capture and shared Match Library */
 (function () {
   'use strict';
   var KE = window.VolleyDomain.STORAGE.captureEvents,
@@ -46,6 +46,11 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
   var esc = window.VolleyDom.esc;
+  // App version shown on the Home screen (kept up to date by tools/bump_version.py).
+  function appVersion() {
+    var label = document.getElementById('appVersion');
+    return (label && label.textContent.trim()) || '';
+  }
   function text(value) {
     return String(value == null ? '' : value).trim();
   }
@@ -75,7 +80,9 @@
       window.dispatchEvent(
         new CustomEvent('volleylive:telemetry', { detail: { event: name, properties: properties || {} } })
       );
-    } catch (e) {}
+    } catch (e) {
+      // Telemetry is optional: it must never break the user action that emits it.
+    }
   }
   function setStatus(id, message, tone) {
     var el = $(id);
@@ -178,7 +185,9 @@
       try {
         var summary = window.VolleySets.summary(match, Array.isArray(raw.events) ? raw.events : []);
         return { home: finite(summary.wonA), away: finite(summary.wonB) };
-      } catch (e) {}
+      } catch (e) {
+        // Inconsistent events: the set counts stay unknown (null) for this summary only.
+      }
     }
     var sets = Array.isArray(raw.sets) ? raw.sets : [],
       h = 0,
@@ -924,7 +933,9 @@
       events.length +
       ' events</p><table><thead><tr><th>#</th><th>Set</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody>' +
       rows +
-      '</tbody></table><p>Generated locally by VolleyLive v1.27.0.</p></body></html>'
+      '</tbody></table><p>Generated locally by VolleyLive ' +
+      esc(appVersion()) +
+      '.</p></body></html>'
     );
   }
   function reportCsv(sum) {
@@ -1084,11 +1095,18 @@
       $('homeContinue').click();
     });
     $('matchHubSaveStart').addEventListener('click', function () {
+      // The current match is cleared only once it has been saved: when saving fails (storage full, export
+      // refused...), it is kept and the user is told why.
       try {
         if (window.VolleyShell && window.VolleyShell.saveMatchJson) window.VolleyShell.saveMatchJson();
         var raw = archiveCurrent();
         if (raw) upsertHistory(raw, 'Saved local match', null, 'finished');
-      } catch (e) {}
+      } catch (e) {
+        console.error('VolleyLive: the current match could not be saved', e);
+        $('matchHubDecisionText').textContent =
+          'Save failed, the current match was kept: ' + ((e && e.message) || 'unknown error') + '.';
+        return;
+      }
       clearCurrent();
       beginSetup();
     });

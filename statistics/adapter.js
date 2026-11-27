@@ -1,4 +1,4 @@
-/* VolleyLive shared data adapter v1.9.1.
+/* VolleyLive shared data adapter.
  * Unified volley-live v2.1 is authoritative for Coach and Advanced Statistics.
  * Capture v1 remains a migration input for an in-progress local match only.
  */

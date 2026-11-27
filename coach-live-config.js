@@ -1,4 +1,4 @@
-/* VolleyLive Coach Live Court configuration v1.13.0.
+/* VolleyLive Coach Live Court configuration.
  * This file contains configurable rules only. Match/player values always come from the loaded match JSON.
  */
 (function (root) {

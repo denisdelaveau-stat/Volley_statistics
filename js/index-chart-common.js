@@ -4,14 +4,12 @@
   var DATA = [];
   var STORAGE_DATA = window.VolleyDomain.STORAGE.captureChartData,
     STORAGE_EVENTS = window.VolleyDomain.STORAGE.captureEvents;
-  try {
-    var storedData = JSON.parse(localStorage.getItem(STORAGE_DATA) || 'null');
-    if (Array.isArray(storedData))
-      DATA = storedData.map(function (p) {
-        if (p && p.c === 'A') p.c = 0;
-        return p;
-      });
-  } catch (e) {}
+  var storedData = window.VolleyDomain.readStored(STORAGE_DATA, null);
+  if (Array.isArray(storedData))
+    DATA = storedData.map(function (p) {
+      if (p && p.c === 'A') p.c = 0;
+      return p;
+    });
   var PC = { 1: '#6A1B9A', 2: '#00ACC1', 3: '#FB8C00', 4: '#1E88E5', 5: '#EC407A', 6: '#FDD835', 7: '#6D4C41' };
   var PN = { 1: 'Setter', 2: 'Libero', 3: '', 4: 'MB', 5: 'OH', 6: 'OH', 7: 'OPP' };
   (function () {

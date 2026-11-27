@@ -1,4 +1,4 @@
-/* VolleyLive v1.28.0 — common runtime input controller for FOCUS, SPEED+ and FLOW. */
+/* VolleyLive capture input: court, FOCUS / SPEED+ / FLOW modes, undo and substitutions (see docs/ARCHITECTURE.md). */
 (function () {
   'use strict';
   var VC = window.VolleyCapture,
@@ -569,7 +569,9 @@
     if (prefs.runtimeHaptics && navigator.vibrate)
       try {
         navigator.vibrate(18);
-      } catch (error) {}
+      } catch (error) {
+        // Haptic feedback is optional (unsupported or blocked by the browser).
+      }
   }
   function commit(result) {
     if (state.pending || Date.now() < state.lockedUntil) return;
@@ -857,7 +859,9 @@
         }),
         replay = window.VolleyRotation.replay(M, set);
       VC.updateScoreService(replay.serving);
-    } catch (error) {}
+    } catch (error) {
+      console.warn('VolleyLive: serving team not updated', error);
+    }
   };
   ensureStructure();
   render();

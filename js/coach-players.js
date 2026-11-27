@@ -356,7 +356,6 @@
     var s = currentPlayerStats(),
       p = s.player,
       ae = s.att.d ? Math.round(((s.att.k - s.att.e) * 100) / s.att.d) : null,
-      rp = pct(s.rec.p, s.rec.d),
       bars = setEfficiency(p),
       recent = s.events.slice(-4).reverse(),
       rows = skillRows(s);

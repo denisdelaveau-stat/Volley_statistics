@@ -50,8 +50,6 @@ module.exports = [
     rules: {
       'no-unused-vars': ['warn', { args: 'none', caughtErrors: 'none' }],
       'no-empty': ['error', { allowEmptyCatch: true }],
-      // `var` re-declared in mutually exclusive branches of the same function is harmless in these classic scripts.
-      'no-redeclare': 'warn',
     },
   },
   {

@@ -12,6 +12,7 @@ pytest -q \
  tests/test_library_v1_6_0.py \
  tests/test_live_court_player_focus_v1_13.py \
  tests/test_live_score_momentum_v1_19_1.py \
+ tests/test_match_hub_save.py \
  tests/test_match_library_v1_27.py \
  tests/test_navigation_visual_v1_25.py \
  tests/test_player_court_palette_v1_15.py \

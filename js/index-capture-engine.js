@@ -6,10 +6,7 @@
    The court, the action input and substitutions are rendered by runtime-input.js. */
 (function () {
   'use strict';
-  var m = null;
-  try {
-    m = JSON.parse(localStorage.getItem(window.VolleyDomain.STORAGE.captureMatch) || 'null');
-  } catch (e) {}
+  var m = window.VolleyDomain.readStored(window.VolleyDomain.STORAGE.captureMatch, null);
   window.VolleyCapture = {
     match: m,
     // side: 'A' (our team serves), 'B' (the opponent serves) or nothing.

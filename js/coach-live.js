@@ -20,7 +20,7 @@
   function render() {
     return P.render.apply(this, arguments);
   }
-  /* --- v1.13.0 LIVE COURT / PLAYER FOCUS --- */
+  /* --- LIVE COURT / PLAYER FOCUS --- */
   var LIVE_CFG = window.VolleyCoachConfig || {};
   function cfg() {
     return LIVE_CFG;
