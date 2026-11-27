@@ -142,18 +142,18 @@
 <dialog class="match-hub-dialog" id="matchHubDuplicate" aria-labelledby="matchHubDuplicateTitle"><div class="mh-dialog-inner"><h2 id="matchHubDuplicateTitle" data-i18n="library.duplicateTitle">Match déjà présent</h2><p id="matchHubDuplicateText"></p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchHubOpenExisting" data-i18n="library.openExisting">Ouvrir l’existant</button><button type="button" id="matchHubImportCopy" data-i18n="library.importCopy">Importer comme copie</button><button type="button" class="mh-cancel" data-dialog-close data-i18n="common.cancel">Annuler</button></div></div></dialog>
 <dialog class="match-hub-dialog library-info-sheet" id="matchInfoDialog" aria-labelledby="matchInfoTitle"><div class="mh-dialog-inner"><div class="library-info-handle" aria-hidden="true"></div><h2 id="matchInfoTitle" data-i18n="library.detailsTitle">DÉTAILS DU MATCH</h2><dl id="matchInfoFields"></dl><div class="mh-dialog-actions"><button type="button" class="mh-primary" data-dialog-close data-i18n="common.close">Fermer</button></div></div></dialog>
 <dialog class="match-hub-dialog" id="matchReportDialog" aria-labelledby="matchReportTitle"><div class="mh-dialog-inner"><h2 id="matchReportTitle" data-i18n="nav.matchReports">RAPPORTS DE MATCH</h2><p id="matchReportText" data-i18n="reports.select">Sélectionnez un match pour préparer ses rapports.</p><div class="mh-dialog-actions"><button type="button" class="mh-primary" id="matchReportHtml" data-i18n="reports.html">Exporter le rapport HTML</button><button type="button" id="matchReportCsv" data-i18n="reports.csv">Exporter les événements CSV</button><button type="button" id="matchReportJson" data-i18n="reports.json">Exporter le JSON officiel</button><button type="button" class="mh-cancel" data-dialog-close data-i18n="common.close">Fermer</button></div><p class="mh-dialog-note" data-i18n="reports.note">Les exports sont générés localement et restent disponibles hors ligne.</p></div></dialog>
-<div id="coachScreen" class="coach-app" hidden aria-label="Interface coach">
+<div id="coachScreen" class="coach-app" hidden aria-label="Interface coach" data-i18n-attr="aria-label:coach.screenLabel">
   <div class="coach-shell">
     <header class="coach-top">
-      <button type="button" class="coach-home" id="coachHome">← ACCUEIL</button>
+      <button type="button" class="coach-home" id="coachHome" data-i18n="settings.back">← ACCUEIL</button>
       <div class="coach-brand"><span class="coach-ball" aria-hidden="true">◉</span><b>VOLLEY <span>LIVE</span></b></div>
-      <div class="coach-live"><i aria-hidden="true"></i><span id="coachLiveLabel">EN DIRECT</span></div>
+      <div class="coach-live"><i aria-hidden="true"></i><span id="coachLiveLabel" data-i18n="common.live">EN DIRECT</span></div>
     </header>
-    <nav class="coach-nav" aria-label="Navigation coach" role="tablist">
-      <button type="button" data-coach-tab="overview" role="tab">Vue coach</button>
+    <nav class="coach-nav" aria-label="Navigation coach" data-i18n-attr="aria-label:coach.navLabel" role="tablist">
+      <button type="button" data-coach-tab="overview" role="tab" data-i18n="coach.overviewTitle">Vue coach</button>
       <button type="button" data-coach-tab="live-court" role="tab">LIVE COURT</button>
-      <button type="button" data-coach-tab="rotations" role="tab">Équipe</button>
-      <button type="button" data-coach-tab="players" role="tab">Joueurs</button>
+      <button type="button" data-coach-tab="rotations" role="tab" data-i18n="coach.team">Équipe</button>
+      <button type="button" data-coach-tab="players" role="tab" data-i18n="coach.players">Joueurs</button>
       <button type="button" data-coach-tab="player-focus" class="player-focus-tab" role="tab" hidden>PLAYER FOCUS</button>
     </nav>
     <main id="coachContent"></main>

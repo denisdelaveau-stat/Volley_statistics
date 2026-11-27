@@ -3,6 +3,7 @@
   'use strict';
   var P = window.VolleyCoachParts;
   if (!P) return;
+  var t = window.VolleyI18n.t;
   var screen = P.screen,
     C = P.C,
     num = P.num,
@@ -37,7 +38,7 @@
     var lb = document.getElementById('coachLiveLabel');
     if (lb)
       lb.textContent = C.data.empty
-        ? 'AUCUN MATCH'
+        ? t('coach.labelNone')
         : C.data.replay
           ? 'REPLAY · MATCH'
           : C.data.explicitContext
@@ -136,7 +137,7 @@
         C.sourceToken = null;
         render();
       } catch (error) {
-        alert('Fichier invalide : ' + error.message);
+        alert(t('coach.invalidFile', { error: error.message }));
       }
     };
     reader.readAsText(file);
@@ -254,14 +255,14 @@
     if (b.id === 'playerDetailCta') {
       if (!C.player) {
         b.disabled = true;
-        b.title = 'Sélectionnez un joueur pour voir le détail';
+        b.title = t('coach.selectPlayer');
         return;
       }
       b.classList.add('loading');
       b.disabled = true;
       b.setAttribute('aria-busy', 'true');
       var old = b.querySelector('span:nth-child(2)').textContent;
-      b.querySelector('span:nth-child(2)').textContent = 'Ouverture du détail joueur';
+      b.querySelector('span:nth-child(2)').textContent = t('coach.openingDetail');
       setTimeout(function () {
         try {
           C.focusOrigin = 'players';
@@ -275,7 +276,7 @@
           b.classList.remove('loading');
           b.removeAttribute('aria-busy');
           b.querySelector('span:nth-child(2)').textContent = old;
-          b.title = 'Impossible d’ouvrir PLAYER FOCUS. Réessayez.';
+          b.title = t('coach.focusFailed');
         }
       }, 90);
       return;
@@ -301,10 +302,18 @@
         msg = p.events.length
           ? p.events
               .map(function (x) {
-                return 'Set ' + (x.set || 1) + ' · ' + num(x.scoreA) + '–' + num(x.scoreB) + ' · ' + actionLabel(x);
+                return (
+                  t('common.setLower', { set: x.set || 1 }) +
+                  ' · ' +
+                  num(x.scoreA) +
+                  '–' +
+                  num(x.scoreB) +
+                  ' · ' +
+                  actionLabel(x)
+                );
               })
               .join('\n')
-          : 'Aucune action enregistrée.';
+          : t('capture.noAction');
       alert(msg);
     }
   });

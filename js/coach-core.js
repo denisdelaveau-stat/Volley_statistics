@@ -28,7 +28,14 @@
   var POS = window.VolleyDomain.court.POS,
     rotate = window.VolleyDomain.court.rotate,
     initialServing = Rotation.initialServing;
-  var ROLE = { setter: 'Passeur', oh: 'Réceptionneuse-attaquante', mb: 'Centrale', opp: 'Pointue', libero: 'Libéro' };
+  var t = window.VolleyI18n.t;
+  var ROLE = {
+    setter: t('coach.roleSetter'),
+    oh: t('coach.roleOh'),
+    mb: t('coach.roleMb'),
+    opp: t('coach.roleOpp'),
+    libero: t('coach.roleLibero'),
+  };
   var ROLE_SHORT = { setter: 'S', oh: 'OH', mb: 'MB', opp: 'OPP', libero: 'L' };
   var esc = window.VolleyDom.esc;
   function read(k, fallback) {
@@ -99,8 +106,8 @@
         name: '',
         status: 'empty',
         currentSet: 1,
-        team: { name: 'Équipe', roster: [] },
-        opponent: { name: 'Adversaire' },
+        team: { name: t('coach.team'), roster: [] },
+        opponent: { name: t('coach.opponent') },
         startingLineup: {},
         startingRotation: {},
         firstRally: {},
@@ -168,7 +175,7 @@
       replay: false,
       explicitContext: false,
       sourceFormat: 'volley-live-capture v1',
-      warnings: ['Phase, rotation et présence terrain sont reconstruites depuis l’historique du match.'],
+      warnings: [t('coach.inferredWarning')],
       provenance: {
         actions: true,
         scores: true,
@@ -366,10 +373,10 @@
   }
   function periodLabel() {
     return C.period === 'match'
-      ? 'Match'
+      ? t('coach.periodMatch')
       : C.period === 'last10'
-        ? '10 derniers'
-        : 'Set ' + (C.data.match.currentSet || 1);
+        ? t('coach.periodLast10')
+        : t('common.setLower', { set: C.data.match.currentSet || 1 });
   }
   function scoreNow() {
     var rr = C.data.rallies.filter(function (r) {
@@ -380,11 +387,13 @@
   }
   function periodButtons() {
     return (
-      '<div class="coach-period" aria-label="Période">' +
+      '<div class="coach-period" aria-label="' +
+      esc(t('coach.period')) +
+      '">' +
       [
-        ['set', 'SET ' + (C.data.match.currentSet || 1)],
-        ['match', 'MATCH'],
-        ['last10', '10 DERNIERS'],
+        ['set', t('common.setN', { set: C.data.match.currentSet || 1 })],
+        ['match', t('coach.periodMatchUpper')],
+        ['last10', t('coach.periodLast10Upper')],
       ]
         .map(function (x) {
           return (
@@ -403,12 +412,12 @@
   }
   function footer(ref) {
     var source = C.data.empty
-      ? 'Aucun match chargé.'
+      ? t('coach.sourceNone')
       : C.data.replay
-        ? 'Match rejoué · fichier JSON'
+        ? t('coach.sourceReplay')
         : C.data.explicitContext
-          ? 'Match chargé · volley-live v2.1'
-          : 'Match live · Capture';
+          ? t('coach.sourceV21')
+          : t('coach.sourceLive');
     return '<footer class="coach-footer"><span>' + source + '</span><span>' + ref + ' · VOLLEY LIVE</span></footer>';
   }
   function provenance(kind) {
@@ -436,13 +445,25 @@
     var warning = (C.data.warnings || []).join(' '),
       live = hasLive();
     return (
-      '<aside class="coach-provenance"><strong>Origine des données</strong><span>' +
-      (C.data.replay ? 'Replay JSON chargé.' : C.data.explicitContext ? 'Match JSON chargé.' : 'Match live chargé.') +
+      '<aside class="coach-provenance"><strong>' +
+      esc(t('coach.dataOrigin')) +
+      '</strong><span>' +
+      (C.data.replay
+        ? t('coach.replayLoaded')
+        : C.data.explicitContext
+          ? t('coach.jsonLoaded')
+          : t('coach.liveLoaded')) +
       '</span>' +
       (warning ? '<small>' + esc(warning) + '</small>' : '') +
-      '<span class="analysis-source-actions"><button type="button" data-coach-load-file>Charger JSON</button>' +
-      (C.data.replay && live ? '<button type="button" data-coach-live>Match live</button>' : '') +
-      '<button type="button" data-coach-unload>Décharger</button></span></aside>'
+      '<span class="analysis-source-actions"><button type="button" data-coach-load-file>' +
+      esc(t('coach.loadJson')) +
+      '</button>' +
+      (C.data.replay && live
+        ? '<button type="button" data-coach-live>' + esc(t('coach.liveMatch')) + '</button>'
+        : '') +
+      '<button type="button" data-coach-unload>' +
+      esc(t('coach.unload')) +
+      '</button></span></aside>'
     );
   }
   function kpi(title, value, sample, cls, kind) {
@@ -491,11 +512,15 @@
       auditClass(kind) +
       '"' +
       auditAttr(kind) +
-      '><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">' +
+      '><div class="coach-card-head"><h2>' +
+      esc(t('coach.currentSetup')) +
+      '</h2><span class="coach-chip">' +
       esc(title) +
       '</span></div>' +
       (demoOnly() ? auditBadge('POSITION DE DÉMONSTRATION') : '') +
-      '<div class="coach-court" role="img" aria-label="Organisation des joueurs sur le terrain"><div class="coach-net"></div><div class="coach-court-grid">' +
+      '<div class="coach-court" role="img" aria-label="' +
+      esc(t('coach.courtLabel')) +
+      '"><div class="coach-net"></div><div class="coach-court-grid">' +
       POS.map(function (z) {
         var p = playerInfo(m, rot[z]);
         return (
@@ -506,9 +531,9 @@
           '"><span class="number">' +
           esc(p.number) +
           '</span><span class="name">' +
-          esc(p.name || 'Joueur') +
-          '</span><small>Poste ' +
-          z.slice(1) +
+          esc(p.name || t('coach.player')) +
+          '</span><small>' +
+          esc(t('coach.zone', { zone: z.slice(1) })) +
           '</small></div>'
         );
       }).join('') +
@@ -530,9 +555,17 @@
   function emptyActions() {
     var live = hasLive();
     return (
-      '<section class="analysis-empty-message" role="status"><strong>Aucun match chargé</strong><span>Chargez un match live issu de Capture ou un fichier JSON pour afficher les statistiques.</span><div class="analysis-empty-actions"><button type="button" data-coach-live ' +
+      '<section class="analysis-empty-message" role="status"><strong>' +
+      esc(t('coach.noMatch')) +
+      '</strong><span>' +
+      esc(t('coach.noMatchHint')) +
+      '</span><div class="analysis-empty-actions"><button type="button" data-coach-live ' +
       (live ? '' : 'disabled') +
-      '>MATCH LIVE</button><button type="button" data-coach-load-file>CHARGER JSON</button></div></section>'
+      '>' +
+      esc(t('coach.liveMatchUpper')) +
+      '</button><button type="button" data-coach-load-file>' +
+      esc(t('coach.loadJsonUpper')) +
+      '</button></div></section>'
     );
   }
   function emptyKpi(title, value, label) {
@@ -548,7 +581,9 @@
   }
   function emptyCourt() {
     return (
-      '<section class="coach-card coach-court-card empty-panel"><div class="coach-card-head"><h2>Organisation actuelle</h2><span class="coach-chip">NA</span></div><div class="coach-court empty-court"><div class="coach-net"></div><div class="coach-court-grid">' +
+      '<section class="coach-card coach-court-card empty-panel"><div class="coach-card-head"><h2>' +
+      esc(t('coach.currentSetup')) +
+      '</h2><span class="coach-chip">NA</span></div><div class="coach-court empty-court"><div class="coach-net"></div><div class="coach-court-grid">' +
       POS.map(function (z) {
         return (
           '<div class="coach-player-dot empty-player"><span class="number">NA</span><span class="name">NA</span><small>' +
@@ -560,26 +595,44 @@
     );
   }
   function renderEmptyOverview() {
-    var h = sharedHeading('Vue coach', 'Aucun match actif') + emptyActions();
+    var h = sharedHeading(t('coach.overviewTitle'), t('coach.noActive')) + emptyActions();
     h +=
-      '<section class="coach-score empty-panel"><div class="coach-team">Équipe<strong class="empty-indicator">0</strong></div><div class="coach-dash">–</div><div class="coach-team away">Adversaire<strong class="empty-indicator">0</strong></div><div class="coach-match-meta">SET 0 · SETS 0–0</div><div class="coach-phase empty-indicator">NA</div></section>';
+      '<section class="coach-score empty-panel"><div class="coach-team">' +
+      esc(t('coach.team')) +
+      '<strong class="empty-indicator">0</strong></div><div class="coach-dash">–</div><div class="coach-team away">' +
+      esc(t('coach.opponent')) +
+      '<strong class="empty-indicator">0</strong></div><div class="coach-match-meta">SET 0 · SETS 0–0</div><div class="coach-phase empty-indicator">NA</div></section>';
     h +=
       '<section class="coach-grid coach-kpis">' +
-      emptyKpi('Side-out', 'NA', '0 réception') +
-      emptyKpi('Break point', 'NA', '0 service') +
-      emptyKpi('Efficacité attaque', 'NA', '0 action') +
-      emptyKpi('Réception +', 'NA', '0 réception') +
-      emptyKpi('Service', '0', '0 service') +
-      emptyKpi('Bloc', '0', '0 action') +
+      emptyKpi('Side-out', 'NA', t('coach.zeroReception')) +
+      emptyKpi('Break point', 'NA', t('coach.zeroService')) +
+      emptyKpi(t('coach.kpiAttackEff'), 'NA', t('coach.zeroAction')) +
+      emptyKpi(t('coach.kpiReceptionPlus'), 'NA', t('coach.zeroReception')) +
+      emptyKpi(t('coach.kpiServe'), '0', t('coach.zeroService')) +
+      emptyKpi(t('coach.kpiBlock'), '0', t('coach.zeroAction')) +
       '</section>' +
       emptyCourt();
     h +=
-      '<section class="coach-grid coach-two"><article class="coach-card coach-insight empty-indicator"><span class="icon">△</span><div><h3>À surveiller</h3><strong>NA</strong><span class="coach-muted">0 rallye</span></div></article><article class="coach-card coach-insight empty-indicator"><span class="icon">▥</span><div><h3>Point fort</h3><strong>NA</strong><span class="coach-muted">0 action</span></div></article></section><section class="coach-card coach-momentum empty-panel"><div><h3>Dynamique · 10 derniers points</h3><div class="empty-indicator">NA</div></div><div class="coach-run-score"><span>Équipe<strong class="empty-indicator">0</strong></span><b>·</b><span>Adversaire<strong class="empty-indicator">0</strong></span></div></section>' +
-      footer('État vide');
+      '<section class="coach-grid coach-two"><article class="coach-card coach-insight empty-indicator"><span class="icon">△</span><div><h3>' +
+      esc(t('coach.watch')) +
+      '</h3><strong>NA</strong><span class="coach-muted">' +
+      esc(t('coach.zeroRally')) +
+      '</span></div></article><article class="coach-card coach-insight empty-indicator"><span class="icon">▥</span><div><h3>' +
+      esc(t('coach.strength')) +
+      '</h3><strong>NA</strong><span class="coach-muted">' +
+      esc(t('coach.zeroAction')) +
+      '</span></div></article></section><section class="coach-card coach-momentum empty-panel"><div><h3>' +
+      esc(t('coach.momentum10')) +
+      '</h3><div class="empty-indicator">NA</div></div><div class="coach-run-score"><span>' +
+      esc(t('coach.team')) +
+      '<strong class="empty-indicator">0</strong></span><b>·</b><span>' +
+      esc(t('coach.opponent')) +
+      '<strong class="empty-indicator">0</strong></span></div></section>' +
+      footer(t('coach.emptyState'));
     content.innerHTML = h;
   }
   function renderEmptyRotations() {
-    var h = sharedHeading('Analyse des rotations', 'Aucun match actif') + emptyActions();
+    var h = sharedHeading(t('coach.rotationsTitle'), t('coach.noActive')) + emptyActions();
     h +=
       '<div class="rotation-tabs">' +
       [1, 2, 3, 4, 5, 6]
@@ -591,11 +644,13 @@
       emptyCourt();
     h +=
       '<section class="coach-grid rotation-kpis">' +
-      emptyKpi('Side-out', 'NA', '0 rallye') +
-      emptyKpi('Break point', 'NA', '0 rallye') +
-      emptyKpi('Attaque', 'NA', '0 action') +
-      emptyKpi('Réception +', 'NA', '0 réception') +
-      '</section><section class="coach-card rotation-chart empty-panel"><h2>Comparaison des rotations</h2>' +
+      emptyKpi('Side-out', 'NA', t('coach.zeroRally')) +
+      emptyKpi('Break point', 'NA', t('coach.zeroRally')) +
+      emptyKpi(t('coach.kpiAttack'), 'NA', t('coach.zeroAction')) +
+      emptyKpi(t('coach.kpiReceptionPlus'), 'NA', t('coach.zeroReception')) +
+      '</section><section class="coach-card rotation-chart empty-panel"><h2>' +
+      esc(t('coach.rotationCompare')) +
+      '</h2>' +
       [1, 2, 3, 4, 5, 6]
         .map(function (n) {
           return (
@@ -605,33 +660,61 @@
           );
         })
         .join('') +
-      '</section><section class="coach-grid rotation-summary"><article class="coach-card rotation-award empty-indicator"><span class="big">NA</span><div>Meilleure rotation<small>0 rallye</small></div></article><article class="coach-card rotation-award empty-indicator"><span class="big">NA</span><div>À surveiller<small>0 rallye</small></div></article></section>' +
-      footer('Équipe · état vide');
+      '</section><section class="coach-grid rotation-summary"><article class="coach-card rotation-award empty-indicator"><span class="big">NA</span><div>' +
+      esc(t('coach.bestRotation')) +
+      '<small>' +
+      esc(t('coach.zeroRally')) +
+      '</small></div></article><article class="coach-card rotation-award empty-indicator"><span class="big">NA</span><div>' +
+      esc(t('coach.watch')) +
+      '<small>' +
+      esc(t('coach.zeroRally')) +
+      '</small></div></article></section>' +
+      footer(t('coach.footerTeamEmpty'));
     content.innerHTML = h;
   }
   function renderEmptyPlayers() {
-    var h = sharedHeading('Performance joueurs', 'Aucun match actif') + emptyActions();
+    var h = sharedHeading(t('coach.playersTitle'), t('coach.noActive')) + emptyActions();
     h +=
-      '<div class="players-layout"><section class="coach-card empty-panel"><div class="coach-card-head"><h2>Joueurs</h2><span class="coach-chip empty-indicator">0</span></div><div class="coach-empty">0 joueur chargé.</div></section><section class="coach-card empty-panel"><h2 class="player-summary-title">NA</h2><section class="coach-grid player-summary-kpis">' +
-      emptyKpi('Attaque', 'NA', '0 action') +
-      emptyKpi('Réception', 'NA', '0 action') +
-      emptyKpi('Service', '0', '0 service') +
-      '</section><section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Rallyes</div></div><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Actions</div></div></div></article><article class="coach-card empty-indicator"><h3>Contribution</h3><strong>NA</strong></article></section><button type="button" class="player-detail-cta empty-detail-cta" data-empty-detail>Voir le détail joueur vide <span>›</span></button></section></div>' +
-      footer('Joueurs · état vide');
+      '<div class="players-layout"><section class="coach-card empty-panel"><div class="coach-card-head"><h2>' +
+      esc(t('coach.players')) +
+      '</h2><span class="coach-chip empty-indicator">0</span></div><div class="coach-empty">' +
+      esc(t('coach.zeroPlayers')) +
+      '</div></section><section class="coach-card empty-panel"><h2 class="player-summary-title">NA</h2><section class="coach-grid player-summary-kpis">' +
+      emptyKpi(t('coach.kpiAttack'), 'NA', t('coach.zeroAction')) +
+      emptyKpi(t('coach.kpiReception'), 'NA', t('coach.zeroAction')) +
+      emptyKpi(t('coach.kpiServe'), '0', t('coach.zeroService')) +
+      '</section><section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">' +
+      esc(t('coach.rallies')) +
+      '</div></div><div class="coach-kpi empty-indicator"><div class="value">0</div><div class="sample">Actions</div></div></div></article><article class="coach-card empty-indicator"><h3>Contribution</h3><strong>NA</strong></article></section><button type="button" class="player-detail-cta empty-detail-cta" data-empty-detail>' +
+      esc(t('coach.emptyDetailCta')) +
+      ' <span>›</span></button></section></div>' +
+      footer(t('coach.footerPlayersEmpty'));
     content.innerHTML = h;
   }
   function renderEmptyDetail() {
     var h =
-      '<button type="button" class="detail-back" data-empty-players>‹ Retour aux joueurs</button>' +
-      sharedHeading('Détail joueur', 'Aucun match actif') +
+      '<button type="button" class="detail-back" data-empty-players>' +
+      esc(t('coach.backToPlayers')) +
+      '</button>' +
+      sharedHeading(t('coach.detailTitle'), t('coach.noActive')) +
       emptyActions();
     h +=
-      '<section class="coach-card detail-hero empty-panel"><div class="detail-number empty-indicator">NA</div><div><div class="detail-name">NA<small>NA</small></div><span class="detail-status empty-indicator">NA</span></div><div class="detail-net">Delta<strong class="empty-indicator">0</strong><small>0 point · 0 erreur</small></div></section><section class="coach-grid player-summary-kpis">' +
-      emptyKpi('Attaque', 'NA', '0 action') +
-      emptyKpi('Réception', 'NA', '0 action') +
-      emptyKpi('Service', '0', '0 service') +
-      '</section><section class="coach-grid detail-grid"><article class="coach-card empty-indicator"><h2>Participation</h2><strong>0</strong><small> rallye</small></article><article class="coach-card empty-indicator"><h2>Points directs</h2><strong>0</strong></article><article class="coach-card empty-indicator"><h2>Performance par set</h2><strong>NA</strong></article><article class="coach-card empty-indicator"><h2>Dernières actions</h2><strong>0</strong></article></section>' +
-      footer('Détail joueur · état vide');
+      '<section class="coach-card detail-hero empty-panel"><div class="detail-number empty-indicator">NA</div><div><div class="detail-name">NA<small>NA</small></div><span class="detail-status empty-indicator">NA</span></div><div class="detail-net">Delta<strong class="empty-indicator">0</strong><small>' +
+      esc(t('coach.zeroPointError')) +
+      '</small></div></section><section class="coach-grid player-summary-kpis">' +
+      emptyKpi(t('coach.kpiAttack'), 'NA', t('coach.zeroAction')) +
+      emptyKpi(t('coach.kpiReception'), 'NA', t('coach.zeroAction')) +
+      emptyKpi(t('coach.kpiServe'), '0', t('coach.zeroService')) +
+      '</section><section class="coach-grid detail-grid"><article class="coach-card empty-indicator"><h2>Participation</h2><strong>0</strong><small> ' +
+      esc(t('coach.rallyWord')) +
+      '</small></article><article class="coach-card empty-indicator"><h2>' +
+      esc(t('coach.directPoints')) +
+      '</h2><strong>0</strong></article><article class="coach-card empty-indicator"><h2>' +
+      esc(t('coach.perSet')) +
+      '</h2><strong>NA</strong></article><article class="coach-card empty-indicator"><h2>' +
+      esc(t('coach.lastActions')) +
+      '</h2><strong>0</strong></article></section>' +
+      footer(t('coach.footerDetailEmpty'));
     content.innerHTML = h;
   }
   function renderEmpty() {
