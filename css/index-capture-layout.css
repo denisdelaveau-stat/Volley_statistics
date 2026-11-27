@@ -1,14 +1,92 @@
 /* v1.1.4 layout: UNDO alone and centred; file buttons at the bottom of the page */
-#capturePanel .capture-tools{display:flex!important;flex-direction:column;align-items:center;gap:8px}
-#capturePanel .capture-tools button{flex:none!important;width:min(320px,70%)!important}
-.file-tools{margin:24px 0 calc(16px + env(safe-area-inset-bottom));padding-top:14px;border-top:2px solid #e2e8f0}
-.file-tools-row{display:flex;gap:10px}
-.file-tools-row button{flex:1;min-height:52px;border:2px solid transparent;border-radius:12px;font-size:15px;font-weight:800;touch-action:manipulation;cursor:pointer}
-.file-status{margin-top:8px;font-size:13px;color:#475569;min-height:18px;word-break:break-all}
+#capturePanel .capture-tools {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+#capturePanel .capture-tools button {
+  flex: none !important;
+  width: min(320px, 70%) !important;
+}
+.file-tools {
+  margin: 24px 0 calc(16px + env(safe-area-inset-bottom));
+  padding-top: 14px;
+  border-top: 2px solid #e2e8f0;
+}
+.file-tools-row {
+  display: flex;
+  gap: 10px;
+}
+.file-tools-row button {
+  flex: 1;
+  min-height: 52px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+.file-status {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #475569;
+  min-height: 18px;
+  word-break: break-all;
+}
 /* v1.2.0 detail level */
-.su-select{width:100%;font-size:18px;min-height:52px;padding:10px 12px;border:2px solid #d7dde3;border-radius:10px;background:#fff;color:#17202a;font-weight:700}
-.su-roster-limit{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:end;margin-bottom:8px}.su-roster-limit label{margin-bottom:4px}.su-roster-limit label small{display:block;font-size:10px;font-weight:600}.su-roster-limit .su-select{min-height:46px;font-size:16px;padding:7px 10px}
-.team-btns{display:grid;grid-template-columns:1fr;gap:12px}
-.team-btns .touch{width:100%;min-height:96px;font-size:26px;font-weight:900}
-.team-btns .team-a{background:#1e2a4a;border-color:#1e2a4a;color:#fff}
-.sets-line .lvl-chip{background:#7c3aed;color:#fff;border-radius:6px;padding:3px 7px;letter-spacing:.04em}
+.su-select {
+  width: 100%;
+  font-size: 18px;
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 2px solid #d7dde3;
+  border-radius: 10px;
+  background: #fff;
+  color: #17202a;
+  font-weight: 700;
+}
+.su-roster-limit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+.su-roster-limit label {
+  margin-bottom: 4px;
+}
+.su-roster-limit label small {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+}
+.su-roster-limit .su-select {
+  min-height: 46px;
+  font-size: 16px;
+  padding: 7px 10px;
+}
+.team-btns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.team-btns .touch {
+  width: 100%;
+  min-height: 96px;
+  font-size: 26px;
+  font-weight: 900;
+}
+.team-btns .team-a {
+  background: #1e2a4a;
+  border-color: #1e2a4a;
+  color: #fff;
+}
+.sets-line .lvl-chip {
+  background: #7c3aed;
+  color: #fff;
+  border-radius: 6px;
+  padding: 3px 7px;
+  letter-spacing: 0.04em;
+}

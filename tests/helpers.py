@@ -19,7 +19,7 @@ def compact_css(text: str) -> str:
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
     text = re.sub(r"\s+", " ", text)
     text = re.sub(r"\s*([{}:;,>()])\s*", r"\1", text)
-    text = re.sub(r"=\"([^\"]*)\"\]", r"=\1]", text)
+    text = re.sub(r"=([\"'])([^\"']*)\1\]", r"=\2]", text)
     text = re.sub(r"(?<![\w.])\.(\d)", r"0.\1", text)
     return text.replace(";}", "}").lower().strip()
 

@@ -25,7 +25,7 @@ JavaScript tooling (Node.js 20 or later):
 ```bash
 npm ci
 npm run lint          # ESLint, no warning allowed
-npm run format        # Prettier (JavaScript only; HTML and CSS are hand-formatted)
+npm run format        # Prettier (JavaScript and CSS; HTML is hand-formatted)
 npm run format:check
 npm run test:unit     # node:test unit tests (tests/unit)
 ```
