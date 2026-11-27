@@ -86,7 +86,7 @@ The capture scripts share one documented object instead of ad-hoc globals. It is
 
 FIVB 7.3.2: the coach hands in a line-up sheet before each set, so the starting players and the rotation order may change. Set 1 is `match.startingLineup` (roles: `setter`, `oh1`, `mb1`, `opposite`, `oh2`, `mb2`, `libero`) and `match.startingRotation` (`p1`..`p6`), written by the New Match wizard. A later set has `match.setLineups[n] = {startingLineup, startingRotation}`. `VolleyDomain.lineup.forSet(match, n)` returns the line-up of set `n`; a set without its own line-up keeps the line-up of the previous set, so matches recorded before per-set line-ups replay unchanged. `statistics/adapter.js` has the same rule (`lineupForSetV1`). The rotation engine, the substitution rules (starters of the set), the Coach View (setter, rotations) and the Spectator matrix use it.
 
-When a set ends, « DÉMARRER LE SET N » opens the set line-up sheet (`js/index-set-lineup.js`, `VolleySetLineup`), filled with the previous set's line-up: setter starting zone and one player per role; the rotation is derived as in the wizard (`rotationFromRoles`: setter, OH1, MB1, opposite, OH2, MB2 from the setter's zone). Six different present players, no libero (19.1). Enforced by `tests/unit/set-lineup.test.js`, `tests/unit/court-consistency.test.js` and `tests/capture/test_set_lineup.py`.
+When a set ends, « DÉMARRER LE SET N » opens the set line-up sheet (`js/index-set-lineup.js`, `VolleySetLineup`), filled with the previous set's line-up: setter starting zone and one player per role; the rotation is derived as in the wizard (`rotationFromRoles`: setter, OH1, MB1, opposite, OH2, MB2 from the setter's zone). Six different present players, no libero (19.1); the acting libero is chosen among the designated liberos. Enforced by `tests/unit/set-lineup.test.js`, `tests/unit/court-consistency.test.js` and `tests/capture/test_set_lineup.py`.
 
 ## Rotation and libero rules
 
@@ -101,7 +101,8 @@ Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the 
   - the Libero can only be replaced by the regular player it replaced (19.3.2.2).
 - `trace()` applies the Libero rules rally after rally (`liberoFor`, the player the Libero replaces). Without that history (a theoretical rotation in the Coach View Rotations tab, or the explicit v2 context), the first middle blocker in an allowed zone is replaced.
 - Each set starts from its own line-up (`VolleyDomain.lineup.forSet`). Middle blockers come from the starting line-up of the set (`mb1`, `mb2`) and follow substitutions. When the line-up does not name them (v2 documents), they are the roster players with position MB.
-- Not modelled: the second Libero and Libero re-designation (19.1.1, 19.4). The data has one Libero per match.
+- Two Liberos (19.1.1): the designated Liberos are the Libero of the line-ups and the roster players registered as Libero. Each set line-up names its acting Libero (or none). Replacing the acting Libero by the other one (« ⇄ Remplacement » sheet) is a Libero replacement, not a substitution (19.3.2): never during a rally, and only with a completed rally since the previous Libero replacement, a Libero coming in or going out at this break included (19.3.2.1; `VolleySubstitutions.liberoSwap()`). It is stored as a `match.subs` entry with `libero: true`; `trace()` and the adapter switch the acting Libero, every `trace()` step records it (`lib`).
+- Not modelled yet: Libero re-designation (19.4).
 - Enforced by `tests/unit/rotation.test.js`, `tests/unit/libero-fivb.test.js` (property test over simulated sets, every starting rotation, middle blockers opposite or adjacent) and `tests/unit/court-consistency.test.js` (engine and adapter agree at every event).
 
 ## Substitution rules
@@ -109,7 +110,7 @@ Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the 
 `js/index-substitution-rules.js` (`VolleySubstitutions`, pure) checks every substitution against the FIVB Official Volleyball Rules 2025-2028, Rule 15. The capture screen opens it from the « ⇄ Remplacement » button of `runtime-input.js`:
 
 - at most six regular substitutions per set (15.1);
-- the Libero is never part of a substitution (15.5.1);
+- the Libero is never part of a substitution (15.5.1); a Libero replacement (`libero: true`, see "Rotation and libero rules") is not counted;
 - a starting player leaves once per set and comes back once, only in place of his/her substitute (15.6.1);
 - a substitute enters once per set and is only replaced by the starting player he/she replaced (15.6.2);
 - an exceptional substitution (injury, illness) is offered only when no regular one is possible. It is recorded with `exceptional: true` and does not count in the six. The replaced player cannot come back in the match (15.7);

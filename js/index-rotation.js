@@ -101,7 +101,7 @@
     }
   }
 
-  // Replays one set. steps[i] is the state (rotation, serving team, player replaced by the libero) when event i is
+  // Replays one set. steps[i] is the state (rotation, serving team, acting libero, player it replaces) when event i is
   // logged, after the substitutions made before it. The other fields are the state after the last event.
   function trace(match, evs, setNo) {
     setNo = setNo || match.currentSet || 1;
@@ -135,7 +135,7 @@
     (evs || []).forEach(function (e, i) {
       subsAt(i);
       placeLibero();
-      steps.push({ rot: Object.assign({}, state.rot), serving: serving, liberoFor: state.liberoFor });
+      steps.push({ rot: Object.assign({}, state.rot), serving: serving, liberoFor: state.liberoFor, lib: state.lib });
       if (e.winningTeam === 'team1') {
         if (serving === 'B') {
           state.rot = rotate(state.rot);

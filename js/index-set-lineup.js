@@ -2,9 +2,9 @@
    FIVB 7.3.2: the coach hands in a line-up sheet before each set, so the starting players and the rotation order may
    change. When a set ends, "Start set N" opens this sheet, filled with the line-up of the previous set: the setter's
    starting zone and the player of each role (setter, OH1, MB1, opposite, OH2, MB2). The rotation is derived from the
-   roles as in the New Match wizard (VolleyDomain.lineup.rotationFromRoles). The libero is the one of the previous set
-   (shown, not changed here). Rules checked: six different registered players, present, none of them a libero
-   (19.1: the libero is not part of the starting six).
+   roles as in the New Match wizard (VolleyDomain.lineup.rotationFromRoles). The acting libero is chosen among the
+   designated liberos (up to two, 19.1.1), or none. Rules checked: six different registered players, present, none of
+   them a libero (19.1: the libero is not part of the starting six).
    open(match, setNo, onConfirm): onConfirm({startingLineup, startingRotation}) is called when the coach confirms. */
 (function () {
   'use strict';
@@ -38,6 +38,13 @@
   }
   function liberos(match) {
     return window.VolleySubstitutions ? window.VolleySubstitutions.liberos(match) : [];
+  }
+  // Designated liberos present for the match: the acting libero of a set is one of them.
+  function presentLiberos(match) {
+    return liberos(match).filter(function (n) {
+      var p = playerOf(match, n);
+      return !p || p.present !== false;
+    });
   }
   // Players who may start: present, registered, not a libero.
   function eligible(match) {
@@ -157,11 +164,25 @@
       h += '</select></label>';
     });
     h +=
-      '</div><p class="set-lineup-libero">' +
-      esc(t('wizard.roleLibero')) +
-      ' : ' +
-      esc(state.libero != null ? label(match, state.libero) : '–') +
-      '</p>' +
+      '</div><label class="set-lineup-libero"><span>' +
+      esc(t('lineup.libero')) +
+      '</span><select data-lineup-libero><option value="">' +
+      esc(t('lineup.noLibero')) +
+      '</option>' +
+      presentLiberos(match)
+        .map(function (n) {
+          return (
+            '<option value="' +
+            esc(n) +
+            '"' +
+            (same(state.libero, n) ? ' selected' : '') +
+            '>' +
+            esc(label(match, n)) +
+            '</option>'
+          );
+        })
+        .join('') +
+      '</select></label>' +
       (error ? '<p class="set-lineup-error" role="alert">' + esc(error) + '</p>' : '') +
       '<div class="set-lineup-actions"><button type="button" class="set-lineup-cancel" data-lineup-cancel>' +
       esc(t('common.cancel')) +
@@ -222,7 +243,13 @@
   }
   function onChange(e) {
     var select = e.target;
-    if (!state || !select.dataset || !select.dataset.lineupRole) return;
+    if (!state || !select.dataset) return;
+    if (select.hasAttribute('data-lineup-libero')) {
+      var libero = playerOf(state.match, select.value);
+      state.libero = libero ? libero.number : null;
+      return;
+    }
+    if (!select.dataset.lineupRole) return;
     var p = playerOf(state.match, select.value);
     state.roles[select.dataset.lineupRole] = p ? p.number : null;
     render('[data-lineup-role="' + select.dataset.lineupRole + '"]');

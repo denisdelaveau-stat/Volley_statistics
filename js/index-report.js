@@ -62,8 +62,9 @@
       E(t('report.subs')) +
       '</th></tr>';
     su.sets.forEach(function (x) {
+      // Substitutions only: a libero replacement (q.libero, FIVB 19.3.2) is not one.
       var ns = (MATCH.subs || []).filter(function (q) {
-        return q.set === x.set;
+        return q.set === x.set && !q.libero;
       }).length;
       h +=
         '<tr><td>' +
@@ -187,6 +188,7 @@
           q['in'] +
           ' ' +
           E((i && i.name) || '') +
+          (q.libero ? ' · ' + E(t('report.liberoSwap')) : '') +
           '</td><td>#' +
           q.out +
           ' ' +

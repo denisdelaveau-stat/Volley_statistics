@@ -587,6 +587,8 @@
             applySubstitutions(lineup, [sub]);
             middleBlockers = applyMiddleBlockerSubstitution(middleBlockers, sub);
             if (liberoFor != null && String(liberoFor) === String(sub.out)) liberoFor = number(sub.in, sub.in);
+            // Libero replacement by the other libero (19.3.2): the incoming libero becomes the acting one.
+            if (liberoNumber != null && String(liberoNumber) === String(sub.out)) liberoNumber = number(sub.in, sub.in);
             applied++;
           }
           liberoFor = nextLiberoForV1(liberoFor, lineup, middleBlockers, liberoNumber, phase);
