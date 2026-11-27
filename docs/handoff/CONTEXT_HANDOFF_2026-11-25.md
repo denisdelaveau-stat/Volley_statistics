@@ -30,7 +30,6 @@ Rules and contracts are documented in `docs/ARCHITECTURE.md` (sections "Capture 
 - **Capture screen charts: removed on 2026-11-27** (decision of the same day). The statistics panel had been hidden since v1.6.4 (`display:none!important`) but its four charts (score progression, point origin, errors, attacker cards: about 1,150 lines) were recomputed after every action. Removed: `js/index-chart-*.js`, the panel markup, its CSS and the drawing calls. Kept: the chart data `volleyCapture.chartData.v1` (now built in `js/index-capture-tools.js`, same format; read by the Match Hub and `statistics/adapter.js`, checked by `tests/capture/test_chart_data.py`) and `VolleyStats` with `attCss` (attacker cards of the HTML report). The same statistics are in the Spectator View (score and fault evolution, ranking) and the Coach View.
 - Starting players are taken from `match.startingRotation` for every set (substitution rules, Rule 15): a different line-up per set needs a data-format change.
 - Second libero and libero re-designation (FIVB 19.1.1, 19.4) are not modelled: one libero per match in the data.
-- `tests/capture/test_capture_regressions.py::test_set_end_undo_and_exports` is skipped: out of date since v1.28 (runtime input and set-end screen changed) and already left out of the old gate. To rewrite against the current capture screen (set end, Undo after a finished set, exports).
 
 ### Remaining audit step
 

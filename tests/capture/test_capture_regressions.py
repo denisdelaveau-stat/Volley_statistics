@@ -1,7 +1,8 @@
 """Cross-feature regression checks for score, set lock, Undo, report and cache version."""
+import json
+import re
 from pathlib import Path
 
-import pytest
 from helpers import ROOT, events, open_match, wait_guard, CACHE_NAME
 
 
@@ -18,11 +19,21 @@ def _point(page, author):
     page.locator(f'[data-runtime-author="{author}"]').click()
     page.locator('[data-runtime-action="attack"]').click()
     page.locator('[data-runtime-result="point"]').click()
+    # Runtime input ignores taps for 500 ms after each commit (double-tap guard).
     page.wait_for_timeout(600)
 
 
-@pytest.mark.skip(reason="Out of date since v1.28 (runtime input and set-end screen changed); it was already left out of the approved gate. To rewrite against the current capture screen.")
-def test_set_end_undo_and_exports(browser):
+def _score(page):
+    return page.locator("#liveScore .digit-box").all_inner_texts()
+
+
+def _locked(page):
+    return "locked" in (page.get_attribute("#capturePanel", "class") or "")
+
+
+def test_set_end_lock_undo_next_set_and_exports(browser):
+    """24-24 in set 1: the set needs a two-point lead, locks the capture once won, can be reopened by deleting the
+    last action, then set 2 starts at 0-0; the HTML report and the JSON file describe the match."""
     seed, a, b = [], 0, 0
     for i in range(48):
         if i % 2 == 0:
@@ -30,12 +41,20 @@ def test_set_end_undo_and_exports(browser):
         else:
             b += 1; winner = "team2"
         seed.append(scoring_event(i + 1, winner, a, b))
-    page, errors = open_match(browser, events=seed)
-    assert page.locator("#liveScore .digit-box").all_inner_texts() == ["24", "24"]
+    page, errors = open_match(browser, events=seed, viewport={"width": 1180, "height": 820})
+    assert _score(page) == ["24", "24"]
+
+    # 25-24 is not enough (two-point lead), 26-24 wins the set and locks the capture.
     _point(page, "3")
+    assert _score(page) == ["25", "24"] and not _locked(page)
+    assert page.locator("#setOver").is_hidden()
     _point(page, "3")
-    assert "locked" in page.get_attribute("#capturePanel", "class")
-    assert "SET 1 FINISHED" in page.inner_text("#setOverTitle")
+    assert _score(page) == ["26", "24"] and _locked(page)
+    assert page.inner_text("#setOverTitle") == "SET 1 TERMINÉ"
+    assert "26-24" in page.inner_text("#setOverText") and "Sets 1 : 0" in page.inner_text("#setOverText")
+    assert page.inner_text("#nextSetBtn") == "DÉMARRER LE SET 2 →"
+
+    # A locked set refuses new actions.
     count = len(events(page))
     page.evaluate("""() => {
       document.querySelector('[data-runtime-author="A"]')?.click();
@@ -44,14 +63,41 @@ def test_set_end_undo_and_exports(browser):
     }""")
     assert len(events(page)) == count
 
+    # Deleting the last action reopens the set at 25-24; scoring goes on (25-25).
     page.click("#historyToggle")
     page.click("[data-delete-last]")
+    wait_guard(page)
     assert len(events(page)) == count - 1
-    assert "locked" not in page.get_attribute("#capturePanel", "class")
+    assert _score(page) == ["25", "24"] and not _locked(page)
+    assert page.locator("#setOver").is_hidden()
+    _point(page, "A")
+    assert _score(page) == ["25", "25"]
+    _point(page, "3")
+    _point(page, "3")
+    assert _score(page) == ["27", "25"] and _locked(page)
+
+    # Exports describe the finished set.
     report = page.evaluate("VolleyCapture.buildReport()")
-    assert "Antibes vs Nice" in report and "Action log" in report and "25 : 24" in report
-    assert page.evaluate("typeof VolleyShell.saveMatchJson") == "function"
-    assert not errors
+    for text in ("Antibes vs Nice", "Journal des actions"):
+        assert text in report, text
+    # Sets table: set 1, 27-25, won by Antibes.
+    assert re.search(r"Set 1</td>\s*<td[^>]*>27</td>\s*<td[^>]*>25</td>\s*<td[^>]*>Antibes</td>", report)
+    with page.expect_download() as download:
+        page.evaluate("VolleyShell.saveMatchJson()")
+    saved = json.loads(Path(download.value.path()).read_text(encoding="utf-8"))
+    assert saved["format"] == "volley-live-capture" and saved["version"] == 1
+    assert len(saved["events"]) == len(events(page))
+    assert saved["score"] == {"team1": 27, "team2": 25}
+
+    # Next set: 0-0, capture open again, one set won.
+    page.click("#nextSetBtn")
+    page.wait_for_timeout(200)
+    assert _score(page) == ["0", "0"] and not _locked(page)
+    assert page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1')).currentSet") == 2
+    assert page.locator("#liveScore .set-badge").all_inner_texts() == ["1", "0"]
+    _point(page, "3")
+    assert _score(page) == ["1", "0"]
+    assert not errors, errors
     page.close()
 
 
