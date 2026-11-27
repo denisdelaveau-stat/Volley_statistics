@@ -3,7 +3,7 @@ import sys
 import pytest
 from playwright.sync_api import sync_playwright
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "support"))
 from helpers import CHROMIUM
 
 LANGUAGE_KEY = "volleyLive.language.v1"

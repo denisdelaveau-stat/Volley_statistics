@@ -6,7 +6,7 @@ import os
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 APP_URI = (ROOT / "index.html").as_uri()
 CHROMIUM = os.environ.get("CHROMIUM_PATH", "/opt/pw-browsers/chromium-1228/chrome-linux64/chrome")
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()

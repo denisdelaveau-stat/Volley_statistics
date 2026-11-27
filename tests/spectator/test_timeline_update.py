@@ -1,7 +1,7 @@
 """v1.16.0 LIVE TIMELINE update from the `time line.docx` acceptance rules."""
 from __future__ import annotations
 
-from test_spectator_timeline_v1_15 import archive_v2, open_spectator
+from spectator_support import archive_v2, open_spectator
 
 
 def test_away_point_and_fault_are_only_coloured_a_circles(browser):

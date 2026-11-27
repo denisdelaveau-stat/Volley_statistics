@@ -8,52 +8,14 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageStat
 
 from helpers import compact_css
-from test_spectator_timeline_v1_15 import V2_FIXTURE, archive_v2, open_spectator
+from spectator_support import V2_FIXTURE, archive_v2, evolution_fixture, open_spectator, two_set_fixture
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 VIEWPORTS = {
     "desktop_1536x1024": {"width": 1536, "height": 1024},
     "landscape_844x390": {"width": 844, "height": 390},
     "portrait_390x844": {"width": 390, "height": 844},
 }
-
-
-def evolution_fixture():
-    # Every row is an official closed rally. ERROR belongs to the team that committed the fault.
-    return archive_v2([
-        (0, 1, "HOME", "AWAY", "HOME", "ATTACK", "POINT"),      # HOME SO
-        (0, 2, "HOME", "HOME", "HOME", "BLOCK", "POINT"),       # HOME BP
-        (1, 2, "AWAY", "HOME", "HOME", "SERVICE", "ERROR"),     # HOME fault, AWAY SO
-        (2, 2, "AWAY", "AWAY", "AWAY", "ATTACK", "POINT"),      # AWAY BP
-        (2, 3, "HOME", "AWAY", "AWAY", "SERVICE", "ERROR"),     # AWAY fault, HOME SO
-        (3, 3, "AWAY", "AWAY", "AWAY", "ATTACK", "POINT"),
-        (3, 4, "HOME", "AWAY", "HOME", "ATTACK", "POINT"),
-        (4, 4, "AWAY", "HOME", "AWAY", "ATTACK", "POINT"),
-        (4, 5, "HOME", "AWAY", "HOME", "ATTACK", "POINT"),
-        (5, 5, "AWAY", "HOME", "AWAY", "ATTACK", "POINT"),
-        (5, 6, "HOME", "AWAY", "HOME", "ATTACK", "POINT"),
-    ])
-
-
-def two_set_fixture():
-    data = evolution_fixture()
-    data["match"]["currentSetNumber"] = 2
-    data["sets"] = [
-        {"setId": "s1", "setNumber": 1, "status": "COMPLETED", "initialServingTeamId": "away", "finalScore": {"our": 2, "opponent": 1}},
-        {"setId": "s2", "setNumber": 2, "status": "IN_PROGRESS", "initialServingTeamId": "home", "finalScore": {"our": 1, "opponent": 1}},
-    ]
-    for idx, rally in enumerate(data["rallies"]):
-        if idx < 3:
-            continue
-        rally["setId"] = "s2"
-        rally["setNumber"] = 2
-        rally["rallyNumber"] = idx - 2
-        data["events"][idx]["setNumber"] = 2
-    # Keep only two rallies in set 2 for a precise reset assertion.
-    keep = {r["rallyId"] for r in data["rallies"][:5]}
-    data["rallies"] = data["rallies"][:5]
-    data["events"] = [e for e in data["events"] if e["rallyId"] in keep]
-    return data
 
 
 def open_graph(browser, data, viewport=None, window="all"):

@@ -1,7 +1,7 @@
 """VolleyLive v1.26.1 SPECTATOR VIEW reference-capture acceptance rules."""
 from __future__ import annotations
 
-from test_spectator_timeline_v1_15 import archive_v2, open_spectator
+from spectator_support import archive_v2, open_spectator
 
 
 def reference_fixture():

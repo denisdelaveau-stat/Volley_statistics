@@ -49,7 +49,7 @@ jobs:
       - name: Approved test gate
         run: |
           set +e
-          bash tests/run_v1_28_approved.sh -rfE 2>&1 | tee pytest.log
+          bash tests/run_gate.sh -rfE 2>&1 | tee pytest.log
           status=${PIPESTATUS[0]}
           python tools/ci_annotate_failures.py pytest.log
           exit $status

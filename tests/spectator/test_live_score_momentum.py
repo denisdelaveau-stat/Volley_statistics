@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 from PIL import Image, ImageChops, ImageStat
 
-from test_spectator_timeline_v1_15 import SPECTATOR_URI, archive_v2, open_spectator
+from spectator_support import SPECTATOR_URI, archive_v2, open_spectator
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def points(sequence: str, set_number: int = 1):

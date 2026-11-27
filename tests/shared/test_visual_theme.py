@@ -29,7 +29,7 @@ def test_saturated_role_palette_and_coach_setup_background(browser):
 
 def test_theme_css_preserves_orange_courts_and_coloured_actions():
     from pathlib import Path
-    root = Path(__file__).resolve().parents[1]
+    root = Path(__file__).resolve().parents[2]
     from helpers import compact_css
     css = compact_css((root / 'index.html').read_text(encoding='utf-8') + ''.join(
         p.read_text(encoding='utf-8') for p in sorted((root / 'css').glob('index-*.css'))))

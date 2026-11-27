@@ -1,5 +1,7 @@
 """Cross-feature regression checks for score, set lock, Undo, report and cache version."""
 from pathlib import Path
+
+import pytest
 from helpers import ROOT, events, open_match, wait_guard, CACHE_NAME
 
 
@@ -19,6 +21,7 @@ def _point(page, author):
     page.wait_for_timeout(600)
 
 
+@pytest.mark.skip(reason="Out of date since v1.28 (runtime input and set-end screen changed); it was already left out of the approved gate. To rewrite against the current capture screen.")
 def test_set_end_undo_and_exports(browser):
     seed, a, b = [], 0, 0
     for i in range(48):

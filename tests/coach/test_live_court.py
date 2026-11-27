@@ -9,7 +9,7 @@ from helpers import APP_URI, base_match
 
 UI_LANGUAGE = "en"  # assertions below use the English interface
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 V2_FIXTURE = json.loads((ROOT / "statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json").read_text(encoding="utf-8"))
 V1_REFERENCE = json.loads((ROOT / "tests/data/As_cannes_vs_Frejus_2026-11-15.capture.v1.json").read_text(encoding="utf-8"))
 

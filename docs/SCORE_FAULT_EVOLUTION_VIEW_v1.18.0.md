@@ -20,4 +20,4 @@ Controls meet the 44 CSS pixel target, remain keyboard operable and expose visib
 
 ## Evidence
 
-Automated coverage is in `tests/test_score_fault_evolution_v1_18.py`. Visual regression baselines cover desktop/tablet landscape, smartphone landscape and smartphone portrait. Additional screenshots cover HOME/AWAY lead, equality, a long set, no rally, one rally and history browse with `Retour au direct`.
+Automated coverage is in `tests/spectator/test_score_fault_evolution.py`. Visual regression baselines cover desktop/tablet landscape, smartphone landscape and smartphone portrait. Additional screenshots cover HOME/AWAY lead, equality, a long set, no rally, one rally and history browse with `Retour au direct`.
