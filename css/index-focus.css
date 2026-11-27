@@ -1,9 +1,46 @@
 /* v1.3.0 Focus */
-.su-focus{grid-column:1 / -1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#334155}
-.su-focus input{width:22px;height:22px;accent-color:#16a34a}
-.su-row.nofocus .su-num{color:#94a3b8}
-.court-grid .touch.nofocus,.bench-row .touch.nofocus{background:#f1f5f9!important;border:3px dashed #94a3b8!important;color:#64748b;pointer-events:none}
-#capturePanel.sub-mode .court-grid .touch.nofocus,#capturePanel.sub-mode .bench-row .touch.nofocus{pointer-events:auto}
-.touch .nf{display:block;font-size:13px;font-weight:800;letter-spacing:.08em;color:#475569}
-.team-focus-btn{background:#1565c0;border-color:#1565c0;color:#fff;margin-bottom:8px;width:100%}
-.team-focus-btn[hidden]{display:none}
+.su-focus {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+}
+.su-focus input {
+  width: 22px;
+  height: 22px;
+  accent-color: #16a34a;
+}
+.su-row.nofocus .su-num {
+  color: #94a3b8;
+}
+.court-grid .touch.nofocus,
+.bench-row .touch.nofocus {
+  background: #f1f5f9 !important;
+  border: 3px dashed #94a3b8 !important;
+  color: #64748b;
+  pointer-events: none;
+}
+#capturePanel.sub-mode .court-grid .touch.nofocus,
+#capturePanel.sub-mode .bench-row .touch.nofocus {
+  pointer-events: auto;
+}
+.touch .nf {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #475569;
+}
+.team-focus-btn {
+  background: #1565c0;
+  border-color: #1565c0;
+  color: #fff;
+  margin-bottom: 8px;
+  width: 100%;
+}
+.team-focus-btn[hidden] {
+  display: none;
+}

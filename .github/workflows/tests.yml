@@ -28,7 +28,7 @@ jobs:
       - name: ESLint (no warnings allowed)
         run: npm run lint
 
-      - name: Prettier (JavaScript)
+      - name: Prettier (JavaScript and CSS)
         run: npx prettier --check .
 
       - name: Unit tests (node:test)

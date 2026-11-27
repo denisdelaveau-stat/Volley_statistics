@@ -33,7 +33,7 @@ Rules and contracts are documented in `docs/ARCHITECTURE.md` (sections "Capture 
 
 ### Remaining audit step
 
-- Step 6, later: tests that assert minified CSS prevent CSS formatting; tests organised by feature instead of by version.
+- Step 6: CSS done on 2026-11-27 (format-independent CSS assertions, all stylesheets formatted by Prettier, 34 screens compared pixel by pixel: identical). Left: tests organised by feature instead of by version.
 
 ### Interface translation FR/EN (2026-11-27, all green in CI)
 
@@ -62,7 +62,7 @@ French is the default language; English is chosen in Settings (page reloaded). H
 - Cross-module calls that point to a module loaded later use a deferred wrapper (`function render(){return P.render.apply(this,arguments)}`); the later module must export the function to the shared namespace.
 - The Windows machine used on 2026-11-26 has no `gh`. Node.js LTS and Python 3.12 were installed there with winget; the test venv is `C:\Users\denis\.venvs\volley-tests` (outside the repository). On Windows the gate shows only the 6 known visual-baseline failures. CI status was read from the public GitHub API (job logs need authentication); the manifest was regenerated with an equivalent shell loop (`git cat-file blob :<path> | sha256sum`, paths sorted with `LC_ALL=C`).
 - Git has no identity configured on that machine; commits used the same author as the earlier ones via `git -c user.name=... -c user.email=...`.
-- Point 3 details: Prettier formats JavaScript only (`printWidth` 120, single quotes, `trailingComma: es5`); HTML and CSS are excluded because tests assert exact markup and minified CSS. Formatting was checked with `prettier --debug-check` (AST unchanged) and the headless Chrome comparisons. ESLint runs `js.configs.recommended` with browser globals and the project globals listed in `eslint.config.js`; 0 errors, 12 warnings left on purpose (unused locals in existing code, harmless `var` re-declarations, and `exportReport()` in `js/index-capture-tools.js`, which is defined but never called).
+- Point 3 details: Prettier formats JavaScript and, since 2026-11-27, CSS (`printWidth` 120, single quotes, `trailingComma: es5`); HTML is excluded because tests assert exact markup. CSS assertions use `compact_css()` in `tests/helpers.py`. Formatting was checked with `prettier --debug-check` (AST unchanged) and the headless Chrome comparisons. ESLint runs `js.configs.recommended` with browser globals and the project globals listed in `eslint.config.js`; 0 errors, 12 warnings left on purpose (unused locals in existing code, harmless `var` re-declarations, and `exportReport()` in `js/index-capture-tools.js`, which is defined but never called).
 - After point 3, run `npm run format` before committing JavaScript changes, or CI fails on `prettier --check`.
 - Remaining: the Mobile Coach View OPP rotation spec, and the new specs added to `TO_DO/` after this handoff (Coach Intelligence, Capture 2 portrait, Matrix full capture, Physical gamepad input, Timeout card, Match report generation, End-of-set summary, Match summary JSON, Consolidated report, Real-time sharing).
 

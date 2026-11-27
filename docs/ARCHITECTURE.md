@@ -25,7 +25,7 @@
 | `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` (run by `.github/workflows/tests.yml`) |
 | `tests/unit/` | `node:test` unit tests of the pure modules (rotation and libero rules, set and match rules, adapter, engine/adapter consistency); `npm run test:unit`, run by CI. `load-browser-scripts.js` loads the classic browser scripts in an isolated `vm` context |
 | `tools/` | `bump_version.py` (release version) and `generate_manifest.py` (source manifest) |
-| `package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Development tooling only (the app has no build step): `npm run lint` (ESLint), `npm run format` / `npm run format:check` (Prettier, JavaScript only; HTML and CSS stay hand-formatted because tests assert exact markup and minified CSS). CI runs both |
+| `package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Development tooling only (the app has no build step): `npm run lint` (ESLint), `npm run format` / `npm run format:check` (Prettier, JavaScript and CSS; HTML stays hand-formatted because tests assert exact markup; CSS assertions go through `compact_css()` in `tests/helpers.py`, so they do not depend on formatting). CI runs both |
 
 ## Interfaces and their specifications
 

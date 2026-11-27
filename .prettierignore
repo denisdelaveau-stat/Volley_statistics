@@ -1,5 +1,5 @@
-# Prettier formats JavaScript only.
-# HTML and CSS stay hand-formatted: several tests assert minified CSS and exact markup strings.
+# Prettier formats JavaScript and CSS.
+# HTML stays hand-formatted: tests assert exact markup strings. CSS assertions use tests/helpers.py compact_css().
 node_modules/
 docs/
 tests/data/
@@ -8,7 +8,7 @@ TO_DO/
 icons/
 statistics/data/
 *.html
-*.css
+
 *.md
 *.json
 *.webmanifest
