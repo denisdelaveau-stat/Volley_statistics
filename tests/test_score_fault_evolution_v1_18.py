@@ -7,6 +7,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageStat
 
+from helpers import compact_css
 from test_spectator_timeline_v1_15 import V2_FIXTURE, archive_v2, open_spectator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -208,7 +209,7 @@ def test_empty_one_rally_accessibility_keyboard_touch_and_reduced_motion(browser
     page.locator("#evolutionSet").focus()
     assert page.evaluate("document.activeElement.id") == "evolutionSet"
     css = (ROOT / "spectator.css").read_text(encoding="utf-8")
-    assert "prefers-reduced-motion: reduce" in css
+    assert compact_css("prefers-reduced-motion: reduce") in compact_css(css)
     assert not errors and not one_errors
     page.close()
 

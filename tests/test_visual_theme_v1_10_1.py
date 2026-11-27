@@ -30,11 +30,17 @@ def test_saturated_role_palette_and_coach_setup_background(browser):
 def test_theme_css_preserves_orange_courts_and_coloured_actions():
     from pathlib import Path
     root = Path(__file__).resolve().parents[1]
-    html = (root / 'index.html').read_text(encoding='utf-8') + ''.join(
-        p.read_text(encoding='utf-8') for p in sorted((root / 'css').glob('index-*.css')))
-    assert '#setupScreen .su-card{background:rgba(10,43,75,.9)' in html
-    assert '#setupScreen .rotation-picker{background:#102f50' in html
-    assert '#setupScreen .su-card input[type=text],#setupScreen .su-select{background:#123b60' in html
-    assert '.roster-court{position:relative' in html and '#ffae63' in html and '#f18a42' in html
-    assert '.setup-orange-court{position:relative' in html and '#ffad62' in html and '#ed8845' in html
-    assert '#setupScreen .btn-next' not in html
+    from helpers import compact_css
+    css = compact_css((root / 'index.html').read_text(encoding='utf-8') + ''.join(
+        p.read_text(encoding='utf-8') for p in sorted((root / 'css').glob('index-*.css'))))
+    for snippet in (
+        '#setupScreen .su-card{background:rgba(10,43,75,.9)',
+        '#setupScreen .rotation-picker{background:#102f50',
+        '#setupScreen .su-card input[type=text],#setupScreen .su-select{background:#123b60',
+        '.roster-court{position:relative',
+        '.setup-orange-court{position:relative',
+    ):
+        assert compact_css(snippet) in css, snippet
+    for colour in ('#ffae63', '#f18a42', '#ffad62', '#ed8845'):
+        assert colour in css, colour
+    assert compact_css('#setupScreen .btn-next') not in css

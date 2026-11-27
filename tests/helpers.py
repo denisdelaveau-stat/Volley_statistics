@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,6 +11,17 @@ APP_URI = (ROOT / "index.html").as_uri()
 CHROMIUM = os.environ.get("CHROMIUM_PATH", "/opt/pw-browsers/chromium-1228/chrome-linux64/chrome")
 VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 CACHE_NAME = f"volley-live-capture-v{VERSION}"
+
+
+def compact_css(text: str) -> str:
+    """CSS (or an expected CSS snippet) in one canonical form, so that assertions do not depend on formatting:
+    no comments, no spaces around punctuation, unquoted attribute values, leading zero on decimals, lower case."""
+    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s*([{}:;,>()])\s*", r"\1", text)
+    text = re.sub(r"=\"([^\"]*)\"\]", r"=\1]", text)
+    text = re.sub(r"(?<![\w.])\.(\d)", r"0.\1", text)
+    return text.replace(";}", "}").lower().strip()
 
 
 def base_match(focus_off=(4,)) -> dict:
