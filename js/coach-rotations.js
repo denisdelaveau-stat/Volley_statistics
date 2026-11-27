@@ -3,7 +3,9 @@
   'use strict';
   var P = window.VolleyCoachParts;
   if (!P) return;
+  var t = window.VolleyI18n.t;
   var C = P.C,
+    esc = P.esc,
     pct = P.pct,
     rotationTo = P.rotationTo,
     currentState = P.currentState,
@@ -74,17 +76,23 @@
         return a.diff - b.diff || b.total - a.total;
       })[0];
     var h =
-      sharedHeading('Analyse des rotations', 'Set ' + (m.currentSet || 1) + ' · contexte tactique') +
+      sharedHeading(t('coach.rotationsTitle'), t('coach.rotationsSub', { set: m.currentSet || 1 })) +
       provenanceBanner() +
       periodButtons();
     h +=
       '<div class="coach-filter-row" aria-label="Phase"><button data-phase="all" class="' +
       (C.phase === 'all' ? 'active' : '') +
-      '">TOUT</button><button data-phase="receive" class="' +
+      '">' +
+      esc(t('coach.phaseAll')) +
+      '</button><button data-phase="receive" class="' +
       (C.phase === 'receive' ? 'active' : '') +
-      '">RÉCEPTION</button><button data-phase="serve" class="' +
+      '">' +
+      esc(t('coach.phaseReceive')) +
+      '</button><button data-phase="serve" class="' +
       (C.phase === 'serve' ? 'active' : '') +
-      '">SERVICE</button></div>';
+      '">' +
+      esc(t('coach.phaseServe')) +
+      '</button></div>';
     h +=
       '<div class="rotation-tabs" aria-label="Rotation">' +
       rows
@@ -96,7 +104,9 @@
             (x.key === C.rotation ? 'active' : '') +
             '" aria-label="' +
             x.label +
-            ', différentiel ' +
+            ', ' +
+            esc(t('coach.differential')) +
+            ' ' +
             x.diff +
             '">' +
             x.label +
@@ -111,30 +121,32 @@
       kpi(
         'Side-out',
         sel.so == null ? '—' : sel.so + '%',
-        sel.total ? sel.won + '/' + sel.total + ' rallyes' : 'Échantillon limité',
+        sel.total ? t('coach.nRallies', { n: sel.won, d: sel.total }) : t('coach.smallSample'),
         status('so', sel.so, sel.total),
         'phase'
       ) +
       kpi(
         'Break point',
         sel.bp == null ? '—' : sel.bp + '%',
-        sel.total ? sel.won + '/' + sel.total + ' rallyes' : 'Échantillon limité',
+        sel.total ? t('coach.nRallies', { n: sel.won, d: sel.total }) : t('coach.smallSample'),
         status('bp', sel.bp, sel.total),
         'phase'
       ) +
       kpi(
-        'Attaque',
+        t('coach.kpiAttack'),
         sel.att == null ? '—' : (sel.att > 0 ? '+' : '') + sel.att + '%',
         sel.events.length + ' actions',
         status('att', sel.att, sel.events.length),
         'actions'
       ) +
       kpi(
-        'Réception +',
+        t('coach.kpiReceptionPlus'),
         sel.rec == null ? '—' : sel.rec + '%',
-        sel.events.filter(function (e) {
-          return e.action === 'reception';
-        }).length + ' réceptions',
+        t('coach.receptionsCount', {
+          n: sel.events.filter(function (e) {
+            return e.action === 'reception';
+          }).length,
+        }),
         status('rec', sel.rec, sel.events.length),
         'actions'
       ) +
@@ -144,9 +156,13 @@
       auditClass('rotation') +
       '"' +
       auditAttr('rotation') +
-      '><h2>Comparaison des rotations</h2>' +
+      '><h2>' +
+      esc(t('coach.rotationCompare')) +
+      '</h2>' +
       (demoOnly() ? auditBadge('ROTATIONS DE DÉMONSTRATION') : '') +
-      '<p class="coach-subtitle">Différentiel de rallyes gagnés / perdus</p>' +
+      '<p class="coach-subtitle">' +
+      esc(t('coach.diffSub')) +
+      '</p>' +
       rows
         .map(function (x) {
           var width = x.total ? Math.max(8, Math.min(100, 50 + x.diff * 10)) : 3;
@@ -165,28 +181,40 @@
           );
         })
         .join('') +
-      '<p class="coach-note">Chaque valeur affiche un différentiel transparent : rallyes gagnés − rallyes perdus. Les faibles échantillons restent neutres.</p></section>';
+      '<p class="coach-note">' +
+      esc(t('coach.diffNote')) +
+      '</p></section>';
     h +=
       '<section class="coach-grid rotation-summary' +
       auditClass('rotation') +
       '"' +
       auditAttr('rotation') +
-      '><article class="coach-card rotation-award"><span class="big">♛</span><div>Meilleure rotation<div class="big">' +
+      '><article class="coach-card rotation-award"><span class="big">♛</span><div>' +
+      esc(t('coach.bestRotation')) +
+      '<div class="big">' +
       best.label +
       '</div><small>' +
       best.won +
       '/' +
       best.total +
-      ' rallyes</small></div></article><article class="coach-card rotation-award watch"><span class="big">△</span><div>À surveiller<div class="big">' +
+      ' ' +
+      esc(t('coach.ralliesWord')) +
+      '</small></div></article><article class="coach-card rotation-award watch"><span class="big">△</span><div>' +
+      esc(t('coach.watch')) +
+      '<div class="big">' +
       watch.label +
       '</div><small>' +
       watch.won +
       '/' +
       watch.total +
-      ' rallyes</small></div></article></section>';
+      ' ' +
+      esc(t('coach.ralliesWord')) +
+      '</small></div></article></section>';
     h +=
-      '<button type="button" class="detail-full-actions" data-coach-go="players">Comparer via les joueurs &nbsp; ›</button>' +
-      footer('Référence 02');
+      '<button type="button" class="detail-full-actions" data-coach-go="players">' +
+      esc(t('coach.comparePlayers')) +
+      ' &nbsp; ›</button>' +
+      footer(t('coach.reference', { n: '02' }));
     content.innerHTML = h;
   }
 

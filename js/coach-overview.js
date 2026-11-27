@@ -3,6 +3,7 @@
   'use strict';
   var P = window.VolleyCoachParts;
   if (!P) return;
+  var t = window.VolleyI18n.t;
   var C = P.C,
     esc = P.esc,
     pct = P.pct,
@@ -50,15 +51,17 @@
       })[0] || { label: 'P—', won: 0, total: 0 };
     var bestSkill =
       aev != null && aev >= Math.max(sov || -999, bpv || -999, recv || -999)
-        ? 'Efficacité attaque'
+        ? t('coach.kpiAttackEff')
         : recv != null && recv >= Math.max(sov || -999, bpv || -999)
-          ? 'Réception positive'
-          : 'Dynamique collective';
+          ? t('coach.positiveReception')
+          : t('coach.teamMomentum');
     var h =
       sharedHeading(
-        'Vue coach',
-        'Détecter la dynamique du match',
-        '<select class="coach-select" data-coach-period-select aria-label="Période"><option>' +
+        t('coach.overviewTitle'),
+        t('coach.overviewSub'),
+        '<select class="coach-select" data-coach-period-select aria-label="' +
+          esc(t('coach.period')) +
+          '"><option>' +
           periodLabel() +
           '</option></select>'
       ) +
@@ -66,11 +69,11 @@
       periodButtons();
     h +=
       '<section class="coach-score"><div class="coach-team">' +
-      esc(m.team.name || 'Nous') +
+      esc(m.team.name || t('coach.us')) +
       '<strong>' +
       sc.a +
       '</strong></div><div class="coach-dash">–</div><div class="coach-team away">' +
-      esc(m.opponent.name || 'Adversaire') +
+      esc(m.opponent.name || t('coach.opponent')) +
       '<strong>' +
       sc.b +
       '</strong></div><div class="coach-match-meta">SET ' +
@@ -84,7 +87,7 @@
       '"' +
       auditAttr('phase') +
       '><span class="mini-ball">◉</span>' +
-      (cur.serving === 'A' ? 'NOTRE SERVICE' : 'SERVICE ADVERSE') +
+      (cur.serving === 'A' ? t('coach.ourServe') : t('coach.theirServe')) +
       (demoOnly() ? auditBadge('DÉMO') : '') +
       '</div></section>';
     h +=
@@ -92,71 +95,84 @@
       kpi(
         'Side-out',
         pctText(mt.so.n, mt.so.d),
-        mt.so.d ? mt.so.n + '/' + mt.so.d + ' réceptions' : 'Échantillon limité',
+        mt.so.d ? t('coach.nReceptions', { n: mt.so.n, d: mt.so.d }) : t('coach.smallSample'),
         status('so', sov, mt.so.d),
         'phase'
       ) +
       kpi(
         'Break point',
         pctText(mt.bp.n, mt.bp.d),
-        mt.bp.d ? mt.bp.n + '/' + mt.bp.d + ' services' : 'Échantillon limité',
+        mt.bp.d ? t('coach.nServes', { n: mt.bp.n, d: mt.bp.d }) : t('coach.smallSample'),
         status('bp', bpv, mt.bp.d),
         'phase'
       ) +
       kpi(
-        'Efficacité attaque',
+        t('coach.kpiAttackEff'),
         mt.att.d ? (aev > 0 ? '+' : '') + aev + '%' : '—',
-        mt.att.d ? mt.att.kills + 'K / ' + mt.att.errors + 'E / ' + mt.att.d + ' ATT' : 'Échantillon limité',
+        mt.att.d ? mt.att.kills + 'K / ' + mt.att.errors + 'E / ' + mt.att.d + ' ATT' : t('coach.smallSample'),
         status('att', aev, mt.att.d),
         'actions'
       ) +
       kpi(
-        'Réception +',
+        t('coach.kpiReceptionPlus'),
         pctText(mt.rec.n, mt.rec.d),
-        mt.rec.d ? mt.rec.n + '/' + mt.rec.d + ' réceptions' : 'Échantillon limité',
+        mt.rec.d ? t('coach.nReceptions', { n: mt.rec.n, d: mt.rec.d }) : t('coach.smallSample'),
         status('rec', recv, mt.rec.d),
         'actions'
       ) +
       kpi(
-        'Service',
+        t('coach.kpiServe'),
         mt.serve.d ? mt.serve.aces + ' ace' + (mt.serve.aces > 1 ? 's' : '') : '—',
         mt.serve.d
-          ? mt.serve.errors + ' erreur' + (mt.serve.errors > 1 ? 's' : '') + ' · ' + mt.serve.d + ' services'
-          : 'Échantillon limité',
+          ? t(mt.serve.errors > 1 ? 'coach.serveErrorsMany' : 'coach.serveErrorsOne', {
+              n: mt.serve.errors,
+              d: mt.serve.d,
+            })
+          : t('coach.smallSample'),
         'neutral',
         'actions'
       ) +
       kpi(
-        'Bloc',
+        t('coach.kpiBlock'),
         mt.block.d ? mt.block.points + ' point' + (mt.block.points > 1 ? 's' : '') : '—',
-        mt.block.d ? mt.block.touches + ' touches · ' + mt.block.d + ' actions' : 'Échantillon limité',
+        mt.block.d ? mt.block.touches + ' touches · ' + mt.block.d + ' actions' : t('coach.smallSample'),
         'neutral',
         'actions'
       ) +
       '</section>';
-    h += courtHTML(rot, 'Passeuse en ' + cur.rotation.toUpperCase());
+    h += courtHTML(rot, t('coach.setterIn', { rotation: cur.rotation.toUpperCase() }));
     h +=
       '<section class="coach-grid coach-two"><article class="coach-card coach-insight' +
       auditClass('rotation') +
       '"' +
       auditAttr('rotation') +
-      '><span class="icon">△</span><div><h3>À surveiller</h3><strong>' +
+      '><span class="icon">△</span><div><h3>' +
+      esc(t('coach.watch')) +
+      '</h3><strong>' +
       watch.label +
       ' · ' +
       watch.won +
       '/' +
       watch.total +
-      ' rallyes gagnés</strong><span class="coach-muted">Signal descriptif · ' +
+      ' ' +
+      esc(t('coach.ralliesWon')) +
+      '</strong><span class="coach-muted">' +
+      esc(t('coach.descriptiveSignal')) +
+      ' · ' +
       periodLabel().toLowerCase() +
       '</span>' +
       (demoOnly() ? auditBadge('ROTATION DE DÉMONSTRATION') : '') +
-      '</div><span class="coach-arrow">›</span></article><article class="coach-card coach-insight good" data-json-backed="true"><span class="icon">▥</span><div><h3>Point fort</h3><strong>' +
+      '</div><span class="coach-arrow">›</span></article><article class="coach-card coach-insight good" data-json-backed="true"><span class="icon">▥</span><div><h3>' +
+      esc(t('coach.strength')) +
+      '</h3><strong>' +
       bestSkill +
-      '</strong><span class="coach-muted">Données observées sur ' +
-      e.length +
-      ' actions</span></div><span class="coach-arrow">›</span></article></section>';
+      '</strong><span class="coach-muted">' +
+      esc(t('coach.observedOn', { n: e.length })) +
+      '</span></div><span class="coach-arrow">›</span></article></section>';
     h +=
-      '<section class="coach-card coach-momentum"><div><h3>Dynamique · 10 derniers points</h3><div class="rally-dots">' +
+      '<section class="coach-card coach-momentum"><div><h3>' +
+      esc(t('coach.momentum10')) +
+      '</h3><div class="rally-dots">' +
       recent
         .map(function (x) {
           return (
@@ -168,14 +184,22 @@
           );
         })
         .join('') +
-      '</div></div><div class="coach-run-score"><span>Nous<strong>' +
+      '</div></div><div class="coach-run-score"><span>' +
+      esc(t('coach.us')) +
+      '<strong>' +
       homeW +
-      '</strong></span><b>·</b><span>Adversaire<strong>' +
+      '</strong></span><b>·</b><span>' +
+      esc(t('coach.opponent')) +
+      '<strong>' +
       (recent.length - homeW) +
       '</strong></span></div></section>';
     h +=
-      '<div class="coach-actions"><button type="button" class="coach-cta" data-coach-go="rotations">↻ &nbsp; Analyser les rotations <span>›</span></button><button type="button" class="coach-cta secondary" data-coach-go="players">♟ &nbsp; Voir les joueurs <span>›</span></button></div>' +
-      footer('Référence 01');
+      '<div class="coach-actions"><button type="button" class="coach-cta" data-coach-go="rotations">↻ &nbsp; ' +
+      esc(t('coach.analyseRotations')) +
+      ' <span>›</span></button><button type="button" class="coach-cta secondary" data-coach-go="players">♟ &nbsp; ' +
+      esc(t('coach.seePlayers')) +
+      ' <span>›</span></button></div>' +
+      footer(t('coach.reference', { n: '01' }));
     content.innerHTML = h;
   }
 
