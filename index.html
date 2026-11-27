@@ -167,40 +167,13 @@
   <button type="button" id="historyToggle" class="stats-toggle history-toggle" aria-expanded="false" aria-controls="historyPanel"><span data-i18n="capture.history">HISTORIQUE</span> <span id="historyArrow">▼</span></button>
   <div id="historyPanel" class="history-panel" hidden><div class="history-wrap"><table class="history"><thead><tr><th>#</th><th data-i18n="capture.colPlayer">Joueur</th><th data-i18n="capture.colAction">Action</th><th data-i18n="capture.colResult">Résultat</th><th data-i18n="capture.colScore">Score</th></tr></thead><tbody id="captureHistory"></tbody></table></div></div>
 </section>
-<button type="button" id="statsToggle" class="stats-toggle" aria-expanded="false" aria-controls="statsPanel" hidden aria-hidden="true" tabindex="-1">STATISTICS <span id="statsArrow">▼</span></button>
-<div id="statsPanel" class="stats-panel" hidden aria-hidden="true">
-<section class="att-section" id="attSection"><div class="att-head"><h3>Attackers</h3><div class="att-scope"><button type="button" data-scope="set" class="on">CURRENT SET</button><button type="button" data-scope="match">MATCH</button></div></div><div class="att-note">One chart per OH / MB / OPP with entries in the log, after each of the player's actions.</div><div class="att-grid" id="attGrid"></div></section>
-<div class="point-origin-charts" aria-label="Point origin statistics for current set">
-  <div class="pie-card"><h3>Team A</h3><div class="pie-sub">Current set - point origin</div><div id="teamAPie" class="pie-chart"></div><div id="teamAPieLegend" class="pie-legend"></div></div>
-  <div class="pie-card"><h3>Team B</h3><div class="pie-sub">Current set - point origin</div><div id="teamBPie" class="pie-chart"></div><div id="teamBPieLegend" class="pie-legend"></div></div>
-</div>
-<div class="error-trend-card">
-  <h3>Error evolution - current set</h3>
-  <div class="chart-note">Cumulative errors after each rally</div>
-  <div id="errorTrendChart" class="error-chart"></div>
-</div>
-<div class="error-diff-card">
-  <h3>Error differential - Team A vs Team B</h3>
-  <div class="chart-note">Positive/green = Team A has fewer errors. Negative/red = Team A has more errors.</div>
-  <div id="errorDiffChart" class="error-chart"></div>
-</div>
-<h1 id="progTitle">Set score progression</h1>
-<div class="sub">Score after each point played, with the lead (A - B) as bars underneath. Use the checkboxes below to show or hide the coloured markers and the action strip. Hover (or tap) a point for details. Below, for each attacker: cumulative points and differential (points - errors) on the same graph.</div>
-<div class="card">
-<svg id="chart" viewBox="0 0 1200 724" preserveAspectRatio="xMidYMid meet"></svg>
-<div id="tip"></div>
-<div class="legend" id="legend"></div>
-<div class="btns"><button type="button" id="all">Select all</button><button type="button" id="none">Clear all</button></div>
-</div>
-<div id="players"></div>
-</div>
 <script>window.VolleyI18n.apply();</script>
 <script src="js/index-match-rules.js"></script>
 <script src="js/index-rotation.js"></script>
 <script src="js/index-substitution-rules.js"></script>
 <script src="js/index-capture-engine.js"></script>
 <script src="js/index-report.js"></script>
-<script src="js/index-chart-common.js"></script><script src="js/index-chart-progression.js"></script><script src="js/index-chart-origin.js"></script><script src="js/index-chart-errors.js"></script><script src="js/index-capture-tools.js"></script><script src="js/index-navigation-new-match.js"></script>
+<script src="js/index-capture-tools.js"></script><script src="js/index-navigation-new-match.js"></script>
 <script src="team-management.js"></script>
 <script src="settings.js"></script>
 <script src="js/index-pwa.js"></script>

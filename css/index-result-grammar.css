@@ -1067,10 +1067,6 @@
     font-size: 9px;
   }
 }
-#statsToggle,
-#statsPanel {
-  display: none !important;
-}
 /* Initial rotation: compact centred grey bench fitted to the libero circle. */
 .libero-setup {
   margin: 10px auto 0;

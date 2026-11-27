@@ -37,61 +37,11 @@ h1 {
   font-size: 13px;
   margin-bottom: 10px;
 }
-.card {
-  background: #fff;
-  border: 1px solid #e3e3e3;
-  border-radius: 8px;
-  padding: 10px;
-  position: relative;
-}
 svg {
   width: 100%;
   height: auto;
   display: block;
   background: #fff;
-}
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  margin: 10px 2px 2px;
-  font-size: 13px;
-}
-.legend span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.legend svg {
-  width: 34px !important;
-  height: 10px !important;
-  min-width: 0 !important;
-  display: inline-block;
-  flex: 0 0 34px;
-}
-.legend label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  user-select: none;
-  padding: 2px 4px;
-  border-radius: 4px;
-}
-.legend label:hover {
-  background: #f1f1f1;
-}
-.sw {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 1px solid #0003;
-  display: inline-block;
-}
-.btns {
-  margin: 8px 0 0;
-  display: flex;
-  gap: 8px;
 }
 button {
   font: inherit;
@@ -108,58 +58,6 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-.ptip {
-  position: absolute;
-  pointer-events: none;
-  background: #222;
-  color: #fff;
-  padding: 6px 9px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.35;
-  display: none;
-  z-index: 5;
-  white-space: nowrap;
-}
-#tip {
-  position: absolute;
-  pointer-events: none;
-  background: #222;
-  color: #fff;
-  padding: 6px 9px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.35;
-  display: none;
-  z-index: 5;
-  white-space: nowrap;
-}
-.grid {
-  stroke: #eee;
-}
-.axis {
-  stroke: #999;
-}
-.tick {
-  font-size: 11px;
-  fill: #555;
-}
-.lbl {
-  font-size: 12px;
-  fill: #333;
-  font-weight: 600;
-}
-.pt {
-  cursor: pointer;
-  stroke: #fff;
-  stroke-width: 1.5;
-  transition: r 0.1s;
-}
-.cell text {
-  font-size: 11px;
-  font-weight: 700;
-  pointer-events: none;
 }
 .capture {
   margin: 0 0 14px;
@@ -310,12 +208,6 @@ h2 {
     min-height: 70px;
     font-size: 18px;
   }
-  .card {
-    overflow-x: auto;
-  }
-  .card svg {
-    min-width: 900px;
-  }
 }
 .stats-toggle {
   width: 100%;
@@ -338,71 +230,6 @@ h2 {
 .stats-toggle[aria-expanded='true'] {
   background: #1f3864;
   color: #fff;
-}
-.stats-panel[hidden] {
-  display: none !important;
-}
-.stats-panel {
-  display: block;
-}
-.point-origin-charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin: 8px 0 20px;
-}
-.pie-card {
-  background: #fff;
-  border: 1px solid #d9e2f2;
-  border-radius: 14px;
-  padding: 14px;
-  text-align: center;
-}
-.pie-card h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #1f3864;
-}
-.pie-sub {
-  font-size: 12px;
-  color: #64748b;
-  margin-bottom: 8px;
-}
-.pie-chart {
-  display: flex;
-  justify-content: center;
-}
-.pie-chart svg {
-  width: min(100%, 260px);
-  height: auto;
-  min-width: 0 !important;
-}
-.pie-legend {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  font-size: 13px;
-}
-.pie-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.pie-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  display: inline-block;
-}
-@media (max-width: 600px) {
-  .point-origin-charts {
-    grid-template-columns: 1fr;
-  }
-  .pie-chart svg {
-    width: 220px;
-  }
 }
 .adversary-btn {
   background: #334155;
@@ -460,51 +287,6 @@ h2 {
     grid-column: auto;
   }
 }
-.error-trend-card,
-.error-diff-card {
-  background: #fff;
-  border: 1px solid #d9e2f2;
-  border-radius: 14px;
-  padding: 14px;
-  margin: 0 0 16px;
-}
-.error-trend-card h3,
-.error-diff-card h3 {
-  margin: 0 0 4px;
-  font-size: 17px;
-  color: #1f3864;
-}
-.chart-note {
-  font-size: 12px;
-  color: #64748b;
-  margin-bottom: 8px;
-}
-.error-chart {
-  width: 100%;
-  overflow-x: auto;
-}
-.error-chart svg {
-  width: 100%;
-  min-width: 680px;
-  height: auto;
-}
-.error-legend {
-  font-size: 12px;
-  font-weight: 700;
-}
-.error-axis {
-  stroke: #94a3b8;
-  stroke-width: 1;
-}
-.error-grid {
-  stroke: #e5e7eb;
-  stroke-width: 1;
-}
-.error-a {
-  stroke: #1f3864;
-  stroke-width: 3;
-  fill: none;
-}
 .error-b {
   stroke: #666;
   stroke-width: 3;
@@ -519,11 +301,6 @@ h2 {
 }
 .diff-zero {
   fill: #94a3b8;
-}
-@media (max-width: 600px) {
-  .error-chart svg {
-    min-width: 620px;
-  }
 }
 /* ---- v1.7 HOME / TEAMS / SETTINGS / NEW MATCH ---- */
 .app-overlay {
@@ -2330,137 +2107,6 @@ h2 {
   color: #991b1b;
   font-weight: 700;
   padding: 10px 0;
-}
-/* ---- attackers section + report ---- */
-.att-section {
-  margin: 14px 0;
-}
-.att-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.att-head h3 {
-  margin: 0;
-  font-size: 18px;
-}
-.att-scope {
-  display: flex;
-  gap: 6px;
-}
-.att-scope button {
-  min-height: 40px;
-  padding: 6px 12px;
-  border: 2px solid #1e2a4a;
-  background: #fff;
-  border-radius: 10px;
-  font-weight: 800;
-  font-size: 13px;
-}
-.att-scope button.on {
-  background: #1e2a4a;
-  color: #fff;
-}
-.att-note {
-  font-size: 12px;
-  color: #64748b;
-  margin: 4px 0 8px;
-}
-.att-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 12px;
-}
-.att-card {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-left: 8px solid #94a3b8;
-  border-radius: 12px;
-  padding: 10px;
-}
-.att-card.role-oh {
-  border-left-color: var(--role-oh);
-}
-.att-card.role-mb {
-  border-left-color: var(--role-mb);
-}
-.att-card.role-opp {
-  border-left-color: var(--role-opp);
-}
-.att-card h4 {
-  margin: 0;
-  font-size: 16px;
-}
-.att-card .att-kpi {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin: 6px 0;
-  font-size: 12px;
-  font-weight: 800;
-}
-.att-kpi span {
-  padding: 3px 7px;
-  border-radius: 6px;
-  background: #f1f5f9;
-}
-.att-kpi .k-p {
-  background: #dcfce7;
-  color: #166534;
-}
-.att-kpi .k-e {
-  background: #fee2e2;
-  color: #991b1b;
-}
-.att-kpi .k-n {
-  background: #e2e8f0;
-  color: #334155;
-}
-.att-kpi .k-d {
-  background: #1e2a4a;
-  color: #fff;
-}
-.att-card svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.att-legend {
-  font-size: 11px;
-  color: #475569;
-  margin-top: 2px;
-}
-.att-legend b {
-  display: inline-block;
-  width: 16px;
-  height: 3px;
-  vertical-align: middle;
-  margin: 0 3px 0 8px;
-}
-.att-tbl {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-top: 6px;
-}
-.att-tbl th,
-.att-tbl td {
-  padding: 3px 4px;
-  text-align: center;
-  border-bottom: 1px solid #eef0f3;
-}
-.att-tbl th:first-child,
-.att-tbl td:first-child {
-  text-align: left;
-}
-.att-empty {
-  padding: 12px;
-  border: 1px dashed #cbd5e1;
-  border-radius: 10px;
-  color: #64748b;
-  font-size: 14px;
 }
 .report-btn {
   background: #0f766e !important;
