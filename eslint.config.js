@@ -3,7 +3,7 @@
 const js = require('@eslint/js');
 const globals = require('globals');
 
-// Globals defined by one script and read by others. Keep this list in sync with docs/ARCHITECTURE.md.
+// Globals defined by one script and read by others. Keep this list in sync with docs/specs/SYS-ARCH.md (7.2).
 const projectGlobals = {
   VolleyCapture: 'readonly',
   VolleyDom: 'readonly',

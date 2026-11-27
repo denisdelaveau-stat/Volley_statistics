@@ -28,14 +28,14 @@ Requirements not implemented yet are in `TO_DO/`, not here. Earlier documents ar
 
 | ID | Title | Status |
 |---|---|---|
-| [SYS-ARCH](SYS-ARCH.md) | Architecture: modules, load order, shared contracts | Planned |
-| [SYS-DATA](SYS-DATA.md) | Local data model and storage | Planned |
-| [SYS-JSON](SYS-JSON.md) | Match document: unified JSON v2.1 and Capture v1 migration | Planned |
-| [SYS-I18N](SYS-I18N.md) | Interface language (French / English) | Planned |
-| [SYS-PWA](SYS-PWA.md) | Offline application, installation and updates | Planned |
-| [SYS-SEC](SYS-SEC.md) | Security and data integrity | Planned |
-| [SYS-QA](SYS-QA.md) | Quality: tests, gate and continuous integration | Planned |
-| [SYS-DESIGN](SYS-DESIGN.md) | Visual design system | Planned |
+| [SYS-ARCH](SYS-ARCH.md) | Architecture: modules, load order, shared contracts | Current |
+| [SYS-DATA](SYS-DATA.md) | Local data model and storage | Current |
+| [SYS-JSON](SYS-JSON.md) | Match document: unified JSON v2.1 and Capture v1 migration | Current |
+| [SYS-I18N](SYS-I18N.md) | Interface language (French / English) | Current |
+| [SYS-PWA](SYS-PWA.md) | Offline application, installation and updates | Current |
+| [SYS-SEC](SYS-SEC.md) | Security and data integrity | Current |
+| [SYS-QA](SYS-QA.md) | Quality: tests, gate and continuous integration | Current |
+| [SYS-DESIGN](SYS-DESIGN.md) | Visual design system | Current |
 
 ### 2.2 Domain rules
 
