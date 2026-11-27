@@ -23,7 +23,7 @@ Purpose: let another machine or another assistant resume the work without the ch
 | `f245c1e` | Dead capture UI layers removed (`js/index-normative-capture.js`, legacy court and substitution sheet of the engine, legacy step markup) |
 | `f9ecb63` | Capture ad-hoc globals replaced by the documented `window.VolleyCapture` contract |
 
-Contracts are documented in `docs/ARCHITECTURE.md` (section "Capture screen contract"); the volleyball rules in `docs/specs/` (DOM-MATCH, DOM-LINEUP, DOM-ROTATION, DOM-LIBERO, DOM-SUBS, DOM-STATS).
+Contracts are documented in `docs/specs/SYS-ARCH.md` (section 7.3, capture contract); the volleyball rules in `docs/specs/` (DOM-MATCH, DOM-LINEUP, DOM-ROTATION, DOM-LIBERO, DOM-SUBS, DOM-STATS).
 
 ### Changes of 2026-11-27
 
@@ -32,7 +32,7 @@ Contracts are documented in `docs/ARCHITECTURE.md` (section "Capture screen cont
 
 ### Specifications (started 2026-11-27)
 
-`docs/specs/` holds the specifications as built, one per interface, feature or rule set, on one template (`_TEMPLATE.md`), with numbered requirements traced to tests; `tests/unit/specs.test.js` checks the template, the traceability and that every cited test exists. Catalogue and status: `docs/specs/README.md`. Done: batch A (template, conventions, index) and batch B (domain rules DOM-*). Next batches: system specs (SYS-*), then the interface specs (UI-*); each moves the documents it replaces to `docs/archive/superseded-specs/`.
+`docs/specs/` holds the specifications as built, one per interface, feature or rule set, on one template (`_TEMPLATE.md`), with numbered requirements traced to tests; `tests/unit/specs.test.js` checks the template, the traceability and that every cited test exists. Catalogue and status: `docs/specs/README.md`. Done: batch A (template, conventions, index), batch B (domain rules DOM-*) and batch C (system specs SYS-*). Next: the interface specs (UI-*); each moves the documents it replaces to `docs/archive/superseded-specs/`.
 
 ### Audit step 6 (done)
 
@@ -40,7 +40,7 @@ Contracts are documented in `docs/ARCHITECTURE.md` (section "Capture screen cont
 
 ### Interface translation FR/EN (2026-11-27, all green in CI)
 
-French is the default language; English is chosen in Settings (page reloaded). How it works: `docs/ARCHITECTURE.md` (i18n row) and the contributor rules of `README.md`.
+French is the default language; English is chosen in Settings (page reloaded). How it works: `docs/specs/SYS-I18N.md` and the contributor rules of `README.md`.
 
 | Commit | Content |
 |---|---|
@@ -156,6 +156,6 @@ Points 1 to 4 are done; see section 0.
 
 ## 10. Where the other context lives
 
-- Repository docs: `docs/ARCHITECTURE.md` (module map), `docs/VolleyLive_Navigation_Home_Specification.md`, `docs/VolleyLive_Team_Management_Specification.md`, `docs/VolleyLive_Match_Library_Specification.md`, `docs/VolleyLive_Coach_View_Specification.md`, `docs/VolleyLive_Spectator_Timeline_Specification.md`, `docs/VolleyLive_Spectator_Ranking_Specification.md`.
+- Repository docs: `docs/specs/` (all specifications; index and conventions in `docs/specs/README.md`, architecture in `SYS-ARCH.md`).
 - Requirements to implement later: `TO_DO/`.
 - The session progress log (todo list and last checkpoint) lived in the original assistant session and is not in the repository; this file replaces it.
