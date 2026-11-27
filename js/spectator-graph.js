@@ -1,6 +1,7 @@
 /* VolleyLive spectator view — GRAPH: score and fault evolution charts. */
 (function () {
   'use strict';
+  var t = window.VolleyI18n.t;
   var P = window.VolleySpectatorParts,
     st = P.state;
   var I18N = P.I18N,
@@ -35,7 +36,7 @@
     var value = side === 'HOME' ? item.homeScore : item.awayScore;
     var state = scoreCellState(item, side);
     var suffix = state === 'so' ? ', ' + I18N.sideOut : state.indexOf('bp-') === 0 ? ', ' + I18N.breakPoint : '';
-    return side + ' ' + value + suffix + ', rallye ' + item.rallyOrdinal;
+    return side + ' ' + value + suffix + ', ' + t('spectator.rallyLower', { n: item.rallyOrdinal });
   }
   function faultCellAria(item, side) {
     var home = side === 'HOME',
@@ -44,19 +45,12 @@
     return (
       side +
       ', ' +
-      value +
-      ' fautes cumulées' +
+      t('spectator.cumulativeFaults', { n: value }) +
       (increment
-        ? ', ' +
-          increment +
-          ' nouvelle' +
-          (increment > 1 ? 's' : '') +
-          ' faute' +
-          (increment > 1 ? 's' : '') +
-          ' sur ce rallye'
+        ? ', ' + t(increment > 1 ? 'spectator.newFaultsMany' : 'spectator.newFaultsOne', { n: increment })
         : '') +
-      ', rallye ' +
-      item.rallyOrdinal
+      ', ' +
+      t('spectator.rallyLower', { n: item.rallyOrdinal })
     );
   }
   function renderValueRows(items, kind) {
@@ -174,10 +168,8 @@
           x(i) +
           '" cy="' +
           y(value) +
-          '" r="5"><title>Rallye ' +
-          item.rallyOrdinal +
-          ' · delta ' +
-          value +
+          '" r="5"><title>' +
+          esc(t('spectator.rallyDelta', { n: item.rallyOrdinal, delta: value })) +
           '</title></circle>';
       });
     }
@@ -213,7 +205,7 @@
     var select = $('evolutionSet');
     var options = (st.model.availableSets || [])
       .map(function (setNo) {
-        return '<option value="' + setNo + '">Set ' + setNo + '</option>';
+        return '<option value="' + setNo + '">' + esc(t('common.setLower', { set: setNo })) + '</option>';
       })
       .join('');
     if (select.innerHTML !== options) select.innerHTML = options;
@@ -222,10 +214,10 @@
     var atLive = st.model.currentSet == null || st.model.currentSet === st.model.liveSet;
     $('returnToLive').hidden = atLive || st.model.noMatch;
     $('liveSetStatus').textContent = st.model.noMatch
-      ? 'AUCUN MATCH'
+      ? t('spectator.noMatchUpper')
       : atLive
-        ? 'DIRECT · SET ' + st.model.liveSet
-        : 'REPLAY · SET ' + st.model.currentSet;
+        ? t('spectator.liveSet', { set: st.model.liveSet })
+        : t('spectator.replaySet', { set: st.model.currentSet });
     $('liveSetStatus').classList.toggle('is-replay', !atLive && !st.model.noMatch);
   }
   function renderGraphs(v) {
@@ -243,14 +235,14 @@
         'scoreDelta',
         'score',
         { positive: I18N.scorePositive, zero: I18N.scoreZero, negative: I18N.scoreNegative },
-        'Évolution du score, Set ' + st.model.currentSet + ', aucun rallye terminé.'
+        t('spectator.scoreEvoEmpty', { set: st.model.currentSet })
       );
       $('faultChart').innerHTML = deltaChartMarkup(
         [],
         'faultDelta',
         'fault',
         { positive: I18N.faultPositive, zero: I18N.faultZero, negative: I18N.faultNegative },
-        'Évolution des fautes, Set ' + st.model.currentSet + ', aucun rallye terminé.'
+        t('spectator.faultEvoEmpty', { set: st.model.currentSet })
       );
       return;
     }
@@ -260,29 +252,23 @@
     $('scoreRows').innerHTML = renderValueRows(rows, 'score');
     $('faultRows').innerHTML = renderValueRows(rows, 'fault');
     var finalItem = st.model.rallies[st.model.rallies.length - 1];
-    var scoreLabel =
-      'Évolution du score, Set ' +
-      st.model.currentSet +
-      '. HOME ' +
-      finalItem.homeScore +
-      ', AWAY ' +
-      finalItem.awayScore +
-      '. Delta ' +
-      (finalItem.scoreDelta >= 0 ? 'plus ' : 'moins ') +
-      Math.abs(finalItem.scoreDelta) +
-      '.';
-    var faultLabel =
-      'Évolution des fautes, Set ' +
-      st.model.currentSet +
-      '. HOME ' +
-      finalItem.cumulativeHomeFaults +
-      ' fautes, AWAY ' +
-      finalItem.cumulativeAwayFaults +
-      ' fautes. Delta ' +
-      (finalItem.faultDelta === 0
-        ? 'zéro'
-        : (finalItem.faultDelta > 0 ? 'plus ' : 'moins ') + Math.abs(finalItem.faultDelta)) +
-      '.';
+    var scoreLabel = t('spectator.scoreEvoLabel', {
+      set: st.model.currentSet,
+      home: finalItem.homeScore,
+      away: finalItem.awayScore,
+      delta: t(finalItem.scoreDelta >= 0 ? 'spectator.plusN' : 'spectator.minusN', {
+        n: Math.abs(finalItem.scoreDelta),
+      }),
+    });
+    var faultLabel = t('spectator.faultEvoLabel', {
+      set: st.model.currentSet,
+      home: finalItem.cumulativeHomeFaults,
+      away: finalItem.cumulativeAwayFaults,
+      delta:
+        finalItem.faultDelta === 0
+          ? t('spectator.zero')
+          : t(finalItem.faultDelta > 0 ? 'spectator.plusN' : 'spectator.minusN', { n: Math.abs(finalItem.faultDelta) }),
+    });
     function fillCharts(plotWidth) {
       $('scoreChart').innerHTML = deltaChartMarkup(
         rows,

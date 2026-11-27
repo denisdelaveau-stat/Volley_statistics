@@ -9,6 +9,13 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // Messages follow the interface language (window.VolleyI18n). Outside the browser (Node unit tests) the key is
+  // returned instead of the text.
+  function t(key, params) {
+    var i18n = typeof window !== 'undefined' ? window.VolleyI18n : null;
+    return i18n ? i18n.t(key, params) : key;
+  }
+
   var ACTION_CODES = {
     SERVICE: 'Sv',
     RECEPTION: 'R',
@@ -122,58 +129,56 @@
       warnings = [],
       ids = {},
       sequences = {};
-    if (!raw || typeof raw !== 'object') errors.push('Le document JSON doit être un objet.');
-    if (raw && raw.format !== 'volley-live') errors.push('format doit valoir "volley-live".');
-    if (raw && !/^2\./.test(String(raw.schemaVersion || '')))
-      errors.push('schemaVersion doit être compatible avec volley-live v2.x.');
-    if (raw && raw.documentType !== 'match') errors.push('documentType doit valoir "match".');
-    if (!raw || !raw.match || typeof raw.match !== 'object') errors.push('match est obligatoire.');
-    if (!raw || !Array.isArray(raw.teams) || raw.teams.length < 2) errors.push('teams doit contenir les deux équipes.');
-    if (!raw || !Array.isArray(raw.players)) errors.push('players doit être un tableau.');
-    if (!raw || !Array.isArray(raw.sets)) errors.push('sets doit être un tableau.');
-    if (!raw || !Array.isArray(raw.rallies)) errors.push('rallies doit être un tableau.');
-    if (!raw || !Array.isArray(raw.events)) errors.push('events doit être un tableau.');
+    if (!raw || typeof raw !== 'object') errors.push(t('adapter.notObject'));
+    if (raw && raw.format !== 'volley-live') errors.push(t('adapter.formatV2'));
+    if (raw && !/^2\./.test(String(raw.schemaVersion || ''))) errors.push(t('adapter.schemaV2'));
+    if (raw && raw.documentType !== 'match') errors.push(t('adapter.documentType'));
+    if (!raw || !raw.match || typeof raw.match !== 'object') errors.push(t('adapter.matchRequired'));
+    if (!raw || !Array.isArray(raw.teams) || raw.teams.length < 2) errors.push(t('adapter.teamsRequired'));
+    if (!raw || !Array.isArray(raw.players)) errors.push(t('adapter.playersArray'));
+    if (!raw || !Array.isArray(raw.sets)) errors.push(t('adapter.setsArray'));
+    if (!raw || !Array.isArray(raw.rallies)) errors.push(t('adapter.ralliesArray'));
+    if (!raw || !Array.isArray(raw.events)) errors.push(t('adapter.eventsArray'));
     if (raw && Array.isArray(raw.events))
       raw.events.forEach(function (event, index) {
         if (!event || typeof event !== 'object') {
-          errors.push('events[' + index + '] doit être un objet.');
+          errors.push(t('adapter.eventObject', { index: index }));
           return;
         }
-        if (!event.eventId) errors.push('events[' + index + '].eventId est obligatoire.');
+        if (!event.eventId) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'eventId' }));
         else if (ids[event.eventId]) errors.push('eventId dupliqué : ' + event.eventId + '.');
         else ids[event.eventId] = true;
         var seq = number(event.sequenceNumber, null);
-        if (seq === null) errors.push('events[' + index + '].sequenceNumber est obligatoire.');
-        else if (sequences[seq]) errors.push('sequenceNumber dupliqué : ' + seq + '.');
+        if (seq === null) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'sequenceNumber' }));
+        else if (sequences[seq]) errors.push(t('adapter.duplicateSequence', { seq: seq }));
         else sequences[seq] = true;
-        if (!event.eventType) errors.push('events[' + index + '].eventType est obligatoire.');
+        if (!event.eventType) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'eventType' }));
         if (upper(event.eventType) === 'ACTION') {
-          if (!event.rallyId) errors.push('events[' + index + '].rallyId est obligatoire pour une action.');
-          if (!event.actionType) errors.push('events[' + index + '].actionType est obligatoire.');
-          if (!event.evaluation) errors.push('events[' + index + '].evaluation est obligatoire.');
+          if (!event.rallyId) errors.push(t('adapter.actionRallyRequired', { index: index }));
+          if (!event.actionType) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'actionType' }));
+          if (!event.evaluation) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'evaluation' }));
         }
       });
-    if (raw && raw.dataQuality && raw.dataQuality.lineupsVerified === false)
-      warnings.push('Les compositions de départ de la fixture sont déduites et non confirmées par le coach.');
+    if (raw && raw.dataQuality && raw.dataQuality.lineupsVerified === false) warnings.push(t('adapter.fixtureLineups'));
     return { valid: errors.length === 0, errors: errors, warnings: warnings, format: 'unified-v2' };
   }
 
   function validateCaptureV1(raw) {
     var errors = [];
-    if (!raw || typeof raw !== 'object') errors.push('Le document JSON doit être un objet.');
-    if (raw && raw.format !== 'volley-live-capture') errors.push('format doit valoir "volley-live-capture".');
-    if (raw && Number(raw.version) !== 1) errors.push('Cette version attend un export Volley Live Capture version 1.');
-    if (!raw || !raw.match || typeof raw.match !== 'object') errors.push('match est obligatoire.');
-    if (!raw || !Array.isArray(raw.events)) errors.push('events doit être un tableau.');
+    if (!raw || typeof raw !== 'object') errors.push(t('adapter.notObject'));
+    if (raw && raw.format !== 'volley-live-capture') errors.push(t('adapter.formatCapture'));
+    if (raw && Number(raw.version) !== 1) errors.push(t('adapter.captureVersion'));
+    if (!raw || !raw.match || typeof raw.match !== 'object') errors.push(t('adapter.matchRequired'));
+    if (!raw || !Array.isArray(raw.events)) errors.push(t('adapter.eventsArray'));
     if (raw && raw.match && (!raw.match.team || !Array.isArray(raw.match.team.roster)))
-      errors.push('match.team.roster est obligatoire.');
+      errors.push(t('adapter.rosterRequired'));
     if (raw && Array.isArray(raw.events))
       raw.events.forEach(function (event, index) {
-        if (!event || typeof event !== 'object') errors.push('events[' + index + '] doit être un objet.');
+        if (!event || typeof event !== 'object') errors.push(t('adapter.eventObject', { index: index }));
         else {
-          if (event.set === undefined) errors.push('events[' + index + '].set est obligatoire.');
-          if (!event.action) errors.push('events[' + index + '].action est obligatoire.');
-          if (!event.result) errors.push('events[' + index + '].result est obligatoire.');
+          if (event.set === undefined) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'set' }));
+          if (!event.action) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'action' }));
+          if (!event.result) errors.push(t('adapter.eventFieldRequired', { index: index, field: 'result' }));
         }
       });
     return { valid: errors.length === 0, errors: errors, warnings: [], format: 'capture-v1' };
@@ -185,7 +190,7 @@
     if (format === 'capture-v1') return validateCaptureV1(raw);
     return {
       valid: false,
-      errors: ['Format non reconnu : utilisez un document volley-live v2.1 (ou un export Capture v1 à migrer).'],
+      errors: [t('adapter.unknownFormat')],
       warnings: [],
       format: 'unknown',
     };
@@ -211,11 +216,11 @@
     var our = teams.find(function (t) {
       return t.teamId === ourId;
     }) ||
-      teams[0] || { teamId: ourId, name: 'Notre équipe' };
+      teams[0] || { teamId: ourId, name: t('adapter.ourTeam') };
     var opponent = teams.find(function (t) {
       return t.teamId === opponentId;
     }) ||
-      teams[1] || { teamId: opponentId, name: 'Adversaire' };
+      teams[1] || { teamId: opponentId, name: t('coach.opponent') };
     return { ourId: our.teamId || ourId, opponentId: opponent.teamId || opponentId, our: our, opponent: opponent };
   }
   function rosterV2(raw, team) {
@@ -266,7 +271,7 @@
       roles[key] = player.role;
       ownPlayers.push(key);
     });
-    var opponent = 'ADV · ' + text(team.opponent.name, 'Adversaire');
+    var opponent = 'ADV · ' + text(team.opponent.name, t('coach.opponent'));
     roles[opponent] = 'OPPONENT';
     var players = ownPlayers.concat([opponent]),
       rallyById = {},
@@ -352,15 +357,9 @@
     }).length;
     var fixture = !!(raw.dataQuality && raw.dataQuality.fixture);
     var warnings = (validation.warnings || []).slice();
-    if (synthetic)
-      warnings.unshift(
-        synthetic +
-          ' événements neutres synthétiques sont inclus pour valider les métriques et les interfaces; les scores et fins de rally restent issus des ' +
-          captured +
-          ' événements capturés.'
-      );
+    if (synthetic) warnings.unshift(t('adapter.syntheticEvents', { synthetic: synthetic, captured: captured }));
     if (raw.dataQuality && Array.isArray(raw.dataQuality.unknownFields) && raw.dataQuality.unknownFields.length)
-      warnings.push('Champs encore inconnus : ' + raw.dataQuality.unknownFields.join(', ') + '.');
+      warnings.push(t('adapter.unknownFields', { fields: raw.dataQuality.unknownFields.join(', ') }));
     return {
       cols: cols,
       players: players,
@@ -368,8 +367,8 @@
       roles: roles,
       meta: {
         matchName: text(raw.match.name, 'Match'),
-        teamName: text(team.our.name, 'Notre équipe'),
-        opponentName: text(team.opponent.name, 'Adversaire'),
+        teamName: text(team.our.name, t('adapter.ourTeam')),
+        opponentName: text(team.opponent.name, t('coach.opponent')),
         savedAt: raw.match.savedAt || raw.generatedAt || null,
         sourceFormat: 'volley-live v' + raw.schemaVersion,
         events: (raw.events || []).length,
@@ -538,7 +537,7 @@
       keyByNumber[String(p.number)] = key;
       roles[key] = p.role;
     });
-    var opponent = 'ADV · ' + text(raw.match.opponent && raw.match.opponent.name, 'Adversaire');
+    var opponent = 'ADV · ' + text(raw.match.opponent && raw.match.opponent.name, t('coach.opponent'));
     roles[opponent] = 'OPPONENT';
     var ownPlayers = roster.map(playerKey),
       players = ownPlayers.concat([opponent]),
@@ -619,17 +618,9 @@
             phase = rally.winner === 'team1' ? 'S' : 'R';
           }
         });
-        if (setNumber > 1)
-          warnings.push(
-            'La phase initiale du set ' +
-              setNumber +
-              ' est déduite par alternance : migrez ce match vers v2.1 pour un contexte explicite.'
-          );
+        if (setNumber > 1) warnings.push(t('adapter.phaseInferred', { set: setNumber }));
       });
-    if (terminalOnly)
-      warnings.unshift(
-        'Entrée Capture v1 de migration : une seule action terminale par rally. Utilisez volley-live v2.1 pour les métriques complètes.'
-      );
+    if (terminalOnly) warnings.unshift(t('adapter.terminalOnly'));
     return {
       cols: cols,
       players: players,
@@ -637,8 +628,8 @@
       roles: roles,
       meta: {
         matchName: text(raw.match.name, 'Match'),
-        teamName: text(raw.match.team && raw.match.team.name, 'Notre équipe'),
-        opponentName: text(raw.match.opponent && raw.match.opponent.name, 'Adversaire'),
+        teamName: text(raw.match.team && raw.match.team.name, t('adapter.ourTeam')),
+        opponentName: text(raw.match.opponent && raw.match.opponent.name, t('coach.opponent')),
         savedAt: raw.savedAt || null,
         sourceFormat: 'volley-live-capture v1 (migration)',
         events: raw.events.length,
@@ -804,10 +795,7 @@
     var warnings = (validation.warnings || []).slice(),
       fixture = !!(raw.dataQuality && raw.dataQuality.fixture);
     if (raw.dataQuality && raw.dataQuality.syntheticEvents)
-      warnings.unshift(
-        raw.dataQuality.syntheticEvents +
-          ' actions neutres synthétiques sont signalées par provenance et utilisées uniquement pour la validation des métriques.'
-      );
+      warnings.unshift(t('adapter.syntheticActions', { n: raw.dataQuality.syntheticEvents }));
     return {
       match: match,
       events: events,
@@ -841,9 +829,7 @@
         demo: false,
         explicitContext: false,
         sourceFormat: 'volley-live-capture v1 (migration)',
-        warnings: [
-          'Match local v1 migré en mémoire; phase, rotation et présence terrain sont reconstruites et ne proviennent pas de records explicites du JSON.',
-        ],
+        warnings: [t('adapter.v1Migrated')],
         provenance: {
           actions: true,
           scores: true,

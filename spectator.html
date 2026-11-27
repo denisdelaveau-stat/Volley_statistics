@@ -10,34 +10,34 @@
 <body>
 <div class="spectator-app" id="spectatorApp">
   <header class="spectator-header" aria-label="VolleyLive">
-    <a class="spectator-brand" href="index.html" aria-label="VolleyLive, retour à la page principale">
+    <a class="spectator-brand" href="index.html" aria-label="VolleyLive, retour à la page principale" data-i18n-attr="aria-label:spectator.brandLabel">
       <svg class="brand-ball" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none"/><path d="M7 7c7 1 11 5 12 12M15 2c1 7-2 12-8 15M29 12c-7-2-12 0-16 6M25 25c-6-4-8-9-6-15M3 20c6 4 12 4 18 1"/></svg>
       <span class="brand-wordmark"><strong>VOLLEY</strong><strong>LIVE</strong></span>
     </a>
     <span class="visually-hidden" id="archiveBadge">LIVE</span>
   </header>
 
-  <nav class="spectator-nav" aria-label="Navigation spectateur">
-    <a class="spectator-home" href="index.html"><span aria-hidden="true">⌂</span><span>ACCUEIL</span></a>
+  <nav class="spectator-nav" aria-label="Navigation spectateur" data-i18n-attr="aria-label:spectator.navLabel">
+    <a class="spectator-home" href="index.html"><span aria-hidden="true">⌂</span><span data-i18n="nav.home">ACCUEIL</span></a>
     <button type="button" data-tab="live-score">SCORES</button>
     <button type="button" data-tab="live-timeline" aria-selected="true">TIMELINE</button>
     <button type="button" data-tab="live-graph">GRAPH</button>
     <button type="button" data-tab="ranking">RANKING</button>
   </nav>
 
-  <section class="spectator-livebar" aria-label="Navigation entre les sets">
+  <section class="spectator-livebar" aria-label="Navigation entre les sets" data-i18n-attr="aria-label:spectator.setNavLabel">
     <label for="evolutionSet">Set
-      <select id="evolutionSet" aria-label="Sélectionner un set"></select>
+      <select id="evolutionSet" aria-label="Sélectionner un set" data-i18n-attr="aria-label:spectator.selectSet"></select>
     </label>
-    <strong id="liveSetStatus" class="live-set-status" role="status">DIRECT</strong>
-    <button id="returnToLive" class="return-to-live" type="button" hidden>Retour au direct</button>
+    <strong id="liveSetStatus" class="live-set-status" role="status" data-i18n="spectator.live">DIRECT</strong>
+    <button id="returnToLive" class="return-to-live" type="button" hidden data-i18n="spectator.backToLive">Retour au direct</button>
   </section>
 
   <main>
     <section class="spectator-panel live-score-panel" data-panel="live-score" hidden>
-      <section class="live-overview" aria-label="Score et momentum du match">
+      <section class="live-overview" aria-label="Score et momentum du match" data-i18n-attr="aria-label:spectator.overviewLabel">
         <div class="live-card-grid">
-          <article class="live-card live-score-card" id="liveScoreboard" aria-label="Aucun match">
+          <article class="live-card live-score-card" id="liveScoreboard" aria-label="Aucun match" data-i18n-attr="aria-label:spectator.noMatch">
             <div class="team-column home-team">
               <div class="team-crest home-crest" aria-hidden="true"><img id="homeTeamLogo" alt=""><span id="homeMonogram">H</span></div>
               <strong class="team-display-name" id="homeTeamDisplay">HOME</strong>
@@ -54,21 +54,21 @@
               <strong class="team-display-name" id="awayTeamDisplay">AWAY</strong>
               <svg class="service-ball" id="serviceAway" viewBox="0 0 32 32" aria-label="Service AWAY" hidden><circle cx="16" cy="16" r="14"/><path d="M7 7c7 1 11 5 12 12M15 2c1 7-2 12-8 15M29 12c-7-2-12 0-16 6M25 25c-6-4-8-9-6-15M3 20c6 4 12 4 18 1"/></svg>
             </div>
-            <div class="score-status" id="headerSet">AUCUN MATCH</div>
+            <div class="score-status" id="headerSet" data-i18n="spectator.noMatchUpper">AUCUN MATCH</div>
           </article>
 
-          <article class="live-card momentum-card state-no-match" id="momentumCard" aria-label="Momentum indisponible">
-            <header><h2>MOMENTUM ACTUEL</h2><p id="momentumSubtitle">Aucun match chargé</p></header>
+          <article class="live-card momentum-card state-no-match" id="momentumCard" aria-label="Momentum indisponible" data-i18n-attr="aria-label:spectator.momentumUnavailable">
+            <header><h2 data-i18n="spectator.currentMomentum">MOMENTUM ACTUEL</h2><p id="momentumSubtitle" data-i18n="spectator.noMatchLoaded">Aucun match chargé</p></header>
             <div class="momentum-headline" id="momentumHeadline" aria-live="polite"><span id="momentumArrow">—</span><strong id="momentumLeader">NA</strong></div>
             <div class="momentum-percentages"><strong id="homePct">NA</strong><strong id="awayPct">NA</strong></div>
-            <div class="momentum-bar" role="img" id="momentumBar" aria-label="Répartition indisponible"><span id="homeMomentumBar"></span><span id="awayMomentumBar"></span></div>
+            <div class="momentum-bar" role="img" id="momentumBar" aria-label="Répartition indisponible" data-i18n-attr="aria-label:spectator.splitUnavailable"><span id="homeMomentumBar"></span><span id="awayMomentumBar"></span></div>
             <div class="momentum-counts"><span><b id="momentumHomeName">HOME</b><strong id="homeCount">0</strong></span><span><strong id="awayCount">0</strong><b id="momentumAwayName">AWAY</b></span></div>
-            <div class="momentum-sequence" id="momentumSequence" role="list" aria-label="Séquence des points récents"></div>
-            <div class="momentum-axis"><i></i><span>Plus ancien</span><b aria-hidden="true">→</b><span>Plus récent</span><i></i></div>
+            <div class="momentum-sequence" id="momentumSequence" role="list" aria-label="Séquence des points récents" data-i18n-attr="aria-label:spectator.recentSequence"></div>
+            <div class="momentum-axis"><i></i><span data-i18n="spectator.oldest">Plus ancien</span><b aria-hidden="true">→</b><span data-i18n="spectator.newest">Plus récent</span><i></i></div>
             <div class="momentum-divider"></div>
-            <div class="streak-row"><span class="streak-pill" id="streakPill">SÉRIE EN COURS</span><strong id="streakText">—</strong></div>
+            <div class="streak-row"><span class="streak-pill" id="streakPill" data-i18n="spectator.currentRun">SÉRIE EN COURS</span><strong id="streakText">—</strong></div>
             <div class="momentum-divider"></div>
-            <p class="momentum-disclaimer">Indicateur de dynamique, pas une prédiction.</p>
+            <p class="momentum-disclaimer" data-i18n="spectator.disclaimer">Indicateur de dynamique, pas une prédiction.</p>
           </article>
         </div>
       </section>
@@ -76,47 +76,47 @@
 
     <section class="spectator-panel timeline-panel" data-panel="live-timeline">
       <div class="timeline-filterbar">
-        <fieldset><legend>En haut</legend><div class="segment"><button type="button" data-order="oldestFirst">Plus anciennes</button><button type="button" data-order="newestFirst">Plus récentes</button></div></fieldset>
-        <label>Nombre d’actions<select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
+        <fieldset><legend data-i18n="spectator.onTop">En haut</legend><div class="segment"><button type="button" data-order="oldestFirst" data-i18n="spectator.oldestFirst">Plus anciennes</button><button type="button" data-order="newestFirst" data-i18n="spectator.newestFirst">Plus récentes</button></div></fieldset>
+        <label><span data-i18n="spectator.actionCount">Nombre d’actions</span><select id="windowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all" data-i18n="spectator.wholeSet">Tout le set</option></select></label>
       </div>
       <div class="timeline-board">
         <div class="timeline-title">
           <strong id="homeName">HOME</strong>
-          <div><h1 id="timelineSet">SET 1 · Fil du match</h1><p>Score : HOME — AWAY</p><p id="timelineOrder">Ancien → récent</p></div>
+          <div><h1 id="timelineSet">SET 1 · Fil du match</h1><p data-i18n="spectator.scoreHomeAway">Score : HOME — AWAY</p><p id="timelineOrder" data-i18n="spectator.orderOldNew">Ancien → récent</p></div>
           <strong id="awayName">AWAY</strong>
         </div>
         <div class="timeline-columns" aria-hidden="true"><span>0</span><b>HOME</b><i></i><b>AWAY</b><span>0</span></div>
         <div id="timelineList" class="timeline-list" aria-live="polite"></div>
-        <div id="timelineEmpty" class="timeline-empty" hidden>Le set n’a pas encore commencé</div>
+        <div id="timelineEmpty" class="timeline-empty" hidden data-i18n="spectator.setNotStarted">Le set n’a pas encore commencé</div>
         <div id="timelineWarning" class="timeline-warning" hidden></div>
-        <footer class="timeline-footer"><div class="replay-status"><span></span> REPLAY D’ARCHIVE</div></footer>
+        <footer class="timeline-footer"><div class="replay-status"><span></span> <strong data-i18n="spectator.archiveReplay">REPLAY D’ARCHIVE</strong></div></footer>
       </div>
     </section>
 
     <section class="spectator-panel graph-panel" data-panel="live-graph" hidden aria-labelledby="liveGraphTitle">
       <h1 id="liveGraphTitle" class="visually-hidden">Score and Fault Evolution</h1>
-      <div class="evolution-toolbar" aria-label="Contrôles de l’historique">
-        <fieldset><legend>Ordre</legend><div class="segment"><button type="button" data-graph-order="oldestFirst">Ancien → récent</button><button type="button" data-graph-order="newestFirst">Récent → ancien</button></div></fieldset>
-        <label>Rallyes visibles<select id="graphWindowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all">Tout le set</option></select></label>
-        <button id="returnLive" class="return-live" type="button" hidden>Dernier point</button>
+      <div class="evolution-toolbar" aria-label="Contrôles de l’historique" data-i18n-attr="aria-label:spectator.historyControls">
+        <fieldset><legend data-i18n="spectator.order">Ordre</legend><div class="segment"><button type="button" data-graph-order="oldestFirst" data-i18n="spectator.orderOldNew">Ancien → récent</button><button type="button" data-graph-order="newestFirst" data-i18n="spectator.orderNewOld">Récent → ancien</button></div></fieldset>
+        <label><span data-i18n="spectator.visibleRallies">Rallyes visibles</span><select id="graphWindowSize" class="window-size" data-window-size><option value="5">5</option><option value="10">10</option><option value="11">11</option><option value="20">20</option><option value="all" data-i18n="spectator.wholeSet">Tout le set</option></select></label>
+        <button id="returnLive" class="return-live" type="button" hidden data-i18n="spectator.latestPoint">Dernier point</button>
       </div>
       <div class="graph-board evolution-board">
-        <div id="graphContent" class="evolution-scroll" tabindex="0" aria-label="Historique synchronisé du score et des fautes">
+        <div id="graphContent" class="evolution-scroll" tabindex="0" aria-label="Historique synchronisé du score et des fautes" data-i18n-attr="aria-label:spectator.syncHistory">
           <div id="evolutionCanvas" class="evolution-canvas">
             <article class="evolution-panel score-evolution" aria-labelledby="scoreGraphTitle">
-              <header class="evolution-heading"><div><h2 id="scoreGraphTitle">Évolution du score</h2><p>Derniers points • lecture de gauche à droite</p></div></header>
+              <header class="evolution-heading"><div><h2 id="scoreGraphTitle" data-i18n="spectator.scoreEvolution">Évolution du score</h2><p data-i18n="spectator.scoreEvolutionSub">Derniers points • lecture de gauche à droite</p></div></header>
               <div id="scoreRows" class="evolution-rows"></div><div id="scoreChart" class="evolution-chart"></div>
-              <div class="score-legend" aria-label="Légende des cellules de score"><span><i class="legend-dot so"></i> Side-out</span><span><i class="legend-dot bp-home"></i> Break HOME</span><span><i class="legend-dot bp-away"></i> Break AWAY</span></div>
+              <div class="score-legend" aria-label="Légende des cellules de score" data-i18n-attr="aria-label:spectator.scoreLegend"><span><i class="legend-dot so"></i> Side-out</span><span><i class="legend-dot bp-home"></i> Break HOME</span><span><i class="legend-dot bp-away"></i> Break AWAY</span></div>
               <p id="scoreSummary" class="visually-hidden" role="status"></p>
             </article>
             <article class="evolution-panel fault-evolution" aria-labelledby="faultGraphTitle">
-              <header class="evolution-heading"><div><h2 id="faultGraphTitle">Évolution des fautes</h2><p>Fautes cumulées • Δ = HOME − AWAY</p></div></header>
+              <header class="evolution-heading"><div><h2 id="faultGraphTitle" data-i18n="spectator.faultEvolution">Évolution des fautes</h2><p data-i18n="spectator.faultEvolutionSub">Fautes cumulées • Δ = HOME − AWAY</p></div></header>
               <div id="faultRows" class="evolution-rows"></div><div id="faultChart" class="evolution-chart"></div>
-              <p class="fault-explanation">Un delta positif indique davantage de fautes HOME.</p><p id="faultSummary" class="visually-hidden" role="status"></p>
+              <p class="fault-explanation" data-i18n="spectator.faultExplanation">Un delta positif indique davantage de fautes HOME.</p><p id="faultSummary" class="visually-hidden" role="status"></p>
             </article>
           </div>
         </div>
-        <div id="graphEmpty" class="graph-empty" hidden><strong>Aucun rallye disponible</strong><span>Les axes restent disponibles sans point de données fabriqué.</span></div>
+        <div id="graphEmpty" class="graph-empty" hidden><strong data-i18n="spectator.noRally">Aucun rallye disponible</strong><span data-i18n="spectator.noRallyHint">Les axes restent disponibles sans point de données fabriqué.</span></div>
       </div>
     </section>
 
@@ -125,17 +125,17 @@
         <div>
           <p>SPECTATOR VIEW</p>
           <h1 id="rankingTitle">Roster Ranking</h1>
-          <span>Classement calculé uniquement depuis le JSON officiel chargé.</span>
+          <span data-i18n="spectator.rankingSource">Classement calculé uniquement depuis le JSON officiel chargé.</span>
         </div>
-        <div class="ranking-filters" aria-label="Filtres du classement">
-          <label>Vue
+        <div class="ranking-filters" aria-label="Filtres du classement" data-i18n-attr="aria-label:spectator.rankingFilters">
+          <label><span data-i18n="spectator.view">Vue</span>
             <select id="rankingView">
               <option value="highlight">Highlight</option>
               <option value="lowlight">Lowlight</option>
               <option value="delta">Delta</option>
             </select>
           </label>
-          <label>Catégorie
+          <label><span data-i18n="spectator.category">Catégorie</span>
             <select id="rankingCategory">
               <option value="all">All</option>
               <option value="attack">Attack</option>
@@ -151,16 +151,17 @@
         <div class="ranking-section-title"><h2 id="rankingModeTitle">Highlight</h2><p id="rankingSummary">0 joueur · 0 action</p></div>
         <div id="rankingCards" class="ranking-cards"></div>
       </section>
-      <p class="ranking-note"><b>Highlight</b> : points marqués. <b>Lowlight</b> : erreurs. <b>Delta</b> : points marqués − erreurs. Les actions neutres restent comptées dans le total.</p>
+      <p class="ranking-note"><b>Highlight</b><span data-i18n="spectator.noteHighlight"> : points marqués.</span> <b>Lowlight</b><span data-i18n="spectator.noteLowlight"> : erreurs.</span> <b>Delta</b><span data-i18n="spectator.noteDelta"> : points marqués − erreurs. Les actions neutres restent comptées dans le total.</span></p>
     </section>
   </main>
 </div>
-<div class="fatal" id="fatal" hidden><h1>Archive indisponible</h1><p id="fatalText"></p><a href="index.html">Retour à la page principale</a></div>
+<div class="fatal" id="fatal" hidden><h1 data-i18n="spectator.archiveUnavailable">Archive indisponible</h1><p id="fatalText"></p><a href="index.html" data-i18n="spectator.backToMain">Retour à la page principale</a></div>
 <script src="js/shared-dom.js"></script>
 <script src="js/shared-domain.js"></script>
 <script src="js/i18n/fr.js"></script>
 <script src="js/i18n/en.js"></script>
 <script src="js/shared-i18n.js"></script>
+<script>window.VolleyI18n.apply();</script>
 <script src="statistics/adapter.js"></script>
 <script src="spectator-live-config.js"></script>
 <script src="js/spectator-core.js"></script>

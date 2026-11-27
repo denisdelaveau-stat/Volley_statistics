@@ -1,6 +1,7 @@
 /* VolleyLive spectator view — TIMELINE rows and window preferences. */
 (function () {
   'use strict';
+  var t = window.VolleyI18n.t;
   var P = window.VolleySpectatorParts,
     st = P.state;
   var ORDER_KEY = P.ORDER_KEY,
@@ -43,7 +44,7 @@
       );
     }
     var p = e.player,
-      name = (p && p.name) || 'Joueur HOME',
+      name = (p && p.name) || t('spectator.playerHome'),
       number = p && p.number != null ? p.number : '—';
     var playerRole = (p && p.role) || '—',
       outcome = ['point', 'error', 'neutral'].indexOf(e.outcome) >= 0 ? e.outcome : 'neutral';
@@ -79,10 +80,9 @@
         (isMaxGap ? ' max-gap' : '') +
         '" role="img" aria-label="' +
         (side === 'away' ? 'AWAY' : 'HOME') +
-        ' mène de ' +
-        value +
-        ' points' +
-        (isMaxGap ? ', écart maximum du set' : '') +
+        ' ' +
+        t('spectator.leadsBy', { n: value }) +
+        (isMaxGap ? ', ' + t('spectator.maxGap') : '') +
         '" title="' +
         (side === 'away' ? 'AWAY' : 'HOME') +
         ' +' +
@@ -127,8 +127,8 @@
       '<div class="delta-lane home">' +
       (side === 'home' ? delta : '') +
       '</div></div>' +
-      '<div class="score-node"><div class="rally-caption"><span>Rallye ' +
-      r.rally +
+      '<div class="score-node"><div class="rally-caption"><span>' +
+      esc(t('spectator.rallyN', { n: r.rally })) +
       '</span></div>' +
       '<div class="score-pill ' +
       (isLast ? 'latest' : '') +
@@ -141,8 +141,8 @@
       '">' +
       r.score.away +
       '</span></div>' +
-      (isLast ? '<span class="last-point">DERNIER POINT</span>' : '') +
-      (r.invalid ? '<span class="invalid-note">DONNÉE À VÉRIFIER</span>' : '') +
+      (isLast ? '<span class="last-point">' + esc(t('spectator.lastPoint')) + '</span>' : '') +
+      (r.invalid ? '<span class="invalid-note">' + esc(t('spectator.dataToCheck')) + '</span>' : '') +
       '</div>' +
       '<div class="timeline-side away"><div class="delta-lane away">' +
       (side === 'away' ? delta : '') +

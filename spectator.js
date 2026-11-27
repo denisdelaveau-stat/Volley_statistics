@@ -1,6 +1,7 @@
 /* VolleyLive Spectator View controller: render, tabs, storage sync and the public window.VolleySpectator API. Views live in js/spectator-*.js. */
 (function () {
   'use strict';
+  var t = window.VolleyI18n.t;
 
   var P = window.VolleySpectatorParts,
     st = P.state;
@@ -33,12 +34,15 @@
     renderScoreboard(st.model);
     renderMomentum(st.model);
     renderRanking();
-    $('archiveBadge').textContent = st.model.finished ? 'TERMINÉ' : 'LIVE';
+    $('archiveBadge').textContent = st.model.finished ? t('spectator.finished') : 'LIVE';
     $('awayName').textContent = 'AWAY';
     $('homeName').textContent = 'HOME';
     $('timelineSet').textContent =
-      st.model.currentSet == null ? 'AUCUN MATCH · Fil du match' : 'SET ' + st.model.currentSet + ' · Fil du match';
-    $('timelineOrder').textContent = v.p.order === 'oldestFirst' ? 'Ancien → récent' : 'Récent → ancien';
+      st.model.currentSet == null
+        ? t('spectator.noMatchThread')
+        : t('spectator.setThread', { set: st.model.currentSet });
+    $('timelineOrder').textContent =
+      v.p.order === 'oldestFirst' ? t('spectator.orderOldNew') : t('spectator.orderNewOld');
     document.querySelectorAll('[data-order],[data-graph-order]').forEach(function (b) {
       var choice = b.dataset.order || b.dataset.graphOrder;
       b.classList.toggle('active', choice === v.p.order);
@@ -61,7 +65,7 @@
       board.scrollLeft = Math.max(0, cardBox.left - boardBox.left + board.scrollLeft - 20);
     });
     $('timelineEmpty').hidden = st.model.rallies.length !== 0;
-    $('timelineEmpty').textContent = st.model.noMatch ? 'Aucun match chargé' : 'Le set n’a pas encore commencé';
+    $('timelineEmpty').textContent = st.model.noMatch ? t('spectator.noMatchLoaded') : t('spectator.setNotStarted');
     $('timelineWarning').hidden = !st.model.warnings.length;
     $('timelineWarning').textContent = st.model.warnings.join(' ');
     renderGraphs(v);

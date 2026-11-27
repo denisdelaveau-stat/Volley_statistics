@@ -1,6 +1,7 @@
 /* VolleyLive spectator view — RANKING. */
 (function () {
   'use strict';
+  var t = window.VolleyI18n.t;
   var P = window.VolleySpectatorParts,
     st = P.state;
   var $ = P.$,
@@ -46,7 +47,7 @@
         players[player.playerId] = {
           id: player.playerId,
           number: player.number == null ? '—' : player.number,
-          name: player.name || 'Joueur ' + (player.number == null ? 'NA' : player.number),
+          name: player.name || t('spectator.playerN', { n: player.number == null ? 'NA' : player.number }),
           role: role(player.role || player.position),
         };
       });
@@ -68,7 +69,7 @@
         players[String(player.number)] = {
           id: String(player.number),
           number: player.number == null ? '—' : player.number,
-          name: player.name || 'Joueur ' + (player.number == null ? 'NA' : player.number),
+          name: player.name || t('spectator.playerN', { n: player.number == null ? 'NA' : player.number }),
           role: role(player.position || player.role),
         };
       });
@@ -126,7 +127,9 @@
       return (
         '<article class="ranking-card empty-ranking"><h3>' +
         category.title +
-        '</h3><div class="ranking-empty"><span>0</span><strong>NA</strong><small>0 action</small></div></article>'
+        '</h3><div class="ranking-empty"><span>0</span><strong>NA</strong><small>' +
+        esc(t('spectator.zeroAction')) +
+        '</small></div></article>'
       );
     var body = rows
       .map(function (row, index) {
@@ -135,7 +138,7 @@
           mode === 'highlight'
             ? row.points + ' pts · ' + row.errors + ' err'
             : mode === 'lowlight'
-              ? row.errors + ' erreurs · ' + row.points + ' pts'
+              ? t('spectator.errorsPts', { e: row.errors, p: row.points })
               : row.points + ' pts − ' + row.errors + ' err';
         return (
           '<div class="ranking-row"><span class="ranking-rank">#' +
@@ -183,13 +186,11 @@
     });
     $('rankingModeTitle').textContent = mode === 'highlight' ? 'Highlight' : mode === 'lowlight' ? 'Lowlight' : 'Delta';
     $('rankingSummary').textContent =
-      Object.keys(playerCount).length +
-      ' joueur' +
-      (Object.keys(playerCount).length > 1 ? 's' : '') +
+      t(Object.keys(playerCount).length > 1 ? 'spectator.playersMany' : 'spectator.playersOne', {
+        n: Object.keys(playerCount).length,
+      }) +
       ' · ' +
-      relevantActions +
-      ' action' +
-      (relevantActions > 1 ? 's' : '');
+      t(relevantActions > 1 ? 'spectator.actionsMany' : 'spectator.actionsOne', { n: relevantActions });
     $('rankingSection').className = 'ranking-section mode-' + mode + (relevantActions ? '' : ' is-empty');
     $('rankingCards').classList.toggle('single-category', categoryValue !== 'all');
     $('rankingCards').innerHTML = categories
