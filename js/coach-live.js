@@ -3,6 +3,7 @@
   'use strict';
   var P = window.VolleyCoachParts;
   if (!P) return;
+  var t = window.VolleyI18n.t;
   var C = P.C,
     POS = P.POS,
     ROLE_SHORT = P.ROLE_SHORT,
@@ -167,26 +168,27 @@
     if (delta >= trendLimit) trend = 'up';
     else if (delta <= -trendLimit) trend = 'down';
     var alert = '';
-    if (errorStreak >= 3) alert = errorStreak + ' errors in a row';
+    if (errorStreak >= 3) alert = t('coach.live.errorStreak', { n: errorStreak });
     else if (
       main === 'set' &&
       rolling.filter(function (e) {
         return outcome(e) === 'negative';
       }).length >= 2
     )
-      alert =
-        rolling.filter(function (e) {
+      alert = t('coach.live.settingErrors', {
+        n: rolling.filter(function (e) {
           return outcome(e) === 'negative';
-        }).length + ' setting errors';
-    else if (main === 'reception' && statusName !== 'good') alert = 'Reception unstable';
-    else if (main === 'attack' && eff != null && statusName !== 'good') alert = 'Attack efficiency ' + eff + '%';
+        }).length,
+      });
+    else if (main === 'reception' && statusName !== 'good') alert = t('coach.live.receptionUnstable');
+    else if (main === 'attack' && eff != null && statusName !== 'good') alert = t('coach.live.attackEff', { eff: eff });
     else if (
       skills.service.slice(-2).length === 2 &&
       skills.service.slice(-2).every(function (e) {
         return outcome(e) === 'negative';
       })
     )
-      alert = '2 serve errors';
+      alert = t('coach.live.serveErrors2');
     return {
       player: p,
       events: pe,
@@ -207,10 +209,14 @@
     };
   }
   function liveStatusLabel(s) {
-    return s === 'difficulty' ? 'Difficulty' : s === 'watch' ? 'Watch' : 'Good';
+    return s === 'difficulty'
+      ? t('coach.live.statusDifficulty')
+      : s === 'watch'
+        ? t('coach.live.statusWatch')
+        : t('coach.live.statusGood');
   }
-  function trendSymbol(t) {
-    return t === 'up' ? '↑' : t === 'down' ? '↓' : '→';
+  function trendSymbol(trend) {
+    return trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
   }
   function roleChip(p) {
     var r = normalizedRole(p.position);
@@ -262,20 +268,21 @@
       cur = empty ? { rotation: 'na', serving: null } : currentState(m, C.data.rallies, +m.currentSet || 1),
       so = empty ? null : pct(mt.so.n, mt.so.d),
       bp = empty ? null : pct(mt.bp.n, mt.bp.d),
-      phase = empty ? 'NA' : cur.serving === 'B' ? 'RECEPTION' : 'SERVE';
+      phase = empty ? 'NA' : cur.serving === 'B' ? t('coach.phaseReceive') : t('coach.phaseServe');
     return (
       '<header class="live-insight-header ' +
       (empty ? 'live-header-empty' : '') +
-      '"><div class="live-insight-brand"><span class="live-logo">◉</span><b>VolleyLive <em>Insight</em></b></div><button type="button" class="live-mode-pill" data-coach-go="overview">COACH VIEW' +
-      (C.view === 'player-focus' ? ' &gt; PLAYER' : '') +
+      '"><div class="live-insight-brand"><span class="live-logo">◉</span><b>VolleyLive <em>Insight</em></b></div><button type="button" class="live-mode-pill" data-coach-go="overview">' +
+      esc(t('coach.live.coachViewUpper')) +
+      (C.view === 'player-focus' ? ' &gt; ' + esc(t('coach.live.playerUpper')) : '') +
       '</button><div class="live-scoreboard"><span>HOME</span><strong class="' +
       (empty ? 'metric-na' : '') +
       '">' +
       sc.a +
       '</strong><div class="live-set"><b class="' +
       (empty ? 'metric-na' : '') +
-      '">Set ' +
-      (empty ? '0' : +m.currentSet || 1) +
+      '">' +
+      esc(t('common.setLower', { set: empty ? '0' : +m.currentSet || 1 })) +
       '</b>' +
       (empty ? '<span class="live-set-dots"><i></i><i></i><i></i></span>' : liveSetDots(m)) +
       '</div><strong class="' +
@@ -318,14 +325,14 @@
       esc(p.number) +
       '" data-position="' +
       position +
-      '" aria-label="Ouvrir Player Focus pour ' +
-      esc(p.name) +
+      '" aria-label="' +
+      esc(t('coach.live.openFocus', { name: p.name || '' })) +
       '"><span class="live-position">' +
       position +
       '</span><div class="live-card-main"><strong class="live-number">#' +
       esc(String(p.number).padStart(2, '0')) +
       '</strong><b>' +
-      esc(String(p.name || 'Joueur').toUpperCase()) +
+      esc(String(p.name || t('coach.player')).toUpperCase()) +
       '</b>' +
       roleChip(p) +
       '<span class="live-trend">' +
@@ -335,7 +342,7 @@
       '</b></span><span>ERR<b>' +
       s.errors +
       '</b></span><span>EFF<b title="' +
-      (['reception', 'defense'].indexOf(s.mainSkill) > -1 ? '≈ dérivé des événements' : '') +
+      (['reception', 'defense'].indexOf(s.mainSkill) > -1 ? t('coach.live.derived') : '') +
       '">' +
       playerEffText(s) +
       '</b></span></div>' +
@@ -348,7 +355,9 @@
   function rallyTimeline(rallies) {
     var last = rallies.slice(-(cfg().timelineLength || 12));
     return (
-      '<section class="live-timeline"><h2>LAST 12 RALLIES</h2><div class="live-rally-track">' +
+      '<section class="live-timeline"><h2>' +
+      esc(t('coach.live.last12')) +
+      '</h2><div class="live-rally-track">' +
       (last.length
         ? last
             .map(function (r, i) {
@@ -360,7 +369,7 @@
                 ' ' +
                 (now ? 'now' : '') +
                 '">' +
-                (now ? '<em>Now</em>' : '') +
+                (now ? '<em>' + esc(t('coach.live.now')) + '</em>' : '') +
                 '<b>' +
                 (win ? 'W' : 'L') +
                 '</b><small>' +
@@ -369,20 +378,36 @@
               );
             })
             .join('')
-        : '<span class="live-empty-rallies metric-na">0 rally</span>') +
+        : '<span class="live-empty-rallies metric-na">' + esc(t('coach.zeroRally')) + '</span>') +
       '</div></section>'
     );
   }
   function renderLiveCourt() {
     if (innerWidth < innerHeight) {
       content.innerHTML =
-        '<div class="live-landscape-gate"><span>↻</span><strong>Tournez l’appareil</strong><p>LIVE COURT est optimisé pour le mode paysage.</p><button type="button" data-coach-go="overview">Retour à Vue coach</button></div>';
+        '<div class="live-landscape-gate"><span>↻</span><strong>' +
+        esc(t('coach.live.rotate')) +
+        '</strong><p>' +
+        esc(t('coach.live.landscape')) +
+        '</p><button type="button" data-coach-go="overview">' +
+        esc(t('coach.live.backToCoach')) +
+        '</button></div>';
       return;
     }
     var h = '<div class="live-court-view">' + liveHeader(true),
       m = C.data.match;
     h +=
-      '<section class="live-court-panel"><div class="live-section-head"><h1>ON COURT</h1><div class="live-status-legend"><span class="good">● Good</span><span class="watch">● Watch</span><span class="difficulty">● Difficulty</span></div></div><div class="live-half-court"><div class="live-net"><span>NET</span></div><div class="live-court-grid">';
+      '<section class="live-court-panel"><div class="live-section-head"><h1>' +
+      esc(t('coach.onCourtUpper')) +
+      '</h1><div class="live-status-legend"><span class="good">' +
+      esc(t('coach.live.legendGood')) +
+      '</span><span class="watch">' +
+      esc(t('coach.live.legendWatch')) +
+      '</span><span class="difficulty">' +
+      esc(t('coach.live.legendDifficulty')) +
+      '</span></div></div><div class="live-half-court"><div class="live-net"><span>' +
+      esc(t('coach.live.net')) +
+      '</span></div><div class="live-court-grid">';
     if (C.data.empty) {
       [4, 3, 2, 5, 6, 1].forEach(function (pos) {
         h += liveEmptyCard(pos);
@@ -414,7 +439,9 @@
               return r.set === (+m.currentSet || 1);
             })
       ) +
-      '<p class="live-threshold-note">Seuils Good / Watch / Difficulty configurables — valeurs par défaut à valider avec le coach.</p></div>';
+      '<p class="live-threshold-note">' +
+      esc(t('coach.live.thresholdNote')) +
+      '</p></div>';
     content.innerHTML = h;
   }
   function focusPlayers() {
@@ -493,10 +520,12 @@
     var list = events.slice(-5);
     while (list.length < 5) list.unshift(null);
     return (
-      '<div class="focus-last-five" aria-label="5 dernières actions, de la plus ancienne à la plus récente">' +
+      '<div class="focus-last-five" aria-label="' +
+      esc(t('coach.live.lastFiveLabel')) +
+      '">' +
       list
         .map(function (e) {
-          if (!e) return '<span class="na" title="Aucune action">NA</span>';
+          if (!e) return '<span class="na" title="' + esc(t('coach.live.noAction')) + '">NA</span>';
           var o = outcome(e);
           return (
             '<span class="' +
@@ -538,13 +567,21 @@
   }
   function efficiencyCurve(playerNumber, skill, rallies) {
     if (!C.data.explicitContext && !hasIntermediateContacts(C.data.events || []))
-      return '<div class="focus-curve focus-curve-na"><span class="metric-na">NA</span><small>Contacts intermédiaires absents de cet export Capture v1</small></div>';
+      return (
+        '<div class="focus-curve focus-curve-na"><span class="metric-na">NA</span><small>' +
+        esc(t('coach.live.noIntermediate')) +
+        '</small></div>'
+      );
     var pts = curvePoints(playerNumber, skill, rallies),
       valid = pts.filter(function (p) {
         return p.v != null;
       });
     if (!valid.length)
-      return '<div class="focus-curve focus-curve-na"><span class="metric-na">NA</span><small>Aucun contact disponible dans le JSON</small></div>';
+      return (
+        '<div class="focus-curve focus-curve-na"><span class="metric-na">NA</span><small>' +
+        esc(t('coach.live.noContact')) +
+        '</small></div>'
+      );
     var W = 420,
       H = 118,
       padL = 34,
@@ -588,9 +625,9 @@
       W +
       ' ' +
       H +
-      '" role="img" aria-label="Courbe d’efficacité ' +
-      skill +
-      ' dérivée des événements réels"><line x1="' +
+      '" role="img" aria-label="' +
+      esc(t('coach.live.curveLabel', { skill: skillTitle(skill) })) +
+      '"><line x1="' +
       padL +
       '" x2="' +
       (W - padR) +
@@ -642,7 +679,12 @@
     );
   }
   function skillTitle(skill) {
-    return { attack: 'ATTACK', block: 'BLOCK', reception: 'RECEPTION', defense: 'DEFENSE' }[skill];
+    return {
+      attack: t('coach.live.skillAttack'),
+      block: t('coach.live.skillBlock'),
+      reception: t('coach.phaseReceive'),
+      defense: t('coach.live.skillDefense'),
+    }[skill];
   }
   function focusPanel(s, skill, rallies) {
     var m = focusSkillModel(s, skill),
@@ -658,16 +700,14 @@
       '</h2><b>›</b></header><div class="focus-skill-summary"><strong class="' +
       (m.eff == null ? 'metric-na' : '') +
       '" ' +
-      (m.derived ? 'title="≈ dérivé des événements : contacts non ERROR / total"' : '') +
+      (m.derived ? 'title="' + esc(t('coach.live.derivedRatio')) + '"' : '') +
       '>' +
       (m.eff == null ? 'NA' : (m.derived ? '≈' : '') + m.eff + '%') +
       '</strong><span class="focus-eff-trend ' +
       trend +
-      '" title="Tendance dérivée des ' +
-      (cfg().rollingWindow || 5) +
-      ' derniers contacts comparés aux ' +
-      (cfg().rollingWindow || 5) +
-      ' précédents">' +
+      '" title="' +
+      esc(t('coach.live.trendTitle', { n: cfg().rollingWindow || 5 })) +
+      '">' +
       trendSymbol(trend) +
       '</span><div class="focus-stat-grid">' +
       m.stats
@@ -678,17 +718,23 @@
             '<b class="' +
             (x[1] === 'NA' ? 'metric-na' : '') +
             '" ' +
-            (String(x[1]).charAt(0) === '≈' ? 'title="≈ dérivé des événements : contacts non ERROR"' : '') +
+            (String(x[1]).charAt(0) === '≈' ? 'title="' + esc(t('coach.live.derivedCount')) + '"' : '') +
             '>' +
             x[1] +
             '</b></span>'
           );
         })
         .join('') +
-      '</div></div><div class="focus-last-title">LAST 5 <small>(oldest → newest)</small></div>' +
+      '</div></div><div class="focus-last-title">' +
+      esc(t('coach.live.last5')) +
+      ' <small>' +
+      esc(t('coach.live.oldestNewest')) +
+      '</small></div>' +
       lastFiveHTML(m.events) +
-      '<div class="focus-curve-title">EFFICIENCY ' +
-      (m.derived ? '<span title="≈ dérivé des événements">≈</span>' : '') +
+      '<div class="focus-curve-title">' +
+      esc(t('coach.live.efficiencyUpper')) +
+      ' ' +
+      (m.derived ? '<span title="' + esc(t('coach.live.derived')) + '">≈</span>' : '') +
       '</div>' +
       efficiencyCurve(s.player.number, skill, rallies) +
       '</article>'
@@ -696,13 +742,19 @@
   }
   function miniCourt(position, status) {
     return (
-      '<article class="focus-position-card"><h2>COURT POSITION</h2><div class="focus-mini-court"><div class="focus-mini-net"></div>' +
+      '<article class="focus-position-card"><h2>' +
+      esc(t('coach.live.courtPosition')) +
+      '</h2><div class="focus-mini-court"><div class="focus-mini-net"></div>' +
       [4, 3, 2, 5, 6, 1]
         .map(function (p) {
           return '<span class="' + (p === position ? 'active status-' + status : '') + '">' + p + '</span>';
         })
         .join('') +
-      '</div><p>Front Row (4-3-2)<br>Back Row (5-6-1)</p></article>'
+      '</div><p>' +
+      esc(t('coach.live.frontRow')) +
+      '<br>' +
+      esc(t('coach.live.backRow')) +
+      '</p></article>'
     );
   }
   function renderEmptyPlayerFocus() {
@@ -724,7 +776,9 @@
     content.innerHTML =
       '<div class="player-focus-view">' +
       liveHeader(false) +
-      '<div class="focus-navigation"><button data-focus-court>← Court</button><div><button disabled>‹</button><strong class="metric-na">NA</strong><button disabled>›</button></div></div><div class="focus-body"><aside><article class="focus-player-card status-neutral"><strong class="metric-na">NA</strong><b class="metric-na">NA</b><span class="live-role empty-role">NA</span><div class="focus-status metric-na">NA</div><div class="focus-player-mini"><span>PTS<b class="metric-na">0</b></span><span>ERR<b class="metric-na">0</b></span><span>EFF<b class="metric-na">NA</b></span></div></article>' +
+      '<div class="focus-navigation"><button data-focus-court>' +
+      esc(t('coach.live.backToCourt')) +
+      '</button><div><button disabled>‹</button><strong class="metric-na">NA</strong><button disabled>›</button></div></div><div class="focus-body"><aside><article class="focus-player-card status-neutral"><strong class="metric-na">NA</strong><b class="metric-na">NA</b><span class="live-role empty-role">NA</span><div class="focus-status metric-na">NA</div><div class="focus-player-mini"><span>PTS<b class="metric-na">0</b></span><span>ERR<b class="metric-na">0</b></span><span>EFF<b class="metric-na">NA</b></span></div></article>' +
       miniCourt(0, 'neutral') +
       '</aside><section class="focus-skills">' +
       ['attack', 'block', 'reception', 'defense']
@@ -772,22 +826,28 @@
     var h =
       '<div class="player-focus-view">' +
       liveHeader(false) +
-      '<div class="focus-navigation"><button type="button" data-focus-court>← Court</button><div><button type="button" data-focus-prev aria-label="Joueur précédent">‹</button><strong>#' +
+      '<div class="focus-navigation"><button type="button" data-focus-court>' +
+      esc(t('coach.live.backToCourt')) +
+      '</button><div><button type="button" data-focus-prev aria-label="' +
+      esc(t('coach.live.prevPlayer')) +
+      '">‹</button><strong>#' +
       esc(String(p.number).padStart(2, '0')) +
       ' ' +
-      esc(String(p.name || 'Joueur').toUpperCase()) +
-      '</strong><button type="button" data-focus-next aria-label="Joueur suivant">›</button></div></div><div class="focus-body"><aside><article class="focus-player-card status-' +
+      esc(String(p.name || t('coach.player')).toUpperCase()) +
+      '</strong><button type="button" data-focus-next aria-label="' +
+      esc(t('coach.live.nextPlayer')) +
+      '">›</button></div></div><div class="focus-body"><aside><article class="focus-player-card status-' +
       s.status +
       '"><span class="focus-trend">' +
       trendSymbol(s.trend) +
       '</span><strong>#' +
       esc(String(p.number).padStart(2, '0')) +
       '</strong><b>' +
-      esc(String(p.name || 'Joueur').toUpperCase()) +
+      esc(String(p.name || t('coach.player')).toUpperCase()) +
       '</b><div>' +
       roleChip(p) +
-      ' <span>Position ' +
-      (position || 'NA') +
+      ' <span>' +
+      esc(t('coach.zone', { zone: position || 'NA' })) +
       '</span></div><div class="focus-status">' +
       liveStatusLabel(s.status) +
       '</div>' +
@@ -797,7 +857,7 @@
       '</b></span><span>ERR<b>' +
       s.errors +
       '</b></span><span>EFF<b title="' +
-      (['reception', 'defense'].indexOf(s.mainSkill) > -1 ? '≈ dérivé des événements' : '') +
+      (['reception', 'defense'].indexOf(s.mainSkill) > -1 ? t('coach.live.derived') : '') +
       '">' +
       playerEffText(s) +
       '</b></span></div></article>' +
@@ -808,7 +868,13 @@
           return focusPanel(s, skill, rallies);
         })
         .join('') +
-      '</section></div><div class="focus-legend"><span class="good">● Good</span><span class="neutral">● Neutral</span><span class="error">● Error</span></div></div>';
+      '</section></div><div class="focus-legend"><span class="good">' +
+      esc(t('coach.live.legendGood')) +
+      '</span><span class="neutral">' +
+      esc(t('coach.live.legendNeutral')) +
+      '</span><span class="error">' +
+      esc(t('coach.live.legendError')) +
+      '</span></div></div>';
     content.innerHTML = h;
   }
 

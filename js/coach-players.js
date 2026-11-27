@@ -3,6 +3,7 @@
   'use strict';
   var P = window.VolleyCoachParts;
   if (!P) return;
+  var t = window.VolleyI18n.t;
   var C = P.C,
     POS = P.POS,
     ROLE = P.ROLE,
@@ -137,23 +138,23 @@
     return (
       '<section class="coach-grid player-summary-kpis">' +
       kpi(
-        'Attaque',
+        t('coach.kpiAttack'),
         ae == null ? '—' : (ae > 0 ? '+' : '') + ae + '%',
-        s.att.d ? s.att.k + 'K / ' + s.att.e + 'E / ' + s.att.d + ' ATT' : 'Échantillon limité',
+        s.att.d ? s.att.k + 'K / ' + s.att.e + 'E / ' + s.att.d + ' ATT' : t('coach.smallSample'),
         status('att', ae, s.att.d),
         'actions'
       ) +
       kpi(
-        'Réception',
+        t('coach.kpiReception'),
         rp == null ? '—' : rp + '%',
-        s.rec.d ? s.rec.p + '/' + s.rec.d + ' positives' : 'Échantillon limité',
+        s.rec.d ? t('coach.nPositive', { n: s.rec.p, d: s.rec.d }) : t('coach.smallSample'),
         status('rec', rp, s.rec.d),
         'actions'
       ) +
       kpi(
-        'Service',
+        t('coach.kpiServe'),
         s.srv.d ? s.srv.a + ' ace' + (s.srv.a > 1 ? 's' : '') : '—',
-        s.srv.d ? s.srv.e + ' erreur · ' + s.srv.d + ' services' : 'Échantillon limité',
+        s.srv.d ? t('coach.serveErrorsOne', { n: s.srv.e, d: s.srv.d }) : t('coach.smallSample'),
         'neutral',
         'actions'
       ) +
@@ -162,10 +163,10 @@
   }
   function contributionBars(s) {
     var vals = [
-        ['Attaque', s.att.d],
-        ['Réception', s.rec.d],
-        ['Service', s.srv.d],
-        ['Bloc', s.blk.d],
+        [t('coach.kpiAttack'), s.att.d],
+        [t('coach.kpiReception'), s.rec.d],
+        [t('coach.kpiServe'), s.srv.d],
+        [t('coach.kpiBlock'), s.blk.d],
       ],
       max = Math.max.apply(
         null,
@@ -203,20 +204,30 @@
     })[0];
     var h =
       sharedHeading(
-        'Performance joueurs',
-        'Contributions observées · delta = points − erreurs',
-        '<select class="coach-select" aria-label="Mode de comparaison"><option>Contributions</option></select>'
+        t('coach.playersTitle'),
+        t('coach.playersSub'),
+        '<select class="coach-select" aria-label="' +
+          esc(t('coach.compareMode')) +
+          '"><option>Contributions</option></select>'
       ) +
       provenanceBanner() +
       periodButtons();
     h +=
-      '<div class="coach-filter-row" aria-label="Présence"><button data-player-scope="court" class="' +
+      '<div class="coach-filter-row" aria-label="' +
+      esc(t('coach.presence')) +
+      '"><button data-player-scope="court" class="' +
       (C.playerScope === 'court' ? 'active' : '') +
-      '">SUR LE TERRAIN</button><button data-player-scope="all" class="' +
+      '">' +
+      esc(t('coach.onCourtUpper')) +
+      '</button><button data-player-scope="all" class="' +
       (C.playerScope === 'all' ? 'active' : '') +
-      '">TOUS</button></div><div class="coach-filter-row" aria-label="Poste">' +
+      '">' +
+      esc(t('coach.allUpper')) +
+      '</button></div><div class="coach-filter-row" aria-label="' +
+      esc(t('coach.position')) +
+      '">' +
       [
-        ['all', 'TOUS'],
+        ['all', t('coach.allUpper')],
         ['oh', 'OH'],
         ['mb', 'MB'],
         ['opp', 'OPP'],
@@ -232,17 +243,25 @@
       '</div>';
     if (!list.length) {
       content.innerHTML =
-        h + '<div class="coach-empty">Aucun joueur ne correspond aux filtres actifs.</div>' + footer('Référence 03');
+        h +
+        '<div class="coach-empty">' +
+        esc(t('coach.noPlayerMatch')) +
+        '</div>' +
+        footer(t('coach.reference', { n: '03' }));
       return;
     }
     h +=
-      '<div class="players-layout"><section class="coach-card"><div class="coach-card-head"><h2>Joueurs</h2><span class="coach-chip">' +
-      list.length +
-      ' affiché' +
-      (list.length > 1 ? 's' : '') +
+      '<div class="players-layout"><section class="coach-card"><div class="coach-card-head"><h2>' +
+      esc(t('coach.players')) +
+      '</h2><span class="coach-chip">' +
+      esc(t(list.length > 1 ? 'coach.shownMany' : 'coach.shownOne', { n: list.length })) +
       '</span></div>' +
       (demoOnly() && C.playerScope === 'court' ? auditBadge('FILTRE DE DÉMONSTRATION') : '') +
-      '<table class="players-table"><thead><tr><th class="rank">#</th><th>Joueur</th><th>Poste</th><th style="text-align:right">Delta</th></tr></thead><tbody>' +
+      '<table class="players-table"><thead><tr><th class="rank">#</th><th>' +
+      esc(t('coach.player')) +
+      '</th><th>' +
+      esc(t('coach.position')) +
+      '</th><th style="text-align:right">Delta</th></tr></thead><tbody>' +
       list
         .map(function (x, i) {
           return (
@@ -253,7 +272,7 @@
             '"><td class="rank">' +
             (i + 1) +
             '</td><td class="player-name">' +
-            esc(x.player.name || 'Joueur') +
+            esc(x.player.name || t('coach.player')) +
             ' <span class="coach-muted">#' +
             x.player.number +
             '</span></td><td>' +
@@ -265,10 +284,12 @@
           );
         })
         .join('') +
-      '</tbody></table><p class="coach-note">Classement explicable : le delta correspond uniquement aux points enregistrés moins les erreurs enregistrées.</p></section>';
+      '</tbody></table><p class="coach-note">' +
+      esc(t('coach.rankingNote')) +
+      '</p></section>';
     h +=
       '<section class="coach-card"><h2 class="player-summary-title">' +
-      esc(s.player.name || 'Joueur') +
+      esc(s.player.name || t('coach.player')) +
       ' · #' +
       s.player.number +
       ' <span>· ' +
@@ -277,21 +298,27 @@
       summaryCards(s) +
       '<section class="coach-grid player-mini-two"><article class="coach-card"><h3>Participation</h3><div class="coach-grid coach-two"><div class="coach-kpi"><div class="value">' +
       s.rallies +
-      '</div><div class="sample">Rallyes avec action</div></div><div class="coach-kpi"><div class="value">' +
+      '</div><div class="sample">' +
+      esc(t('coach.ralliesWithAction')) +
+      '</div></div><div class="coach-kpi"><div class="value">' +
       s.attempts +
-      '</div><div class="sample">Actions enregistrées</div></div></div></article><article class="coach-card"><h3>Contribution</h3>' +
+      '</div><div class="sample">' +
+      esc(t('coach.recordedActions')) +
+      '</div></div></div></article><article class="coach-card"><h3>Contribution</h3>' +
       contributionBars(s) +
-      '</article></section><button type="button" class="player-detail-cta" id="playerDetailCta" aria-label="Voir le détail du joueur numéro ' +
-      s.player.number +
-      ', ' +
-      esc(s.player.name || 'Joueur') +
-      '"><span class="silhouette" aria-hidden="true">♟</span><span>Voir le détail joueur</span><span class="chev" aria-hidden="true">›</span></button><div class="coach-footer"><span class="demo">' +
+      '</article></section><button type="button" class="player-detail-cta" id="playerDetailCta" aria-label="' +
+      esc(t('coach.seeDetailOf', { number: s.player.number, name: s.player.name || t('coach.player') })) +
+      '"><span class="silhouette" aria-hidden="true">♟</span><span>' +
+      esc(t('coach.seeDetail')) +
+      '</span><span class="chev" aria-hidden="true">›</span></button><div class="coach-footer"><span class="demo">' +
       (C.data.demo
-        ? 'Données de démonstration.'
+        ? t('coach.demoData')
         : C.data.explicitContext
-          ? 'Référence officielle · volley-live v2.1'
-          : 'Match courant · migration v1') +
-      '</span><span>Référence 03 · VOLLEY LIVE</span></div></section></div>';
+          ? t('coach.refOfficial')
+          : t('coach.currentMigration')) +
+      '</span><span>' +
+      esc(t('coach.reference', { n: '03' })) +
+      ' · VOLLEY LIVE</span></div></section></div>';
     content.innerHTML = h;
   }
 
@@ -301,10 +328,10 @@
   }
   function skillRows(s) {
     var rows = [
-      ['Attaque', s.att.d, s.att.k + ' gagnantes · ' + s.att.e + ' erreurs'],
-      ['Réception', s.rec.d, s.rec.p + ' positives · ' + s.rec.e + ' négatives'],
-      ['Service', s.srv.d, s.srv.a + ' aces · ' + s.srv.e + ' erreurs'],
-      ['Bloc', s.blk.d, s.blk.p + ' points'],
+      [t('coach.kpiAttack'), s.att.d, t('coach.killsErrors', { k: s.att.k, e: s.att.e })],
+      [t('coach.kpiReception'), s.rec.d, t('coach.positiveNegative', { p: s.rec.p, e: s.rec.e })],
+      [t('coach.kpiServe'), s.srv.d, t('coach.acesErrors', { a: s.srv.a, e: s.srv.e })],
+      [t('coach.kpiBlock'), s.blk.d, s.blk.p + ' points'],
     ];
     if (C.skill === 'attack') rows = rows.slice(0, 1);
     else if (C.skill === 'receive') rows = rows.slice(1, 2);
@@ -339,17 +366,17 @@
   }
   function actionLabel(e) {
     var A = {
-      attack: 'Attaque',
-      reception: 'Réception',
-      service: 'Service',
-      block: 'Bloc',
-      defense: 'Défense',
-      set: 'Passe',
-      generic: 'Action',
-      team: 'Équipe',
-      adverse: 'Adversaire',
+      attack: t('coach.kpiAttack'),
+      reception: t('coach.kpiReception'),
+      service: t('coach.kpiServe'),
+      block: t('coach.kpiBlock'),
+      defense: t('coach.actDefense'),
+      set: t('coach.actSet'),
+      generic: t('coach.actGeneric'),
+      team: t('coach.team'),
+      adverse: t('coach.opponent'),
     };
-    var R = { point: 'gagnante', error: 'erreur', neutral: 'continue' };
+    var R = { point: t('coach.resPoint'), error: t('coach.resError'), neutral: t('coach.resNeutral') };
     return (A[e.action] || e.action) + ' ' + (R[e.result] || e.result);
   }
   function renderDetail() {
@@ -361,13 +388,15 @@
       rows = skillRows(s);
     var onCourt = currentCourtNumbers().map(String).indexOf(String(p.number)) > -1;
     var h =
-      '<button type="button" class="detail-back" data-detail-back>‹ Retour aux joueurs</button>' +
-      sharedHeading('Détail joueur', 'Analyse complète · ' + periodLabel()) +
+      '<button type="button" class="detail-back" data-detail-back>' +
+      esc(t('coach.backToPlayers')) +
+      '</button>' +
+      sharedHeading(t('coach.detailTitle'), t('coach.fullAnalysis', { period: periodLabel() })) +
       provenanceBanner() +
       '<section class="coach-card detail-hero"><div class="detail-number">' +
       p.number +
       '</div><div><div class="detail-name">' +
-      esc(p.name || 'Joueur') +
+      esc(p.name || t('coach.player')) +
       '<small>#' +
       p.number +
       ' · ' +
@@ -377,24 +406,26 @@
       '"' +
       auditAttr('lineup') +
       '><i></i> ' +
-      (onCourt ? 'Sur le terrain' : 'Sur le banc') +
+      (onCourt ? t('coach.onCourt') : t('coach.onBench')) +
       (demoOnly() ? ' · DÉMO' : '') +
-      '</span></div><div class="detail-net">Delta observé<strong>' +
+      '</span></div><div class="detail-net">' +
+      esc(t('coach.observedDelta')) +
+      '<strong>' +
       (s.delta > 0 ? '+' : '') +
       s.delta +
       '</strong><small>' +
-      s.points +
-      ' points · ' +
-      s.errors +
-      ' erreurs</small></div></section>';
+      esc(t('coach.pointsErrors', { p: s.points, e: s.errors })) +
+      '</small></div></section>';
     h +=
-      '<div class="skill-tabs" aria-label="Famille technique">' +
+      '<div class="skill-tabs" aria-label="' +
+      esc(t('coach.skillFamily')) +
+      '">' +
       [
-        ['summary', 'Synthèse'],
-        ['attack', 'Attaque'],
-        ['receive', 'Réception'],
-        ['serve', 'Service'],
-        ['more', 'Plus'],
+        ['summary', t('coach.summary')],
+        ['attack', t('coach.kpiAttack')],
+        ['receive', t('coach.kpiReception')],
+        ['serve', t('coach.kpiServe')],
+        ['more', t('coach.skillMore')],
       ]
         .map(function (x) {
           return (
@@ -411,9 +442,15 @@
       '</div>' +
       summaryCards(s);
     h +=
-      '<section class="coach-card"><div class="coach-card-head"><h2>Bilan par geste</h2><span class="coach-chip">' +
+      '<section class="coach-card"><div class="coach-card-head"><h2>' +
+      esc(t('coach.bySkill')) +
+      '</h2><span class="coach-chip">' +
       C.skill.toUpperCase() +
-      '</span></div><table class="gesture-table"><thead><tr><th>Geste</th><th>Volume</th><th>Résultats</th></tr></thead><tbody>' +
+      '</span></div><table class="gesture-table"><thead><tr><th>' +
+      esc(t('coach.skill')) +
+      '</th><th>Volume</th><th>' +
+      esc(t('coach.results')) +
+      '</th></tr></thead><tbody>' +
       rows
         .map(function (x) {
           return (
@@ -429,23 +466,39 @@
           );
         })
         .join('') +
-      '</tbody></table><p class="coach-note">Efficacité attaque : ' +
+      '</tbody></table><p class="coach-note">' +
+      esc(t('coach.attackEffColon')) +
+      ' ' +
       (s.att.d
         ? '(' + s.att.k + ' − ' + s.att.e + ') / ' + s.att.d + ' = ' + (ae > 0 ? '+' : '') + ae + '%'
-        : '— · échantillon limité') +
+        : '— · ' + esc(t('coach.smallSampleLower'))) +
       '</p></section>';
     h +=
       '<section class="coach-grid detail-grid"><article class="coach-card"><h2>Participation</h2><div class="coach-grid coach-two"><div class="coach-kpi"><div class="value">' +
       s.rallies +
-      '</div><div class="sample">Rallyes joués</div></div><div class="coach-kpi"><div class="value">' +
+      '</div><div class="sample">' +
+      esc(t('coach.ralliesPlayed')) +
+      '</div></div><div class="coach-kpi"><div class="value">' +
       s.attempts +
-      '</div><div class="sample">Actions enregistrées</div></div></div></article><article class="coach-card"><h2>Points directs</h2><div class="coach-grid coach-kpis"><div class="coach-kpi"><div class="value">' +
+      '</div><div class="sample">' +
+      esc(t('coach.recordedActions')) +
+      '</div></div></div></article><article class="coach-card"><h2>' +
+      esc(t('coach.directPoints')) +
+      '</h2><div class="coach-grid coach-kpis"><div class="coach-kpi"><div class="value">' +
       s.att.k +
-      '</div><div class="sample">Attaques</div></div><div class="coach-kpi"><div class="value">' +
+      '</div><div class="sample">' +
+      esc(t('coach.attacks')) +
+      '</div></div><div class="coach-kpi"><div class="value">' +
       s.srv.a +
       '</div><div class="sample">Aces</div></div><div class="coach-kpi"><div class="value">' +
       s.blk.p +
-      '</div><div class="sample">Blocs</div></div></div></article><article class="coach-card"><h2>Performance par set</h2><p class="coach-note">Efficacité attaque</p><div class="set-bars">' +
+      '</div><div class="sample">' +
+      esc(t('coach.blocks')) +
+      '</div></div></div></article><article class="coach-card"><h2>' +
+      esc(t('coach.perSet')) +
+      '</h2><p class="coach-note">' +
+      esc(t('coach.kpiAttackEff')) +
+      '</p><div class="set-bars">' +
       bars
         .map(function (x) {
           return (
@@ -459,15 +512,17 @@
           );
         })
         .join('') +
-      '</div></article><article class="coach-card"><h2>Dernières actions</h2><div class="recent-list">' +
+      '</div></article><article class="coach-card"><h2>' +
+      esc(t('coach.lastActions')) +
+      '</h2><div class="recent-list">' +
       (recent.length
         ? recent
             .map(function (e) {
               return (
                 '<div class="recent-item ' +
                 (e.result === 'error' ? 'loss' : '') +
-                '"><i></i><span>Set ' +
-                (e.set || 1) +
+                '"><i></i><span>' +
+                esc(t('common.setLower', { set: e.set || 1 })) +
                 ' · ' +
                 num(e.scoreA) +
                 '–' +
@@ -478,11 +533,13 @@
               );
             })
             .join('')
-        : '<div class="coach-empty">Aucune action enregistrée.</div>') +
+        : '<div class="coach-empty">' + esc(t('capture.noAction')) + '</div>') +
       '</div></article></section>';
     h +=
-      '<button type="button" class="detail-full-actions" data-all-actions>☷ &nbsp; Voir toutes les actions &nbsp; ›</button>' +
-      footer('Détail joueur');
+      '<button type="button" class="detail-full-actions" data-all-actions>☷ &nbsp; ' +
+      esc(t('coach.allActions')) +
+      ' &nbsp; ›</button>' +
+      footer(t('coach.detailTitle'));
     content.innerHTML = h;
   }
 

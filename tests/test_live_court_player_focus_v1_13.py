@@ -7,6 +7,8 @@ from pathlib import Path
 
 from helpers import APP_URI, base_match
 
+UI_LANGUAGE = "en"  # assertions below use the English interface
+
 ROOT = Path(__file__).resolve().parents[1]
 V2_FIXTURE = json.loads((ROOT / "statistics/data/As_cannes_vs_Frejus_2026-11-15.fixture.v2.json").read_text(encoding="utf-8"))
 V1_REFERENCE = json.loads((ROOT / "tests/data/As_cannes_vs_Frejus_2026-11-15.capture.v1.json").read_text(encoding="utf-8"))
@@ -167,7 +169,7 @@ def test_v2_fixture_derived_pos_good_trend_last_five_and_curves(browser):
     assert reception.locator(".focus-skill-summary > strong").inner_text() == "≈0%"
     assert defense.locator(".focus-skill-summary > strong").inner_text() == "≈100%"
     assert attack.locator(".focus-eff-trend").inner_text() == "↑"
-    assert "derniers" in (attack.locator(".focus-eff-trend").get_attribute("title") or "")
+    assert "last 5 contacts" in (attack.locator(".focus-eff-trend").get_attribute("title") or "")
 
     last_five = attack.locator(".focus-last-five span")
     assert last_five.count() == 5
@@ -185,7 +187,7 @@ def test_capture_v1_without_intermediate_contacts_uses_na_curves(browser):
     page.locator(".live-player-card").filter(has_text="HUGO").click() if page.locator(".live-player-card").filter(has_text="HUGO").count() else page.locator(".live-player-card").first.click()
     assert page.locator("svg.focus-curve").count() == 0
     assert page.locator(".focus-curve-na").count() == 4
-    assert "Contacts intermédiaires absents" in page.locator(".focus-curve-na").first.inner_text()
+    assert "No intermediate contacts" in page.locator(".focus-curve-na").first.inner_text()
     assert "BLK\nNA" in page.locator(".focus-attack .focus-stat-grid").inner_text()
     assert not errors
     page.close()
@@ -194,6 +196,6 @@ def test_capture_v1_without_intermediate_contacts_uses_na_curves(browser):
 def test_live_court_requests_rotation_in_portrait(browser):
     page, errors = _open_with_raw(browser, V2_FIXTURE, viewport={"width": 390, "height": 844})
     assert page.locator(".live-landscape-gate").is_visible()
-    assert "Tournez l’appareil" in page.locator(".live-landscape-gate").inner_text()
+    assert "Rotate the device" in page.locator(".live-landscape-gate").inner_text()
     assert not errors
     page.close()
