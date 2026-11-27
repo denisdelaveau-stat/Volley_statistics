@@ -1,7 +1,7 @@
 # VolleyLive — Coach View Specification
 
 Status: current as of v1.28.0. Source of truth: `coach.js`, `coach-live-config.js`, `coach.css`, `index.html` (`#coachScreen`).
-Acceptance tests: `tests/test_coach_v1_8.py`, `tests/test_live_court_player_focus_v1_13.py`, `tests/test_empty_analysis_state_v1_12_5.py`, `tests/test_player_court_palette_v1_15.py`.
+Acceptance tests: `tests/coach/test_coach_views.py`, `tests/coach/test_live_court.py`, `tests/coach/test_empty_state.py`, `tests/capture/test_player_court_palette.py`.
 Related: `Volley_Live_Live_Statistics_UI_Specification_v1.1.md` (statistics UI principles), `VolleyLive_Statistics_Implementation_Specification.md` (metric definitions).
 
 ## 1. Purpose

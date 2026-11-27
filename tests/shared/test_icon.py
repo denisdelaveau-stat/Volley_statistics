@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from helpers import CACHE_NAME
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 ICONS = ROOT / "icons"
 EXPECTED = {
     "apple-touch-icon.png": 180,

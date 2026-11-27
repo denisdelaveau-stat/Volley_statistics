@@ -1,7 +1,7 @@
 """v1.16.1 layout acceptance rules from `time line2.docx`."""
 from __future__ import annotations
 
-from test_spectator_timeline_v1_15 import archive_v2, open_spectator
+from spectator_support import archive_v2, open_spectator
 
 
 def layout_fixture():

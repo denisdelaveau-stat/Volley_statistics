@@ -4,7 +4,7 @@ from zipfile import ZipFile
 
 from docx import Document
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DOC = ROOT / "docs" / "Volley_Live_Capture_UI_Functional_Specification_EN_With_Original_Images.docx"
 
 

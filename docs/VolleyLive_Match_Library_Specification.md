@@ -1,7 +1,7 @@
 # VolleyLive — Match Library and Match Reports Specification
 
 Status: current as of v1.27.0 (unchanged in v1.28.0). Source of truth: `index.html` (`#matchLibraryScreen`, dialogs), `match-hub.js`, `match-hub.css`.
-Acceptance tests: `tests/test_match_library_v1_27.py`, `tests/test_spectator_view_v1_26.py`.
+Acceptance tests: `tests/library/test_match_library.py`, `tests/spectator/test_set_navigation.py`.
 
 ## 1. Purpose
 

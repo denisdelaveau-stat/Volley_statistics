@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from helpers import events
-from test_runtime_input_v1_28 import open_runtime
+from capture_support import open_runtime
 
 
 def _commit(page, author, result="point", action="attack"):

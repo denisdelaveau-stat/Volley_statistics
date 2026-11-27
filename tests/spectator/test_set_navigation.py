@@ -1,8 +1,8 @@
 """SPECTATOR VIEW v1.26.0: shared set navigation, role colours, and compact Timeline."""
 from __future__ import annotations
 
-from test_score_fault_evolution_v1_18 import two_set_fixture
-from test_spectator_timeline_v1_15 import archive_v2, open_spectator
+from spectator_support import two_set_fixture
+from spectator_support import archive_v2, open_spectator
 
 
 def timeline_fixture():

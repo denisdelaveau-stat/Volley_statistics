@@ -1,7 +1,7 @@
 # VolleyLive — Spectator View RANKING Specification
 
 Status: current as of v1.28.0 (implementation last changed in v1.26.x). Source of truth: `spectator.js` (`RANKING_CATEGORIES`, `rankingCategoryForAction`, `rankingSource`, `rankingRows`, `rankingCard`, `renderRanking`), `spectator.html` (`[data-panel="ranking"]`), `spectator.css` (`SPECTATOR VIEW RANKING v1.20.0` block).
-Acceptance tests: `tests/test_spectator_ranking_v1_20.py`, `tests/test_spectator_view_v1_26.py`, `tests/test_spectator_view_v1_26_1.py`. Visual baselines: `tests/visual_baselines/ranking_{phone_390x844,tablet_768x1024,desktop_1536x1024}_v1_26_0.png`.
+Acceptance tests: `tests/spectator/test_ranking.py`, `tests/spectator/test_set_navigation.py`, `tests/spectator/test_reference_capture.py`. Visual baselines: `tests/visual_baselines/ranking_{phone_390x844,tablet_768x1024,desktop_1536x1024}_v1_26_0.png`.
 Related: `VolleyLive_Statistics_Implementation_Specification.md` §9 (ranking metric definitions), `VolleyLive_Match_Library_Specification.md` (entry point), `VolleyLive_Spectator_Timeline_Specification.md` (shared set navigation).
 Supersedes: the ranking parts of `ADVANCED_STATISTICS_RANKING_v1.20.0.md` (its Advanced Statistics page was removed in v1.25.0).
 
@@ -157,8 +157,8 @@ Ranks are sequential (`#1`, `#2`, …); tied players receive distinct ranks in s
 ## 11. Acceptance
 
 1. Tabs read `SCORES`, `TIMELINE`, `GRAPH`, `RANKING`; TIMELINE is selected by default; RANKING shows the panel with the filter options of §3.1 and five cards for `All`.
-2. With the `ranking_fixture` (`test_spectator_ranking_v1_20.py`), Attack/Highlight lists Alex `2` then Blair `1`; Lowlight puts Blair `1` first; Delta shows Alex `2` then Blair `0`; Service/Lowlight shows only Alex `2`; the opponent never appears.
+2. With the `ranking_fixture` (`tests/spectator/test_ranking.py`), Attack/Highlight lists Alex `2` then Blair `1`; Lowlight puts Blair `1` first; Delta shows Alex `2` then Blair `0`; Service/Lowlight shows only Alex `2`; the opponent never appears.
 3. An archive without actions shows five empty cards with gray `0` / `NA` and `0 joueur · 0 action`.
-4. Selecting set 1 in the shared set selector scopes the ranking to set 1 (`… 3 actions` in `test_spectator_view_v1_26.py`); `Retour au direct` restores the live set.
+4. Selecting set 1 in the shared set selector scopes the ranking to set 1 (`… 3 actions` in `tests/spectator/test_set_navigation.py`); `Retour au direct` restores the live set.
 5. Visual output matches the `ranking_*_v1_26_0.png` baselines at 390×844, 768×1024 and 1536×1024 (mean channel difference < 3.0).
 6. No RANKING control writes to `volleyCapture.*` keys or modifies the archive.

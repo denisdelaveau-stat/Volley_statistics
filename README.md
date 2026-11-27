@@ -33,7 +33,7 @@ npm run test:unit     # node:test unit tests (tests/unit)
 Acceptance gate (Python 3 with `pytest`, `playwright` (Chromium), `numpy`, `pillow`, `python-docx` and `jsonschema`):
 
 ```bash
-bash tests/run_v1_28_approved.sh
+bash tests/run_gate.sh
 ```
 
 CI (`.github/workflows/tests.yml`) runs the syntax check, ESLint, Prettier, the unit tests and the acceptance gate on every pull request and every push to `main`. Run `npm run format` before committing JavaScript changes.
@@ -42,7 +42,7 @@ Set `CHROMIUM_PATH` to use a specific Chromium binary; otherwise Playwright's bu
 
 ## Rules for contributors
 
-- Every non-constant value inserted with `innerHTML` goes through `VolleyDom.esc()`, or use `textContent` (`tests/test_html_escaping.py`).
+- Every non-constant value inserted with `innerHTML` goes through `VolleyDom.esc()`, or use `textContent` (`tests/shared/test_html_escaping.py`).
 - Storage keys and shared role labels come from `VolleyDomain`. Read stored JSON with `VolleyDomain.readStored()`, which reports corrupted values instead of hiding them.
 - User-visible text goes through `VolleyI18n.t()` (or `data-i18n` in HTML), with the French and English texts in `js/i18n/fr.js` and `js/i18n/en.js`. `npm run test:unit` fails if a key is missing in one language.
 - Rotation, libero and substitution rules live only in `js/index-rotation.js` and `js/index-substitution-rules.js`, with their unit tests.

@@ -6,7 +6,7 @@ from helpers import APP_URI, CACHE_NAME, compact_css
 UI_LANGUAGE = "en"  # assertions below use the English interface
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def open_team_management(browser):

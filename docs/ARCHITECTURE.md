@@ -5,7 +5,7 @@
 | File | Role |
 |---|---|
 | `index.html` | Application shell markup: Home, workspace navigation, New Match wizard, live capture, Match Hub and Match Library markup, Coach View container. Loads the modules below. Exposes shared shell helpers as `window.VolleyShell` |
-| `js/shared-dom.js` | Shared DOM helpers loaded first by `index.html` and `spectator.html`: `window.VolleyDom.esc()`. Rule: every non-constant value inserted with `innerHTML` / `insertAdjacentHTML` goes through `esc()` (or use `textContent`). Enforced by `tests/test_html_escaping.py` |
+| `js/shared-dom.js` | Shared DOM helpers loaded first by `index.html` and `spectator.html`: `window.VolleyDom.esc()`. Rule: every non-constant value inserted with `innerHTML` / `insertAdjacentHTML` goes through `esc()` (or use `textContent`). Enforced by `tests/shared/test_html_escaping.py` |
 | `js/shared-domain.js` | Shared domain constants loaded right after `shared-dom.js`: `window.VolleyDomain.STORAGE` (every localStorage / sessionStorage key), `ROLE_CODES` / `ROLE_NAMES` (capture role labels) and `court` (`POS`, `NEXT`, `LIBERO_ZONES`, `rotate()`). Frozen objects. `readStored(key, fallback)` reads stored JSON and reports unreadable values in the console. Rule: never write a storage key or one of these role maps as a literal elsewhere. `statistics/adapter.js` keeps its own copies because it also runs standalone in Node |
 | `js/i18n/fr.js`, `js/i18n/en.js`, `js/shared-i18n.js` | Translations (`window.VolleyI18n`). French is the default language; English is chosen in Settings (stored under `VolleyDomain.STORAGE.language`, page reloaded). Code uses `VolleyI18n.t('key', params)`; static HTML uses `data-i18n="key"` (text) and `data-i18n-attr="aria-label:key"`, translated by `VolleyI18n.apply()`, which each page calls once its markup is parsed and before its app scripts render. `statistics/adapter.js` returns the key instead of the text outside the browser (Node unit tests). `tests/unit/i18n.test.js` checks that both dictionaries have the same keys and placeholders, that every key used in the code exists and that no key is orphaned |
 | `css/index-*.css` | Shell styling extracted from `index.html`: theme, capture layout, focus mode, result grammar |
@@ -22,10 +22,10 @@
 | `statistics/data/` | Reference fixtures (unified v2.1) used by viewers and tests |
 | `sw.js` | Versioned offline app-shell cache (`volley-live-capture-v<VERSION>`) |
 | `manifest.webmanifest`, `icons/` | PWA metadata and Home-screen assets |
-| `tests/` | pytest + Playwright acceptance suite; approved release gate: `tests/run_v1_28_approved.sh` (run by `.github/workflows/tests.yml`) |
+| `tests/` | pytest + Playwright acceptance suite, one folder per screen: `capture/`, `setup/` (New Match wizard), `teams/`, `home/`, `library/` (Match Hub and Match Library), `coach/`, `spectator/`, `shared/` (escaping, translation, JSON contract, theme, icons). Shared test code is in `support/` (`helpers.py`, `capture_support.py`, `spectator_support.py`), never imported from another test file. `conftest.py` gives each module the interface language of its assertions (`UI_LANGUAGE`). Approved release gate: `tests/run_gate.sh` (the whole folder; run by `.github/workflows/tests.yml`) |
 | `tests/unit/` | `node:test` unit tests of the pure modules (rotation and libero rules, set and match rules, adapter, engine/adapter consistency); `npm run test:unit`, run by CI. `load-browser-scripts.js` loads the classic browser scripts in an isolated `vm` context |
 | `tools/` | `bump_version.py` (release version) and `generate_manifest.py` (source manifest) |
-| `package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Development tooling only (the app has no build step): `npm run lint` (ESLint), `npm run format` / `npm run format:check` (Prettier, JavaScript and CSS; HTML stays hand-formatted because tests assert exact markup; CSS assertions go through `compact_css()` in `tests/helpers.py`, so they do not depend on formatting). CI runs both |
+| `package.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Development tooling only (the app has no build step): `npm run lint` (ESLint), `npm run format` / `npm run format:check` (Prettier, JavaScript and CSS; HTML stays hand-formatted because tests assert exact markup; CSS assertions go through `compact_css()` in `tests/support/helpers.py`, so they do not depend on formatting). CI runs both |
 
 ## Interfaces and their specifications
 
@@ -109,7 +109,7 @@ Single implementation in `js/index-rotation.js` (`VolleyRotation`), used by the 
 - an exceptional substitution (injury, illness) is offered only when no regular one is possible. It is recorded with `exceptional: true` and does not count in the six. The replaced player cannot come back in the match (15.7);
 - only registered, present players (15.9.1); no substitution during a rally (15.11.1.1).
 
-A substitution is stored as a `match.subs` entry (`set`, `at` = number of events of the set before it, `out`, `in`, `eventId`) and a `SUBSTITUTION` event, through `VLCLogSubstitution`. Undo removes both. Starting players are `match.startingRotation` (the app uses one starting line-up for every set). Enforced by `tests/unit/substitution-rules.test.js` and `tests/test_substitutions.py`.
+A substitution is stored as a `match.subs` entry (`set`, `at` = number of events of the set before it, `out`, `in`, `eventId`) and a `SUBSTITUTION` event, through `VLCLogSubstitution`. Undo removes both. Starting players are `match.startingRotation` (the app uses one starting line-up for every set). Enforced by `tests/unit/substitution-rules.test.js` and `tests/capture/test_substitutions.py`.
 
 ## Dependency chain
 
