@@ -5,6 +5,8 @@ import json
 from playwright.sync_api import expect
 from helpers import APP_URI, base_match
 
+UI_LANGUAGE = "en"  # assertions below use the English interface
+
 
 def archive(match_id, home, away, date, score=(3, 1), status="completed"):
     match = base_match()

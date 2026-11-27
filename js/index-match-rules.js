@@ -1,17 +1,21 @@
 (function () {
   // ---- set & match rules (derived from events only) ----
   window.VolleyStats = (function () {
+    // Translated label when the translation layer is loaded (browser), English otherwise (unit tests).
+    function tr(key, fallback) {
+      return window.VolleyI18n ? window.VolleyI18n.t(key) : fallback;
+    }
     var ACTS = ['attack', 'block', 'service', 'reception', 'defense', 'set', 'freeball'],
       ALL = ['attack', 'block', 'service', 'reception', 'defense', 'set', 'freeball', 'generic'],
       ALAB = {
-        generic: 'No action detail',
-        attack: 'Attack',
-        block: 'Block',
-        service: 'Service',
-        reception: 'Reception',
-        defense: 'Defense',
-        set: 'Set',
-        freeball: 'Free ball',
+        generic: tr('stats.noDetail', 'No action detail'),
+        attack: tr('stats.attack', 'Attack'),
+        block: tr('stats.block', 'Block'),
+        service: tr('stats.service', 'Service'),
+        reception: tr('stats.reception', 'Reception'),
+        defense: tr('stats.defense', 'Defense'),
+        set: tr('stats.set', 'Set'),
+        freeball: tr('stats.freeball', 'Free ball'),
       };
     var RN = window.VolleyDomain.ROLE_NAMES;
     var esc = window.VolleyDom.esc;
@@ -143,7 +147,9 @@
         (L + (W - L - R) / 2) +
         '" y="' +
         (H - 3) +
-        '" font-size="10" text-anchor="middle" fill="#475569">player actions</text>';
+        '" font-size="10" text-anchor="middle" fill="#475569">' +
+        esc(tr('stats.axis', 'player actions')) +
+        '</text>';
       function line(key, col, w, dash) {
         var d = 'M' + X(0) + ' ' + Y(0),
           prev = 0;
@@ -189,29 +195,51 @@
         RN[x.position] +
         '</h4>';
       h +=
-        '<div class="att-kpi"><span class="k-p">Pts ' +
+        '<div class="att-kpi"><span class="k-p">' +
+        esc(tr('stats.pts', 'Pts')) +
+        ' ' +
         tot.p +
-        '</span><span class="k-e">Err ' +
+        '</span><span class="k-e">' +
+        esc(tr('stats.err', 'Err')) +
+        ' ' +
         tot.e +
         '</span>' +
-        '<span class="k-n">Neu ' +
+        '<span class="k-n">' +
+        esc(tr('stats.neu', 'Neu')) +
+        ' ' +
         tot.n +
         '</span>' +
-        '<span class="k-d">Diff ' +
+        '<span class="k-d">' +
+        esc(tr('stats.diff', 'Diff')) +
+        ' ' +
         (df > 0 ? '+' : '') +
         df +
         '</span></div>';
       h +=
         svg(sr) +
-        '<div class="att-legend"><b style="background:#16a34a"></b>points<b style="background:#dc2626"></b>errors<b style="background:#1e2a4a"></b>points \u2212 errors</div><table class="att-tbl"><tr><th>Action</th><th>Pt</th><th>Err</th>' +
-        '<th>Neu</th>' +
+        '<div class="att-legend"><b style="background:#16a34a"></b>' +
+        esc(tr('stats.legendPoints', 'points')) +
+        '<b style="background:#dc2626"></b>' +
+        esc(tr('stats.legendErrors', 'errors')) +
+        '<b style="background:#1e2a4a"></b>' +
+        esc(tr('stats.legendDiff', 'points \u2212 errors')) +
+        '</div><table class="att-tbl"><tr><th>' +
+        esc(tr('stats.colAction', 'Action')) +
+        '</th><th>' +
+        esc(tr('stats.colPt', 'Pt')) +
+        '</th><th>' +
+        esc(tr('stats.err', 'Err')) +
+        '</th>' +
+        '<th>' +
+        esc(tr('stats.neu', 'Neu')) +
+        '</th>' +
         '</tr>';
       ALL.forEach(function (a) {
         var r = t[a];
         if (r.point + r.error + r.neutral)
           h +=
             '<tr><td>' +
-            ALAB[a] +
+            esc(ALAB[a]) +
             '</td><td>' +
             r.point +
             '</td><td>' +
@@ -232,7 +260,7 @@
               return card(mm, evs, x);
             })
             .join('')
-        : '<div class="att-empty">No OH / MB / OPP action in the log yet.</div>';
+        : '<div class="att-empty">' + esc(tr('stats.empty', 'No OH / MB / OPP action in the log yet.')) + '</div>';
     }
     return {
       attackers: attackers,

@@ -46,6 +46,7 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
   var esc = window.VolleyDom.esc;
+  var t = window.VolleyI18n.t;
   // App version shown on the Home screen (kept up to date by tools/bump_version.py).
   function appVersion() {
     var label = document.getElementById('appVersion');
@@ -304,7 +305,11 @@
     var date = new Date(value);
     if (!isFinite(date.getTime())) return 'NA';
     try {
-      return new Intl.DateTimeFormat(undefined, { day: '2-digit', month: 'short', year: 'numeric' }).format(date);
+      return new Intl.DateTimeFormat(window.VolleyI18n.lang(), {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(date);
     } catch (e) {
       return date.toLocaleDateString();
     }
@@ -318,17 +323,19 @@
       year = String(date.getFullYear()).slice(-2);
     return day + '/' + month + '/' + year;
   }
+  function clock(when) {
+    return when.toLocaleTimeString(window.VolleyI18n.lang(), { hour: '2-digit', minute: '2-digit' });
+  }
   function savedLabel(value) {
-    if (!value) return 'Save status unavailable';
+    if (!value) return t('hub.saveUnknown');
     var when = new Date(value),
       now = new Date();
-    if (!isFinite(when.getTime())) return 'Save status unavailable';
+    if (!isFinite(when.getTime())) return t('hub.saveUnknown');
     var diff = Math.max(0, now.getTime() - when.getTime());
-    if (diff < 60000) return 'Saved just now';
-    if (diff < 3600000) return 'Saved ' + Math.floor(diff / 60000) + ' min ago';
-    if (when.toDateString() === now.toDateString())
-      return 'Saved at ' + when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    return 'Saved ' + formatDate(value) + ' ' + when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (diff < 60000) return t('hub.savedNow');
+    if (diff < 3600000) return t('hub.savedMinutes', { min: Math.floor(diff / 60000) });
+    if (when.toDateString() === now.toDateString()) return t('hub.savedAt', { time: clock(when) });
+    return t('hub.savedOn', { date: formatDate(value), time: clock(when) });
   }
   function readHistory() {
     var rows = storageGet(KH, []);
@@ -349,7 +356,7 @@
       else value.id = copyId;
     }
     var sum = summaryFrom(value, sourceName, { sourceType: sourceType || 'imported' });
-    if (!sum) throw new Error('Missing stable match ID or required team fields.');
+    if (!sum) throw new Error(t('library.errorMissingId'));
     var rows = readHistory(),
       record = {
         id: sum.id,
@@ -460,6 +467,10 @@
   function stateLabel(sum) {
     return isLive(sum) ? 'LIVE' : 'FINISHED';
   }
+  // State shown to the user (stateLabel() stays the stable code used by telemetry).
+  function stateText(sum) {
+    return t(isLive(sum) ? 'library.stateLive' : 'library.stateFinished');
+  }
   function filtered() {
     if (state.filter === 'live') return state.all.filter(isLive);
     if (state.filter === 'finished') return state.all.filter(isFinished);
@@ -487,22 +498,24 @@
       button.setAttribute('aria-disabled', state.active ? 'false' : 'true');
     }
     if (!state.active) {
-      if (info) info.textContent = 'No match in progress';
+      if (info) info.textContent = t('hub.noActive');
       if (summary) summary.hidden = true;
-      if (button) button.setAttribute('aria-label', 'No match in progress');
+      if (button) button.setAttribute('aria-label', t('hub.noActive'));
     } else {
       var home = displayName(state.active.homeTeam, 'HOME'),
         away = displayName(state.active.awayTeam, 'AWAY'),
         setNo = state.active.currentSetNumber;
-      if (info) info.textContent = 'Resume official data entry';
+      if (info) info.textContent = t('hub.resume');
       if (summary) {
         summary.hidden = false;
         $('matchHubTeams').textContent = home + ' vs ' + away;
         $('matchHubScore').textContent = currentScoreLabel(state.active);
         $('matchHubMeta').textContent =
-          (setNo ? 'Set ' + setNo : 'Set unavailable') + ' • ' + savedLabel(state.active.updatedAt);
+          (setNo ? t('common.setLower', { set: setNo }) : t('hub.setUnknown')) +
+          ' • ' +
+          savedLabel(state.active.updatedAt);
       }
-      if (button) button.setAttribute('aria-label', 'Continue capture ' + home + ' versus ' + away);
+      if (button) button.setAttribute('aria-label', t('hub.continueLabel', { home: home, away: away }));
     }
     var off = $('matchHubOffline');
     if (off) off.hidden = navigator.onLine;
@@ -565,17 +578,17 @@
       if (!items.length) {
         var message =
           state.filter === 'live'
-            ? 'No live match.'
+            ? t('library.emptyLive')
             : state.filter === 'finished'
-              ? 'No finished match.'
-              : 'No matches yet.';
+              ? t('library.emptyFinished')
+              : t('library.emptyAll');
         list.innerHTML =
           '<div class="library-empty"><strong>' +
           esc(message) +
           '</strong><span>' +
-          (!all ? 'Import a VolleyLive match JSON to get started.' : 'Choose another filter.') +
+          esc(t(!all ? 'library.emptyAllHint' : 'library.emptyFilterHint')) +
           '</span>' +
-          (!all ? '<button type="button" data-empty-import>Import match JSON</button>' : '') +
+          (!all ? '<button type="button" data-empty-import>' + esc(t('library.importLabel')) + '</button>' : '') +
           '</div>';
         list.removeAttribute('aria-activedescendant');
       } else {
@@ -594,9 +607,9 @@
                 ' ' +
                 away +
                 ', ' +
-                stateLabel(sum) +
+                stateText(sum) +
                 ', ' +
-                (formatRowDate(sum.matchDate) === 'NA' ? 'date unavailable' : formatRowDate(sum.matchDate));
+                (formatRowDate(sum.matchDate) === 'NA' ? t('library.dateUnknown') : formatRowDate(sum.matchDate));
             return (
               '<div id="libraryOption' +
               index +
@@ -636,10 +649,8 @@
               esc(sum.id) +
               '" data-source="' +
               esc(sum.sourceType) +
-              '" aria-label="Match details for ' +
-              esc(home) +
-              ' versus ' +
-              esc(away) +
+              '" aria-label="' +
+              esc(t('library.detailsFor', { home: home, away: away })) +
               '">ⓘ</button><span class="library-check" aria-hidden="true">✓</span></div>'
             );
           })
@@ -651,10 +662,10 @@
       renderActionBar();
       var offline = $('libraryOffline');
       if (offline) offline.hidden = navigator.onLine;
-      $('matchLibrarySubtitle').textContent = 'Choose a match, then open a view.';
+      $('matchLibrarySubtitle').textContent = t('library.subtitle');
       emit('match_library_viewed', { filter: state.filter, count: items.length, mode: state.mode });
     } catch (error) {
-      setStatus('matchLibraryStatus', 'Matches could not be loaded: ' + error.message, 'error');
+      setStatus('matchLibraryStatus', t('library.loadFailed', { reason: error.message }), 'error');
     }
     state.rendering = false;
   }
@@ -691,16 +702,15 @@
     if (!sum) return;
     state.info = sum;
     var origin = sum.imported ? 'Imported' : 'Captured on this device',
-      access = sum.imported ? 'Read only' : 'Local match',
       fields = [
-        ['Teams', longName(sum.homeTeam, 'NA') + ' vs ' + longName(sum.awayTeam, 'NA')],
-        ['Date', formatDate(sum.matchDate)],
-        ['Final / current score', resultLabel(sum)],
-        ['Set scores', setScoresLabel(sum)],
-        ['Status', stateLabel(sum) === 'LIVE' ? 'Live' : 'Finished'],
-        ['Origin', origin],
-        ['Access', access],
-        ['Source file', sum.sourceName || 'NA'],
+        [t('library.fieldTeams'), longName(sum.homeTeam, 'NA') + ' vs ' + longName(sum.awayTeam, 'NA')],
+        [t('library.fieldDate'), formatDate(sum.matchDate)],
+        [t('library.fieldScore'), resultLabel(sum)],
+        [t('library.fieldSets'), setScoresLabel(sum)],
+        [t('library.fieldStatus'), t(isLive(sum) ? 'library.statusLive' : 'library.statusFinished')],
+        [t('library.fieldOrigin'), t(sum.imported ? 'library.originImported' : 'library.originLocal')],
+        [t('library.fieldAccess'), t(sum.imported ? 'library.accessReadOnly' : 'library.accessLocal')],
+        [t('library.fieldSource'), sum.sourceName || 'NA'],
       ];
     $('matchInfoFields').innerHTML = fields
       .map(function (field) {
@@ -735,7 +745,7 @@
     var coach = $('coachScreen');
     if (coach) coach.dataset.returnScreen = 'matchLibraryScreen';
     if (window.VolleyCoach && window.VolleyCoach.open) window.VolleyCoach.open();
-    else setStatus('matchLibraryStatus', 'Coach View is unavailable.', 'error');
+    else setStatus('matchLibraryStatus', t('library.coachUnavailable'), 'error');
   }
   function openSpectator(sum, tab) {
     if (!sum) return;
@@ -774,28 +784,25 @@
     }
     event.preventDefault();
     event.stopImmediatePropagation();
-    $('matchHubDecisionText').textContent =
-      'A match is already in progress: ' +
-      matchName(state.active) +
-      '. Continue it, save it before starting another, or cancel.';
+    $('matchHubDecisionText').textContent = t('hub.decisionText', { name: matchName(state.active) });
     openDialog($('matchHubDecision'));
     emit('match_capture_new_selected', { hasActiveMatch: true });
   }
   function validateImport(raw) {
-    if (hasUnsafeKey(raw)) throw new Error('Unsafe object keys are not allowed.');
+    if (hasUnsafeKey(raw)) throw new Error(t('library.errorUnsafe'));
     var check =
       window.VolleyStatsAdapter && window.VolleyStatsAdapter.validate ? window.VolleyStatsAdapter.validate(raw) : null;
     if (!check || !check.valid)
       throw new Error(
-        check && check.errors && check.errors.length ? check.errors.join(' ') : 'Unsupported VolleyLive JSON structure.'
+        check && check.errors && check.errors.length ? check.errors.join(' ') : t('library.errorStructure')
       );
     var sum = summaryFrom(raw, 'Imported match', { sourceType: 'imported' });
-    if (!sum) throw new Error('Missing stable match ID or required team fields.');
+    if (!sum) throw new Error(t('library.errorMissingId'));
     if (
       !text(first(sum.homeTeam.name, sum.homeTeam.shortName, '')) ||
       !text(first(sum.awayTeam.name, sum.awayTeam.shortName, ''))
     )
-      throw new Error('Required team fields are missing.');
+      throw new Error(t('library.errorTeams'));
     return sum;
   }
   function chooseFile() {
@@ -805,7 +812,7 @@
     emit('match_library_import_selected', {});
   }
   function importFailure(message, category) {
-    setStatus('matchLibraryStatus', 'Import failed: ' + message, 'error');
+    setStatus('matchLibraryStatus', t('library.importFailed', { reason: message }), 'error');
     emit('match_library_import_failed', { errorCategory: category || 'validation' });
   }
   function importRaw(raw, fileName) {
@@ -813,7 +820,7 @@
     try {
       sum = validateImport(raw);
     } catch (error) {
-      importFailure('invalid match file.', 'validation');
+      importFailure(t('library.errorInvalidFile'), 'validation');
       return;
     }
     load();
@@ -823,12 +830,11 @@
     if (existing) {
       persistSelected(existing);
       persistFilter('all');
-      setStatus('matchLibraryStatus', 'This match is already in the library.', 'success');
+      setStatus('matchLibraryStatus', t('library.alreadyIn'), 'success');
       renderLibrary();
       state.pendingImport = raw;
       state.pendingFileName = fileName;
-      $('matchHubDuplicateText').textContent =
-        'This match is already in the library. The existing row is selected. You can open it, import this file as a copy, or cancel.';
+      $('matchHubDuplicateText').textContent = t('library.duplicateText');
       $('matchHubOpenExisting').dataset.matchId = sum.id;
       openDialog($('matchHubDuplicate'));
       return;
@@ -837,7 +843,7 @@
       var imported = upsertHistory(raw, fileName, null, 'imported');
       persistSelected(imported);
       persistFilter('all');
-      setStatus('matchLibraryStatus', 'Match imported successfully in read-only mode.', 'success');
+      setStatus('matchLibraryStatus', t('library.imported'), 'success');
       renderLibrary();
     } catch (error) {
       importFailure(error.message, 'persistence');
@@ -847,23 +853,23 @@
     var file = this.files && this.files[0];
     if (!file) return;
     if (file.size > MAX_FILE_BYTES) {
-      importFailure('File exceeds the 10 MB limit.', 'size');
+      importFailure(t('library.errorSize'), 'size');
       return;
     }
     if (!/\.json$/i.test(file.name)) {
-      importFailure('Select a .json file.', 'type');
+      importFailure(t('library.errorType'), 'type');
       return;
     }
     var reader = new FileReader();
     reader.onerror = function () {
-      importFailure('The file could not be read.', 'read');
+      importFailure(t('library.errorRead'), 'read');
     };
     reader.onload = function () {
       var raw;
       try {
         raw = JSON.parse(reader.result);
       } catch (error) {
-        importFailure('Invalid JSON syntax.', 'parse');
+        importFailure(t('library.errorSyntax'), 'parse');
         return;
       }
       importRaw(raw, file.name);
@@ -919,10 +925,14 @@
         })
         .join('');
     return (
-      '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>' +
-      esc(matchName(sum)) +
-      ' report</title><style>body{font:14px Arial;margin:24px;color:#17212b}h1{color:#123b62}.badge{display:inline-block;padding:5px 8px;border:1px solid #6a52bf;border-radius:99px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{padding:7px;border:1px solid #ccd6df;text-align:left}th{background:#eaf2f8}</style></head><body><span class="badge">READ ONLY · ' +
-      esc(stateLabel(sum)) +
+      '<!doctype html><html lang="' +
+      window.VolleyI18n.lang() +
+      '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>' +
+      esc(t('reports.titleNamed', { name: matchName(sum) })) +
+      '</title><style>body{font:14px Arial;margin:24px;color:#17212b}h1{color:#123b62}.badge{display:inline-block;padding:5px 8px;border:1px solid #6a52bf;border-radius:99px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{padding:7px;border:1px solid #ccd6df;text-align:left}th{background:#eaf2f8}</style></head><body><span class="badge">' +
+      esc(t('reports.readOnly')) +
+      ' · ' +
+      esc(stateText(sum)) +
       '</span><h1>' +
       esc(matchName(sum)) +
       '</h1><p>' +
@@ -930,12 +940,22 @@
       ' · ' +
       esc(resultLabel(sum)) +
       ' · ' +
-      events.length +
-      ' events</p><table><thead><tr><th>#</th><th>Set</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr></thead><tbody>' +
+      esc(t('reports.eventsCount', { count: events.length })) +
+      '</p><table><thead><tr><th>#</th><th>' +
+      esc(t('reports.colSet')) +
+      '</th><th>' +
+      esc(t('capture.colPlayer')) +
+      '</th><th>' +
+      esc(t('capture.colAction')) +
+      '</th><th>' +
+      esc(t('capture.colResult')) +
+      '</th><th>' +
+      esc(t('capture.colScore')) +
+      '</th></tr></thead><tbody>' +
       rows +
-      '</tbody></table><p>Generated locally by VolleyLive ' +
-      esc(appVersion()) +
-      '.</p></body></html>'
+      '</tbody></table><p>' +
+      esc(t('reports.generatedBy', { version: appVersion() })) +
+      '</p></body></html>'
     );
   }
   function reportCsv(sum) {
@@ -965,7 +985,13 @@
     persistSelected(sum);
     state.report = sum;
     $('matchReportText').textContent =
-      matchName(sum) + ' · ' + stateLabel(sum) + ' · READ ONLY · ' + rawEvents(sum).length + ' events';
+      matchName(sum) +
+      ' · ' +
+      stateText(sum) +
+      ' · ' +
+      t('reports.readOnly') +
+      ' · ' +
+      t('reports.eventsCount', { count: rawEvents(sum).length });
     openDialog($('matchReportDialog'));
   }
   function doLibraryAction(action, sum) {
@@ -1103,8 +1129,9 @@
         if (raw) upsertHistory(raw, 'Saved local match', null, 'finished');
       } catch (e) {
         console.error('VolleyLive: the current match could not be saved', e);
-        $('matchHubDecisionText').textContent =
-          'Save failed, the current match was kept: ' + ((e && e.message) || 'unknown error') + '.';
+        $('matchHubDecisionText').textContent = t('hub.saveFailed', {
+          reason: (e && e.message) || t('runtime.unknownError'),
+        });
         return;
       }
       clearCurrent();
@@ -1139,7 +1166,7 @@
         state.pendingImport = null;
         persistSelected(sum);
         persistFilter('all');
-        setStatus('matchLibraryStatus', 'Match imported as a read-only copy.', 'success');
+        setStatus('matchLibraryStatus', t('library.importedCopy'), 'success');
         renderLibrary();
       } catch (error) {
         importFailure(error.message, 'duplicate');

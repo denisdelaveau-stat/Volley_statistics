@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from helpers import APP_URI, base_match
 
+UI_LANGUAGE = "en"  # assertions below use the English interface
+
 
 def open_home_with_active_match(browser):
     page = browser.new_page(viewport={"width": 390, "height": 844}, accept_downloads=True)

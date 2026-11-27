@@ -51,5 +51,5 @@ jobs:
           set +e
           bash tests/run_v1_28_approved.sh -rfE 2>&1 | tee pytest.log
           status=${PIPESTATUS[0]}
-          grep -E "^(FAILED|ERROR) " pytest.log | cut -c1-400 | sed 's/^/::error title=pytest::/'
+          python tools/ci_annotate_failures.py pytest.log
           exit $status
