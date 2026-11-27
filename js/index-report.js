@@ -3,9 +3,11 @@
   function buildReport(MATCH, EVENTS) {
     var VSt = window.VolleyStats,
       E = VSt.esc,
+      t = window.VolleyI18n.t,
+      lang = window.VolleyI18n.lang(),
       su = window.VolleySets.summary(MATCH, EVENTS),
-      tA = MATCH.team.name || 'Team A',
-      tB = MATCH.opponent.name || 'Team B';
+      tA = MATCH.team.name || t('common.teamA'),
+      tB = MATCH.opponent.name || t('common.teamB');
     var css =
       'body{font-family:-apple-system,Segoe UI,Arial,sans-serif;margin:0;background:#f3f5f7;color:#17202a}main{max-width:1100px;margin:0 auto;padding:16px}h1{margin:0;font-size:24px}h2{font-size:18px;margin:22px 0 8px;border-bottom:2px solid #1e2a4a;padding-bottom:4px}' +
       '.hero{background:#1e2a4a;color:#fff;border-radius:14px;padding:16px}.hero .res{font-size:20px;font-weight:800;margin-top:6px}.hero .sub{opacity:.8;font-size:13px;margin-top:4px}' +
@@ -14,11 +16,13 @@
       document.getElementById('attCss').textContent +
       '.foot{color:#64748b;font-size:11px;margin:20px 0}';
     var won = su.matchWinner
-      ? 'Match won by ' + (su.matchWinner === 'team1' ? tA : tB)
-      : 'In progress \u00B7 set ' + (MATCH.currentSet || 1);
+      ? t('report.wonBy', { team: su.matchWinner === 'team1' ? tA : tB })
+      : t('report.inProgress', { set: MATCH.currentSet || 1 });
     var h =
-      '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' +
-      E(MATCH.name || 'Match report') +
+      '<!DOCTYPE html><html lang="' +
+      lang +
+      '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' +
+      E(MATCH.name || t('report.title')) +
       '</title><style>' +
       css +
       '</style></he' +
@@ -37,26 +41,33 @@
       '</div><div class="sub">' +
       E(MATCH.name || '') +
       ' \u00B7 ' +
-      new Date(MATCH.createdAt || Date.now()).toLocaleDateString() +
-      ' \u00B7 best of ' +
-      (su.setsToWin * 2 - 1) +
+      new Date(MATCH.createdAt || Date.now()).toLocaleDateString(lang) +
       ' \u00B7 ' +
-      EVENTS.length +
-      ' actions</div></div>';
+      E(t('report.bestOf', { sets: su.setsToWin * 2 - 1 })) +
+      ' \u00B7 ' +
+      E(t('report.actionsCount', { count: EVENTS.length })) +
+      '</div></div>';
     h +=
-      '<h2>Sets</h2><div class="tw"><table class="sets"><tr><th>Set</th><th>' +
+      '<h2>' +
+      E(t('report.sets')) +
+      '</h2><div class="tw"><table class="sets"><tr><th>' +
+      E(t('reports.colSet')) +
+      '</th><th>' +
       E(tA) +
       '</th><th>' +
       E(tB) +
-      '</th><th>Winner</th><th>Subs</th></tr>';
+      '</th><th>' +
+      E(t('report.winner')) +
+      '</th><th>' +
+      E(t('report.subs')) +
+      '</th></tr>';
     su.sets.forEach(function (x) {
       var ns = (MATCH.subs || []).filter(function (q) {
         return q.set === x.set;
       }).length;
       h +=
-        '<tr><td>Set ' +
-        x.set +
-        (x.target === 15 ? ' (to 15)' : '') +
+        '<tr><td>' +
+        E(t(x.target === 15 ? 'report.setTo15' : 'report.setN', { set: x.set })) +
         '</td><td class="' +
         (x.winner === 'team1' ? 'w' : x.winner ? 'l' : '') +
         '">' +
@@ -66,25 +77,31 @@
         '">' +
         x.b +
         '</td><td>' +
-        (x.winner ? E(x.winner === 'team1' ? tA : tB) : 'in progress') +
+        (x.winner ? E(x.winner === 'team1' ? tA : tB) : E(t('report.setInProgress'))) +
         '</td><td>' +
         ns +
         '</td></tr>';
     });
     h += '</table></div>';
     var who = function (x) {
-      if (x.player === 'A') return 'Adverse';
+      if (x.player === 'A') return E(t('report.opponent'));
       if (x.player === 'T') return E(tA);
       var r = VSt.info(MATCH, x.player);
       return '#' + x.player + (r && r.name ? ' ' + E(r.name) : '');
     };
     var tot = { p: 0, e: 0, n: 0 };
     h +=
-      '<h2>Players (P / E / N = point / error / neutral)</h2><div class="tw"><table><tr><th>Player</th><th>Pos.</th>';
+      '<h2>' +
+      E(t('report.players')) +
+      '</h2><div class="tw"><table><tr><th>' +
+      E(t('capture.colPlayer')) +
+      '</th><th>' +
+      E(t('report.position')) +
+      '</th>';
     VSt.ACTS.forEach(function (a) {
-      h += '<th>' + VSt.ALAB[a] + '</th>';
+      h += '<th>' + E(VSt.ALAB[a]) + '</th>';
     });
-    h += '<th>Pts</th><th>Err</th><th>Diff</th></tr>';
+    h += '<th>' + E(t('stats.pts')) + '</th><th>' + E(t('stats.err')) + '</th><th>' + E(t('stats.diff')) + '</th></tr>';
     (MATCH.team.roster || []).forEach(function (r) {
       var t = VSt.byAction(EVENTS, r.number),
         p = 0,
@@ -119,7 +136,7 @@
       tot.p += tp2;
       tot.e += te2;
       tot.n += tn2;
-      h += '<tr><td>TEAM (players without focus)</td><td></td>';
+      h += '<tr><td>' + E(t('report.teamWithoutFocus')) + '</td><td></td>';
       VSt.ACTS.forEach(function (a) {
         var x = tT[a];
         h += '<td>' + (x.point + x.error + x.neutral ? x.point + ' / ' + x.error + ' / ' + x.neutral : '') + '</td>';
@@ -130,7 +147,9 @@
       return x.player === 'A' && x.winningTeam === 'team2';
     }).length;
     h +=
-      '<tr><td><b>Team total</b></td><td></td>' +
+      '<tr><td><b>' +
+      E(t('report.teamTotal')) +
+      '</b></td><td></td>' +
       VSt.ACTS.map(function () {
         return '<td></td>';
       }).join('') +
@@ -141,14 +160,21 @@
       '</b></td><td><b>' +
       (tot.p - tot.e) +
       '</b></td></tr></table></div>';
-    h += '<p style="font-size:13px">Points recorded with the ADVERSE button (' + E(tB) + '): ' + adv + '</p>';
-    h +=
-      '<h2>Attackers \u00B7 whole match (dashed vertical line = new set)</h2><div class="att-grid">' +
-      VSt.cards(MATCH, EVENTS) +
-      '</div>';
+    h += '<p style="font-size:13px">' + E(t('report.opponentPoints', { team: tB, count: adv })) + '</p>';
+    h += '<h2>' + E(t('report.attackers')) + '</h2><div class="att-grid">' + VSt.cards(MATCH, EVENTS) + '</div>';
     if ((MATCH.subs || []).length) {
       h +=
-        '<h2>Substitutions</h2><div class="tw"><table><tr><th>Set</th><th>After action #</th><th>In</th><th>Out</th></tr>';
+        '<h2>' +
+        E(t('report.substitutions')) +
+        '</h2><div class="tw"><table><tr><th>' +
+        E(t('reports.colSet')) +
+        '</th><th>' +
+        E(t('report.afterAction')) +
+        '</th><th>' +
+        E(t('report.in')) +
+        '</th><th>' +
+        E(t('report.out')) +
+        '</th></tr>';
       MATCH.subs.forEach(function (q) {
         var i = VSt.info(MATCH, q['in']),
           o = VSt.info(MATCH, q.out);
@@ -170,7 +196,21 @@
       h += '</table></div>';
     }
     h +=
-      '<h2>Action log</h2><div class="tw"><table><tr><th>#</th><th>Set</th><th>Time</th><th>Player</th><th>Action</th><th>Result</th><th>Score</th></tr>';
+      '<h2>' +
+      E(t('report.actionLog')) +
+      '</h2><div class="tw"><table><tr><th>#</th><th>' +
+      E(t('reports.colSet')) +
+      '</th><th>' +
+      E(t('report.time')) +
+      '</th><th>' +
+      E(t('capture.colPlayer')) +
+      '</th><th>' +
+      E(t('capture.colAction')) +
+      '</th><th>' +
+      E(t('capture.colResult')) +
+      '</th><th>' +
+      E(t('capture.colScore')) +
+      '</th></tr>';
     EVENTS.forEach(function (x) {
       h +=
         '<tr><td>' +
@@ -192,9 +232,9 @@
         '</td></tr>';
     });
     h +=
-      '</table></div><div class="foot">Generated by Volley Live Capture on ' +
-      new Date().toLocaleString() +
-      '. Self-contained file, no network needed.</div></main></bo' +
+      '</table></div><div class="foot">' +
+      E(t('report.footer', { date: new Date().toLocaleString(lang) })) +
+      '</div></main></bo' +
       'dy></ht' +
       'ml>';
     return h;
