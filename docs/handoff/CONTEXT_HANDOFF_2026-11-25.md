@@ -25,12 +25,16 @@ Purpose: let another machine or another assistant resume the work without the ch
 
 Contracts are documented in `docs/ARCHITECTURE.md` (section "Capture screen contract"); the volleyball rules in `docs/specs/` (DOM-MATCH, DOM-LINEUP, DOM-ROTATION, DOM-LIBERO, DOM-SUBS, DOM-STATS).
 
-### Points to verify later
+### Changes of 2026-11-27
 
 - **Capture screen charts: removed on 2026-11-27** (decision of the same day). The statistics panel had been hidden since v1.6.4 (`display:none!important`) but its four charts (score progression, point origin, errors, attacker cards: about 1,150 lines) were recomputed after every action. Removed: `js/index-chart-*.js`, the panel markup, its CSS and the drawing calls. Kept: the chart data `volleyCapture.chartData.v1` (now built in `js/index-capture-tools.js`, same format; read by the Match Hub and `statistics/adapter.js`, checked by `tests/capture/test_chart_data.py`) and `VolleyStats` with `attCss` (attacker cards of the HTML report). The same statistics are in the Spectator View (score and fault evolution, ranking) and the Coach View.
-- **Volleyball modelling (2026-11-27), done:** batch 1, starting line-up per set (FIVB 7.3.2: `match.setLineups[n]`, `VolleyDomain.lineup.forSet()`, set line-up sheet at « DÉMARRER LE SET N », `js/index-set-lineup.js`); batch 2, second libero (19.1.1, 19.3.2: acting libero per set, libero replacement from the substitution sheet, `match.subs` entry with `libero: true`); batch 3, libero unable to play and re-designation (19.4: `unable: true`, `redesignated: true`). Rules and tests: ARCHITECTURE.md, "Starting line-up per set" and "Rotation and libero rules".
+- **Volleyball modelling (2026-11-27), done:** batch 1, starting line-up per set (FIVB 7.3.2: `match.setLineups[n]`, `VolleyDomain.lineup.forSet()`, set line-up sheet at « DÉMARRER LE SET N », `js/index-set-lineup.js`); batch 2, second libero (19.1.1, 19.3.2: acting libero per set, libero replacement from the substitution sheet, `match.subs` entry with `libero: true`); batch 3, libero unable to play and re-designation (19.4: `unable: true`, `redesignated: true`). Rules and tests: `docs/specs/DOM-LINEUP.md`, `DOM-LIBERO.md`, `DOM-SUBS.md`.
 
-### Remaining audit step
+### Specifications (started 2026-11-27)
+
+`docs/specs/` holds the specifications as built, one per interface, feature or rule set, on one template (`_TEMPLATE.md`), with numbered requirements traced to tests; `tests/unit/specs.test.js` checks the template, the traceability and that every cited test exists. Catalogue and status: `docs/specs/README.md`. Done: batch A (template, conventions, index) and batch B (domain rules DOM-*). Next batches: system specs (SYS-*), then the interface specs (UI-*); each moves the documents it replaces to `docs/archive/superseded-specs/`.
+
+### Audit step 6 (done)
 
 - Step 6: CSS done on 2026-11-27 (format-independent CSS assertions, all stylesheets formatted by Prettier, 34 screens compared pixel by pixel: identical). Tests organised by screen done the same day: `tests/<screen>/test_<feature>.py`, shared code in `tests/support/`, gate `tests/run_gate.sh` = `pytest tests`. Audit finished.
 
@@ -51,8 +55,7 @@ French is the default language; English is chosen in Settings (page reloaded). H
 - Failing tests are published as CI annotations (`tools/ci_annotate_failures.py`), readable through the public API `/repos/<owner>/<repo>/check-runs/<job id>/annotations` without authentication.
 - Kept as they are in both languages (decided 2026-11-27: some English terms are fine in the French interface): product names (VolleyLive, LIVE COURT, PLAYER FOCUS), stat codes (PTS, ERR, EFF, SO, BP, KILL...), HOME/AWAY, and the Spectator View labels already in English (SCORES, TIMELINE, GRAPH, RANKING, Roster Ranking, Highlight/Lowlight/Delta, ranking categories). Translating those labels later would change the screenshots of the visual-baseline tests, to be regenerated on Linux (the CI reference), not on Windows.
 
-### Points to verify later
-
+### Notes on the module splits (2026-11-26)
 
 - Point 4 (docs) is up to date for these splits in `docs/ARCHITECTURE.md`.
 - Public globals (`VolleySets`, `VolleyStats`, `VolleyRotation`, `VolleySpectator`, `VolleyCoach`) are unchanged.
