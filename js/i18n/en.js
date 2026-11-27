@@ -776,4 +776,17 @@ window.VolleyI18nMessages.en = {
     'The initial phase of set {set} is inferred by alternation: migrate this match to v2.1 for an explicit context.',
   'adapter.syntheticActions':
     '{n} synthetic neutral actions are flagged by provenance and only used to validate the metrics.',
+  // Set line-up sheet (js/index-set-lineup.js)
+  'lineup.title': 'Set {set} line-up',
+  'lineup.hint':
+    'FIVB rule 7.3.2: the line-up may change for each set. It starts from the line-up of the previous set.',
+  'lineup.roleSetter': 'Setter',
+  'lineup.roleOh1': 'Outside hitter 1',
+  'lineup.roleMb1': 'Middle blocker 1',
+  'lineup.roleOpposite': 'Opposite',
+  'lineup.roleOh2': 'Outside hitter 2',
+  'lineup.roleMb2': 'Middle blocker 2',
+  'lineup.errorMissing': 'Choose a player for each role.',
+  'lineup.errorTwice': 'A player can only take one role.',
+  'lineup.errorNotEligible': 'Only present players, liberos excepted, can start the set.',
 };

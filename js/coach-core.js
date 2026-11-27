@@ -69,9 +69,13 @@
       return p.present !== false;
     });
   }
-  function setterNumber(match) {
+  // Line-up of a set (FIVB 7.3.2: it may change from set to set); the current set by default.
+  function setLineup(match, setNo) {
+    return window.VolleyDomain.lineup.forSet(match || {}, setNo || (match && match.currentSet) || 1);
+  }
+  function setterNumber(match, setNo) {
     return (
-      (match && match.startingLineup && match.startingLineup.setter) ||
+      (setLineup(match, setNo).startingLineup || {}).setter ||
       (
         teamPlayers(match).filter(function (p) {
           return p.position === 'setter';
@@ -79,8 +83,8 @@
       ).number
     );
   }
-  function setterZone(match, rot) {
-    var s = setterNumber(match),
+  function setterZone(match, rot, setNo) {
+    var s = setterNumber(match, setNo),
       z = '';
     POS.some(function (k) {
       if (String(rot[k]) === String(s)) {
@@ -91,10 +95,10 @@
     });
     return z || 'p1';
   }
-  function rotationTo(match, target) {
-    var r = clone(match.startingRotation || {}),
+  function rotationTo(match, target, setNo) {
+    var r = clone(setLineup(match, setNo).startingRotation || {}),
       guard = 0;
-    while (setterZone(match, r) !== target && guard++ < 6) r = rotate(r);
+    while (setterZone(match, r, setNo) !== target && guard++ < 6) r = rotate(r);
     return r;
   }
 
@@ -210,7 +214,7 @@
           if (!pending.length) rallyLineup = clone(rot);
           pending.push(e);
           if (!e.winningTeam) return;
-          var z = setterZone(match, rot),
+          var z = setterZone(match, rot, setNo),
             r = {
               set: setNo,
               actions: pending.slice(),
@@ -239,13 +243,13 @@
           return r.set === setNo;
         }),
         last = explicit[explicit.length - 1],
-        rot = last && last.lineup ? clone(last.lineup) : clone(match.startingRotation || {}),
+        rot = last && last.lineup ? clone(last.lineup) : clone(setLineup(match, setNo).startingRotation || {}),
         serving = last ? (last.winner === 'team1' ? 'A' : 'B') : initialServing(match, setNo);
       if (last && last.phase === 'receive' && last.winner === 'team1') rot = rotate(rot);
       return {
         serving: serving,
         rot: rot,
-        rotation: setterZone(match, rot),
+        rotation: setterZone(match, rot, setNo),
         court: Rotation.onCourt(match, rot, { serving: serving }),
       };
     }
@@ -257,7 +261,7 @@
     return {
       serving: state.serving,
       rot: state.rot,
-      rotation: setterZone(match, state.rot),
+      rotation: setterZone(match, state.rot, setNo),
       court: Rotation.onCourt(match, state.rot, state),
     };
   }

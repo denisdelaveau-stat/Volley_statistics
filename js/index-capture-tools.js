@@ -430,15 +430,22 @@
       deleteLastAction();
     });
     VC.deleteLastAction = deleteLastAction;
+    // Next set: the coach confirms or changes the line-up first (FIVB 7.3.2, js/index-set-lineup.js), stored in
+    // match.setLineups[set]; then the capture screen restarts on the new set.
     document.getElementById('nextSetBtn').addEventListener('click', function () {
       var su = VS.summary(MATCH, EVENTS);
       if (!su.current || !su.current.winner || su.matchWinner) return;
-      MATCH.currentSet = curSet() + 1;
-      saveMatch();
-      DATA.length = 0;
-      persist();
-      sessionStorage.setItem(window.VolleyDomain.STORAGE.captureStage, 'capture');
-      location.reload();
+      var next = curSet() + 1;
+      window.VolleySetLineup.open(MATCH, next, function (lineup) {
+        MATCH.setLineups = MATCH.setLineups || {};
+        MATCH.setLineups[next] = lineup;
+        MATCH.currentSet = next;
+        saveMatch();
+        DATA.length = 0;
+        persist();
+        sessionStorage.setItem(window.VolleyDomain.STORAGE.captureStage, 'capture');
+        location.reload();
+      });
     });
     if (MATCH) {
       rebuildData();

@@ -866,3 +866,119 @@ html.runtime-capture-active .score-line {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Set line-up sheet (js/index-set-lineup.js): setter zone, court preview and one select per role. */
+.set-lineup-card {
+  width: min(100%, 560px);
+  max-height: 94vh;
+  overflow-y: auto;
+}
+.set-lineup-zones {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.set-lineup-zones button {
+  min-height: 44px;
+  border: 2px solid #386f98;
+  border-radius: 10px;
+  background: #103a5e;
+  color: #fff;
+  font-weight: 900;
+}
+.set-lineup-zones button.on {
+  border-color: #3ee7ff;
+  background: #0b6f8f;
+}
+.set-lineup-court {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f18a42;
+  margin-bottom: 12px;
+}
+.set-lineup-slot {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  min-height: 64px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  background: #08294799;
+  text-align: center;
+}
+.set-lineup-slot small {
+  color: #ffd9b8;
+  font-size: 10px;
+  font-weight: 900;
+}
+.set-lineup-slot strong {
+  font-size: 20px;
+  line-height: 1.1;
+}
+.set-lineup-slot span {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.set-lineup-roles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+}
+.set-lineup-roles label {
+  display: grid;
+  gap: 4px;
+  color: #a9c9de;
+  font-size: 12px;
+  font-weight: 800;
+}
+.set-lineup-roles select {
+  min-height: 44px;
+  border: 1px solid #3f84b3;
+  border-radius: 9px;
+  background: #061d38;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 8px;
+}
+.set-lineup-card .set-lineup-libero {
+  margin: 12px 0 0;
+  color: #dbe9f4;
+}
+.set-lineup-card .set-lineup-error {
+  margin: 10px 0 0;
+  color: #ffb4b4;
+  font-weight: 800;
+}
+.set-lineup-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+.set-lineup-actions button {
+  margin-top: 14px;
+}
+.set-lineup-cancel {
+  min-height: 50px;
+  border: 1px solid #3f84b3;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  font-weight: 900;
+}
+.set-lineup-actions .runtime-prefs-close:disabled {
+  background: #3b5a73;
+  color: #a9c9de;
+}
+@media (max-width: 340px) {
+  .set-lineup-roles {
+    grid-template-columns: 1fr;
+  }
+}

@@ -11,7 +11,8 @@
              the replaced player cannot come back for the rest of the match;
    - 15.9.1  a substitution involving a player who is not registered is illegal;
    - 15.11.1.1 no substitution during a rally (checked by the caller: rallyInProgress()).
-   Starting players are the starting rotation of match.startingRotation (the app uses one line-up for every set). */
+   Starting players are the starting rotation of the set (VolleyDomain.lineup.forSet: FIVB 7.3.2, one line-up sheet
+   per set). */
 (function () {
   'use strict';
   var REGULAR_LIMIT = 6;
@@ -24,8 +25,8 @@
       return same(x, value);
     });
   }
-  function starters(match) {
-    var rot = match.startingRotation || {};
+  function starters(match, setNo) {
+    var rot = window.VolleyDomain.lineup.forSet(match, setNo || match.currentSet || 1).startingRotation || {};
     return Object.keys(rot)
       .map(function (k) {
         return rot[k];
@@ -34,11 +35,17 @@
         return n != null;
       });
   }
-  // Liberos are excluded from regular and exceptional substitutions (15.5.1, 15.7).
+  // Liberos are excluded from regular and exceptional substitutions (15.5.1, 15.7): the libero of every set line-up
+  // and the roster players registered as libero.
   function liberos(match) {
     var list = [],
-      lib = (match.startingLineup || {}).libero;
-    if (lib != null) list.push(lib);
+      lineups = [match.startingLineup || {}];
+    Object.keys(match.setLineups || {}).forEach(function (n) {
+      lineups.push(match.setLineups[n].startingLineup || {});
+    });
+    lineups.forEach(function (lineup) {
+      if (lineup.libero != null && !contains(list, lineup.libero)) list.push(lineup.libero);
+    });
     ((match.team && match.team.roster) || []).forEach(function (p) {
       var position = String(p.position || '').toLowerCase();
       if ((position === 'libero' || position === 'lib') && !contains(list, p.number)) list.push(p.number);
@@ -68,7 +75,7 @@
 
   // Substitution history of a set: counts and who left / entered with whom.
   function history(match, setNo) {
-    var start = starters(match),
+    var start = starters(match, setNo),
       h = {
         regular: 0,
         exceptional: 0,
@@ -111,7 +118,7 @@
   // when it is legal.
   function regularRefusal(match, setNo, rot, outgoing, incoming, h) {
     h = h || history(match, setNo);
-    var start = starters(match),
+    var start = starters(match, setNo),
       court = onCourtNumbers(rot);
     if (h.regular >= REGULAR_LIMIT) return 'subs.refuseLimit';
     if (!contains(court, outgoing)) return 'subs.refuseOutNotOnCourt';

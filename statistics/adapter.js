@@ -401,9 +401,21 @@
       };
     });
   }
-  function startingRotationV1(raw, roster) {
-    var source = raw.match.startingRotation || {},
-      fallback = raw.match.startingLineup || {},
+  // Line-up of a set, same rule as VolleyDomain.lineup.forSet (js/shared-domain.js), kept here because the adapter
+  // also runs standalone: set 1 is match.startingLineup / startingRotation, match.setLineups[n] holds the line-up of a
+  // later set, and a set without its own line-up keeps the line-up of the previous set (FIVB 7.3.2).
+  function lineupForSetV1(match, setNumber) {
+    var lineups = (match && match.setLineups) || {};
+    for (var n = number(setNumber, 1); n >= 2; n--) {
+      var lineup = lineups[n];
+      if (lineup && lineup.startingRotation) return lineup;
+    }
+    return { startingLineup: match.startingLineup || {}, startingRotation: match.startingRotation || {} };
+  }
+  function startingRotationV1(raw, roster, setNumber) {
+    var setLineup = lineupForSetV1(raw.match, setNumber || 1),
+      source = setLineup.startingRotation || {},
+      fallback = setLineup.startingLineup || {},
       values = roster.map(function (p) {
         return p.number;
       }),
@@ -443,8 +455,8 @@
   // Middle blockers tracked for the libero, as in js/index-rotation.js: the starting line-up when it names them,
   // otherwise the roster players whose role is MB. A middle blocker playing another slot after a substitution
   // (for example in place of the opposite) is not one of them.
-  function middleBlockersV1(raw, roster) {
-    var lineup = (raw.match && raw.match.startingLineup) || {};
+  function middleBlockersV1(raw, roster, setNumber) {
+    var lineup = lineupForSetV1(raw.match || {}, setNumber || 1).startingLineup || {};
     if (lineup.mb1 != null || lineup.mb2 != null) return [lineup.mb1, lineup.mb2];
     return roster
       .filter(function (p) {
@@ -529,7 +541,6 @@
     var validation = validateCaptureV1(raw);
     if (!validation.valid) throw new Error(validation.errors.join(' '));
     var roster = buildRosterV1(raw),
-      start = startingRotationV1(raw, roster),
       keyByNumber = {},
       roles = {};
     roster.forEach(function (p) {
@@ -554,7 +565,8 @@
         return a - b;
       })
       .forEach(function (setNumber) {
-        var lineup = clone(start.lineup),
+        var start = startingRotationV1(raw, roster, setNumber),
+          lineup = clone(start.lineup),
           phase = phaseForSetV1(raw, setNumber),
           setSubs = (raw.match.subs || [])
             .filter(function (s) {
@@ -564,8 +576,8 @@
               return number(a.at, 0) - number(b.at, 0);
             }),
           applied = 0,
-          middleBlockers = middleBlockersV1(raw, roster),
-          liberoNumber = raw.match.startingLineup && raw.match.startingLineup.libero,
+          middleBlockers = middleBlockersV1(raw, roster, setNumber),
+          liberoNumber = lineupForSetV1(raw.match, setNumber).startingLineup.libero,
           liberoFor = null;
         previousResult = null;
         groups[setNumber].forEach(function (rally) {

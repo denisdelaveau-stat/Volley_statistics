@@ -47,6 +47,45 @@
     return next;
   }
 
+  // Rotation order of the line-up roles from the setter's zone, as the New Match wizard places them: the setter, then
+  // OH1, MB1, opposite, OH2 and MB2 in the following zones (P1 -> P2 -> ... -> P6 -> P1).
+  var ROTATION_ROLES = Object.freeze(['setter', 'oh1', 'mb1', 'opposite', 'oh2', 'mb2']);
+
+  // Starting rotation {p1..p6} from the role assignment {setter, oh1, ...} and the setter's zone ('p1'..'p6').
+  function rotationFromRoles(roles, setterZone) {
+    var z = +String(setterZone || 'p1').slice(1) || 1,
+      rotation = {};
+    ROTATION_ROLES.forEach(function (role, i) {
+      rotation['p' + (((z - 1 + i) % 6) + 1)] = roles[role] != null ? roles[role] : null;
+    });
+    return rotation;
+  }
+
+  // Zone ('p1'..'p6') of a player in a rotation, or null. Numbers may be stored as numbers or strings.
+  function zoneOf(rotation, player) {
+    var found = null;
+    POS.forEach(function (zone) {
+      if (player != null && rotation[zone] != null && String(rotation[zone]) === String(player)) found = zone;
+    });
+    return found;
+  }
+
+  // Starting line-up of a set. FIVB 7.3.2: the coach hands in a line-up sheet before each set, so it may change.
+  // Set 1 is match.startingLineup / match.startingRotation; match.setLineups[n] = {startingLineup, startingRotation}
+  // holds the line-up of a later set. A set without its own line-up keeps the line-up of the previous set, so
+  // matches recorded before per-set line-ups replay unchanged. statistics/adapter.js applies the same rule.
+  function lineupForSet(match, setNo) {
+    var lineups = (match && match.setLineups) || {};
+    for (var n = +setNo || 1; n >= 2; n--) {
+      var lineup = lineups[n];
+      if (lineup && lineup.startingRotation) return lineup;
+    }
+    return {
+      startingLineup: (match && match.startingLineup) || {},
+      startingRotation: (match && match.startingRotation) || {},
+    };
+  }
+
   // Reads a JSON value from storage (localStorage by default). Returns fallback when the key is missing, and also
   // when the value cannot be read, but then says so in the console: corrupted data must not disappear silently.
   function readStored(key, fallback, storage) {
@@ -72,6 +111,11 @@
     readStored: readStored,
     ROLE_CODES: ROLE_CODES,
     ROLE_NAMES: ROLE_NAMES,
-    court: Object.freeze({ POS: POS, NEXT: NEXT, LIBERO_ZONES: LIBERO_ZONES, rotate: rotate }),
+    court: Object.freeze({ POS: POS, NEXT: NEXT, LIBERO_ZONES: LIBERO_ZONES, rotate: rotate, zoneOf: zoneOf }),
+    lineup: Object.freeze({
+      ROTATION_ROLES: ROTATION_ROLES,
+      rotationFromRoles: rotationFromRoles,
+      forSet: lineupForSet,
+    }),
   });
 })();
