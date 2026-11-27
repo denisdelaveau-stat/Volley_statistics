@@ -780,4 +780,17 @@ window.VolleyI18nMessages.fr = {
     'La phase initiale du set {set} est déduite par alternance : migrez ce match vers v2.1 pour un contexte explicite.',
   'adapter.syntheticActions':
     '{n} actions neutres synthétiques sont signalées par provenance et utilisées uniquement pour la validation des métriques.',
+  // Set line-up sheet (js/index-set-lineup.js)
+  'lineup.title': 'Composition du set {set}',
+  'lineup.hint':
+    'Règle FIVB 7.3.2 : la composition peut changer à chaque set. Elle est préremplie avec celle du set précédent.',
+  'lineup.roleSetter': 'Passeur',
+  'lineup.roleOh1': 'Réceptionneur-attaquant 1',
+  'lineup.roleMb1': 'Central 1',
+  'lineup.roleOpposite': 'Pointu',
+  'lineup.roleOh2': 'Réceptionneur-attaquant 2',
+  'lineup.roleMb2': 'Central 2',
+  'lineup.errorMissing': 'Choisissez un joueur pour chaque poste.',
+  'lineup.errorTwice': 'Un joueur ne peut occuper qu’un seul poste.',
+  'lineup.errorNotEligible': 'Seuls les joueurs présents, hors libéro, peuvent commencer le set.',
 };

@@ -10,13 +10,15 @@
    - the Libero can only be replaced by the regular player it replaced (19.3.2.2).
    trace() applies these rules rally after rally (liberoFor = the player the Libero replaces). Without that history,
    court() falls back to the first middle blocker found in an allowed zone. statistics/adapter.js applies the same
-   rules for the Spectator matrix. */
+   rules for the Spectator matrix.
+   Each set starts from its own line-up (FIVB 7.3.2): VolleyDomain.lineup.forSet(match, set). */
 (function () {
   'use strict';
   var court = window.VolleyDomain.court;
   var POS = court.POS,
     LIBERO_ZONES = court.LIBERO_ZONES,
-    rotate = court.rotate;
+    rotate = court.rotate,
+    lineupForSet = window.VolleyDomain.lineup.forSet;
 
   // Player numbers may be stored as numbers or strings (imported files): compare them as text.
   function sameNumber(a, b) {
@@ -34,10 +36,10 @@
       return (+sub.set || 1) === setNo;
     });
   }
-  // Middle blockers tracked for the libero: the starting line-up when it names them (capture), otherwise the
-  // roster players whose position is MB (imported v2 documents have no mb1/mb2).
-  function middleBlockers(match) {
-    var lineup = match.startingLineup || {};
+  // Middle blockers tracked for the libero: the starting line-up of the set when it names them (capture), otherwise
+  // the roster players whose position is MB (imported v2 documents have no mb1/mb2).
+  function middleBlockers(match, setNo) {
+    var lineup = lineupForSet(match, setNo || match.currentSet || 1).startingLineup || {};
     if (lineup.mb1 != null || lineup.mb2 != null) return [lineup.mb1, lineup.mb2];
     return ((match.team && match.team.roster) || [])
       .filter(function (p) {
@@ -103,8 +105,9 @@
   // logged, after the substitutions made before it. The other fields are the state after the last event.
   function trace(match, evs, setNo) {
     setNo = setNo || match.currentSet || 1;
-    var lineup = match.startingLineup || {},
-      start = match.startingRotation || {},
+    var setLineup = lineupForSet(match, setNo),
+      lineup = setLineup.startingLineup || {},
+      start = setLineup.startingRotation || {},
       rot = {};
     POS.forEach(function (k) {
       rot[k] = start[k];
@@ -113,7 +116,7 @@
       ordered = subs.slice().sort(function (a, b) {
         return (+a.at || 0) - (+b.at || 0);
       }),
-      state = { rot: rot, mbs: middleBlockers(match), lib: lineup.libero, liberoFor: null },
+      state = { rot: rot, mbs: middleBlockers(match, setNo), lib: lineup.libero, liberoFor: null },
       serving = initialServing(match, setNo),
       rotations = 0,
       steps = [],
@@ -173,9 +176,10 @@
   }
   // Court as displayed. stt is a trace() step, a trace()/replay() result or a partial state ({serving}); when it has
   // no liberoFor (no rally history, e.g. a theoretical rotation) the first middle blocker in an allowed zone is
-  // replaced. Without stt.serving the serving team is assumed to be ours (libero in P6/P5 only).
+  // replaced. Without stt.serving the serving team is assumed to be ours (libero in P6/P5 only). Without stt.lib and
+  // stt.mbs, the line-up of the current set gives the libero and the middle blockers.
   function courtFrom(match, rot, stt) {
-    var lineup = match.startingLineup || {},
+    var lineup = lineupForSet(match, match.currentSet || 1).startingLineup || {},
       c = {},
       lib = (stt && stt.lib) || lineup.libero,
       mbs = (stt && stt.mbs) || middleBlockers(match),

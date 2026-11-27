@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { loadBrowserScripts, plain } = require('./load-browser-scripts');
 
-const { VolleySubstitutions: S } = loadBrowserScripts('js/index-substitution-rules.js');
+const { VolleySubstitutions: S } = loadBrowserScripts('js/shared-domain.js', 'js/index-substitution-rules.js');
 
 // Starters 1, 3, 4, 5, 6, 7; libero 2; bench 8, 9, 10, 11, 12, 13 (12 absent); 14 is a second libero.
 function match(subs) {

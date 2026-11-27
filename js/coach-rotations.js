@@ -66,7 +66,7 @@
           return x.key === C.rotation;
         })[0] || rows[0],
       // Displayed line-up of the selected rotation, libero included (P1 only when the phase filter is reception).
-      rot = window.VolleyRotation.onCourt(m, rotationTo(m, C.rotation), {
+      rot = window.VolleyRotation.onCourt(m, rotationTo(m, C.rotation, +m.currentSet || 1), {
         serving: C.phase === 'receive' ? 'B' : 'A',
       }),
       best = rows.slice().sort(function (a, b) {

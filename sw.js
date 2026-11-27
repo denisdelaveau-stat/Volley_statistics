@@ -34,6 +34,7 @@ var ASSETS = [
   'js/index-rotation.js',
   'js/index-substitution-rules.js',
   'js/index-capture-engine.js',
+  'js/index-set-lineup.js',
   'js/index-capture-tools.js',
   'js/index-report.js',
   'js/index-navigation-new-match.js',

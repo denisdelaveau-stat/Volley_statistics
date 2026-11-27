@@ -97,3 +97,19 @@ test('a middle blocker who replaces the opposite is not replaced by the libero',
   const court = R.onCourt(raw.match, t.rot, t);
   assert.ok(Object.values(court).includes(6), 'MB 6, playing opposite, stays on court');
 });
+
+test('they agree when set 2 has its own line-up (FIVB 7.3.2), for every setter zone', () => {
+  // Set 2 line-up: outside hitters and middle blockers swapped, the setter starting in each zone in turn.
+  const raw = fixture('tests/data/As_cannes_vs_Frejus_2026-11-15.capture.v1.json');
+  const { VolleyDomain: D } = loadBrowserScripts('js/shared-domain.js');
+  const l = raw.match.startingLineup;
+  const roles = Object.assign({}, l, { oh1: l.oh2, oh2: l.oh1, mb1: l.mb2, mb2: l.mb1 });
+  let compared = 0;
+  for (let z = 1; z <= 6; z++) {
+    const variant = JSON.parse(JSON.stringify(raw));
+    const rotation = JSON.parse(JSON.stringify(D.lineup.rotationFromRoles(roles, 'p' + z)));
+    variant.match.setLineups = { 2: { startingLineup: roles, startingRotation: rotation } };
+    compared += compareEngineAndAdapter(variant, 'set 2 setter in P' + z);
+  }
+  assert.ok(compared > 500, 'events compared: ' + compared);
+});

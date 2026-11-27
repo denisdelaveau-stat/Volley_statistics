@@ -12,6 +12,7 @@ const projectGlobals = {
   VolleyI18nMessages: 'writable',
   VolleySets: 'readonly',
   VolleyStats: 'readonly',
+  VolleySetLineup: 'readonly',
   VolleyRotation: 'readonly',
   VolleyReport: 'readonly',
   VolleyShell: 'readonly',

@@ -89,9 +89,12 @@ def test_set_end_lock_undo_next_set_and_exports(browser):
     assert len(saved["events"]) == len(events(page))
     assert saved["score"] == {"team1": 27, "team2": 25}
 
-    # Next set: 0-0, capture open again, one set won.
+    # Next set: the line-up sheet opens (tests/capture/test_set_lineup.py); confirming the previous line-up starts
+    # set 2 at 0-0, capture open again, one set won.
     page.click("#nextSetBtn")
-    page.wait_for_timeout(200)
+    page.click("[data-lineup-confirm]")
+    page.wait_for_load_state()
+    page.wait_for_timeout(300)
     assert _score(page) == ["0", "0"] and not _locked(page)
     assert page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.match.v1')).currentSet") == 2
     assert page.locator("#liveScore .set-badge").all_inner_texts() == ["1", "0"]
