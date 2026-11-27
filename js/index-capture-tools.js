@@ -436,16 +436,21 @@
       var su = VS.summary(MATCH, EVENTS);
       if (!su.current || !su.current.winner || su.matchWinner) return;
       var next = curSet() + 1;
-      window.VolleySetLineup.open(MATCH, next, function (lineup) {
-        MATCH.setLineups = MATCH.setLineups || {};
-        MATCH.setLineups[next] = lineup;
-        MATCH.currentSet = next;
-        saveMatch();
-        DATA.length = 0;
-        persist();
-        sessionStorage.setItem(window.VolleyDomain.STORAGE.captureStage, 'capture');
-        location.reload();
-      });
+      window.VolleySetLineup.open(
+        MATCH,
+        next,
+        function (lineup) {
+          MATCH.setLineups = MATCH.setLineups || {};
+          MATCH.setLineups[next] = lineup;
+          MATCH.currentSet = next;
+          saveMatch();
+          DATA.length = 0;
+          persist();
+          sessionStorage.setItem(window.VolleyDomain.STORAGE.captureStage, 'capture');
+          location.reload();
+        },
+        EVENTS
+      );
     });
     if (MATCH) {
       rebuildData();

@@ -16,7 +16,11 @@
    Liberos, Rule 19: a team designates up to two liberos (19.1.1): the libero of the line-ups and the roster players
    registered as libero. One acting libero on court (19.1.3). Replacing the acting libero by the other one is a libero
    replacement (19.3.2): it is not a substitution, needs a completed rally since the previous libero replacement
-   (19.3.2.1) and never happens during a rally. It is stored as a match.subs entry with libero: true. */
+   (19.3.2.1) and never happens during a rally. It is stored as a match.subs entry with libero: true.
+   Re-designation, 19.4: the acting libero may be declared unable to play (injury, illness, expulsion). The other
+   libero then becomes the acting one; without one, the coach re-designates as libero, for the rest of the match, a
+   player who is not on court (not the player the libero replaced). The libero declared unable cannot play again in
+   the match. Stored as a libero entry with unable: true (and redesignated: true for a new libero). */
 (function () {
   'use strict';
   var REGULAR_LIMIT = 6;
@@ -39,8 +43,18 @@
         return n != null;
       });
   }
-  // Liberos are excluded from regular and exceptional substitutions (15.5.1, 15.7): the libero of every set line-up
-  // and the roster players registered as libero.
+  // Liberos declared unable to play (19.4): they cannot play again in the match.
+  function unableLiberos(match) {
+    return (match.subs || [])
+      .filter(function (s) {
+        return s.libero && s.unable;
+      })
+      .map(function (s) {
+        return s.out;
+      });
+  }
+  // Liberos are excluded from regular and exceptional substitutions (15.5.1, 15.7): the libero of every set line-up,
+  // the roster players registered as libero and the players re-designated as libero (19.4).
   function liberos(match) {
     var list = [],
       lineups = [match.startingLineup || {}];
@@ -49,6 +63,9 @@
     });
     lineups.forEach(function (lineup) {
       if (lineup.libero != null && !contains(list, lineup.libero)) list.push(lineup.libero);
+    });
+    (match.subs || []).forEach(function (s) {
+      if (s.libero && s.redesignated && !contains(list, s['in'])) list.push(s['in']);
     });
     ((match.team && match.team.roster) || []).forEach(function (p) {
       var position = String(p.position || '').toLowerCase();
@@ -173,8 +190,9 @@
       t = window.VolleyRotation.trace(match, events, setNo),
       current = t.lib,
       present = registered(match),
+      unable = unableLiberos(match),
       candidates = liberos(match).filter(function (n) {
-        return !same(n, current) && contains(present, n);
+        return !same(n, current) && contains(present, n) && !contains(unable, n);
       }),
       refusal = null;
     if (current == null || !candidates.length) refusal = 'subs.refuseNoSecondLibero';
@@ -195,6 +213,41 @@
       if (swappedHere || replacedHere) refusal = 'subs.refuseLiberoRally';
     }
     return { current: current, candidates: candidates, refusal: refusal };
+  }
+
+  // The acting libero declared unable to play (19.4), between two rallies: the other liberos who may take over and,
+  // when there is none, the players who may be re-designated as libero (not on court, not the player the libero
+  // replaced, not a libero, not barred). refusal is a translation key when it is not possible now.
+  function liberoUnable(match, setNo, setEvents) {
+    var events = setEvents || [],
+      t = window.VolleyRotation.trace(match, events, setNo),
+      current = t.lib,
+      present = registered(match),
+      unable = unableLiberos(match),
+      others = liberos(match).filter(function (n) {
+        return !same(n, current) && contains(present, n) && !contains(unable, n);
+      }),
+      court = window.VolleyRotation.onCourt(match, t.rot, t),
+      onCourt = Object.keys(court).map(function (k) {
+        return court[k];
+      }),
+      h = history(match, setNo),
+      players = others.length
+        ? []
+        : present.filter(function (n) {
+            return (
+              !contains(onCourt, n) &&
+              !same(n, t.liberoFor) &&
+              !contains(liberos(match), n) &&
+              !contains(unable, n) &&
+              !h.barred[String(n)]
+            );
+          }),
+      refusal = null;
+    if (current == null) refusal = 'subs.refuseNoLibero';
+    else if (rallyInProgress(events)) refusal = 'subs.blockedRally';
+    else if (!others.length && !players.length) refusal = 'subs.refuseNoRedesignation';
+    return { current: current, liberos: others, players: players, refusal: refusal };
   }
 
   // A rally is in progress when the last event of the set is an action that did not end the rally.
@@ -253,6 +306,14 @@
       sub.libero = true;
       event.libero = true;
     }
+    if (opts.unable) {
+      sub.unable = true;
+      event.unable = true;
+    }
+    if (opts.redesignated) {
+      sub.redesignated = true;
+      event.redesignated = true;
+    }
     return { sub: sub, event: event };
   }
 
@@ -265,6 +326,8 @@
     options: options,
     rallyInProgress: rallyInProgress,
     liberoSwap: liberoSwap,
+    liberoUnable: liberoUnable,
+    unableLiberos: unableLiberos,
     build: build,
   };
 })();

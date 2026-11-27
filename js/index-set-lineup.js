@@ -5,7 +5,8 @@
    roles as in the New Match wizard (VolleyDomain.lineup.rotationFromRoles). The acting libero is chosen among the
    designated liberos (up to two, 19.1.1), or none. Rules checked: six different registered players, present, none of
    them a libero (19.1: the libero is not part of the starting six).
-   open(match, setNo, onConfirm): onConfirm({startingLineup, startingRotation}) is called when the coach confirms. */
+   open(match, setNo, onConfirm, events): onConfirm({startingLineup, startingRotation}) is called when the coach
+   confirms; events (the match events) give the libero acting at the end of the previous set. */
 (function () {
   'use strict';
   var esc = window.VolleyDom.esc,
@@ -39,12 +40,41 @@
   function liberos(match) {
     return window.VolleySubstitutions ? window.VolleySubstitutions.liberos(match) : [];
   }
-  // Designated liberos present for the match: the acting libero of a set is one of them.
+  // Designated liberos present for the match: the acting libero of a set is one of them. A libero declared unable to
+  // play (19.4) cannot play again in the match.
   function presentLiberos(match) {
+    var unable = window.VolleySubstitutions ? window.VolleySubstitutions.unableLiberos(match) : [];
     return liberos(match).filter(function (n) {
       var p = playerOf(match, n);
-      return !p || p.present !== false;
+      return (
+        (!p || p.present !== false) &&
+        !unable.some(function (u) {
+          return same(u, n);
+        })
+      );
     });
+  }
+  // Libero proposed for the new set: the previous set's libero, or the libero acting at the end of the previous set
+  // when that one can no longer play, or none.
+  function proposedLibero(match, setNo, previousLibero, events) {
+    var allowed = presentLiberos(match),
+      ok = function (n) {
+        return (
+          n != null &&
+          allowed.some(function (a) {
+            return same(a, n);
+          })
+        );
+      };
+    if (ok(previousLibero)) return previousLibero;
+    var acting = null;
+    if (window.VolleyRotation) {
+      var setEvents = (events || []).filter(function (e) {
+        return (+e.set || 1) === setNo - 1;
+      });
+      acting = window.VolleyRotation.trace(match, setEvents, setNo - 1).lib;
+    }
+    return ok(acting) ? acting : null;
   }
   // Players who may start: present, registered, not a libero.
   function eligible(match) {
@@ -254,14 +284,14 @@
     state.roles[select.dataset.lineupRole] = p ? p.number : null;
     render('[data-lineup-role="' + select.dataset.lineupRole + '"]');
   }
-  function open(match, setNo, onConfirm) {
+  function open(match, setNo, onConfirm, events) {
     var prev = previous(match, setNo);
     state = {
       match: match,
       setNo: setNo,
       roles: prev.roles,
       setterZone: prev.setterZone,
-      libero: prev.libero,
+      libero: proposedLibero(match, setNo, prev.libero, events),
       onConfirm: onConfirm,
       trigger: document.activeElement,
     };

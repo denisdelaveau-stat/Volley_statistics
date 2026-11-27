@@ -188,7 +188,12 @@
           q['in'] +
           ' ' +
           E((i && i.name) || '') +
-          (q.libero ? ' · ' + E(t('report.liberoSwap')) : '') +
+          (q.libero
+            ? ' · ' +
+              E(
+                t(q.redesignated ? 'report.liberoRedesignated' : q.unable ? 'report.liberoUnable' : 'report.liberoSwap')
+              )
+            : '') +
           '</td><td>#' +
           q.out +
           ' ' +

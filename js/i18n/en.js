@@ -798,4 +798,17 @@ window.VolleyI18nMessages.en = {
   'subs.refuseNoSecondLibero': 'No other libero available (rule 19.1.1).',
   'subs.refuseLiberoRally': 'A libero replacement has just taken place: wait for a completed rally (rule 19.3.2.1).',
   'report.liberoSwap': 'libero replacement',
+  // Libero unable to play and re-designation (FIVB 19.4)
+  'subs.refuseNoLibero': 'No acting libero.',
+  'subs.refuseNoRedesignation': 'No player can be re-designated as libero: the player must be present and off court.',
+  'subs.unableOpen': 'Libero #{libero} unable to play (injury, expulsion)…',
+  'subs.unableTitle': 'Libero #{libero} unable to play',
+  'subs.unableWarning': 'Rule 19.4: libero #{libero} cannot play again in this match.',
+  'subs.unableTakeOver': 'takes over',
+  'subs.redesignateHint': 'becomes libero',
+  'subs.unableBack': 'Back',
+  'subs.unableDone': 'Libero #{out} unable to play: #{in} is now the libero',
+  'subs.redesignateDone': 'Libero #{out} unable to play: #{in} re-designated libero for the rest of the match',
+  'report.liberoUnable': 'libero unable to play',
+  'report.liberoRedesignated': 're-designated libero',
 };
