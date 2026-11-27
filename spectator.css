@@ -444,10 +444,10 @@ html, body { background: radial-gradient(circle at 50% -20%, #123b63 0, transpar
 /* SPECTATOR VIEW RANKING v1.20.0. */
 .ranking-panel { max-width: 1180px; padding: 0 0 24px; }
 .ranking-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 18px 20px; border: 1px solid var(--vl-border-card); border-radius: 16px; background: linear-gradient(125deg, rgba(17,42,72,.98), rgba(7,27,50,.98)); box-shadow: 0 12px 28px rgba(0,0,0,.24); }
-.ranking-heading p, .ranking-heading h1, .ranking-heading span { margin: 0; }
+.ranking-heading p, .ranking-heading h1, .ranking-heading > div > span { margin: 0; }
 .ranking-heading p { color: var(--vl-accent); font-size: 11px; font-weight: 900; letter-spacing: .15em; }
 .ranking-heading h1 { margin-top: 3px; font-size: clamp(25px, 4vw, 36px); }
-.ranking-heading span { display: block; margin-top: 4px; color: var(--vl-text-secondary); font-size: 14px; }
+.ranking-heading > div > span { display: block; margin-top: 4px; color: var(--vl-text-secondary); font-size: 14px; }
 .ranking-filters { display: flex; align-items: end; gap: 10px; }
 .ranking-filters label { display: flex; min-width: 160px; flex-direction: column; gap: 5px; color: var(--vl-text-secondary); font-size: 12px; font-weight: 800; }
 .ranking-filters select { min-height: 44px; border: 1px solid #28749f; border-radius: 9px; background: #061d38; color: #fff; padding: 7px 34px 7px 11px; font-weight: 900; }
