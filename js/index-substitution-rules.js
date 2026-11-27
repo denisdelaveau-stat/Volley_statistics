@@ -107,29 +107,26 @@
       });
   }
 
-  // Why `incoming` cannot replace `outgoing` in a regular substitution, or null when it is legal.
+  // Why `incoming` cannot replace `outgoing` in a regular substitution (a translation key, subs.refuse*), or null
+  // when it is legal.
   function regularRefusal(match, setNo, rot, outgoing, incoming, h) {
     h = h || history(match, setNo);
     var start = starters(match),
       court = onCourtNumbers(rot);
-    if (h.regular >= REGULAR_LIMIT) return 'Six remplacements déjà effectués dans ce set (15.1).';
-    if (!contains(court, outgoing)) return 'Le joueur qui sort doit être sur le terrain.';
-    if (contains(liberos(match), outgoing) || contains(liberos(match), incoming))
-      return 'Le libéro ne fait pas partie des remplacements (15.5.1).';
-    if (!contains(registered(match), incoming)) return 'Joueur non inscrit ou absent (15.9.1).';
-    if (contains(court, incoming)) return 'Ce joueur est déjà sur le terrain.';
-    if (h.barred[String(incoming)]) return 'Joueur remplacé exceptionnellement : il ne peut plus revenir (15.7).';
+    if (h.regular >= REGULAR_LIMIT) return 'subs.refuseLimit';
+    if (!contains(court, outgoing)) return 'subs.refuseOutNotOnCourt';
+    if (contains(liberos(match), outgoing) || contains(liberos(match), incoming)) return 'subs.refuseLibero';
+    if (!contains(registered(match), incoming)) return 'subs.refuseNotRegistered';
+    if (contains(court, incoming)) return 'subs.refuseOnCourt';
+    if (h.barred[String(incoming)]) return 'subs.refuseBarred';
     if (contains(start, incoming)) {
-      if (h.starterReturned[String(incoming)]) return 'Ce titulaire est déjà revenu une fois dans ce set (15.6.1).';
-      if (!same(h.starterLeft[String(incoming)], outgoing))
-        return 'Un titulaire ne revient qu’à la place de son remplaçant (15.6.1).';
+      if (h.starterReturned[String(incoming)]) return 'subs.refuseStarterReturned';
+      if (!same(h.starterLeft[String(incoming)], outgoing)) return 'subs.refuseStarterOwnPlace';
       return null;
     }
-    if (h.substituteEntered[String(incoming)] != null)
-      return 'Ce remplaçant est déjà entré une fois dans ce set (15.6.2).';
-    if (!contains(start, outgoing))
-      return 'Un remplaçant ne peut être remplacé que par le titulaire qu’il a remplacé (15.6.2).';
-    if (h.starterLeft[String(outgoing)] != null) return 'Ce titulaire est déjà sorti une fois dans ce set (15.6.1).';
+    if (h.substituteEntered[String(incoming)] != null) return 'subs.refuseSubEntered';
+    if (!contains(start, outgoing)) return 'subs.refuseSubOwnStarter';
+    if (h.starterLeft[String(outgoing)] != null) return 'subs.refuseStarterLeft';
     return null;
   }
 

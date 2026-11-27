@@ -24,6 +24,7 @@
     historyArrow.textContent = open ? '▲' : '▼';
   });
   var VC = window.VolleyCapture;
+  var i18n = window.VolleyI18n;
   var Charts = window.VolleyCaptureCharts;
   var DATA = Charts.DATA,
     STORAGE_DATA = Charts.STORAGE_DATA,
@@ -87,7 +88,9 @@
       localStorage.setItem(KM_, JSON.stringify(MATCH));
     }
     function tn(t) {
-      return t === 'team1' ? (MATCH && MATCH.team.name) || 'Team A' : (MATCH && MATCH.opponent.name) || 'Team B';
+      return t === 'team1'
+        ? (MATCH && MATCH.team.name) || i18n.t('common.teamA')
+        : (MATCH && MATCH.opponent.name) || i18n.t('common.teamB');
     }
     var attScope = 'set';
     function renderAttackers() {
@@ -136,19 +139,16 @@
       if (su.matchWinner) {
         box.hidden = false;
         box.className = 'set-over match';
-        t.textContent = 'MATCH WON BY ' + tn(su.matchWinner).toUpperCase();
+        t.textContent = i18n.t('capture.matchWonBy', { team: tn(su.matchWinner).toUpperCase() });
         tx.textContent =
-          'Sets ' +
-          su.wonA +
-          ' : ' +
-          su.wonB +
+          i18n.t('capture.setsScore', { a: su.wonA, b: su.wonB }) +
           ' \u00B7 ' +
           su.sets
             .map(function (x) {
               return x.a + '-' + x.b;
             })
             .join(', ');
-        nb.textContent = 'MATCH FINISHED';
+        nb.textContent = i18n.t('capture.matchFinished');
         nb.dataset.mode = 'finished';
         nb.disabled = true;
         panel.classList.add('locked');
@@ -160,20 +160,14 @@
         box.hidden = false;
         box.className = 'set-over set';
         nb.disabled = false;
-        t.textContent = 'SET ' + c.set + ' FINISHED';
+        t.textContent = i18n.t('capture.setFinished', { set: c.set });
         tx.textContent =
-          'Won by ' +
-          tn(c.winner) +
-          ' ' +
-          Math.max(c.a, c.b) +
-          '-' +
-          Math.min(c.a, c.b) +
-          ' \u00B7 Sets ' +
-          su.wonA +
-          ' : ' +
-          su.wonB;
-        nb.textContent =
-          'START SET ' + (c.set + 1) + (c.set + 1 === VS.decidingSet(MATCH) ? ' (to 15)' : '') + ' \u2192';
+          i18n.t('capture.setWonBy', { team: tn(c.winner), score: Math.max(c.a, c.b) + '-' + Math.min(c.a, c.b) }) +
+          ' \u00B7 ' +
+          i18n.t('capture.setsScore', { a: su.wonA, b: su.wonB });
+        nb.textContent = i18n.t(c.set + 1 === VS.decidingSet(MATCH) ? 'capture.startDecidingSet' : 'capture.startSet', {
+          set: c.set + 1,
+        });
         nb.dataset.mode = 'next';
         nb.disabled = false;
         panel.classList.add('locked');
@@ -200,10 +194,18 @@
         render();
       }, DELETE_LOCK_MS);
     }
+    // Action codes are stored in the events; only their labels are translated (action.* keys).
+    function actionLabel(code) {
+      var key = 'action.' + code;
+      var label = i18n.t(key);
+      return label === key ? code : label;
+    }
     function historyRow(e, isLatest) {
       var tr = document.createElement('tr'),
         rk = e.result === 'error' ? 'error' : e.result === 'point' ? 'point' : 'neutral',
-        rl = rk.charAt(0).toUpperCase() + rk.slice(1);
+        rl = i18n.t(
+          rk === 'error' ? 'capture.resultError' : rk === 'point' ? 'capture.resultPoint' : 'capture.resultNeutral'
+        );
       if (isLatest) tr.className = 'history-latest';
       tr.innerHTML =
         '<td>' +
@@ -211,20 +213,26 @@
         '</td><td>' +
         esc(e.player) +
         '</td><td>' +
-        esc(e.action) +
+        esc(actionLabel(e.action)) +
         '</td><td><span class="result-badge result-' +
         rk +
         '">' +
-        rl +
+        esc(rl) +
         '</span></td><td><div class="history-score-cell"><span>' +
         esc(e.scoreA) +
         ' : ' +
         esc(e.scoreB) +
         '</span>' +
         (isLatest
-          ? '<button type="button" class="history-delete" data-delete-last aria-label="Delete last action" title="Delete last action"' +
+          ? '<button type="button" class="history-delete" data-delete-last aria-label="' +
+            esc(i18n.t('capture.deleteLast')) +
+            '" title="' +
+            esc(i18n.t('capture.deleteLast')) +
+            '"' +
             (isDeleteLocked() ? ' disabled' : '') +
-            '>Delete</button>'
+            '>' +
+            esc(i18n.t('capture.delete')) +
+            '</button>'
           : '') +
         '</div></td>';
       return tr;
@@ -235,20 +243,20 @@
       score.classList.remove('lead', 'trail', 'tie');
       score.classList.add(sc.a > sc.b ? 'lead' : sc.a < sc.b ? 'trail' : 'tie');
       score.innerHTML =
-        '<span class="set-badge set-badge-a" aria-label="Sets won by ' +
-        esc(tn('team1')) +
+        '<span class="set-badge set-badge-a" aria-label="' +
+        esc(i18n.t('capture.setsWonBy', { team: tn('team1') })) +
         '">' +
         esc(suHead.wonA) +
         '</span><span class="score-side side-a"><span class="digit-box" aria-label="' +
-        esc(tn('team1')) +
-        ' score">' +
+        esc(i18n.t('capture.teamScore', { team: tn('team1') })) +
+        '">' +
         esc(sc.a) +
         '</span><span class="service-line" aria-hidden="true"></span></span><span class="sep">:</span><span class="score-side side-b"><span class="digit-box" aria-label="' +
-        esc(tn('team2')) +
-        ' score">' +
+        esc(i18n.t('capture.teamScore', { team: tn('team2') })) +
+        '">' +
         esc(sc.b) +
-        '</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="Sets won by ' +
-        esc(tn('team2')) +
+        '</span><span class="service-line" aria-hidden="true"></span></span><span class="set-badge set-badge-b" aria-label="' +
+        esc(i18n.t('capture.setsWonBy', { team: tn('team2') })) +
         '">' +
         esc(suHead.wonB) +
         '</span>';
@@ -260,7 +268,7 @@
       if (!EVENTS.length) {
         var empty = document.createElement('tr');
         empty.className = 'history-empty';
-        empty.innerHTML = '<td colspan="5">No action recorded.</td>';
+        empty.innerHTML = '<td colspan="5">' + esc(i18n.t('capture.noAction')) + '</td>';
         hist.appendChild(empty);
       } else
         EVENTS.slice()
@@ -269,13 +277,15 @@
             hist.appendChild(historyRow(e, index === 0));
           });
       status.innerHTML = EVENTS.length
-        ? '<span class="last-event">Last:</span> #' +
+        ? '<span class="last-event">' +
+          esc(i18n.t('capture.last')) +
+          '</span> #' +
           esc(EVENTS[EVENTS.length - 1].player) +
           ' ' +
-          esc(EVENTS[EVENTS.length - 1].action) +
+          esc(actionLabel(EVENTS[EVENTS.length - 1].action)) +
           ' / ' +
           esc(EVENTS[EVENTS.length - 1].result)
-        : 'Ready for a new action.';
+        : esc(i18n.t('capture.ready'));
       updateOriginPies(EVENTS);
       renderErrorCharts(EVENTS);
       if (VC.refreshCourt) VC.refreshCourt(EVENTS);
@@ -382,7 +392,7 @@
           return existing.eventId && existing.eventId === ev.eventId;
         })
       ) {
-        status.textContent = 'Événement déjà enregistré.';
+        status.textContent = i18n.t('capture.duplicate');
         return;
       }
       EVENTS.push(ev);
@@ -425,7 +435,7 @@
         return false;
       }
       if (!EVENTS.length) {
-        status.textContent = 'No action to delete.';
+        status.textContent = i18n.t('capture.nothingToDelete');
         render();
         return false;
       }

@@ -5,22 +5,23 @@
     M = VC && VC.match,
     panel = document.getElementById('capturePanel');
   if (!M || !VC.commit || !panel) return;
+  var t = window.VolleyI18n.t;
   var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
     EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
   var MODES = ['FOCUS', 'SPEED', 'FLOW'];
   var ACTIONS = [
-    { id: 'service', code: 'SERVE', label: 'SERVICE', family: 'serve' },
-    { id: 'reception', code: 'RECEPTION', label: 'RÉCEPTION', family: 'build' },
-    { id: 'set', code: 'SET', label: 'PASSE', family: 'build' },
-    { id: 'attack', code: 'ATTACK', label: 'ATTAQUE', family: 'offence' },
-    { id: 'block', code: 'BLOCK', label: 'BLOCK', family: 'offence' },
-    { id: 'defense', code: 'DEFENCE', label: 'DÉFENSE', family: 'defence' },
-    { id: 'freeball', code: 'RELANCE', label: 'RELANCE', family: 'defence', full: true },
+    { id: 'service', code: 'SERVE', label: t('action.service'), family: 'serve' },
+    { id: 'reception', code: 'RECEPTION', label: t('action.reception'), family: 'build' },
+    { id: 'set', code: 'SET', label: t('action.set'), family: 'build' },
+    { id: 'attack', code: 'ATTACK', label: t('action.attack'), family: 'offence' },
+    { id: 'block', code: 'BLOCK', label: t('action.block'), family: 'offence' },
+    { id: 'defense', code: 'DEFENCE', label: t('action.defense'), family: 'defence' },
+    { id: 'freeball', code: 'RELANCE', label: t('action.freeball'), family: 'defence', full: true },
   ];
   var RESULTS = [
-    { id: 'point', code: 'POSITIVE', label: '✓  POSITIF', css: 'positive', symbol: '+' },
-    { id: 'neutral', code: 'NEUTRAL', label: '○  NEUTRE', css: 'neutral', symbol: '−' },
-    { id: 'error', code: 'ERROR', label: '×  ERREUR', css: 'error', symbol: '×' },
+    { id: 'point', code: 'POSITIVE', label: t('result.point'), css: 'positive', symbol: '+' },
+    { id: 'neutral', code: 'NEUTRAL', label: t('result.neutral'), css: 'neutral', symbol: '−' },
+    { id: 'error', code: 'ERROR', label: t('result.error'), css: 'error', symbol: '×' },
   ];
   var PREFERRED = {
     opp: ['service', 'attack', 'block'],
@@ -143,7 +144,7 @@
     return null;
   }
   function authorText() {
-    if (state.author === 'A') return 'A · ADVERSAIRE';
+    if (state.author === 'A') return t('runtime.opponentAuthor');
     var p = player(state.author);
     return p
       ? '#' + p.number + ' · ' + (ROLE_LABEL[role(p)] || String(role(p) || '').toUpperCase())
@@ -188,7 +189,9 @@
       esc(number) +
       '" aria-pressed="' +
       (selected ? 'true' : 'false') +
-      '" aria-label="Joueur ' +
+      '" aria-label="' +
+      esc(t('runtime.playerLabel')) +
+      ' ' +
       esc(number) +
       ' ' +
       esc(ROLE_LABEL[r] || r) +
@@ -208,7 +211,11 @@
       (selected ? ' selected' : '') +
       '" data-runtime-author="A" aria-pressed="' +
       (selected ? 'true' : 'false') +
-      '" aria-label="Adversaire">A</button><span class="runtime-opponent-label">Adversaire</span></div>'
+      '" aria-label="' +
+      esc(t('runtime.opponent')) +
+      '">A</button><span class="runtime-opponent-label">' +
+      esc(t('runtime.opponent')) +
+      '</span></div>'
     );
   }
   function plainPlayers() {
@@ -226,7 +233,9 @@
   }
   function courtSelector() {
     return (
-      '<div><div class="runtime-court" aria-label="Joueurs sur le terrain, sans filet"><div class="runtime-court-grid">' +
+      '<div><div class="runtime-court" aria-label="' +
+      esc(t('runtime.courtLabel')) +
+      '"><div class="runtime-court-grid">' +
       courtPlayers()
         .map(function (n) {
           return playerButton(n, true);
@@ -238,7 +247,7 @@
     );
   }
   function authorChip(withAction) {
-    var text = state.author ? authorText() : 'Aucun auteur';
+    var text = state.author ? authorText() : t('runtime.noAuthor');
     if (withAction && state.action) {
       var a = actionMeta(state.action);
       text += ' · ' + (a ? a.label : state.action);
@@ -248,8 +257,10 @@
   function inlineTools(canBack) {
     return (
       '<div class="runtime-inline-tools">' +
-      (canBack ? '<button type="button" data-runtime-back>← Retour</button>' : '') +
-      '<button type="button" data-runtime-change>Changer de joueur</button></div>'
+      (canBack ? '<button type="button" data-runtime-back>' + esc(t('runtime.back')) + '</button>' : '') +
+      '<button type="button" data-runtime-change>' +
+      esc(t('runtime.changeAuthor')) +
+      '</button></div>'
     );
   }
   function actionGrid(flow) {
@@ -274,7 +285,7 @@
           ' aria-pressed="' +
           (selected ? 'true' : 'false') +
           '">' +
-          a.label +
+          esc(a.label) +
           '</button>'
         );
       }).join('') +
@@ -294,17 +305,23 @@
           '"' +
           (enabled ? '' : ' disabled') +
           '>' +
-          r.label +
+          esc(r.label) +
           '</button>'
         );
       }).join('') +
-      '</div><p class="runtime-immediate">Enregistrement immédiat</p>'
+      '</div><p class="runtime-immediate">' +
+      esc(t('runtime.immediate')) +
+      '</p>'
     );
   }
   function focusLayout() {
     if (state.stage === 'player')
       return (
-        '<section class="runtime-stage"><h2 class="runtime-question"><span class="runtime-kicker">1 · JOUEUR</span>Qui joue ?</h2>' +
+        '<section class="runtime-stage"><h2 class="runtime-question"><span class="runtime-kicker">' +
+        esc(t('runtime.step1')) +
+        '</span>' +
+        esc(t('runtime.whoPlays')) +
+        '</h2>' +
         plainPlayers() +
         '</section>'
       );
@@ -313,7 +330,11 @@
         '<section class="runtime-stage">' +
         authorChip(false) +
         inlineTools(false) +
-        '<h2 class="runtime-question"><span class="runtime-kicker">2 · ACTION</span>Quelle action ?</h2><div class="runtime-panel">' +
+        '<h2 class="runtime-question"><span class="runtime-kicker">' +
+        esc(t('runtime.step2')) +
+        '</span>' +
+        esc(t('runtime.whichAction')) +
+        '</h2><div class="runtime-panel">' +
         actionGrid(false) +
         '</div></section>'
       );
@@ -321,20 +342,26 @@
       '<section class="runtime-stage">' +
       authorChip(true) +
       inlineTools(true) +
-      '<h2 class="runtime-question"><span class="runtime-kicker">3 · RÉSULTAT</span>Quel résultat ?</h2><div class="runtime-panel">' +
+      '<h2 class="runtime-question"><span class="runtime-kicker">' +
+      esc(t('runtime.step3')) +
+      '</span>' +
+      esc(t('runtime.whichResult')) +
+      '</h2><div class="runtime-panel">' +
       resultGrid(false) +
       '</div></section>'
     );
   }
   function speedCommands() {
     if (!state.author)
-      return '<div class="runtime-panel runtime-speed-prompt">Touchez un joueur ou A pour saisir une action</div>';
+      return '<div class="runtime-panel runtime-speed-prompt">' + esc(t('runtime.speedPrompt')) + '</div>';
     if (!state.action)
       return (
         '<div class="runtime-panel">' +
         authorChip(false) +
         inlineTools(false) +
-        '<h2 class="runtime-question">Quelle action ?</h2>' +
+        '<h2 class="runtime-question">' +
+        esc(t('runtime.whichAction')) +
+        '</h2>' +
         actionGrid(false) +
         '</div>'
       );
@@ -342,7 +369,9 @@
       '<div class="runtime-panel">' +
       authorChip(true) +
       inlineTools(true) +
-      '<h2 class="runtime-question">Quel résultat ?</h2>' +
+      '<h2 class="runtime-question">' +
+      esc(t('runtime.whichResult')) +
+      '</h2>' +
       resultGrid(false) +
       '</div>'
     );
@@ -358,11 +387,17 @@
   }
   function flowLayout() {
     return (
-      '<section class="runtime-stage runtime-flow"><div class="runtime-flow-block"><h3>1 · JOUEUR</h3><div class="runtime-panel">' +
+      '<section class="runtime-stage runtime-flow"><div class="runtime-flow-block"><h3>' +
+      esc(t('runtime.step1')) +
+      '</h3><div class="runtime-panel">' +
       courtSelector() +
-      '</div></div><div class="runtime-flow-block"><h3>2 · ACTION</h3><div class="runtime-panel">' +
+      '</div></div><div class="runtime-flow-block"><h3>' +
+      esc(t('runtime.step2')) +
+      '</h3><div class="runtime-panel">' +
       actionGrid(true) +
-      '</div></div><div class="runtime-flow-block"><h3>3 · RÉSULTAT</h3><div class="runtime-panel">' +
+      '</div></div><div class="runtime-flow-block"><h3>' +
+      esc(t('runtime.step3')) +
+      '</h3><div class="runtime-panel">' +
       resultGrid(true) +
       '</div></div></section>'
     );
@@ -370,22 +405,24 @@
   function lastEvent() {
     var list = events(),
       e = list[list.length - 1];
-    if (!e) return 'Aucun événement enregistré.';
-    if (e.type === 'SUBSTITUTION') return 'Dernière : remplacement #' + e.playerIn + ' / #' + e.playerOut;
+    if (!e) return t('runtime.noEvent');
+    if (e.type === 'SUBSTITUTION') return t('runtime.lastSubstitution', { in: e.playerIn, out: e.playerOut });
     var who =
         e.authorSide === 'AWAY' || e.player === 'A' ? 'A' : '#' + (e.playerNumber != null ? e.playerNumber : e.player),
-      a = e.actionCode || (actionMeta(e.action) || {}).code || String(e.action || '').toUpperCase(),
+      a = (actionMeta(e.action) || {}).label || e.actionCode || String(e.action || '').toUpperCase(),
       s =
         e.status === 'POSITIVE' || e.result === 'point'
           ? '+'
           : e.status === 'ERROR' || e.result === 'error'
             ? '×'
             : '−';
-    return 'Dernière : ' + who + ' · ' + a + ' ' + s;
+    return t('runtime.lastEvent', { who: who, action: a, result: s });
   }
   function modes() {
     return (
-      '<nav class="runtime-mode-tabs" aria-label="Mode de saisie">' +
+      '<nav class="runtime-mode-tabs" aria-label="' +
+      esc(t('runtime.modeLabel')) +
+      '">' +
       MODES.map(function (m) {
         return (
           '<button type="button" data-runtime-mode="' +
@@ -416,18 +453,26 @@
       esc(lastEvent()) +
       '</b></div>' +
       (Subs
-        ? '<button type="button" class="runtime-sub-open" data-runtime-sub-open aria-haspopup="dialog">⇄ Remplacement</button>'
+        ? '<button type="button" class="runtime-sub-open" data-runtime-sub-open aria-haspopup="dialog">⇄ ' +
+          esc(t('subs.title')) +
+          '</button>'
         : '') +
       '<button type="button" class="runtime-undo" data-runtime-undo' +
       (events().length ? '' : ' disabled') +
-      '>↶ Annuler</button></div><div class="runtime-feedback" id="runtimeFeedback" role="status" aria-live="polite">' +
+      '>↶ ' +
+      esc(t('runtime.undo')) +
+      '</button></div><div class="runtime-feedback" id="runtimeFeedback" role="status" aria-live="polite">' +
       esc(state.feedback) +
       '</div></div>'
     );
   }
   function prefsHtml() {
     return (
-      '<div class="runtime-prefs-card"><h2>Options de saisie runtime</h2><p>Le mode modifie uniquement l’interface. Les événements métier restent identiques.</p><div class="runtime-pref-modes">' +
+      '<div class="runtime-prefs-card"><h2>' +
+      esc(t('runtime.optionsTitle')) +
+      '</h2><p>' +
+      esc(t('runtime.optionsHint')) +
+      '</p><div class="runtime-pref-modes">' +
       MODES.map(function (m) {
         return (
           '<button type="button" data-runtime-pref-mode="' +
@@ -439,11 +484,17 @@
           '</button>'
         );
       }).join('') +
-      '</div><label class="runtime-switch"><span>Mettre en avant les actions par poste</span><input type="checkbox" data-runtime-highlight' +
+      '</div><label class="runtime-switch"><span>' +
+      esc(t('runtime.highlight')) +
+      '</span><input type="checkbox" data-runtime-highlight' +
       (prefs.runtimeHighlights ? ' checked' : '') +
-      '></label><label class="runtime-switch"><span>Feedback haptique</span><input type="checkbox" data-runtime-haptic' +
+      '></label><label class="runtime-switch"><span>' +
+      esc(t('runtime.haptics')) +
+      '</span><input type="checkbox" data-runtime-haptic' +
       (prefs.runtimeHaptics ? ' checked' : '') +
-      '></label><button type="button" class="runtime-prefs-close" data-runtime-close-options>TERMINÉ</button></div>'
+      '></label><button type="button" class="runtime-prefs-close" data-runtime-close-options>' +
+      esc(t('runtime.done')) +
+      '</button></div>'
     );
   }
   function ensureStructure() {
@@ -460,7 +511,9 @@
         'beforeend',
         '<div class="runtime-head-meta"><span class="runtime-set">S' +
           esc(M.currentSet || 1) +
-          '</span><button type="button" class="runtime-options-button" data-runtime-options aria-label="Options de saisie">☰</button></div>'
+          '</span><button type="button" class="runtime-options-button" data-runtime-options aria-label="' +
+          esc(t('runtime.optionsLabel')) +
+          '">☰</button></div>'
       );
     var overlay = document.createElement('div');
     overlay.className = 'runtime-prefs';
@@ -518,7 +571,7 @@
   }
   function chooseAction(value) {
     if (!state.author) {
-      state.error = 'Sélectionnez d’abord un joueur ou A.';
+      state.error = t('runtime.errorNoAuthorFirst');
       render();
       return;
     }
@@ -576,17 +629,17 @@
   function commit(result) {
     if (state.pending || Date.now() < state.lockedUntil) return;
     if (!state.author) {
-      state.error = 'Auteur manquant.';
+      state.error = t('runtime.errorNoAuthor');
       render();
       return;
     }
     if (!state.action) {
-      state.error = 'Action manquante.';
+      state.error = t('runtime.errorNoAction');
       render();
       return;
     }
     if (!resultMeta(result)) {
-      state.error = 'Résultat invalide.';
+      state.error = t('runtime.errorBadResult');
       render();
       return;
     }
@@ -600,7 +653,7 @@
       VC.commit(state.author, state.action, result);
     } catch (error) {
       state.pending = false;
-      state.error = 'Enregistrement impossible : ' + ((error && error.message) || 'erreur inconnue');
+      state.error = t('runtime.errorSave', { reason: (error && error.message) || t('runtime.unknownError') });
       render();
       return;
     } finally {
@@ -608,7 +661,7 @@
     }
     if (events().length !== beforeCount + 1) {
       state.pending = false;
-      state.error = 'L’événement n’a pas été enregistré. La sélection est conservée.';
+      state.error = t('runtime.errorNotRecorded');
       render();
       return;
     }
@@ -627,19 +680,19 @@
   function undo() {
     if (state.pending || Date.now() < state.lockedUntil) return;
     if (typeof VC.deleteLastAction !== 'function') {
-      state.error = 'Annulation indisponible.';
+      state.error = t('runtime.errorUndoUnavailable');
       render();
       return;
     }
     var ok = VC.deleteLastAction();
     if (ok) {
       clear(true);
-      state.feedback = 'Dernier événement annulé';
+      state.feedback = t('runtime.undone');
       state.lockedUntil = Date.now() + 460;
       render();
       setTimeout(render, 480);
     } else {
-      state.error = 'Aucun événement à annuler.';
+      state.error = t('runtime.errorNothingToUndo');
       render();
     }
   }
@@ -681,16 +734,16 @@
   }
   function subsBlocked() {
     var su = window.VolleySets ? window.VolleySets.summary(M, events()) : null;
-    if (su && (su.matchWinner || (su.current && su.current.winner)))
-      return 'Set terminé : passez au set suivant pour effectuer un remplacement.';
-    if (Subs.rallyInProgress(currentSetEvents()))
-      return 'Remplacement impossible pendant un échange (règle 15.11.1.1). Terminez l’échange d’abord.';
+    if (su && (su.matchWinner || (su.current && su.current.winner))) return t('subs.blockedSetOver');
+    if (Subs.rallyInProgress(currentSetEvents())) return t('subs.blockedRally');
     return '';
   }
   function subsOutStep(st, setNo) {
     var zones = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'];
     return (
-      '<p class="runtime-subs-step">Joueur qui sort</p><div class="runtime-sub-grid">' +
+      '<p class="runtime-subs-step">' +
+      esc(t('subs.playerOut')) +
+      '</p><div class="runtime-sub-grid">' +
       zones
         .map(function (z) {
           var n = st.rot[z];
@@ -707,8 +760,8 @@
             playerLabel(n) +
             '<small>' +
             esc(z.toUpperCase()) +
-            (withLibero ? ' · remplacé par le libéro' : '') +
-            (possible ? '' : ' · aucun remplaçant autorisé') +
+            (withLibero ? ' · ' + esc(t('subs.replacedByLibero')) : '') +
+            (possible ? '' : ' · ' + esc(t('subs.noAllowedSubstitute'))) +
             '</small></button>'
           );
         })
@@ -722,13 +775,11 @@
       exceptional = !o.regular.length && o.exceptional.length > 0,
       list = exceptional ? o.exceptional : o.regular;
     return (
-      '<p class="runtime-subs-step">Sort : #' +
-      esc(out) +
-      ' — joueur qui entre</p>' +
+      '<p class="runtime-subs-step">' +
+      esc(t('subs.playerIn', { out: out })) +
+      '</p>' +
       (exceptional
-        ? '<p class="runtime-subs-warning">Aucun remplacement régulier possible. Remplacement exceptionnel (blessure ou maladie, règle 15.7) : le joueur #' +
-          esc(out) +
-          ' ne pourra plus revenir dans le match.</p>'
+        ? '<p class="runtime-subs-warning">' + esc(t('subs.exceptionalWarning', { out: out })) + '</p>'
         : '') +
       (list.length
         ? '<div class="runtime-sub-grid">' +
@@ -746,19 +797,21 @@
             })
             .join('') +
           '</div>'
-        : '<p class="runtime-subs-warning">Aucun joueur ne peut entrer à la place du #' + esc(out) + '.</p>') +
+        : '<p class="runtime-subs-warning">' + esc(t('subs.noneAllowed', { out: out })) + '</p>') +
       (o.refused.length
-        ? '<details class="runtime-subs-refused"><summary>Joueurs non autorisés (' +
-          o.refused.length +
-          ')</summary><ul>' +
+        ? '<details class="runtime-subs-refused"><summary>' +
+          esc(t('subs.refusedTitle', { count: o.refused.length })) +
+          '</summary><ul>' +
           o.refused
             .map(function (r) {
-              return '<li><b>#' + esc(r.number) + '</b> ' + esc(r.reason) + '</li>';
+              return '<li><b>#' + esc(r.number) + '</b> ' + esc(t(r.reason)) + '</li>';
             })
             .join('') +
           '</ul></details>'
         : '') +
-      '<button type="button" class="runtime-subs-back" data-sub-back>← Changer le joueur qui sort</button>'
+      '<button type="button" class="runtime-subs-back" data-sub-back>' +
+      esc(t('subs.changeOut')) +
+      '</button>'
     );
   }
   function subsHtml() {
@@ -772,18 +825,21 @@
           ? subsOutStep(st, setNo)
           : subsInStep(st, setNo);
     return (
-      '<div class="runtime-prefs-card runtime-subs-card" role="dialog" aria-modal="true" aria-labelledby="runtimeSubsTitle"><h2 id="runtimeSubsTitle">Remplacement</h2><p>Set ' +
-      setNo +
+      '<div class="runtime-prefs-card runtime-subs-card" role="dialog" aria-modal="true" aria-labelledby="runtimeSubsTitle"><h2 id="runtimeSubsTitle">' +
+      esc(t('subs.title')) +
+      '</h2><p>' +
+      esc(t('subs.counter', { set: setNo, count: h.regular, limit: Subs.REGULAR_LIMIT })) +
+      (h.exceptional
+        ? ' · ' + esc(t(h.exceptional > 1 ? 'subs.exceptionalMany' : 'subs.exceptionalOne', { count: h.exceptional }))
+        : '') +
       ' · ' +
-      h.regular +
-      '/' +
-      Subs.REGULAR_LIMIT +
-      ' remplacements' +
-      (h.exceptional ? ' · ' + h.exceptional + ' exceptionnel' + (h.exceptional > 1 ? 's' : '') : '') +
-      ' · règle 15 FIVB</p>' +
+      esc(t('subs.rule')) +
+      '</p>' +
       (subState.error ? '<p class="runtime-subs-error" role="alert">' + esc(subState.error) + '</p>' : '') +
       body +
-      '<button type="button" class="runtime-prefs-close" data-sub-close>FERMER</button></div>'
+      '<button type="button" class="runtime-prefs-close" data-sub-close>' +
+      esc(t('subs.close')) +
+      '</button></div>'
     );
   }
   function renderSubs() {
@@ -821,8 +877,7 @@
           return String(n) === String(incoming);
         })
           ? ''
-          : (exceptional ? '' : Subs.regularRefusal(M, setNo, st.rot, out, incoming)) ||
-            'Remplacement non autorisé par la règle 15.');
+          : t((exceptional ? '' : Subs.regularRefusal(M, setNo, st.rot, out, incoming)) || 'subs.notAllowed'));
     if (reason) {
       subState.error = reason;
       renderSubs();
@@ -841,7 +896,7 @@
       list.push(built.event);
       writeObject(EVENTS_KEY, list);
     }
-    state.feedback = '⇄ #' + incoming + ' remplace #' + out + (exceptional ? ' (exceptionnel)' : '');
+    state.feedback = t(exceptional ? 'subs.doneExceptional' : 'subs.done', { in: incoming, out: out });
     closeSubs();
     clear(true);
     render();

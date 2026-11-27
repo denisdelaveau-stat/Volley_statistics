@@ -8,7 +8,7 @@ const { loadBrowserScriptsWith, ROOT } = require('./load-browser-scripts');
 
 const DICTIONARIES = ['js/i18n/fr.js', 'js/i18n/en.js'];
 // Keys built at run time from a prefix (t('language.' + code)): every key with these prefixes counts as used.
-const DYNAMIC_PREFIXES = ['language.'];
+const DYNAMIC_PREFIXES = ['language.', 'action.'];
 
 function memoryStorage(values) {
   const data = { ...values };

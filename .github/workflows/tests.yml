@@ -44,5 +44,12 @@ jobs:
           pip install pytest playwright numpy pillow python-docx jsonschema
           python -m playwright install --with-deps chromium
 
+      # Each failing test is also published as an annotation, readable on the run page and through the public
+      # check-runs API (job logs need authentication).
       - name: Approved test gate
-        run: bash tests/run_v1_28_approved.sh
+        run: |
+          set +e
+          bash tests/run_v1_28_approved.sh -rfE 2>&1 | tee pytest.log
+          status=${PIPESTATUS[0]}
+          grep -E "^(FAILED|ERROR) " pytest.log | cut -c1-400 | sed 's/^/::error title=pytest::/'
+          exit $status
