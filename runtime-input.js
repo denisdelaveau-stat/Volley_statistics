@@ -1,4 +1,5 @@
-/* VolleyLive capture input: court, FOCUS / SPEED+ / FLOW modes, undo and substitutions. Architecture: docs/specs/SYS-ARCH.md. */
+/* VolleyLive capture input: court, FOCUS / SPEED+ / FLOW modes, undo and substitutions.
+   Spec: docs/specs/UI-CAPTURE.md, docs/specs/UI-SUBS.md. */
 (function () {
   'use strict';
   var VC = window.VolleyCapture,
