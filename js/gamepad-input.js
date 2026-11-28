@@ -13,6 +13,7 @@
     { id: 'defense', code: 'DEFENCE', label: 'DEFENCE', color: '#3a93db' },
     { id: 'freeball', code: 'RELANCE', label: 'FREE BALL', color: '#5f8eb4' },
   ];
+  var INLINE_ACTIONS = ['reception', 'set', 'attack', 'block', 'defense', 'service'];
   var statusLabels = [
     { id: 'positive', code: 'POSITIVE', label: 'POSITIVE', symbol: '✓', color: '#20c766' },
     { id: 'neutral', code: 'NEUTRAL', label: 'NEUTRAL', symbol: 'O', color: '#f2b84b' },
@@ -118,6 +119,34 @@
     if (role === 'middle' || role === 'mb') return '#20c766';
     return '#ed4949';
   }
+  function escapeMarkup(value) {
+    return String(value).replace(/[&<>"]/g, function (character) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[character];
+    });
+  }
+  function polarPoint(radius, angle) {
+    var radians = angle * Math.PI / 180;
+    return { x: 180 + Math.cos(radians) * radius, y: 180 + Math.sin(radians) * radius };
+  }
+  function sectorPath(index, count) {
+    if (count === 1) {
+      return 'M180 0 A180 180 0 1 1 180 360 A180 180 0 1 1 180 0 Z' +
+        ' M180 125 A55 55 0 1 0 180 235 A55 55 0 1 0 180 125 Z';
+    }
+    var width = 360 / count;
+    var center = -90 + index * width;
+    var start = polarPoint(180, center - width / 2);
+    var end = polarPoint(180, center + width / 2);
+    var innerEnd = polarPoint(55, center + width / 2);
+    var innerStart = polarPoint(55, center - width / 2);
+    return 'M' + start.x.toFixed(2) + ' ' + start.y.toFixed(2) +
+      ' A180 180 0 0 1 ' + end.x.toFixed(2) + ' ' + end.y.toFixed(2) +
+      ' L' + innerEnd.x.toFixed(2) + ' ' + innerEnd.y.toFixed(2) +
+      ' A55 55 0 0 0 ' + innerStart.x.toFixed(2) + ' ' + innerStart.y.toFixed(2) + ' Z';
+  }
+  function sectorLabelPoint(index, count) {
+    return polarPoint(119, -90 + index * (360 / count));
+  }
 
   function binding(group, target) {
     for (var i = 0; i < config.bindings.length; i++) {
@@ -219,6 +248,50 @@
       }).join('') +
       '</div><div class="gamepad-needle" style="' + needleStyle(ACTIONS.length, actionIndex) + '"></div><div class="gamepad-center"><b>' + selected.label + '</b></div></div>';
   }
+  function renderInlinePlayerWheel() {
+    var players = courtPlayers();
+    if (!players.length) players = ['#0'];
+    playerIndex = ((playerIndex % players.length) + players.length) % players.length;
+    var state = window.VLRuntimeInput ? window.VLRuntimeInput.getState() : {};
+    var opponentSelected = state.author === 'A';
+    return '<div class="gamepad-touch-wheel gamepad-player-circle"><svg viewBox="0 0 360 360" role="group" aria-label="Sélection du joueur">' +
+      '<circle class="gamepad-wheel-disc" cx="180" cy="180" r="178"></circle>' +
+      players.map(function (number, index) {
+        var point = sectorLabelPoint(index, players.length);
+        var selected = !opponentSelected && index === playerIndex;
+        var color = roleColor(playerMeta(number).position);
+        var labelColor = color === '#ed4949' || color === '#4c9aff' ? '#fff' : '#061a33';
+        return '<g class="gamepad-touch-sector' + (selected ? ' selected' : '') + '" data-gamepad-player="' + index +
+          '" role="button" tabindex="0" aria-label="Joueur numéro ' + escapeMarkup(number) + '" aria-pressed="' + selected + '">' +
+          '<path d="' + sectorPath(index, players.length) + '" fill="' + color + '"></path>' +
+          '<text x="' + point.x.toFixed(2) + '" y="' + point.y.toFixed(2) + '" fill="' + labelColor + '">' +
+          escapeMarkup(number) + '</text></g>';
+      }).join('') +
+      '<g class="gamepad-touch-center gamepad-player-center' + (opponentSelected ? ' selected' : '') +
+      '" data-gamepad-player="A" role="button" tabindex="0" aria-label="Adversaire" aria-pressed="' + opponentSelected + '">' +
+      '<circle cx="180" cy="180" r="52"></circle><text x="180" y="180">A</text></g></svg></div>';
+  }
+  function renderInlineActionWheel() {
+    var state = window.VLRuntimeInput ? window.VLRuntimeInput.getState() : {};
+    var selectedId = state.action || 'attack';
+    var freeballSelected = selectedId === 'freeball';
+    return '<div class="gamepad-touch-wheel gamepad-action-circle"><svg viewBox="0 0 360 360" role="group" aria-label="Sélection de l action">' +
+      '<circle class="gamepad-wheel-disc" cx="180" cy="180" r="178"></circle>' +
+      INLINE_ACTIONS.map(function (actionId, index) {
+        var action = ACTIONS.filter(function (item) { return item.id === actionId; })[0];
+        var point = sectorLabelPoint(index, INLINE_ACTIONS.length);
+        var selected = selectedId === actionId;
+        var labelColor = actionId === 'set' || actionId === 'attack' ? '#fff' : '#061a33';
+        return '<g class="gamepad-touch-sector' + (selected ? ' selected' : '') + '" data-gamepad-action="' + action.id +
+          '" role="button" tabindex="0" aria-label="' + escapeMarkup(action.label) + '" aria-pressed="' + selected + '">' +
+          '<path d="' + sectorPath(index, INLINE_ACTIONS.length) + '" fill="' + action.color + '"></path>' +
+          '<text x="' + point.x.toFixed(2) + '" y="' + point.y.toFixed(2) + '" fill="' + labelColor + '">' +
+          escapeMarkup(action.label) + '</text></g>';
+      }).join('') +
+      '<g class="gamepad-touch-center gamepad-action-center' + (freeballSelected ? ' selected' : '') +
+      '" data-gamepad-action="freeball" role="button" tabindex="0" aria-label="Relance" aria-pressed="' + freeballSelected + '">' +
+      '<circle cx="180" cy="180" r="52"></circle><text x="180" y="180">R</text></g></svg></div>';
+  }
   function renderStatus() {
     statusIndex = ((statusIndex % statusLabels.length) + statusLabels.length) % statusLabels.length;
     var author = window.VLRuntimeInput ? window.VLRuntimeInput.getState().author : null;
@@ -257,13 +330,13 @@
     }
     host.innerHTML =
       '<div class="gamepad-inline-layout">' +
-      renderPlayerCircle() +
+      renderInlinePlayerWheel() +
       '<div class="gamepad-inline-status" aria-label="Statut de l action">' +
       '<button type="button" class="gamepad-inline-status positive" data-gamepad-status="positive" aria-label="Positif">✓</button>' +
       '<button type="button" class="gamepad-inline-status neutral" data-gamepad-status="neutral" aria-label="Neutre">O</button>' +
-      '<button type="button" class="gamepad-inline-status negative" data-gamepad-status="error" aria-label="Négatif">X</button>' +
+      '<button type="button" class="gamepad-inline-status negative" data-gamepad-status="error" aria-label="Négatif">✕</button>' +
       '</div>' +
-      renderActionCircle() +
+      renderInlineActionWheel() +
       '</div>';
   }
   function showResult() {
@@ -280,7 +353,7 @@
     step = 'playerAction';
     renderDualPads();
   }
-  function selectStatus(statusId) {
+  function selectStatus(statusId, inputSource) {
     var runtime = window.VLRuntimeInput;
     if (!runtime) return;
     var state = runtime.getState();
@@ -288,9 +361,10 @@
     var status = statusLabels.filter(function (item) { return item.id === statusId; })[0];
     if (!status) return;
     var resultId = statusId === 'positive' ? 'point' : statusId === 'neutral' ? 'neutral' : 'error';
+    runtime.commit(resultId, inputSource === 'touch' ? 'touch' : 'gamepad');
+    if (inputSource === 'touch') return;
     var action = runtime.actions.filter(function (item) { return item.id === state.action; })[0];
     resultData = { player: state.author, actionLabel: action ? action.label : state.action, status: statusId };
-    runtime.commit(resultId, 'gamepad');
     haptic(statusId === 'error' ? 'negative' : 'record');
     showResult();
     resultTimer = setTimeout(closeResult, config.resultDurationMs);
@@ -301,9 +375,18 @@
     playerIndex = ((index % players.length) + players.length) % players.length;
     if (window.VLRuntimeInput) window.VLRuntimeInput.selectPlayer(players[playerIndex]);
   }
+  function selectPlayer(player) {
+    if (window.VLRuntimeInput) window.VLRuntimeInput.selectPlayer(player);
+  }
+  function selectActionById(actionId) {
+    var index = ACTIONS.map(function (item) { return item.id; }).indexOf(actionId);
+    if (index < 0) return;
+    actionIndex = index;
+    if (window.VLRuntimeInput) window.VLRuntimeInput.selectAction(actionId);
+  }
   function selectActionFromIndex(index) {
     actionIndex = ((index % ACTIONS.length) + ACTIONS.length) % ACTIONS.length;
-    if (window.VLRuntimeInput) window.VLRuntimeInput.selectAction(ACTIONS[actionIndex].id);
+    selectActionById(ACTIONS[actionIndex].id);
   }
   function validate() {
     if (step === 'status') {
@@ -595,9 +678,24 @@
   if (panel) {
     panel.addEventListener('click', function (event) {
       var status = event.target.closest('[data-gamepad-status]');
-      if (status) selectStatus(status.dataset.gamepadStatus);
+      var player = event.target.closest('[data-gamepad-player]');
+      var action = event.target.closest('[data-gamepad-action]');
+      if (status) selectStatus(status.dataset.gamepadStatus, status.closest('.gamepad-inline-status') ? 'touch' : 'gamepad');
+      if (player) {
+        if (player.dataset.gamepadPlayer === 'A') selectPlayer('A');
+        else selectPlayerFromIndex(Number(player.dataset.gamepadPlayer));
+      }
+      if (action) selectActionById(action.dataset.gamepadAction);
       if (event.target.closest('[data-gamepad-settings]')) openSetup();
       if (event.target.closest('[data-gamepad-back]')) goBack();
+    });
+    panel.addEventListener('keydown', function (event) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      var target = event.target.closest('[data-gamepad-player], [data-gamepad-action]');
+      if (!target) return;
+      event.preventDefault();
+      event.stopPropagation();
+      target.click();
     });
   }
   var settingsOverlay = ensureSettings();
@@ -640,6 +738,7 @@
     getStep: function () { return step; },
   };
   window.VLGamepad = window.VolleyGamepad;
+  if (window.VLRuntimeInput && window.VLRuntimeInput.getState().mode === 'GAMEPAD') renderInlineCapture();
 
   var initial = navigator.getGamepads ? navigator.getGamepads() : [];
   for (var i = 0; i < initial.length; i++) {

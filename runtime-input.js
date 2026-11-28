@@ -1,4 +1,4 @@
-/* VolleyLive capture input: court, FOCUS / SPEED+ / FLOW modes, undo and substitutions.
+/* VolleyLive capture input: FOCUS / Matrix Full / FLOW modes, undo and substitutions.
    Spec: docs/specs/UI-CAPTURE.md, docs/specs/UI-SUBS.md. */
 (function () {
   'use strict';
@@ -41,6 +41,7 @@
     lockedUntil: 0,
     error: '',
     feedback: '',
+    matrixFlash: '',
   };
   // Substitution sheet (FIVB Rule 15, js/index-substitution-rules.js): out = player chosen to leave, error = refusal.
   var Subs = window.VolleySubstitutions;
@@ -78,6 +79,14 @@
     }
     if (typeof raw.runtimeHaptics !== 'boolean') {
       raw.runtimeHaptics = false;
+      changed = true;
+    }
+    if (['horizontal-right', 'horizontal-left'].indexOf(raw.runtimeMatrixHorizontalLayout) < 0) {
+      raw.runtimeMatrixHorizontalLayout = 'horizontal-right';
+      changed = true;
+    }
+    if (['vertical-down', 'vertical-up'].indexOf(raw.runtimeMatrixVerticalLayout) < 0) {
+      raw.runtimeMatrixVerticalLayout = 'vertical-down';
       changed = true;
     }
     if (changed) writeObject(SETTINGS_KEY, raw);
@@ -133,6 +142,73 @@
       (PREFERRED[authorRole()] || []).indexOf(actionId) > -1
     );
   }
+  var MATRIX_PREFERRED = {
+    oh: ['reception', 'attack'],
+    opp: ['attack', 'block'],
+    mb: ['block', 'attack'],
+    setter: ['set', 'service'],
+    libero: ['reception', 'defense'],
+  };
+  function isMatrixPreferred(actionId) {
+    return !!(
+      state.author &&
+      state.author !== 'A' &&
+      prefs.runtimeHighlights &&
+      (MATRIX_PREFERRED[authorRole()] || []).indexOf(actionId) > -1
+    );
+  }
+  function isPortraitOrientation() {
+    return !!(window.matchMedia && window.matchMedia('(orientation: portrait)').matches);
+  }
+  function matrixLayoutValue() {
+    return isPortraitOrientation()
+      ? prefs.runtimeMatrixVerticalLayout
+      : prefs.runtimeMatrixHorizontalLayout;
+  }
+  function setMatrixLayout(value) {
+    var key,
+      valid = ['horizontal-right', 'horizontal-left', 'vertical-down', 'vertical-up'];
+    if (valid.indexOf(value) < 0) return;
+    key = value.indexOf('horizontal-') === 0 ? 'runtimeMatrixHorizontalLayout' : 'runtimeMatrixVerticalLayout';
+    savePrefs((function () {
+      var update = {};
+      update[key] = value;
+      return update;
+    })());
+    render();
+    refreshPrefs();
+  }
+  function matrixLayoutOptions() {
+    var portrait = isPortraitOrientation(),
+      options = portrait
+        ? [
+            { value: 'vertical-down', label: t('runtime.matrixVerticalDown') },
+            { value: 'vertical-up', label: t('runtime.matrixVerticalUp') },
+          ]
+        : [
+            { value: 'horizontal-right', label: t('runtime.matrixHorizontalRight') },
+            { value: 'horizontal-left', label: t('runtime.matrixHorizontalLeft') },
+          ];
+    return (
+      '<fieldset class="runtime-matrix-layout-options"><legend>' +
+      esc(t('runtime.matrixLayoutTitle')) +
+      '</legend><div>' +
+      options.map(function (option) {
+        return (
+          '<button type="button" data-matrix-layout="' +
+          option.value +
+          '" class="' +
+          (matrixLayoutValue() === option.value ? 'active' : '') +
+          '" aria-pressed="' +
+          (matrixLayoutValue() === option.value ? 'true' : 'false') +
+          '">' +
+          esc(option.label) +
+          '</button>'
+        );
+      }).join('') +
+      '</div></fieldset>'
+    );
+  }
   function modeLabel(mode) {
     return mode === 'SPEED' ? 'SPEED+' : mode === 'GAMEPAD' ? 'GAMEPAD' : mode;
   }
@@ -153,6 +229,16 @@
   }
   function scoreNow() {
     return window.VolleySets ? window.VolleySets.score(events(), M.currentSet || 1) : { a: 0, b: 0 };
+  }
+  function pulseMatrixScore() {
+    var score = document.getElementById('liveScore');
+    if (!score) return;
+    score.classList.remove('runtime-matrix-score-pulse');
+    void score.offsetWidth;
+    score.classList.add('runtime-matrix-score-pulse');
+    setTimeout(function () {
+      score.classList.remove('runtime-matrix-score-pulse');
+    }, 320);
   }
   function courtPlayers() {
     var out = [],
@@ -177,6 +263,29 @@
         });
     }
     return out.slice(0, 6);
+  }
+  function matrixCourtPlayers() {
+    var replay = window.VolleyRotation && window.VolleyRotation.replay
+        ? window.VolleyRotation.replay(M, [])
+        : null,
+      court = replay && window.VolleyRotation.court ? window.VolleyRotation.court(M, replay.rot, replay) : null,
+      slots = ['p4', 'p3', 'p2', 'p5', 'p6', 'p1'].map(function (position) {
+        return court && court[position] ? court[position].num : null;
+      });
+    if (slots.some(function (number) { return number == null; })) return courtPlayers();
+    currentSetEvents().forEach(function (event) {
+      if (
+        (event.type === 'SUBSTITUTION' || event.eventType === 'SUBSTITUTION' || event.action === 'substitution') &&
+        event.playerOut != null &&
+        event.playerIn != null
+      ) {
+        var index = slots.findIndex(function (number) {
+          return String(number) === String(event.playerOut);
+        });
+        if (index >= 0) slots[index] = event.playerIn;
+      }
+    });
+    return slots.slice(0, 6);
   }
   function playerButton(number, court) {
     var p = player(number) || { number: number, name: '', position: '' },
@@ -219,6 +328,29 @@
       '</span></div>'
     );
   }
+  function matrixPlayerButton(number) {
+    var p = player(number) || { number: number, position: '' },
+      r = role(p),
+      selected = String(state.author) === String(number);
+    return (
+      '<button type="button" class="runtime-matrix-player runtime-role-' +
+      esc(r) +
+      (selected ? ' selected' : '') +
+      '" data-runtime-author="' +
+      esc(number) +
+      '" aria-pressed="' +
+      (selected ? 'true' : 'false') +
+      '" aria-label="' +
+      esc(t('runtime.playerLabel')) +
+      ' ' +
+      esc(number) +
+      ' ' +
+      esc(ROLE_LABEL[r] || r) +
+      '"><span class="runtime-matrix-role-accent" aria-hidden="true"></span><b>' +
+      esc(number) +
+      '</b></button>'
+    );
+  }
   function plainPlayers() {
     return (
       '<div class="runtime-panel is-focus"><div class="runtime-player-grid">' +
@@ -228,21 +360,6 @@
         })
         .join('') +
       '</div>' +
-      opponentButton() +
-      '</div>'
-    );
-  }
-  function courtSelector() {
-    return (
-      '<div><div class="runtime-court" aria-label="' +
-      esc(t('runtime.courtLabel')) +
-      '"><div class="runtime-court-grid">' +
-      courtPlayers()
-        .map(function (n) {
-          return playerButton(n, true);
-        })
-        .join('') +
-      '</div></div>' +
       opponentButton() +
       '</div>'
     );
@@ -352,38 +469,71 @@
       '</div></section>'
     );
   }
-  function speedCommands() {
-    if (!state.author)
-      return '<div class="runtime-panel runtime-speed-prompt">' + esc(t('runtime.speedPrompt')) + '</div>';
-    if (!state.action)
-      return (
-        '<div class="runtime-panel">' +
-        authorChip(false) +
-        inlineTools(false) +
-        '<h2 class="runtime-question">' +
-        esc(t('runtime.whichAction')) +
-        '</h2>' +
-        actionGrid(false) +
-        '</div>'
-      );
+  function matrixLayout() {
+    var actions = ACTIONS.filter(function (action) { return !action.full; }),
+      resultOrder = ['error', 'neutral', 'point'];
     return (
-      '<div class="runtime-panel">' +
-      authorChip(true) +
-      inlineTools(true) +
-      '<h2 class="runtime-question">' +
-      esc(t('runtime.whichResult')) +
-      '</h2>' +
-      resultGrid(false) +
-      '</div>'
-    );
-  }
-  function speedLayout() {
-    return (
-      '<section class="runtime-stage runtime-speed-layout"><div>' +
-      courtSelector() +
-      '</div>' +
-      speedCommands() +
-      '</section>'
+      '<section class="runtime-stage runtime-matrix runtime-matrix-' +
+      matrixLayoutValue() +
+      '" aria-label="' +
+      esc(t('runtime.matrixTitle')) +
+      '">' +
+      '<section class="runtime-matrix-section runtime-matrix-player-section"><h2><span>1</span> ' +
+      esc(t('runtime.matrixSectionPlayers')) +
+      '</h2><div class="runtime-matrix-player-grid">' +
+      matrixCourtPlayers().map(matrixPlayerButton).join('') +
+      '<button type="button" class="runtime-matrix-opponent' +
+      (state.author === 'A' ? ' selected' : '') +
+      '" data-runtime-author="A" aria-pressed="' +
+      (state.author === 'A' ? 'true' : 'false') +
+      '" aria-label="' +
+      esc(t('runtime.opponent')) +
+      '">A</button></div></section>' +
+      '<section class="runtime-matrix-section runtime-matrix-action-section"><h2><span>2</span> ' +
+      esc(t('runtime.matrixSectionActions')) +
+      '</h2><div class="runtime-matrix-action-grid">' +
+      actions.map(function (action) {
+        var selected = state.action === action.id;
+        return (
+          '<button type="button" class="runtime-matrix-action' +
+          (isMatrixPreferred(action.id) ? ' preferred' : '') +
+          (selected ? ' selected' : '') +
+          '" data-runtime-action="' +
+          action.id +
+          '" aria-pressed="' +
+          (selected ? 'true' : 'false') +
+          '">' +
+          esc(action.label) +
+          '</button>'
+        );
+      }).join('') +
+      '</div></section>' +
+      '<section class="runtime-matrix-section runtime-matrix-status-section"><h2><span>3</span> ' +
+      esc(t('runtime.matrixSectionStatus')) +
+      '</h2><div class="runtime-matrix-status-grid">' +
+      resultOrder.map(function (resultId) {
+        var result = resultMeta(resultId),
+          label = flowStatusLabel(resultId),
+          icon = resultId === 'error' ? '✕' : resultId === 'neutral' ? '↻' : '✓',
+          allowed = flowStatusAllowed(resultId) && !state.pending && Date.now() >= state.lockedUntil;
+        return (
+          '<button type="button" class="runtime-matrix-status ' +
+          result.css +
+          (state.matrixFlash === resultId ? ' matrix-flash' : '') +
+          '" data-runtime-result="' +
+          resultId +
+          '"' +
+          (allowed ? '' : ' disabled') +
+          ' aria-label="' +
+          esc(label) +
+          '"><b>' +
+          icon +
+          '</b><span>' +
+          esc(label) +
+          '</span></button>'
+        );
+      }).join('') +
+      '</div></section></section>'
     );
   }
   function flowLayout() {
@@ -391,7 +541,7 @@
     return (
       '<section class="runtime-stage runtime-flow-screen" aria-label="Manual action capture">' +
       '<div class="runtime-flow-last">' +
-      esc(lastEvent()) +
+      esc(flowLastEvent()) +
       '</div><div class="runtime-flow-actions">' +
       '<div class="runtime-flow-action-grid">' +
       ACTIONS.map(function (action) {
@@ -430,12 +580,12 @@
           '"' +
           (allowed && !state.pending && Date.now() >= state.lockedUntil ? '' : ' disabled') +
           ' aria-label="' +
-          esc(result.id === 'point' ? 'Point' : result.id === 'neutral' ? 'Continue' : 'Error') +
+          esc(flowStatusLabel(result.id)) +
           '">' +
           '<b>' +
           (result.id === 'point' ? '✓' : result.id === 'neutral' ? 'O' : '✕') +
           '</b><span>' +
-          esc(result.id === 'point' ? 'Point' : result.id === 'neutral' ? 'Continue' : 'Error') +
+          esc(flowStatusLabel(result.id)) +
           '</span></button>'
         );
       }).join('') +
@@ -453,7 +603,7 @@
           esc(number) +
           '" aria-pressed="' +
           (selected ? 'true' : 'false') +
-          '"><span class="runtime-flow-player-bar"></span><b>' +
+          '"><b>' +
           esc(number) +
           '</b></button>'
         );
@@ -473,9 +623,50 @@
     if (resultId !== 'point') return true;
     return ['service', 'attack', 'block'].indexOf(state.action) >= 0;
   }
+  function flowLastEvent() {
+    var list = events(),
+      event = list[list.length - 1];
+    if (!event) return t('runtime.noEvent');
+    if (event.type === 'SUBSTITUTION')
+      return t('runtime.lastSubstitution', { in: event.playerIn, out: event.playerOut });
+    var who =
+        event.authorSide === 'AWAY' || event.player === 'A'
+          ? 'A'
+          : '#' + (event.playerNumber != null ? event.playerNumber : event.player),
+    actionLabel = (actionMeta(event.action) || {}).label || '',
+    action = actionLabel
+      ? actionLabel.charAt(0).toUpperCase() + actionLabel.slice(1).toLowerCase()
+      : '',
+      actionText = action ? ' · ' + action : '';
+    return t('runtime.flowLastEvent', {
+      who: who,
+      action: actionText,
+    status: flowStatusLabel(event.result),
+    });
+  }
+  function flowStatusLabel(resultId) {
+    return resultId === 'point'
+    ? t('runtime.flowStatusPoint')
+    : resultId === 'neutral'
+      ? t('runtime.flowStatusContinue')
+      : t('runtime.flowStatusError');
+  }
   function gamepadLayout() {
     return (
       '<section class="runtime-stage runtime-gamepad-layout" aria-label="Saisie type manette">' +
+      '<p class="gamepad-inline-last-action" role="status">' +
+      esc(lastEvent()) +
+      '</p><div class="gamepad-inline-toolbar"><button type="button" class="gamepad-inline-tool" data-runtime-undo' +
+      (undoDisabled() ? ' disabled' : '') +
+      '>↶ ' +
+      esc(t('runtime.undo')) +
+      '</button>' +
+      (Subs
+        ? '<button type="button" class="gamepad-inline-tool" data-runtime-sub-open aria-haspopup="dialog">⇄ ' +
+          esc(t('subs.title')) +
+          '</button>'
+        : '') +
+      '</div>' +
       '<div id="gamepadInlineView"></div>' +
       '</section>'
     );
@@ -495,6 +686,10 @@
             ? '×'
             : '−';
     return t('runtime.lastEvent', { who: who, action: a, result: s });
+  }
+  function undoDisabled() {
+    if (state.mode === 'SPEED' && (state.author || state.action)) return false;
+    return !(state.mode === 'SPEED' ? currentSetEvents().length : events().length);
   }
   function modes() {
     return (
@@ -522,10 +717,11 @@
       state.mode === 'FOCUS'
         ? focusLayout()
         : state.mode === 'SPEED'
-          ? speedLayout()
+          ? matrixLayout()
           : state.mode === 'GAMEPAD'
             ? gamepadLayout()
             : flowLayout();
+    var lastAction = state.mode === 'SPEED' ? flowLastEvent() : lastEvent();
     return (
       '<div class="runtime-shell" data-runtime-layout="' +
       state.mode +
@@ -540,7 +736,7 @@
       '<p class="runtime-error" role="alert">' +
       esc(state.error) +
       '</p><div class="runtime-footer"><div class="runtime-last"><b>' +
-      esc(lastEvent()) +
+      esc(lastAction) +
       '</b></div>' +
       (Subs
         ? '<button type="button" class="runtime-sub-open" data-runtime-sub-open aria-haspopup="dialog">⇄ ' +
@@ -548,7 +744,7 @@
           '</button>'
         : '') +
       '<button type="button" class="runtime-undo" data-runtime-undo' +
-      (events().length ? '' : ' disabled') +
+      (undoDisabled() ? ' disabled' : '') +
       '>↶ ' +
       esc(t('runtime.undo')) +
       '</button></div><div class="runtime-feedback" id="runtimeFeedback" role="status" aria-live="polite">' +
@@ -574,7 +770,9 @@
           '</button>'
         );
       }).join('') +
-      '</div><label class="runtime-switch"><span>' +
+      '</div>' +
+      (state.mode === 'SPEED' ? matrixLayoutOptions() : '') +
+      '<label class="runtime-switch"><span>' +
       esc(t('runtime.highlight')) +
       '</span><input type="checkbox" data-runtime-highlight' +
       (prefs.runtimeHighlights ? ' checked' : '') +
@@ -622,6 +820,10 @@
     if (!root) return;
     document.documentElement.setAttribute('data-runtime-mode', state.mode);
     root.innerHTML = rootHtml();
+    var setLabel = panel.querySelector('.runtime-set');
+    if (setLabel)
+      setLabel.textContent =
+        state.mode === 'SPEED' ? t('runtime.matrixSet', { set: M.currentSet || 1 }) : 'S' + (M.currentSet || 1);
     if (state.mode === 'GAMEPAD' && window.VolleyGamepad) {
       window.VolleyGamepad.renderInlineCapture();
     }
@@ -655,8 +857,12 @@
     if (overlay) overlay.innerHTML = prefsHtml();
   }
   function chooseAuthor(value) {
-    if (state.pending || (state.mode !== 'FLOW' && Date.now() < state.lockedUntil)) return;
-    if (state.mode === 'FLOW') {
+    if (
+      state.pending ||
+      (state.mode !== 'FLOW' && state.mode !== 'SPEED' && Date.now() < state.lockedUntil)
+    )
+      return;
+    if (state.mode === 'FLOW' || state.mode === 'SPEED') {
       state.author = String(state.author) === String(value) ? null : String(value);
       state.error = '';
       state.stage = state.action ? 'result' : 'action';
@@ -670,7 +876,7 @@
     render();
   }
   function chooseAction(value) {
-    if (state.mode === 'FLOW') {
+    if (state.mode === 'FLOW' || state.mode === 'SPEED') {
       state.action = state.action === value ? null : value;
       state.error = '';
       state.stage = state.author && state.action ? 'result' : state.author ? 'action' : 'player';
@@ -716,7 +922,7 @@
     e.playerId = p ? 'player_' + p.number : null;
     e.playerNumber = p ? Number(p.number) : null;
     e.playerRole = p ? ROLE_LABEL[role(p)] || String(role(p) || '').toUpperCase() : 'OPPONENT';
-    e.actionCode = a ? a.code : String(e.action || '').toUpperCase();
+    e.actionCode = a ? a.code : state.action == null ? null : String(e.action || '').toUpperCase();
     e.status = r ? r.code : String(e.result || '').toUpperCase();
     e.inputSource = inputSource || 'touch';
     e.scoreBefore = { home: beforeScore.a, away: beforeScore.b };
@@ -741,14 +947,16 @@
       render();
       return;
     }
-    var opponentQuickResult =
-      state.mode === 'FLOW' && state.author === 'A' && (result === 'point' || result === 'error');
+    var matrixMode = state.mode === 'SPEED',
+      matrixOrFlow = matrixMode || state.mode === 'FLOW',
+      opponentQuickResult =
+        matrixOrFlow && state.author === 'A' && (result === 'point' || result === 'error');
     if (!state.action && !opponentQuickResult) {
       state.error = t('runtime.errorNoAction');
       render();
       return;
     }
-    if (state.mode === 'FLOW' && !flowStatusAllowed(result)) return;
+    if (matrixOrFlow && !flowStatusAllowed(result)) return;
     if (!resultMeta(result)) {
       state.error = t('runtime.errorBadResult');
       render();
@@ -781,16 +989,24 @@
       r = resultMeta(result);
     state.feedback = '✓ ' + authorText() + ' · ' + (a ? a.label : state.action) + ' ' + (r ? r.symbol : '');
     haptic();
+    var afterScore = scoreNow();
+    if (matrixMode && (afterScore.a !== beforeScore.a || afterScore.b !== beforeScore.b)) pulseMatrixScore();
+    if (matrixMode) state.matrixFlash = result;
     state.lockedUntil = Date.now() + (state.mode === 'FLOW' ? 300 : 500);
     state.pending = false;
     clear(true);
     render();
+    if (matrixMode)
+      setTimeout(function () {
+        state.matrixFlash = '';
+        if (state.mode === 'SPEED') render();
+      }, 150);
     setTimeout(render, 520);
     document.dispatchEvent(new CustomEvent('volleylive:runtime-event', { detail: { event: committed } }));
   }
   function undo() {
-    if (state.pending || (state.mode !== 'FLOW' && Date.now() < state.lockedUntil)) return;
-    if (state.mode === 'FLOW' && (state.author || state.action)) {
+    if (state.pending) return;
+    if ((state.mode === 'FLOW' || state.mode === 'SPEED') && (state.author || state.action)) {
       state.author = null;
       state.action = null;
       state.stage = 'player';
@@ -798,6 +1014,7 @@
       render();
       return;
     }
+    if (state.mode !== 'FLOW' && Date.now() < state.lockedUntil) return;
     if (typeof VC.deleteLastAction !== 'function') {
       state.error = t('runtime.errorUndoUnavailable');
       render();
@@ -1250,6 +1467,10 @@
   document.getElementById('runtimePrefs').addEventListener('click', function (event) {
     var target = event.target.closest('button');
     if (!target) return;
+    if (target.dataset.matrixLayout) {
+      setMatrixLayout(target.dataset.matrixLayout);
+      return;
+    }
     if (target.dataset.runtimePrefMode) {
       setMode(target.dataset.runtimePrefMode, true);
       return;
@@ -1291,6 +1512,16 @@
     new MutationObserver(function () {
       render();
     }).observe(score, { childList: true, subtree: true });
+  var lastPortrait = isPortraitOrientation();
+  window.addEventListener('resize', function () {
+    var portrait = isPortraitOrientation();
+    if (portrait === lastPortrait) return;
+    lastPortrait = portrait;
+    if (state.mode === 'SPEED') {
+      render();
+      refreshPrefs();
+    }
+  });
   window.VLRuntimeInput = {
     setMode: setMode,
     getState: function () {

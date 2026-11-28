@@ -198,7 +198,7 @@ Tap 1: Player   →   Tap 2: Action   →   Tap 3: Status   →   Event recorded
 | Action selected only | Enabled | Enabled | Disabled |
 | Player + Action selected | Enabled | Enabled | Enabled (filtered, see §6) |
 
-Disabled buttons stay visible at the same position, at reduced opacity (≈ 40 %).
+Disabled buttons stay visible at the same position, at reduced but readable opacity (≈ 82 %).
 
 ### 5.3 Opponent "A"
 
@@ -275,14 +275,18 @@ The status group is shared, but some combinations are not possible. When an acti
 | Token | Value |
 |---|---|
 | Background | Gradient `#07142B` → `#0B1F3F` |
-| Panel / card | `#0A1730` |
+| Panel / card | `#0A1730` (base surface) |
+| Player section | Emerald `rgba(32, 199, 102, 0.32)` |
+| Action section | Blue `rgba(13, 54, 93, 0.72)` |
+| Status section | Violet `rgba(155, 114, 243, 0.56)` |
+| Status button surface | Navy `#102E50`, opaque and layered over the Status section |
 | Borders | Thin, `#22D3EE` at low opacity; full opacity for selection |
 | Selection | Cyan `#22D3EE` outline + light cyan tint |
 | Primary text | White |
 | Secondary text | Muted cyan-grey |
-| Error | Red `#EF4444` — border + translucent tint |
-| Continue | Slate grey — border + translucent tint |
-| Point | Green `#22C55E` — border + translucent tint |
+| Error | Red `#EF4444` border |
+| Continue | Slate grey border |
+| Point | Green `#22C55E` border |
 | Opponent "A" | Black circle, white letter |
 
 Rules:
@@ -291,6 +295,7 @@ Rules:
 - **VIS-2** Role colours only on the slim accent strip of player tiles, never as full fill.
 - **VIS-3** No explanatory text on the capture screen.
 - **VIS-4** Same theme for the four layouts.
+- **VIS-5** Player, Action and Status section backgrounds use the shared emerald, blue and violet palette from FLOW1 and GAMEPAD. Status buttons keep an opaque navy surface over the violet panel, with status-colored borders.
 
 ---
 

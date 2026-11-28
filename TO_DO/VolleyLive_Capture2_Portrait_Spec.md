@@ -5,18 +5,18 @@
 | Field | Value |
 |---|---|
 | Product | VolleyLive |
-| Feature | Manual live capture on tablet — Interface 2 (players below, shared statuses) |
-| Version | 1.0 (draft, implementation-ready) |
-| Date | 25 November 2026 |
+| Feature | FLOW1 manual live capture — portrait layout with players below shared statuses |
+| Version | 1.1 (baseline) |
+| Date | 28 November 2026 |
 | Owner | Denis Delaveau |
-| Visual reference | `VolleyLive_Saisie_Portrait_v3.png` |
+| Visual reference | `TO_DO/IMG_5770.jpg` |
 | Related spec | `VolleyLive_Matrix_Full_Capture_Spec.md` (Interface 1) |
 
 ---
 
 ## 1. Purpose
 
-Interface 2 is a second manual capture screen for tablets used in **portrait** orientation. It starts from the same capture step as Interface 1 (**action + status**) but puts the **player selection below** the action/status block, on the same screen.
+FLOW1 is the portrait manual-capture view. The application score header and mode selector remain outside this view; the reference image specifies the FLOW1 canvas itself. The canvas keeps the action/status grid above the **player selection**, with the undo and substitution controls at the bottom.
 
 Every event is made of three pieces of information:
 
@@ -26,7 +26,7 @@ PLAYER (number)  +  ACTION  +  STATUS
 
 Design goals:
 
-- **Intuitive**: three coloured sections, always visible, always in the same place.
+- **Intuitive**: three distinctly colored sections, always visible, always in the same place.
 - **Very fast**: one event = 3 taps, no screen change, no confirmation.
 - **Deterministic**: fixed button positions, no automatic guessing, no hidden state.
 
@@ -52,17 +52,15 @@ Out of scope:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ VolleyLive | SAISIE MANUELLE | Set 2 | NOUS 18 – 16 ADV  │  Header
 │        Last action: #7 · Réception · Continue            │  Caption
 ├──────────────────────────────────────────────────────────┤
 │  ACTION SECTION (blue background)                        │
 │                      [   FREE BALL   ]                   │
-│   [ ATTACK ]       ┌───────────────┐      [  SERVE    ]  │
-│                    │  STATUS (violet)                    │
-│   [ BLOCK  ]       │  [   ✓   ]    │      [ RECEPTION ]  │
-│                    │  [   O   ]    │                     │
-│   [  SET   ]       │  [   ✕   ]    │      [ DEFENCE   ]  │
-│                    └───────────────┘                     │
+│   [ ATTACK ]      │  [   ✓   ]       │     [  SERVE    ]  │
+│                   │  [   O   ]       │                    │
+│   [ BLOCK  ]      │  [   ✕   ]       │     [ RECEPTION ] │
+│                   └──────────────────┘                    │
+│            [  SET   ]        [  DEFENCE  ]                │
 ├──────────────────────────────────────────────────────────┤
 │  PLAYER SECTION (emerald background)                     │
 │   [ 7 ]  [ 12 ]  [ 4 ]   ┌─────┐                         │
@@ -73,22 +71,15 @@ Out of scope:
 └──────────────────────────────────────────────────────────┘
 ```
 
-No scrolling, pop-ups or overlays during capture. Section titles are **not displayed**: the three sections are identified only by their background colour and position.
+No scrolling, pop-ups or overlays during capture. Section titles are **not displayed**: the three sections are identified by their background color and position. The application header and mode selector remain available outside the FLOW1 canvas.
 
-### 3.1 Header
+### 3.1 Application header
 
-| Element | Content |
-|---|---|
-| Logo + name | VolleyLive |
-| Mode pill | `SAISIE MANUELLE` (cyan outline) |
-| Set | `Set N` |
-| Score | `NOUS` chip · large white score `18 – 16` · `ADVERSAIRE` chip |
-
-The header is read-only. A thin cyan line separates it from the content.
+The score header and mode selector belong to the capture application shell and are outside the FLOW1 canvas shown in the reference image. They remain available while FLOW1 is selected.
 
 ### 3.2 Caption
 
-One centred line under the header: `Dernière action : #<number> · <Action> · <Status>`. Opponent: `Dernière action : A · <Action> · <Status>`.
+One centered line at the top of the FLOW1 canvas: `Dernière action : #<number> · <Action> · <Status>`. For the opponent, omit the action when none was recorded: `Dernière action : A · [<Action> · ]<Status>`.
 
 ---
 
@@ -96,23 +87,25 @@ One centred line under the header: `Dernière action : #<number> · <Action> · 
 
 ### 4.1 Grid
 
-One rounded panel containing a fixed 3-column grid:
+One rounded blue panel containing a fixed grid arranged as three visual columns. The implementation uses six equal tracks so the bottom action pair can be centered precisely:
 
-| | Left column | Centre column | Right column |
+| Row | Left column | Centre column | Right column |
 |---|---|---|---|
-| Row 1 | — | **FREE BALL** | — |
-| Row 2 | **ATTACK** | Status block (rows 2–3) | **SERVE** |
-| Row 3 | **BLOCK** | Status block (rows 2–3) | **RECEPTION** |
-| Row 4 | **SET** | — | **DEFENCE** |
+| 1 | — | **FREE BALL** | — |
+| 2 | **ATTACK**, vertically centered across rows 2–3 | **✓ Point** | **SERVE**, vertically centered across rows 2–3 |
+| 3 | **BLOCK**, vertically centered across rows 3–4 | **O Continue** | **RECEPTION**, vertically centered across rows 3–4 |
+| 4 | — | **✕ Error** | — |
+| 5 | — | **SET** and **DEFENCE**, centered together as a pair | — |
 
 ### 4.2 Button rules
 
 - **AC-1** All seven action buttons have the **same size** (same width and same height).
 - **AC-2** FREE BALL is **centred** on the vertical axis of the screen, alone on its row, directly above the status block.
 - **AC-3** Left and right columns are symmetrical about the centre column.
-- **AC-4** Buttons never move, resize or hide, whatever the state.
-- **AC-5** Only one action can be selected at a time. Tapping another action replaces the selection; tapping the selected action again deselects it.
-- **AC-6** Labels are in English, bold uppercase: FREE BALL, ATTACK, BLOCK, SERVE, RECEPTION, SET, DEFENCE.
+- **AC-4** SET and DEFENCE are centered side by side as a pair beneath the main action/status grid.
+- **AC-5** Buttons never move, resize or hide, whatever the state.
+- **AC-6** Only one action can be selected at a time. Tapping another action replaces the selection; tapping the selected action again deselects it.
+- **AC-7** Labels are in English, bold uppercase: FREE BALL, ATTACK, BLOCK, SERVE, RECEPTION, SET, DEFENCE.
 
 ### 4.3 Role-based emphasis (optional, same as Interface 1)
 
@@ -133,7 +126,7 @@ When a player is selected, the most likely actions for his role get a slightly l
 
 ### 5.1 Layout
 
-- A **violet rounded panel** centred between the left and right action columns, spanning rows 2–3 of the action grid.
+- A **violet rounded panel** centered between the left and right action columns, spanning rows 2–4 of the action grid and slightly extending beyond the button edges so the section background remains visible.
 - It contains exactly **three stacked buttons**, shared by **all actions**. Statuses are never repeated per action.
 
 | Position | Button | Meaning | Persisted value |
@@ -142,7 +135,7 @@ When a player is selected, the most likely actions for his role get a slightly l
 | Middle | **O** (slate grey) | Continue — action done, rally continues | `neutral` |
 | Bottom | **✕** (red) | Error | `error` |
 
-The order ✓ / O / ✕ is fixed. The two score-changing statuses are at the extremities; O is in the middle.
+The panel fill is `rgba(155, 114, 243, 0.56)` with a violet inset border. It extends slightly beyond the status buttons so its background remains visible. The order ✓ / O / ✕ is fixed. The two score-changing statuses are at the extremities; O is in the middle.
 
 ### 5.2 Allowed statuses per action
 
@@ -158,7 +151,7 @@ The order ✓ / O / ✕ is fixed. The two score-changing statuses are at the ext
 
 - **ST-1** A status that is not allowed stays **in place but disabled** (reduced opacity, not tappable). It is never hidden.
 - **ST-2** All three statuses are disabled until the selection is complete (see §7.2).
-- **ST-3** The status buttons are the **committing taps**. They must be at least as large as an action button wherever the layout allows (see open point 1).
+- **ST-3** The status buttons are the **committing taps** and have the same size as the action buttons.
 
 ---
 
@@ -168,6 +161,7 @@ The order ✓ / O / ✕ is fixed. The two score-changing statuses are at the ext
 
 - One **emerald rounded panel** under the action section, **without title**.
 - Six player cards in **2 rows × 3 columns**, plus one tall **A** card on the right spanning both rows.
+- Jersey numbers shown below are an example; the actual six numbers and role colors follow the current on-court lineup.
 
 | Row | Col 1 | Col 2 | Col 3 | Col 4 |
 |---|---|---|---|---|
@@ -176,21 +170,21 @@ The order ✓ / O / ✕ is fixed. The two score-changing statuses are at the ext
 
 ### 6.2 Player card
 
-- Dark navy card with thin border.
+- Each card uses the shared role border, fill and text colors from the other interfaces.
 - **Jersey number only**, large and bold, centred.
-- A short **vertical colour bar** on the left identifies the role:
+- Role colors are applied to the full player card:
 
-| Role | Bar colour |
-|---|---|
-| OH | Red |
-| OPP | Blue |
-| Setter | Yellow |
-| MB | Green |
-| Libero | Grey |
+| Role | Border | Fill | Text |
+|---|---|---|---|---|
+| OH | `#EB6F7A` | `#FFD1D6` | `#50141B` |
+| OPP | `#4FA8E8` | `#CFEAFA` | `#0A3555` |
+| Setter | `#F2C94C` | `#FFF0A8` | `#4A3600` |
+| MB | `#63C985` | `#C9F0D6` | `#123D24` |
+| Libero | `#9AA5B1` | `#DCE1E6` | `#26313D` |
 
 ### 6.3 Card "A" (opponent)
 
-- Tall **black** card with a large white **A**.
+- Tall **black** card with a thin slate border and a large white **A**.
 - Selecting **A** means the event is attributed to the opponent team (no player detail).
 
 ### 6.4 Rules
@@ -263,36 +257,37 @@ Tap 1: Player   →   Tap 2: Action   →   Tap 3: Status   →   Event recorded
 
 - Cyan-outlined button, bottom right.
 - Opens a substitution panel: tap the outgoing player, then the incoming bench player, then confirm.
-- The incoming player takes the outgoing player's card position and role bar.
+- The incoming player takes the outgoing player's card position and role colors.
 - Recorded as an event (`type: "substitution"`) and can be undone with Annuler.
 - Capture is not possible while the panel is open.
 
 ---
 
-## 10. Visual theme
+## 10. Visual baseline
 
-Coach View dark theme with **three clearly different section backgrounds**.
+Coach View dark theme with **three clearly different section backgrounds**. The translucent fills are composited over the application background.
 
 | Token | Value | Usage |
 |---|---|---|
-| Page background | Gradient `#07142B` → `#0B1F3F` | Screen |
-| Action section | Fill `#1F55C4`, border `#60A5FA` | Blue panel |
-| Status section | Fill `#7B35D6`, border `#C4B5FD` | Violet panel |
-| Player section | Fill `#0E8A6A`, border `#6EE7B7` | Emerald panel |
-| Button / card | Fill `#0A1730`, border `#6F86A8` | Actions, player cards |
-| Selection | Border `#22D3EE` (3 px), fill `#0C2A44` | Selected player and action |
-| ✓ Point | Fill `#0D3B1E`, border `#22C55E`, icon `#4ADE80` | Status |
+| Page background | Radial gradient `#0D3E6B` → `#061A33` → `#041326` | Screen |
+| Action section | Fill `rgba(13, 54, 93, 0.72)`, inset border `rgba(95, 142, 180, 0.62)` | Blue panel |
+| Status section | Fill `rgba(155, 114, 243, 0.56)`, inset border `rgba(155, 114, 243, 0.9)` | Violet panel behind status buttons |
+| Player section | Fill `rgba(32, 199, 102, 0.32)`, border `rgba(32, 199, 102, 0.62)` | Emerald panel |
+| Action button | Transparent fill, border `#536E96` | Buttons within the blue action panel |
+| Player card | Shared role border, fill and text colors from `css/index-theme.css` | Cards in the player panel |
+| Selection | Border `#22D3EE` (4 px), action fill `#11364B` | Selected player and action |
+| ✓ Point | Fill `#0D3B1E`, border `#22C55E`, white icon | Status |
 | O Continue | Fill `#3A4658`, border `#94A3B8`, white icon | Status |
-| ✕ Error | Fill `#4A1520`, border `#EF4444`, icon `#F87171` | Status |
-| Opponent card | Fill `#000000`, white letter | Card A |
+| ✕ Error | Fill `#4A1520`, border `#EF4444`, white icon | Status |
+| Opponent card | Fill `#000000`, slate border `#415A80`, white letter | Card A |
 | Text | White, bold sans-serif | Labels, numbers |
 
 Rules:
 
-- **VIS-1** Flat design, no glow, no gloss.
-- **VIS-2** The three section backgrounds must be distinguishable at a glance.
-- **VIS-3** Buttons and cards keep the same dark navy fill in all three sections.
-- **VIS-4** Role colours appear only on the slim bar of player cards.
+- **VIS-1** Keep the dark Coach View theme and translucent section fills.
+- **VIS-2** The three section backgrounds must be distinguishable at a glance: blue actions, violet statuses, emerald players.
+- **VIS-3** Player-card colors must remain aligned with the shared role palette used in other interfaces.
+- **VIS-4** SET and DEFENCE form a centered pair beneath the action grid.
 - **VIS-5** No section titles and no explanatory text on the capture screen.
 
 ---
@@ -346,7 +341,7 @@ The event log is the source of truth for all statistics and views.
 
 ## 13. Open points
 
-1. **Status size**: in the validated visual, the status block spans two action rows, leaving an empty slot between SET and DEFENCE. Option: extend the status block over three rows so each status button has the same height as an action button.
+1. **Resolved baseline**: the status block spans rows 2–4; SET and DEFENCE are centered together on row 5.
 2. **Layout options**: reversed layouts (players on top, left/right mirror) are not defined for this interface.
 3. **Role emphasis** (§4.3): keep or remove for Interface 2.
 4. **A without action** (§7.2): keep the 2-tap shortcut for opponent errors and points.
@@ -375,3 +370,12 @@ The event log is the source of truth for all statistics and views.
 | AT-16 | Network off, record 10 events | All events persisted locally |
 | AT-17 | Restart the app | Log, score and caption restored |
 | AT-18 | Any state | All seven action buttons keep identical size and position; FREE BALL centred |
+| AT-19 | Render FLOW1 at the baseline viewport | Three distinct section backgrounds; shared role-card colors; SET and DEFENCE centered as a pair |
+
+---
+
+## 15. Baseline history
+
+| Version | Date | Change |
+|---|---|---|
+| 1.1 | 28 November 2026 | Baselines the current FLOW1 section colors, shared player-role palette, status panel and centered SET/DEFENCE pair. |
