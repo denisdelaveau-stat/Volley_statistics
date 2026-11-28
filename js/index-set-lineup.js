@@ -1,4 +1,4 @@
-/* VolleyLive set line-up sheet: window.VolleySetLineup.
+/* VolleyLive set line-up sheet: window.VolleySetLineup. Spec: docs/specs/UI-SETLINEUP.md.
    FIVB 7.3.2: the coach hands in a line-up sheet before each set, so the starting players and the rotation order may
    change. When a set ends, "Start set N" opens this sheet, filled with the line-up of the previous set: the setter's
    starting zone and the player of each role (setter, OH1, MB1, opposite, OH2, MB2). The rotation is derived from the

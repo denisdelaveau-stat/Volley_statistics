@@ -1,4 +1,5 @@
-/* VolleyLive capture screen controller: history panel, action input, persistence, history, sets and undo. */
+/* VolleyLive capture screen controller: history panel, action input, persistence, history, sets and undo.
+   Spec: docs/specs/UI-CAPTURE.md. */
 (function () {
   // Player names, team names and event fields come from user input or imported files: escape them in HTML.
   var esc = window.VolleyDom.esc;

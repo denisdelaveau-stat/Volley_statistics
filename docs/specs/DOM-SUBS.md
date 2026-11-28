@@ -86,7 +86,7 @@ Not applicable (rules only). Reasons: `subs.refuse*` keys (SYS-I18N).
 | `DOM-SUBS-06` | `tests/unit/set-lineup.test.js` « substitutions: the starters are those of the set » |
 | `DOM-SUBS-07`, `-08` | `tests/unit/substitution-rules.test.js` « 15.7: … » (both tests) |
 | `DOM-SUBS-09` | `tests/unit/substitution-rules.test.js` « 15.9.1: … » |
-| `DOM-SUBS-10` | `tests/unit/substitution-rules.test.js` « 15.11.1.1: … »; `tests/capture/test_substitutions.py::test_no_substitution_during_a_rally`; set over: manual (win a set, open « ⇄ Remplacement »: « Le set est terminé » is shown and no player is offered) |
+| `DOM-SUBS-10` | `tests/unit/substitution-rules.test.js` « 15.11.1.1: … »; `tests/capture/test_substitutions.py::test_no_substitution_during_a_rally`; set over: manual (win a set, open « ⇄ Remplacement »: « Set terminé : passez au set suivant pour effectuer un remplacement. » is shown and no player is offered) |
 | `DOM-SUBS-11` | `tests/unit/substitution-rules.test.js` « build records the substitution… »; `tests/capture/test_substitutions.py::test_substitution_is_recorded_and_the_court_updates`, `::test_undo_removes_the_substitution` |
 | `DOM-SUBS-12` | `tests/capture/test_substitutions.py::test_the_sheet_applies_fivb_rule_15` |
 
