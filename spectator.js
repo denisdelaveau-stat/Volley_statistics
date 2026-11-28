@@ -1,4 +1,5 @@
-/* VolleyLive Spectator View controller: render, tabs, storage sync and the public window.VolleySpectator API. Views live in js/spectator-*.js. */
+/* VolleyLive Spectator View controller: render, tabs, storage sync and the public window.VolleySpectator API. Views live in js/spectator-*.js.
+   Spec: docs/specs/UI-SPECTATOR.md and UI-SPECTATOR-SCORE, -TIMELINE, -GRAPH, -RANKING. */
 (function () {
   'use strict';
   var t = window.VolleyI18n.t;
