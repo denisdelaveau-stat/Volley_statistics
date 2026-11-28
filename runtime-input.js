@@ -10,7 +10,7 @@
   var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
     EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
   var MODES = ['FOCUS', 'SPEED', 'FLOW', 'GAMEPAD'];
-  var FIT_MODES = ['FOCUS', 'SPEED'];
+  var FIT_MODES = ['FOCUS', 'SPEED', 'GAMEPAD'];
   var ACTIONS = [
     { id: 'service', code: 'SERVE', label: t('action.service'), family: 'serve' },
     { id: 'reception', code: 'RECEPTION', label: t('action.reception'), family: 'build' },

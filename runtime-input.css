@@ -2330,11 +2330,25 @@ html.runtime-fit .runtime-footer .runtime-sub-open {
   min-height: 44px;
 }
 
+/* Step titles ("1 · Joueur", "2 · Action", "3 · Statut") stay available to screen readers but take no room. */
+html.runtime-fit .runtime-focus-stage > .runtime-question,
+html.runtime-fit .runtime-matrix-section > h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* FOCUS: one row height shared by the player, action and status steps, so buttons keep their page position.
-   Fixed parts: context 100 px, question 43 px, panel border and padding 23 px, two row gaps 16 px. */
+   Fixed parts: context 100 px, panel border and padding 23 px, two row gaps 16 px. */
 html.runtime-fit .runtime-focus-stage {
-  --rt-focus-fixed: 143px;
-  --rt-focus-row: clamp(44px, calc((100cqh - var(--rt-focus-fixed) - 39px) / 3), 96px);
+  --rt-focus-fixed: 100px;
+  --rt-focus-row: clamp(44px, calc((100cqh - var(--rt-focus-fixed) - 39px) / 3), 120px);
 }
 html.runtime-fit .runtime-focus-stage > .runtime-focus-context,
 html.runtime-fit .runtime-focus-stage > .runtime-question {
@@ -2366,7 +2380,7 @@ html.runtime-fit .runtime-focus-stage .runtime-player {
 
 /* SPEED (Matrix Full): one button height for the three sections.
    Vertical layouts stack three sections (9 rows); horizontal layouts place them side by side (3 rows).
-   Per section: padding 12 px, border 2 px, title 18 px, title gap 5 px, two row gaps 12 px = 49 px. */
+   Per section (title hidden): padding 12 px, border 2 px, two row gaps 12 px = 26 px. */
 html.runtime-fit .runtime-matrix {
   gap: var(--rt-fit-gap);
   align-content: start;
@@ -2377,14 +2391,85 @@ html.runtime-fit .runtime-matrix-section {
 }
 html.runtime-fit .runtime-matrix-vertical-down > .runtime-matrix-section,
 html.runtime-fit .runtime-matrix-vertical-up > .runtime-matrix-section {
-  --runtime-matrix-button-height: clamp(44px, calc((100cqh - 163px) / 9), 64px);
+  --runtime-matrix-button-height: clamp(44px, calc((100cqh - 94px) / 9), 64px);
 }
 html.runtime-fit .runtime-matrix-horizontal-right > .runtime-matrix-section,
 html.runtime-fit .runtime-matrix-horizontal-left > .runtime-matrix-section {
-  --runtime-matrix-button-height: clamp(44px, calc((100cqh - 49px) / 3), 72px);
+  --runtime-matrix-button-height: clamp(44px, calc((100cqh - 26px) / 3), 72px);
+}
+
+/* GAMEPAD: the wheels take the height left under the last-action line and the Undo/Substitution toolbar.
+   Side by side (wide areas): wheel = min(column, height, 360 px). Stacked (narrow areas, phone portrait): player
+   wheel, a row of three status buttons, then the action wheel. */
+html.runtime-fit .runtime-gamepad-layout {
+  display: flex;
+  flex-direction: column;
+}
+html.runtime-fit .gamepad-inline-last-action {
+  flex: none;
+}
+html.runtime-fit .gamepad-inline-toolbar {
+  flex: none;
+  margin: 8px 0;
+}
+html.runtime-fit #gamepadInlineView {
+  flex: 1 1 0;
+  min-height: 0;
+  container-type: size;
+}
+html.runtime-fit .gamepad-inline-layout {
+  grid-template-columns: minmax(0, 1fr) clamp(72px, 20cqw, 200px) minmax(0, 1fr);
+  justify-content: initial;
+  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+}
+html.runtime-fit .gamepad-touch-wheel {
+  width: min(100%, 100cqh, 360px);
+}
+html.runtime-fit .gamepad-inline-layout > .gamepad-inline-status {
+  align-content: center;
+}
+html.runtime-fit .gamepad-inline-status button {
+  height: clamp(44px, calc((min(100cqh, 360px) - 40px) / 3), 100px);
+  min-height: 0;
+  padding: 0;
+}
+@container (max-height: 300px) {
+  html.runtime-fit .gamepad-inline-status button {
+    font-size: 36px;
+  }
+}
+@container (max-width: 599px) {
+  html.runtime-fit .gamepad-inline-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: space-evenly;
+    gap: 6px;
+  }
+  html.runtime-fit .gamepad-touch-wheel {
+    width: min(100%, calc((100cqh - 86px) / 2), 360px);
+  }
+  html.runtime-fit .gamepad-inline-layout > .gamepad-inline-status {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(100%, 360px);
+  }
+  html.runtime-fit .gamepad-inline-status button {
+    height: 56px;
+    font-size: 32px;
+  }
 }
 
 @media (max-height: 520px) and (orientation: landscape) {
+  /* GAMEPAD joins the shared bottom row: its own toolbar and last-action line give way to the footer buttons. */
+  html.runtime-fit .runtime-shell[data-runtime-layout='GAMEPAD'] .runtime-footer {
+    display: contents;
+  }
+  html.runtime-fit .gamepad-inline-last-action,
+  html.runtime-fit .gamepad-inline-toolbar {
+    display: none;
+  }
   html.runtime-fit .runtime-shell {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
@@ -2423,34 +2508,22 @@ html.runtime-fit .runtime-matrix-horizontal-left > .runtime-matrix-section {
     bottom: 60px;
   }
 
-  /* FOCUS: the step title and the selected-player context share one 44 px row above the grid. */
+  /* FOCUS: the selected-player context takes one 44 px row above the grid. */
   html.runtime-fit .runtime-focus-stage {
     --rt-focus-fixed: 50px;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 44px auto;
     grid-template-areas:
-      'question context'
-      'panel panel';
-    column-gap: 12px;
+      'context'
+      'panel';
     row-gap: 6px;
     align-content: start;
-  }
-  html.runtime-fit .runtime-focus-stage > .runtime-question {
-    grid-area: question;
-    align-items: center;
-    gap: 8px;
-    min-height: 0;
-    margin: 0;
-    font-size: 16px;
-  }
-  html.runtime-fit .runtime-focus-stage .runtime-kicker {
-    margin: 0;
   }
   html.runtime-fit .runtime-focus-stage > .runtime-focus-context {
     grid-area: context;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
     gap: 8px;
     height: auto;
@@ -2479,7 +2552,7 @@ html.runtime-fit .runtime-matrix-horizontal-left > .runtime-matrix-section {
   /* SPEED: labels shrink so the narrower phone-landscape buttons keep whole words. */
   html.runtime-fit .runtime-matrix-horizontal-right > .runtime-matrix-section,
   html.runtime-fit .runtime-matrix-horizontal-left > .runtime-matrix-section {
-    --runtime-matrix-button-height: clamp(44px, calc((100cqh - 49px) / 3), 56px);
+    --runtime-matrix-button-height: clamp(44px, calc((100cqh - 26px) / 3), 60px);
   }
   html.runtime-fit .runtime-matrix-section {
     padding: 5px;
