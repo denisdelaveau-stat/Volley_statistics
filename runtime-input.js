@@ -10,6 +10,7 @@
   var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
     EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
   var MODES = ['FOCUS', 'SPEED', 'FLOW', 'GAMEPAD'];
+  var FIT_MODES = ['FOCUS', 'SPEED'];
   var ACTIONS = [
     { id: 'service', code: 'SERVE', label: t('action.service'), family: 'serve' },
     { id: 'reception', code: 'RECEPTION', label: t('action.reception'), family: 'build' },
@@ -731,11 +732,6 @@
       state.mode +
       '">' +
       modes() +
-      '<button type="button" class="runtime-gamepad-button" data-runtime-gamepad>🎮 <span>' +
-      (window.VolleyGamepad && window.VolleyGamepad.GamepadManager.getState().connected
-        ? 'MANETTE CONNECTÉE'
-        : 'CONFIGURER LA MANETTE') +
-      '</span></button>' +
       body +
       '<p class="runtime-error" role="alert">' +
       esc(state.error) +
@@ -823,6 +819,8 @@
     var root = document.getElementById('runtimeInputRoot');
     if (!root) return;
     document.documentElement.setAttribute('data-runtime-mode', state.mode);
+    // Modes whose layout is fitted to the screen height (runtime-input.css, "Fit-to-screen capture layout").
+    document.documentElement.classList.toggle('runtime-fit', FIT_MODES.indexOf(state.mode) >= 0);
     root.innerHTML = rootHtml();
     var setLabel = panel.querySelector('.runtime-set');
     if (setLabel)
@@ -1385,14 +1383,6 @@
   panel.addEventListener('click', function (event) {
     var target = event.target.closest('button');
     if (!target) return;
-    if (target.hasAttribute('data-runtime-gamepad')) {
-      if (window.VolleyGamepad && typeof window.VolleyGamepad.openSetup === 'function') {
-        window.VolleyGamepad.openSetup();
-      } else {
-        document.dispatchEvent(new CustomEvent('volleylive:open-gamepad'));
-      }
-      return;
-    }
     if (target.hasAttribute('data-runtime-options')) {
       openOptions();
       return;

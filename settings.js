@@ -43,7 +43,13 @@
       i18n.SUPPORTED.map(function (code) {
         return choice('data-setting-language', code, language === code, t('language.' + code));
       }).join('') +
-      '</div></div>';
+      '</div></div><div class="su-card"><label class="field-label">' +
+      esc(t('settings.gamepad')) +
+      '</label><div class="su-format"><button type="button" class="su-btn" data-setting-gamepad>' +
+      esc(t('settings.gamepadSetup')) +
+      '<small>' +
+      esc(t('settings.gamepadSetupDetail')) +
+      '</small></button></div></div>';
     $('settingsBody').innerHTML = h;
     $('settingsMsg').textContent = '';
   }
@@ -59,8 +65,11 @@
   });
   $('settingsBody').addEventListener('click', function (e) {
     var format = e.target.closest('[data-setting-format]'),
-      lang = e.target.closest('[data-setting-language]');
-    if (format) {
+      lang = e.target.closest('[data-setting-language]'),
+      gamepad = e.target.closest('[data-setting-gamepad]');
+    if (gamepad) {
+      if (window.VolleyGamepad) window.VolleyGamepad.openSetup();
+    } else if (format) {
       CFG.setsToWin = +format.dataset.settingFormat;
       renderSettings();
     } else if (lang) {

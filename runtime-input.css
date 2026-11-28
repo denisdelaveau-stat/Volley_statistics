@@ -184,22 +184,6 @@ html.runtime-capture-active .score-line {
   color: #05203c;
   box-shadow: 0 0 16px rgba(53, 217, 255, 0.25);
 }
-.runtime-gamepad-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 7px;
-  min-height: 44px;
-  width: min(620px, 100%);
-  margin: -4px auto 8px;
-  border: 1px solid #3977a3;
-  border-radius: 10px;
-  background: #0d365d;
-  color: #dff5ff;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-}
 .runtime-shell {
   max-width: 1120px;
   margin: 0 auto;
@@ -978,7 +962,6 @@ html[data-runtime-mode='FLOW'] #historyToggle,
 html[data-runtime-mode='FLOW'] #historyPanel {
   display: none !important;
 }
-html[data-runtime-mode='FLOW'] .runtime-gamepad-button,
 html[data-runtime-mode='FLOW'] .runtime-footer .runtime-last {
   display: none;
 }
@@ -1066,9 +1049,6 @@ html[data-runtime-mode='FLOW'] .runtime-footer .runtime-last {
 }
 .runtime-shell[data-runtime-layout="GAMEPAD"] {
   max-width: none;
-}
-.runtime-shell[data-runtime-layout="GAMEPAD"] .runtime-gamepad-button {
-  display: none;
 }
 .runtime-shell[data-runtime-layout="GAMEPAD"] .runtime-footer {
   display: none;
@@ -1886,7 +1866,6 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
     font-size: 10px;
   }
 }
-html[data-runtime-mode='SPEED'] .runtime-gamepad-button,
 html[data-runtime-mode='SPEED'] #gamepadCaptureIndicator {
   display: none;
 }
@@ -2272,5 +2251,258 @@ html[data-runtime-mode='SPEED'] .runtime-sub-open {
 @media (max-width: 340px) {
   .set-lineup-roles {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Fit-to-screen capture layout (modes listed in FIT_MODES, runtime-input.js).
+   The input area takes exactly the screen height left under the score header, so nothing needed during a rally
+   sits below the screen edge. Button sizes derive from that height through container queries (the stage is the
+   container) and never go below the 44 px touch minimum. On short landscape screens (phones), the mode tabs join
+   Undo and Substitution in one bottom row. */
+html.runtime-fit.runtime-capture-active {
+  --rt-fit-head: calc(max(8px, env(safe-area-inset-top, 0px)) + 57px);
+  --rt-fit-gap: 8px;
+  --rt-fit-bottom: env(safe-area-inset-bottom, 0px);
+}
+html.runtime-fit.runtime-capture-active #capturePanel > .capture-head {
+  height: var(--rt-fit-head);
+  min-height: 0;
+  margin-bottom: var(--rt-fit-gap);
+}
+html.runtime-fit.runtime-capture-active #capturePanel > .steps {
+  height: calc(100vh - var(--rt-fit-head) - var(--rt-fit-gap) - var(--rt-fit-bottom));
+  height: calc(100dvh - var(--rt-fit-head) - var(--rt-fit-gap) - var(--rt-fit-bottom));
+  min-height: 0;
+  gap: 0;
+}
+html.runtime-fit.runtime-capture-active #runtimeInputRoot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+html.runtime-fit .runtime-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+}
+html.runtime-fit .runtime-mode-tabs {
+  flex: none;
+  width: 100%;
+  margin-bottom: var(--rt-fit-gap);
+}
+html.runtime-fit .runtime-shell > .runtime-stage {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  container-type: size;
+}
+/* The error line floats above the bottom bar instead of reserving a row. */
+html.runtime-fit .runtime-error {
+  position: absolute;
+  bottom: 66px;
+  left: 50%;
+  z-index: 26;
+  max-width: 92%;
+  min-height: 0;
+  margin: 0;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(70, 12, 22, 0.94);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+html.runtime-fit .runtime-error:empty {
+  display: none;
+}
+html.runtime-fit .runtime-footer {
+  position: relative;
+  flex: none;
+  width: 100%;
+  margin: var(--rt-fit-gap) 0 0;
+  padding: 6px 8px;
+}
+html.runtime-fit .runtime-footer .runtime-undo,
+html.runtime-fit .runtime-footer .runtime-sub-open {
+  min-height: 44px;
+}
+
+/* FOCUS: one row height shared by the player, action and status steps, so buttons keep their page position.
+   Fixed parts: context 100 px, question 43 px, panel border and padding 23 px, two row gaps 16 px. */
+html.runtime-fit .runtime-focus-stage {
+  --rt-focus-fixed: 143px;
+  --rt-focus-row: clamp(44px, calc((100cqh - var(--rt-focus-fixed) - 39px) / 3), 96px);
+}
+html.runtime-fit .runtime-focus-stage > .runtime-focus-context,
+html.runtime-fit .runtime-focus-stage > .runtime-question {
+  flex: none;
+}
+html.runtime-fit .runtime-focus-stage > .runtime-panel {
+  height: calc(var(--rt-focus-row) * 3 + 39px);
+  min-height: 0;
+}
+html.runtime-fit .runtime-focus-stage .runtime-player-grid,
+html.runtime-fit .runtime-focus-stage .runtime-action-grid,
+html.runtime-fit .runtime-focus-stage .runtime-result-grid {
+  grid-auto-rows: var(--rt-focus-row);
+}
+html.runtime-fit .runtime-focus-stage .runtime-player,
+html.runtime-fit .runtime-focus-stage .runtime-action,
+html.runtime-fit .runtime-focus-stage .runtime-result {
+  height: var(--rt-focus-row);
+  min-height: 0;
+}
+html.runtime-fit .runtime-focus-stage .runtime-player {
+  overflow: hidden;
+}
+@container (max-height: 410px) {
+  html.runtime-fit .runtime-focus-stage .runtime-player .name {
+    display: none;
+  }
+}
+
+/* SPEED (Matrix Full): one button height for the three sections.
+   Vertical layouts stack three sections (9 rows); horizontal layouts place them side by side (3 rows).
+   Per section: padding 12 px, border 2 px, title 18 px, title gap 5 px, two row gaps 12 px = 49 px. */
+html.runtime-fit .runtime-matrix {
+  gap: var(--rt-fit-gap);
+  align-content: start;
+}
+html.runtime-fit .runtime-matrix-section {
+  gap: 5px;
+  padding: 6px;
+}
+html.runtime-fit .runtime-matrix-vertical-down > .runtime-matrix-section,
+html.runtime-fit .runtime-matrix-vertical-up > .runtime-matrix-section {
+  --runtime-matrix-button-height: clamp(44px, calc((100cqh - 163px) / 9), 64px);
+}
+html.runtime-fit .runtime-matrix-horizontal-right > .runtime-matrix-section,
+html.runtime-fit .runtime-matrix-horizontal-left > .runtime-matrix-section {
+  --runtime-matrix-button-height: clamp(44px, calc((100cqh - 49px) / 3), 72px);
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  html.runtime-fit .runtime-shell {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'stage stage stage'
+      'undo tabs sub';
+    column-gap: var(--rt-fit-gap);
+    row-gap: var(--rt-fit-gap);
+  }
+  html.runtime-fit .runtime-shell > .runtime-stage {
+    grid-area: stage;
+  }
+  html.runtime-fit .runtime-mode-tabs {
+    grid-area: tabs;
+    align-self: center;
+    max-width: none;
+    margin: 0;
+    padding: 3px;
+  }
+  html.runtime-fit .runtime-footer {
+    display: contents;
+  }
+  html.runtime-fit .runtime-footer .runtime-last {
+    display: none;
+  }
+  html.runtime-fit .runtime-footer .runtime-undo {
+    grid-area: undo;
+    align-self: center;
+  }
+  html.runtime-fit .runtime-footer .runtime-sub-open {
+    grid-area: sub;
+    align-self: center;
+  }
+  html.runtime-fit .runtime-error {
+    bottom: 60px;
+  }
+
+  /* FOCUS: the step title and the selected-player context share one 44 px row above the grid. */
+  html.runtime-fit .runtime-focus-stage {
+    --rt-focus-fixed: 50px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 44px auto;
+    grid-template-areas:
+      'question context'
+      'panel panel';
+    column-gap: 12px;
+    row-gap: 6px;
+    align-content: start;
+  }
+  html.runtime-fit .runtime-focus-stage > .runtime-question {
+    grid-area: question;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    margin: 0;
+    font-size: 16px;
+  }
+  html.runtime-fit .runtime-focus-stage .runtime-kicker {
+    margin: 0;
+  }
+  html.runtime-fit .runtime-focus-stage > .runtime-focus-context {
+    grid-area: context;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    min-width: 0;
+  }
+  html.runtime-fit .runtime-focus-stage .runtime-author-chip,
+  html.runtime-fit .runtime-focus-stage .runtime-inline-tools {
+    flex-wrap: nowrap;
+    min-height: 0;
+    margin: 0;
+  }
+  html.runtime-fit .runtime-focus-stage > .runtime-panel {
+    grid-area: panel;
+  }
+  html.runtime-fit .runtime-focus-stage .runtime-player {
+    padding: 2px 4px;
+  }
+  html.runtime-fit .runtime-focus-stage .runtime-player .number {
+    font-size: 26px;
+  }
+  html.runtime-fit .runtime-focus-stage .runtime-player .role,
+  html.runtime-fit .runtime-focus-stage .runtime-player .name {
+    display: none;
+  }
+
+  /* SPEED: labels shrink so the narrower phone-landscape buttons keep whole words. */
+  html.runtime-fit .runtime-matrix-horizontal-right > .runtime-matrix-section,
+  html.runtime-fit .runtime-matrix-horizontal-left > .runtime-matrix-section {
+    --runtime-matrix-button-height: clamp(44px, calc((100cqh - 49px) / 3), 56px);
+  }
+  html.runtime-fit .runtime-matrix-section {
+    padding: 5px;
+  }
+  html.runtime-fit .runtime-matrix-player-grid,
+  html.runtime-fit .runtime-matrix-action-grid,
+  html.runtime-fit .runtime-matrix-status-grid {
+    gap: 4px;
+  }
+  html.runtime-fit .runtime-matrix-action {
+    padding: 2px;
+    font-size: 11px;
+  }
+  /* Status buttons are as narrow as a player button: the symbol sits above its label. */
+  html.runtime-fit .runtime-matrix-status {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: center;
+    gap: 2px;
+    padding: 2px 3px;
+    font-size: 11px;
+  }
+  html.runtime-fit .runtime-matrix-status b {
+    font-size: 17px;
   }
 }

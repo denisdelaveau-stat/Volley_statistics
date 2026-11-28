@@ -23,14 +23,19 @@ def canonical_subset(event):
     return {key: event.get(key) for key in keys}
 
 
-def test_gamepad_configuration_button_opens_gamepad_setup(browser):
+def test_gamepad_setup_is_opened_from_settings_not_from_capture(browser):
     page, errors = open_runtime(browser)
-    button = page.locator('[data-runtime-gamepad]')
+    for mode in ("FOCUS", "SPEED", "FLOW", "GAMEPAD"):
+        page.locator(f'.runtime-mode-tabs [data-runtime-mode="{mode}"]').click()
+        assert page.get_by_text("CONFIGURER LA MANETTE").count() == 0
+    page.evaluate("sessionStorage.removeItem('volleyCapture.stage')")
+    page.reload()
+    page.locator("#homeSettings").click()
+    button = page.locator("[data-setting-gamepad]")
     assert button.count() == 1
     button.click()
     assert page.locator('#gamepadSettings').is_visible()
     assert page.locator('[data-gamepad-capture]').count() == 1
-    assert page.locator('#runtimePrefs').is_hidden()
     assert errors == []
     page.close()
 
