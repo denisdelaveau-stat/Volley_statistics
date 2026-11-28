@@ -65,11 +65,11 @@ Requirements not implemented yet are in `TO_DO/`, not here. Earlier documents ar
 | [UI-COACH-ROTATIONS](UI-COACH-ROTATIONS.md) | Coach View: rotations | Current |
 | [UI-COACH-PLAYERS](UI-COACH-PLAYERS.md) | Coach View: players and player detail | Current |
 | [UI-COACH-LIVE](UI-COACH-LIVE.md) | Coach View: LIVE COURT and PLAYER FOCUS | Current |
-| [UI-SPECTATOR](UI-SPECTATOR.md) | Spectator View: shell, navigation and set selection | Planned |
-| [UI-SPECTATOR-SCORE](UI-SPECTATOR-SCORE.md) | Spectator View: live score and momentum | Planned |
-| [UI-SPECTATOR-TIMELINE](UI-SPECTATOR-TIMELINE.md) | Spectator View: timeline | Planned |
-| [UI-SPECTATOR-GRAPH](UI-SPECTATOR-GRAPH.md) | Spectator View: score and fault evolution | Planned |
-| [UI-SPECTATOR-RANKING](UI-SPECTATOR-RANKING.md) | Spectator View: ranking | Planned |
+| [UI-SPECTATOR](UI-SPECTATOR.md) | Spectator View: shell, navigation and set selection | Current |
+| [UI-SPECTATOR-SCORE](UI-SPECTATOR-SCORE.md) | Spectator View: live score and momentum | Current |
+| [UI-SPECTATOR-TIMELINE](UI-SPECTATOR-TIMELINE.md) | Spectator View: timeline | Current |
+| [UI-SPECTATOR-GRAPH](UI-SPECTATOR-GRAPH.md) | Spectator View: score and fault evolution | Current |
+| [UI-SPECTATOR-RANKING](UI-SPECTATOR-RANKING.md) | Spectator View: ranking | Current |
 
 ## 3. Glossary
 
@@ -109,3 +109,5 @@ Requirements not implemented yet are in `TO_DO/`, not here. Earlier documents ar
 | `tests/TEST_PLAN.md` | SYS-QA and section 9 of each spec |
 
 A former document moves to `docs/archive/superseded-specs/` in the same commit as the spec that replaces it.
+
+Besides this folder, `docs/` keeps source material only: the normative JSON Schema (`volley-live.match.schema.v2.1.json`), reference images and screenshots, and the original Word and PDF documents the first versions were built from. They are inputs, not specifications.

@@ -32,7 +32,7 @@ Contracts are documented in `docs/specs/SYS-ARCH.md` (section 7.3, capture contr
 
 ### Specifications (started 2026-11-27)
 
-`docs/specs/` holds the specifications as built, one per interface, feature or rule set, on one template (`_TEMPLATE.md`), with numbered requirements traced to tests; `tests/unit/specs.test.js` checks the template, the traceability and that every cited test exists. Catalogue and status: `docs/specs/README.md`. Done: batch A (template, conventions, index), batch B (domain rules DOM-*) and batch C (system specs SYS-*). Next: the interface specs (UI-*); each moves the documents it replaces to `docs/archive/superseded-specs/`.
+`docs/specs/` holds the specifications as built, one per interface, feature or rule set, on one template (`_TEMPLATE.md`), with numbered requirements traced to tests; `tests/unit/specs.test.js` checks the template, the traceability and that every cited test exists. Catalogue and status: `docs/specs/README.md`. Done on 2026-11-27/28: the 28 specifications of the catalogue (A template and index, B domain rules DOM-*, C system SYS-*, D interfaces UI-*), all Current. Known gaps they document: the detailed match report has no button (UI-REPORTS), the former Coach player detail view is unreachable code (UI-COACH-PLAYERS), design variables and breakpoints are per area (SYS-DESIGN). Every replaced document is in `docs/archive/superseded-specs/`.
 
 ### Audit step 6 (done)
 
