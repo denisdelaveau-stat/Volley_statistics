@@ -1,4 +1,5 @@
-/* VolleyLive Coach View controller: render, open/close, event wiring and the public window.VolleyCoach API. Views live in js/coach-*.js. */
+/* VolleyLive Coach View controller: render, open/close, event wiring and the public window.VolleyCoach API. Views live in js/coach-*.js.
+   Spec: docs/specs/UI-COACH.md, UI-COACH-ROTATIONS.md, UI-COACH-PLAYERS.md, UI-COACH-LIVE.md. */
 (function () {
   'use strict';
   var P = window.VolleyCoachParts;

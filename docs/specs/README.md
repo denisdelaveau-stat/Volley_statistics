@@ -61,10 +61,10 @@ Requirements not implemented yet are in `TO_DO/`, not here. Earlier documents ar
 | [UI-HUB](UI-HUB.md) | Match Hub (Match Capture) | Current |
 | [UI-LIBRARY](UI-LIBRARY.md) | Match Library | Current |
 | [UI-REPORTS](UI-REPORTS.md) | Match reports and exports | Current |
-| [UI-COACH](UI-COACH.md) | Coach View: shell, data source and overview | Planned |
-| [UI-COACH-ROTATIONS](UI-COACH-ROTATIONS.md) | Coach View: rotations | Planned |
-| [UI-COACH-PLAYERS](UI-COACH-PLAYERS.md) | Coach View: players and player detail | Planned |
-| [UI-COACH-LIVE](UI-COACH-LIVE.md) | Coach View: LIVE COURT and PLAYER FOCUS | Planned |
+| [UI-COACH](UI-COACH.md) | Coach View: shell, data source and overview | Current |
+| [UI-COACH-ROTATIONS](UI-COACH-ROTATIONS.md) | Coach View: rotations | Current |
+| [UI-COACH-PLAYERS](UI-COACH-PLAYERS.md) | Coach View: players and player detail | Current |
+| [UI-COACH-LIVE](UI-COACH-LIVE.md) | Coach View: LIVE COURT and PLAYER FOCUS | Current |
 | [UI-SPECTATOR](UI-SPECTATOR.md) | Spectator View: shell, navigation and set selection | Planned |
 | [UI-SPECTATOR-SCORE](UI-SPECTATOR-SCORE.md) | Spectator View: live score and momentum | Planned |
 | [UI-SPECTATOR-TIMELINE](UI-SPECTATOR-TIMELINE.md) | Spectator View: timeline | Planned |
