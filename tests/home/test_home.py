@@ -1,5 +1,7 @@
 """v1.26.0 Home, workspace hierarchy, and responsive navigation acceptance."""
-from helpers import APP_URI, ROOT, base_match, VERSION
+import re
+
+from helpers import APP_URI, ROOT, base_match
 
 UI_LANGUAGE = "en"  # assertions below use the English interface
 
@@ -31,7 +33,8 @@ def test_home_workspace_navigation_and_back_paths(browser):
     assert page.locator("#homeScreen .home-main").all_inner_texts() == [
         "SETUP & CAPTURE", "INSIGHTS & VIEWING", "SETTINGS"
     ]
-    assert page.locator("#appVersion").inner_text() == f"v{VERSION}"
+    # Branch and build number, stamped at each commit by tools/stamp_build.py.
+    assert re.fullmatch(r"\S+ · build \d+", page.locator("#appVersion").inner_text())
 
     page.locator("#homeSetupCapture").click()
     assert page.locator("#setupCaptureTitle").inner_text() == "SETUP & CAPTURE"

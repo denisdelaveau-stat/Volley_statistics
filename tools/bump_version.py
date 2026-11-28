@@ -2,8 +2,9 @@
 
 Usage: python tools/bump_version.py 1.29.0
 
-Updates VERSION, the service-worker cache name and header, the Home version label
-and the README title. Tests read VERSION, so they follow automatically.
+Updates VERSION, the service-worker cache name and header and the README title. Tests read VERSION, so they
+follow automatically. The Home label shows the branch and build number instead (tools/stamp_build.py, run by the
+pre-commit hook), which also adds the build number to the cache name at the next commit.
 """
 from __future__ import annotations
 
@@ -15,9 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # (file, pattern, replacement template) — each pattern must match exactly once.
 TARGETS = [
-    ("sw.js", r"var CACHE = 'volley-live-capture-v[\d.]+';", "var CACHE = 'volley-live-capture-v{v}';"),
+    ("sw.js", r"var CACHE = 'volley-live-capture-v[^']*';", "var CACHE = 'volley-live-capture-v{v}';"),
     ("sw.js", r"^/\* Volley Live Capture v[\d.]+", "/* Volley Live Capture v{v}"),
-    ("index.html", r'<div class="home-version" id="appVersion">v[\d.]+</div>', '<div class="home-version" id="appVersion">v{v}</div>'),
     ("README.md", r"^# VolleyLive v[\d.]+", "# VolleyLive v{v}"),
 ]
 
