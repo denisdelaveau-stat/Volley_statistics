@@ -354,6 +354,7 @@
         scoreA: a,
         scoreB: b,
         inputMode: runtimeContext.inputMode || 'LEGACY',
+        inputSource: runtimeContext.inputSource || 'touch',
         schemaVersion: 'runtime-input-v1',
       };
       if (

@@ -101,7 +101,7 @@ html.runtime-capture-active .score-line {
 }
 .runtime-mode-tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   max-width: 620px;
   margin: 0 auto 10px;
@@ -124,6 +124,22 @@ html.runtime-capture-active .score-line {
   background: linear-gradient(135deg, #26caed, #62e0f6);
   color: #05203c;
   box-shadow: 0 0 16px rgba(53, 217, 255, 0.25);
+}
+.runtime-gamepad-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  width: min(620px, 100%);
+  margin: -4px auto 8px;
+  border: 1px solid #3977a3;
+  border-radius: 10px;
+  background: #0d365d;
+  color: #dff5ff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
 }
 .runtime-shell {
   max-width: 1120px;
@@ -527,6 +543,444 @@ html.runtime-capture-active .score-line {
 .runtime-capture-active #captureStatus {
   display: none;
 }
+
+/* Inline GAMEPAD capture mode */
+.runtime-gamepad-layout {
+  width: 100%;
+}
+.gamepad-inline-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 150px minmax(240px, 1fr);
+  align-items: center;
+  justify-items: center;
+  min-height: 470px;
+  border: 1px solid #27628d;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 50%, #123b66 0, #071e3b 72%);
+  padding: 18px 24px;
+}
+.gamepad-inline-layout .gamepad-circle {
+  width: min(34vw, 390px);
+  max-width: 390px;
+}
+.gamepad-inline-status {
+  display: grid;
+  gap: 14px;
+  width: 150px;
+}
+.gamepad-inline-status button {
+  min-height: 112px;
+  width: 150px;
+  border: 3px solid currentColor;
+  border-radius: 14px;
+  background: #102e50;
+  color: #fff;
+  font-size: 54px;
+  font-weight: 1000;
+  line-height: 1;
+}
+.gamepad-inline-status .positive {
+  color: #20c766;
+  background: rgba(32, 199, 102, 0.14);
+}
+.gamepad-inline-status .neutral {
+  color: #dbe9f4;
+  background: rgba(128, 155, 184, 0.22);
+}
+.gamepad-inline-status .negative {
+  color: #ed4949;
+  background: rgba(237, 73, 73, 0.16);
+}
+.gamepad-inline-status button:active {
+  transform: scale(0.97);
+}
+@media (max-width: 700px), (orientation: portrait) {
+  .gamepad-inline-layout {
+    grid-template-columns: minmax(150px, 1fr) 92px minmax(150px, 1fr);
+    min-height: 390px;
+    padding: 8px 2px;
+  }
+  .gamepad-inline-layout .gamepad-circle {
+    width: 38vw;
+  }
+  .gamepad-inline-status {
+    width: 92px;
+  }
+  .gamepad-inline-status button {
+    width: 92px;
+    min-height: 82px;
+    font-size: 38px;
+  }
+}
+
+/* Physical gamepad capture view */
+.gamepad-indicator {
+  min-height: 44px;
+  border: 1px solid #3977a3;
+  border-radius: 10px;
+  background: #0d365d;
+  color: #bcd8ea;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.gamepad-capture-overlay {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 72px minmax(0, 1fr) 44px;
+  background: radial-gradient(circle at 50% 40%, #123c68 0, #071e3b 72%);
+  color: #fff;
+}
+.gamepad-capture-overlay[hidden],
+.gamepad-settings[hidden] {
+  display: none;
+}
+.gamepad-result-head {
+  display: grid;
+  grid-template-columns: 170px 1fr 170px;
+  align-items: center;
+  border-bottom: 1px solid #2e6f9e;
+  padding: 8px 20px;
+}
+.gamepad-result-head button {
+  min-height: 48px;
+  border: 2px solid #35d9ff;
+  border-radius: 12px;
+  background: #0d365d;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+}
+.gamepad-result-head button:last-child {
+  justify-self: end;
+  width: 48px;
+  font-size: 24px;
+}
+.gamepad-brand {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+.gamepad-pad-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 8vw;
+  padding: 20px 5vw;
+}
+.gamepad-circle {
+  position: relative;
+  width: min(36vw, 410px);
+  aspect-ratio: 1;
+  justify-self: center;
+  border: 3px solid rgba(53, 217, 255, 0.12);
+  border-radius: 50%;
+}
+.gamepad-bubble {
+  position: absolute;
+  z-index: 2;
+  width: 112px;
+  height: 112px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  border: 5px solid var(--bubble-color);
+  border-radius: 50%;
+  background: #102d4a;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  transition: transform 0.08s, background 0.08s;
+}
+.gamepad-bubble.selected {
+  z-index: 4;
+  transform: translate(-50%, -50%) scale(1.3);
+  background: var(--bubble-color);
+  outline: 4px solid #fff;
+  outline-offset: 3px;
+  font-size: 22px;
+}
+.gamepad-needle {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  width: 42%;
+  height: 5px;
+  transform-origin: 0 50%;
+  background: #35d9ff;
+  border-radius: 5px;
+  pointer-events: none;
+}
+.gamepad-center {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 50%;
+  width: 92px;
+  height: 92px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-content: center;
+  border: 5px solid #061426;
+  border-radius: 50%;
+  background: #061426;
+  text-align: center;
+}
+.gamepad-center b {
+  max-width: 88px;
+  font-size: 26px;
+  line-height: 1;
+}
+.gamepad-center small {
+  margin-top: 4px;
+  color: #cfe5f4;
+  font-size: 10px;
+  font-weight: 900;
+}
+.gamepad-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #2e6f9e;
+  padding: 0 20px;
+  color: #bcd8ea;
+  font-size: 13px;
+  font-weight: 800;
+}
+.gamepad-status-screen {
+  display: grid;
+  align-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+.gamepad-chips {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.gamepad-chips span {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #527da0;
+  border-radius: 999px;
+  background: #0a2f52;
+  padding: 8px 16px;
+  font-weight: 900;
+}
+.gamepad-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+.gamepad-status-button {
+  min-height: 250px;
+  border: 5px solid var(--status-color);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--status-color) 18%, #071e3b);
+  color: #fff;
+}
+.gamepad-status-button b {
+  display: block;
+  color: var(--status-color);
+  font-size: 80px;
+  line-height: 1;
+}
+.gamepad-status-button span {
+  display: block;
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 900;
+}
+.gamepad-status-button.selected {
+  transform: scale(1.05);
+  outline: 4px solid #fff;
+  outline-offset: 4px;
+}
+.gamepad-result-screen {
+  grid-row: 1 / 4;
+  display: grid;
+  grid-template-rows: 40px 1fr 90px 1fr 8px;
+  place-items: center;
+  border: 4px solid var(--status-color);
+  background: color-mix(in srgb, var(--status-color) 14%, #061a33);
+  text-align: center;
+}
+.gamepad-result-screen small {
+  align-self: end;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+.gamepad-result-player b {
+  display: block;
+  font-size: clamp(48px, 8vw, 96px);
+  line-height: 1;
+}
+.gamepad-result-player span {
+  display: block;
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 900;
+}
+.gamepad-result-action {
+  align-self: end;
+  font-size: clamp(32px, 6vw, 72px);
+  font-weight: 1000;
+}
+.gamepad-result-status b {
+  display: block;
+  color: var(--status-color);
+  font-size: clamp(80px, 12vw, 150px);
+  line-height: 0.8;
+}
+.gamepad-result-status span {
+  display: block;
+  margin-top: 18px;
+  font-size: 22px;
+  font-weight: 900;
+}
+.gamepad-progress {
+  align-self: end;
+  width: 100%;
+  height: 8px;
+  background: #071e3b;
+}
+.gamepad-progress i {
+  display: block;
+  height: 100%;
+  background: var(--status-color);
+  animation: gamepad-progress var(--gamepad-duration, 2.5s) linear forwards;
+}
+@keyframes gamepad-progress {
+  from { width: 100%; }
+  to { width: 0; }
+}
+.gamepad-settings {
+  position: fixed;
+  z-index: 220;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 12, 28, 0.92);
+  color: #fff;
+}
+.gamepad-settings-card {
+  width: min(760px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  border: 2px solid #35d9ff;
+  border-radius: 16px;
+  background: #092b4d;
+  padding: 16px;
+}
+.gamepad-settings-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gamepad-settings-card header button {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #123f64;
+  color: #fff;
+}
+.gamepad-settings-grid {
+  display: grid;
+  gap: 7px;
+}
+.gamepad-binding-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 100px 80px;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  border: 1px solid #3a7198;
+  border-radius: 8px;
+  padding: 6px;
+}
+.gamepad-binding-row button,
+.gamepad-reset,
+.gamepad-learn button {
+  min-height: 40px;
+  border: 1px solid #35d9ff;
+  border-radius: 8px;
+  background: #123f64;
+  color: #fff;
+  font-weight: 900;
+}
+.gamepad-binding-row .clear {
+  border-color: #ed4949;
+}
+.gamepad-settings-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+.gamepad-settings-options label {
+  display: grid;
+  gap: 5px;
+  font-weight: 900;
+}
+.gamepad-settings-options select,
+.gamepad-settings-options input {
+  min-height: 44px;
+}
+.gamepad-reset {
+  margin-top: 12px;
+  padding: 8px 12px;
+}
+.gamepad-learn {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 64px;
+  margin-top: 10px;
+  border: 2px solid #35d9ff;
+  border-radius: 10px;
+  background: #061a33;
+  padding: 10px;
+  font-weight: 900;
+}
+@media (max-width: 700px), (orientation: portrait) {
+  .gamepad-result-head {
+    grid-template-columns: 120px 1fr 48px;
+  }
+  .gamepad-pad-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    padding: 8px 2px;
+  }
+  .gamepad-circle {
+    width: 48vw;
+  }
+  .gamepad-bubble {
+    width: 82px;
+    height: 82px;
+  }
+  .gamepad-status-grid {
+    gap: 7px;
+  }
+  .gamepad-status-button {
+    min-height: 190px;
+  }
+  .gamepad-status-button b {
+    font-size: 62px;
+  }
+  .gamepad-binding-row {
+    grid-template-columns: 130px 1fr 80px 70px;
+  }
+}
 .runtime-capture-active #captureBack,
 .runtime-capture-active #pickChip,
 .runtime-capture-active .capture-sub-toggle,
@@ -577,7 +1031,7 @@ html.runtime-capture-active .score-line {
 }
 .runtime-pref-modes {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 7px;
 }
 .runtime-pref-modes button {

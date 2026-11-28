@@ -9,7 +9,7 @@
   var t = window.VolleyI18n.t;
   var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
     EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
-  var MODES = ['FOCUS', 'SPEED', 'FLOW'];
+  var MODES = ['FOCUS', 'SPEED', 'FLOW', 'GAMEPAD'];
   var ACTIONS = [
     { id: 'service', code: 'SERVE', label: t('action.service'), family: 'serve' },
     { id: 'reception', code: 'RECEPTION', label: t('action.reception'), family: 'build' },
@@ -134,7 +134,7 @@
     );
   }
   function modeLabel(mode) {
-    return mode === 'SPEED' ? 'SPEED+' : mode;
+    return mode === 'SPEED' ? 'SPEED+' : mode === 'GAMEPAD' ? 'GAMEPAD' : mode;
   }
   function actionMeta(id) {
     for (var i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].id === id) return ACTIONS[i];
@@ -403,6 +403,13 @@
       '</div></div></section>'
     );
   }
+  function gamepadLayout() {
+    return (
+      '<section class="runtime-stage runtime-gamepad-layout" aria-label="Saisie type manette">' +
+      '<div id="gamepadInlineView"></div>' +
+      '</section>'
+    );
+  }
   function lastEvent() {
     var list = events(),
       e = list[list.length - 1];
@@ -441,12 +448,24 @@
     );
   }
   function rootHtml() {
-    var body = state.mode === 'FOCUS' ? focusLayout() : state.mode === 'SPEED' ? speedLayout() : flowLayout();
+    var body =
+      state.mode === 'FOCUS'
+        ? focusLayout()
+        : state.mode === 'SPEED'
+          ? speedLayout()
+          : state.mode === 'GAMEPAD'
+            ? gamepadLayout()
+            : flowLayout();
     return (
       '<div class="runtime-shell" data-runtime-layout="' +
       state.mode +
       '">' +
       modes() +
+      '<button type="button" class="runtime-gamepad-button" data-runtime-gamepad>🎮 <span>' +
+      (window.VolleyGamepad && window.VolleyGamepad.GamepadManager.getState().connected
+        ? 'MANETTE CONNECTÉE'
+        : 'CONFIGURER LA MANETTE') +
+      '</span></button>' +
       body +
       '<p class="runtime-error" role="alert">' +
       esc(state.error) +
@@ -512,7 +531,7 @@
         'beforeend',
         '<div class="runtime-head-meta"><span class="runtime-set">S' +
           esc(M.currentSet || 1) +
-          '</span><button type="button" class="runtime-options-button" data-runtime-options aria-label="' +
+          '</span><button type="button" id="gamepadCaptureIndicator" class="gamepad-indicator" data-gamepad-indicator>🎮 No controller</button><button type="button" class="runtime-options-button" data-runtime-options aria-label="' +
           esc(t('runtime.optionsLabel')) +
           '">☰</button></div>'
       );
@@ -533,6 +552,9 @@
     if (!root) return;
     document.documentElement.setAttribute('data-runtime-mode', state.mode);
     root.innerHTML = rootHtml();
+    if (state.mode === 'GAMEPAD' && window.VolleyGamepad) {
+      window.VolleyGamepad.renderInlineCapture();
+    }
     if (state.feedback) {
       var f = document.getElementById('runtimeFeedback');
       if (f) {
@@ -596,7 +618,7 @@
   function uniqueEventId() {
     return 'evt_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9);
   }
-  function patchCanonicalEvent(beforeScore, eventId) {
+  function patchCanonicalEvent(beforeScore, eventId, inputSource) {
     var list = events(),
       e = list[list.length - 1];
     if (!e) return null;
@@ -612,6 +634,7 @@
     e.playerRole = p ? ROLE_LABEL[role(p)] || String(role(p) || '').toUpperCase() : 'OPPONENT';
     e.actionCode = a ? a.code : String(e.action || '').toUpperCase();
     e.status = r ? r.code : String(e.result || '').toUpperCase();
+    e.inputSource = inputSource || 'touch';
     e.scoreBefore = { home: beforeScore.a, away: beforeScore.b };
     e.scoreAfter = after;
     e.inputMode = state.mode;
@@ -627,7 +650,7 @@
         // Haptic feedback is optional (unsupported or blocked by the browser).
       }
   }
-  function commit(result) {
+  function commit(result, inputSource) {
     if (state.pending || Date.now() < state.lockedUntil) return;
     if (!state.author) {
       state.error = t('runtime.errorNoAuthor');
@@ -649,7 +672,7 @@
     var beforeCount = events().length,
       beforeScore = scoreNow(),
       eventId = uniqueEventId();
-    VC.runtimeContext = { eventId: eventId, inputMode: state.mode };
+    VC.runtimeContext = { eventId: eventId, inputMode: state.mode, inputSource: inputSource || 'touch' };
     try {
       VC.commit(state.author, state.action, result);
     } catch (error) {
@@ -666,7 +689,7 @@
       render();
       return;
     }
-    var committed = patchCanonicalEvent(beforeScore, eventId),
+    var committed = patchCanonicalEvent(beforeScore, eventId, inputSource || 'touch'),
       a = actionMeta(state.action),
       r = resultMeta(result);
     state.feedback = '✓ ' + authorText() + ' · ' + (a ? a.label : state.action) + ' ' + (r ? r.symbol : '');
@@ -1046,6 +1069,14 @@
   panel.addEventListener('click', function (event) {
     var target = event.target.closest('button');
     if (!target) return;
+    if (target.hasAttribute('data-runtime-gamepad')) {
+      if (window.VolleyGamepad && typeof window.VolleyGamepad.openSetup === 'function') {
+        window.VolleyGamepad.openSetup();
+      } else {
+        document.dispatchEvent(new CustomEvent('volleylive:open-gamepad'));
+      }
+      return;
+    }
     if (target.hasAttribute('data-runtime-options')) {
       openOptions();
       return;
@@ -1180,6 +1211,10 @@
     results: RESULTS.slice(),
     commit: commit,
     undo: undo,
+    selectPlayer: chooseAuthor,
+    selectAction: chooseAction,
+    goBack: goBack,
+    changePlayer: changePlayer,
     openSubstitution: openSubs,
     // Records a substitution after checking FIVB Rule 15; returns false (with the reason in the sheet) when refused.
     substitute: substitute,

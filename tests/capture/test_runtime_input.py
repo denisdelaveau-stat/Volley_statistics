@@ -23,10 +23,34 @@ def canonical_subset(event):
     return {key: event.get(key) for key in keys}
 
 
+def test_gamepad_configuration_button_opens_gamepad_setup(browser):
+    page, errors = open_runtime(browser)
+    button = page.locator('[data-runtime-gamepad]')
+    assert button.count() == 1
+    button.click()
+    assert page.locator('#gamepadSettings').is_visible()
+    assert page.locator('[data-gamepad-capture]').count() == 1
+    assert page.locator('#runtimePrefs').is_hidden()
+    assert errors == []
+    page.close()
+
+
+def test_gamepad_capture_mode_displays_dual_selectors(browser):
+    page, errors = open_runtime(browser)
+    page.locator('[data-runtime-mode="GAMEPAD"]').click()
+    assert page.locator('.runtime-gamepad-layout').count() == 1
+    assert page.locator('.gamepad-inline-layout').count() == 1
+    assert page.locator('.gamepad-player-circle').count() == 1
+    assert page.locator('.gamepad-action-circle').count() == 1
+    assert page.locator('.gamepad-inline-status button').count() == 3
+    assert errors == []
+    page.close()
+
+
 def test_runtime_options_are_available_and_persisted(browser):
     page, errors = open_runtime(browser)
     page.locator('[data-runtime-options]').click()
-    assert page.locator('[data-runtime-pref-mode]').count() == 3
+    assert page.locator('[data-runtime-pref-mode]').count() == 4
     assert page.locator('[data-runtime-pref-mode="SPEED"]').inner_text() == "SPEED+"
     page.locator('[data-runtime-pref-mode="FLOW"]').click()
     saved = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.runtimeInput.preferences.v1'))")
