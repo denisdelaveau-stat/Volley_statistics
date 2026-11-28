@@ -466,6 +466,188 @@ html.runtime-capture-active .score-line {
 .runtime-flow .runtime-panel {
   width: 100%;
 }
+.runtime-flow-screen {
+  display: grid;
+  gap: 8px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.runtime-flow-last {
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  color: #b7c8df;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+.runtime-flow-actions {
+  border: 2px solid #60a5fa;
+  border-radius: 16px;
+  background: #1f55c4;
+  padding: 10px;
+}
+.runtime-flow-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(62px, 1fr));
+  gap: 7px;
+}
+.runtime-flow-action {
+  min-width: 0;
+  min-height: 62px;
+  border: 1px solid #6f86a8;
+  border-radius: 9px;
+  background: #0a1730;
+  color: #fff;
+  font-size: clamp(16px, 2vw, 21px);
+  font-weight: 900;
+  touch-action: manipulation;
+}
+.runtime-flow-action[data-runtime-action='freeball'] {
+  grid-area: 1 / 2;
+}
+.runtime-flow-action[data-runtime-action='attack'] {
+  grid-area: 2 / 1;
+}
+.runtime-flow-action[data-runtime-action='service'] {
+  grid-area: 2 / 3;
+}
+.runtime-flow-action[data-runtime-action='block'] {
+  grid-area: 3 / 1;
+}
+.runtime-flow-action[data-runtime-action='reception'] {
+  grid-area: 3 / 3;
+}
+.runtime-flow-action[data-runtime-action='set'] {
+  grid-area: 4 / 1;
+}
+.runtime-flow-action[data-runtime-action='defense'] {
+  grid-area: 4 / 3;
+}
+.runtime-flow-action.selected,
+.runtime-flow-player.selected {
+  border-color: #22d3ee;
+  outline: 3px solid #22d3ee;
+  outline-offset: -4px;
+  background-color: #0c2a44;
+}
+.runtime-flow-action.preferred {
+  background-color: #1d3765;
+}
+.runtime-flow-status-grid {
+  grid-area: 2 / 2 / span 3 / 3;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(62px, 1fr));
+  gap: 7px;
+  border: 2px solid #c4b5fd;
+  border-radius: 12px;
+  background: #7b35d6;
+  padding: 8px;
+}
+.runtime-flow-status {
+  min-width: 0;
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px solid;
+  border-radius: 9px;
+  color: #fff;
+  font-size: clamp(14px, 1.8vw, 19px);
+  font-weight: 900;
+  touch-action: manipulation;
+}
+.runtime-flow-status b {
+  font-size: 28px;
+  line-height: 1;
+}
+.runtime-flow-status.positive {
+  border-color: #22c55e;
+  background: #0d3b1e;
+}
+.runtime-flow-status.neutral {
+  border-color: #94a3b8;
+  background: #3a4658;
+}
+.runtime-flow-status.error {
+  border-color: #ef4444;
+  background: #4a1520;
+}
+.runtime-flow-status:disabled {
+  opacity: 0.4;
+  filter: saturate(0.5);
+}
+.runtime-flow-status:not(:disabled):active,
+.runtime-flow-action:active,
+.runtime-flow-player:active {
+  transform: scale(0.98);
+}
+.runtime-flow-players {
+  border: 2px solid #6ee7b7;
+  border-radius: 16px;
+  background: #0e8a6a;
+  padding: 10px;
+}
+.runtime-flow-player-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(72px, 0.72fr);
+  grid-template-rows: repeat(2, minmax(66px, 1fr));
+  gap: 7px;
+}
+.runtime-flow-player {
+  position: relative;
+  min-width: 0;
+  min-height: 66px;
+  overflow: hidden;
+  border: 1px solid #6f86a8;
+  border-radius: 9px;
+  background: #0a1730;
+  color: #fff;
+  touch-action: manipulation;
+}
+.runtime-flow-player b {
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 1000;
+}
+.runtime-flow-player-bar {
+  position: absolute;
+  top: 14%;
+  bottom: 14%;
+  left: 7px;
+  width: 5px;
+  border-radius: 5px;
+  background: #ed4949;
+}
+.runtime-flow-player.runtime-role-opp .runtime-flow-player-bar {
+  background: #4c9aff;
+}
+.runtime-flow-player.runtime-role-setter .runtime-flow-player-bar {
+  background: #f2b84b;
+}
+.runtime-flow-player.runtime-role-mb .runtime-flow-player-bar {
+  background: #20c766;
+}
+.runtime-flow-player.runtime-role-libero .runtime-flow-player-bar {
+  background: #9aa5b1;
+}
+.runtime-flow-opponent {
+  grid-column: 4;
+  grid-row: 1 / span 2;
+  border-color: #fff;
+  background: #000;
+}
+.runtime-flow-opponent b {
+  font-size: clamp(42px, 5vw, 58px);
+}
+.runtime-flow-player.runtime-flow-opponent.selected {
+  border-color: #22d3ee;
+}
+html[data-runtime-mode='FLOW'] .runtime-gamepad-button,
+html[data-runtime-mode='FLOW'] .runtime-footer .runtime-last {
+  display: none;
+}
 .runtime-feedback {
   position: fixed;
   left: 50%;

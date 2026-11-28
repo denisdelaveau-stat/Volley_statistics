@@ -169,6 +169,7 @@
     }
     // Action codes are stored in the events; only their labels are translated (action.* keys).
     function actionLabel(code) {
+      if (code == null || code === '') return '—';
       var key = 'action.' + code;
       var label = i18n.t(key);
       return label === key ? code : label;

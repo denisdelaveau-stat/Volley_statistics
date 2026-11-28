@@ -137,16 +137,66 @@ def test_speed_keeps_court_visible_through_action_and_result(browser):
     page.close()
 
 
-def test_flow_shows_fixed_three_blocks_and_disables_future_steps(browser):
+def test_flow_shows_player_action_and_shared_status_sections(browser):
     page, errors = open_runtime(browser, "FLOW", {"width": 1180, "height": 820})
-    assert page.locator(".runtime-flow-block").count() == 3
+    assert page.locator(".runtime-flow-actions").count() == 1
+    assert page.locator(".runtime-flow-players").count() == 1
+    assert page.locator(".runtime-flow-status-grid").count() == 1
     assert page.locator('[data-runtime-action]').count() == 7
-    assert page.locator('[data-runtime-action]:disabled').count() == 7
-    assert page.locator('[data-runtime-result]:disabled').count() == 3
-    page.locator('[data-runtime-author="3"]').click()
     assert page.locator('[data-runtime-action]:disabled').count() == 0
+    assert page.locator('[data-runtime-result]:disabled').count() == 3
+    page.locator('[data-runtime-action="reception"]').click()
+    assert page.locator('[data-runtime-result="point"]').is_disabled()
+    assert page.locator('[data-runtime-result="neutral"]').is_disabled()
+    page.locator('[data-runtime-author="3"]').click()
+    assert page.locator('[data-runtime-result="point"]').is_disabled()
+    assert page.locator('[data-runtime-result="neutral"]').is_enabled()
+    assert page.locator('[data-runtime-result="error"]').is_enabled()
+    assert page.locator('[data-runtime-action="reception"]').get_attribute("aria-pressed") == "true"
     page.locator('[data-runtime-action="attack"]').click()
-    assert page.locator('[data-runtime-result]:disabled').count() == 0
+    assert page.locator('[data-runtime-result="point"]').is_enabled()
+    assert page.locator('[data-runtime-result="neutral"]').is_enabled()
+    assert page.locator('[data-runtime-result="error"]').is_enabled()
+    assert errors == []
+    page.close()
+
+
+def test_flow_allows_either_selection_order_and_toggles_selection(browser):
+    page, errors = open_runtime(browser, "FLOW", {"width": 390, "height": 844})
+    page.locator('[data-runtime-action="attack"]').click()
+    page.locator('[data-runtime-author="3"]').click()
+    assert page.locator('[data-runtime-result="point"]').is_enabled()
+    page.locator('[data-runtime-author="3"]').click()
+    assert page.locator('[data-runtime-author="3"]').get_attribute("aria-pressed") == "false"
+    assert page.locator('[data-runtime-result]').evaluate_all("nodes => nodes.every(node => node.disabled)")
+    page.locator('[data-runtime-author="3"]').click()
+    page.locator('[data-runtime-action="attack"]').click()
+    assert page.locator('[data-runtime-action="attack"]').get_attribute("aria-pressed") == "false"
+    assert page.locator('[data-runtime-result]').evaluate_all("nodes => nodes.every(node => node.disabled)")
+    page.locator('[data-runtime-undo]').click()
+    assert page.locator('[data-runtime-author="3"]').get_attribute("aria-pressed") == "false"
+    assert page.locator('[data-runtime-action="attack"]').get_attribute("aria-pressed") == "false"
+    assert events(page) == []
+    assert errors == []
+    page.close()
+
+
+def test_flow_opponent_can_record_point_or_error_without_an_action(browser):
+    page, errors = open_runtime(browser, "FLOW", {"width": 1180, "height": 820})
+    page.locator('[data-runtime-author="A"]').click()
+    assert page.locator('[data-runtime-result="point"]').is_enabled()
+    assert page.locator('[data-runtime-result="error"]').is_enabled()
+    assert page.locator('[data-runtime-result="neutral"]').is_disabled()
+    page.locator('[data-runtime-result="error"]').click()
+    saved = events(page)
+    assert len(saved) == 1
+    assert saved[0]["authorSide"] == "AWAY"
+    assert saved[0]["playerNumber"] is None
+    assert saved[0]["action"] is None
+    assert saved[0]["result"] == "error"
+    assert saved[0]["scoreAfter"] == {"home": 1, "away": 0}
+    page.locator('[data-runtime-author="3"]').click()
+    assert page.evaluate("VLRuntimeInput.getState().author") == "3"
     assert errors == []
     page.close()
 

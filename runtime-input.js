@@ -387,21 +387,91 @@
     );
   }
   function flowLayout() {
+    var players = courtPlayers();
     return (
-      '<section class="runtime-stage runtime-flow"><div class="runtime-flow-block"><h3>' +
-      esc(t('runtime.step1')) +
-      '</h3><div class="runtime-panel">' +
-      courtSelector() +
-      '</div></div><div class="runtime-flow-block"><h3>' +
-      esc(t('runtime.step2')) +
-      '</h3><div class="runtime-panel">' +
-      actionGrid(true) +
-      '</div></div><div class="runtime-flow-block"><h3>' +
-      esc(t('runtime.step3')) +
-      '</h3><div class="runtime-panel">' +
-      resultGrid(true) +
+      '<section class="runtime-stage runtime-flow-screen" aria-label="Manual action capture">' +
+      '<div class="runtime-flow-last">' +
+      esc(lastEvent()) +
+      '</div><div class="runtime-flow-actions">' +
+      '<div class="runtime-flow-action-grid">' +
+      ACTIONS.map(function (action) {
+        var selected = state.action === action.id;
+        return (
+          '<button type="button" class="runtime-flow-action' +
+          (selected ? ' selected' : '') +
+          (isPreferred(action.id) ? ' preferred' : '') +
+          '" data-runtime-action="' +
+          action.id +
+          '" aria-pressed="' +
+          (selected ? 'true' : 'false') +
+          '">' +
+          esc(
+            {
+              service: 'SERVE',
+              reception: 'RECEPTION',
+              set: 'SET',
+              attack: 'ATTACK',
+              block: 'BLOCK',
+              defense: 'DEFENCE',
+              freeball: 'FREE BALL',
+            }[action.id]
+          ) +
+          '</button>'
+        );
+      }).join('') +
+      '<div class="runtime-flow-status-grid">' +
+      RESULTS.map(function (result) {
+        var allowed = flowStatusAllowed(result.id);
+        return (
+          '<button type="button" class="runtime-flow-status ' +
+          result.css +
+          '" data-runtime-result="' +
+          result.id +
+          '"' +
+          (allowed && !state.pending && Date.now() >= state.lockedUntil ? '' : ' disabled') +
+          ' aria-label="' +
+          esc(result.id === 'point' ? 'Point' : result.id === 'neutral' ? 'Continue' : 'Error') +
+          '">' +
+          '<b>' +
+          (result.id === 'point' ? '✓' : result.id === 'neutral' ? 'O' : '✕') +
+          '</b><span>' +
+          esc(result.id === 'point' ? 'Point' : result.id === 'neutral' ? 'Continue' : 'Error') +
+          '</span></button>'
+        );
+      }).join('') +
+      '</div></div><div class="runtime-flow-players">' +
+      '<div class="runtime-flow-player-grid">' +
+      players.map(function (number) {
+        var p = player(number) || { number: number, position: '' };
+        var selected = String(state.author) === String(number);
+        var playerRole = role(p);
+        return (
+          '<button type="button" class="runtime-flow-player runtime-role-' +
+          esc(playerRole) +
+          (selected ? ' selected' : '') +
+          '" data-runtime-author="' +
+          esc(number) +
+          '" aria-pressed="' +
+          (selected ? 'true' : 'false') +
+          '"><span class="runtime-flow-player-bar"></span><b>' +
+          esc(number) +
+          '</b></button>'
+        );
+      }).join('') +
+      '<button type="button" class="runtime-flow-player runtime-flow-opponent' +
+      (state.author === 'A' ? ' selected' : '') +
+      '" data-runtime-author="A" aria-pressed="' +
+      (state.author === 'A' ? 'true' : 'false') +
+      '"><b>A</b></button>' +
       '</div></div></section>'
     );
+  }
+  function flowStatusAllowed(resultId) {
+    if (!state.author) return false;
+    if (state.author === 'A' && !state.action) return resultId !== 'neutral';
+    if (!state.action) return false;
+    if (resultId !== 'point') return true;
+    return ['service', 'attack', 'block'].indexOf(state.action) >= 0;
   }
   function gamepadLayout() {
     return (
@@ -585,7 +655,14 @@
     if (overlay) overlay.innerHTML = prefsHtml();
   }
   function chooseAuthor(value) {
-    if (state.pending || Date.now() < state.lockedUntil) return;
+    if (state.pending || (state.mode !== 'FLOW' && Date.now() < state.lockedUntil)) return;
+    if (state.mode === 'FLOW') {
+      state.author = String(state.author) === String(value) ? null : String(value);
+      state.error = '';
+      state.stage = state.action ? 'result' : 'action';
+      render();
+      return;
+    }
     state.author = String(value);
     state.action = null;
     state.error = '';
@@ -593,6 +670,13 @@
     render();
   }
   function chooseAction(value) {
+    if (state.mode === 'FLOW') {
+      state.action = state.action === value ? null : value;
+      state.error = '';
+      state.stage = state.author && state.action ? 'result' : state.author ? 'action' : 'player';
+      render();
+      return;
+    }
     if (!state.author) {
       state.error = t('runtime.errorNoAuthorFirst');
       render();
@@ -657,11 +741,14 @@
       render();
       return;
     }
-    if (!state.action) {
+    var opponentQuickResult =
+      state.mode === 'FLOW' && state.author === 'A' && (result === 'point' || result === 'error');
+    if (!state.action && !opponentQuickResult) {
       state.error = t('runtime.errorNoAction');
       render();
       return;
     }
+    if (state.mode === 'FLOW' && !flowStatusAllowed(result)) return;
     if (!resultMeta(result)) {
       state.error = t('runtime.errorBadResult');
       render();
@@ -694,7 +781,7 @@
       r = resultMeta(result);
     state.feedback = '✓ ' + authorText() + ' · ' + (a ? a.label : state.action) + ' ' + (r ? r.symbol : '');
     haptic();
-    state.lockedUntil = Date.now() + 500;
+    state.lockedUntil = Date.now() + (state.mode === 'FLOW' ? 300 : 500);
     state.pending = false;
     clear(true);
     render();
@@ -702,7 +789,15 @@
     document.dispatchEvent(new CustomEvent('volleylive:runtime-event', { detail: { event: committed } }));
   }
   function undo() {
-    if (state.pending || Date.now() < state.lockedUntil) return;
+    if (state.pending || (state.mode !== 'FLOW' && Date.now() < state.lockedUntil)) return;
+    if (state.mode === 'FLOW' && (state.author || state.action)) {
+      state.author = null;
+      state.action = null;
+      state.stage = 'player';
+      state.error = '';
+      render();
+      return;
+    }
     if (typeof VC.deleteLastAction !== 'function') {
       state.error = t('runtime.errorUndoUnavailable');
       render();

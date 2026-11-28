@@ -4,9 +4,9 @@
 |---|---|
 | Spec ID | `UI-CAPTURE` |
 | Status | Current |
-| Version | 1.0 |
-| Applies to | VolleyLive v1.28.0 |
-| Last review | 2026-11-27 |
+| Version | 1.1 |
+| Applies to | VolleyLive v1.28.0+ |
+| Last review | 2026-11-28 |
 | Source of truth | `runtime-input.js`, `runtime-input.css`, `js/index-capture-tools.js`, `js/index-capture-engine.js`, `index.html` (`#capturePanel`), `css/index-*.css` |
 | Related specs | DOM-MATCH, DOM-ROTATION, DOM-LIBERO, UI-SUBS, UI-SETLINEUP, UI-HUB (entry), SYS-DATA (events), SYS-I18N |
 
@@ -17,7 +17,7 @@ result. It shows the score and the sets, lets the scorer correct the last action
 
 ## 2. Scope
 
-- In scope: score header, the three input modes, the options sheet, undo, the history and its last-row deletion, the
+- In scope: score header, the four input modes, the options sheet, undo, the history and its last-row deletion, the
   end-of-set and end-of-match boxes.
 - Out of scope: the substitution and libero sheet (UI-SUBS), the set line-up sheet (UI-SETLINEUP), the rules that
   give points and lock sets (DOM-MATCH).
@@ -25,7 +25,8 @@ result. It shows the score and the sets, lets the scorer correct the last action
 ## 3. Definitions
 
 - Author: one of the six players on court, or « A » for the opponent.
-- Step: author → action → result; the action is recorded when the result is chosen.
+- Step: author, action and result; the event is recorded when the result is chosen. FLOW allows author and action to be
+  selected in either order on the same screen.
 
 ## 4. Requirements
 
@@ -39,13 +40,13 @@ result. It shows the score and the sets, lets the scorer correct the last action
 
 | ID | Requirement | Rule / source |
 |---|---|---|
-| `UI-CAPTURE-02` | Three input modes give the same steps: FOCUS (one question per screen: « Qui joue ? », « Quelle action ? », « Quel résultat ? »), SPEED+ (the court stays visible, commands appear next to it) and FLOW (three fixed blocks, later steps disabled until the earlier one is chosen). | `specification_saisie_action` (product) |
+| `UI-CAPTURE-02` | Four input modes share the same event model: FOCUS (one question per screen), SPEED+ (the court stays visible beside the commands), FLOW (single-screen action/status/player layout; player and action can be selected in either order; status is the final tap) and GAMEPAD (dual circular selectors with shared status buttons). In FLOW, Point is enabled only for Serve, Attack and Block; Continue and Error are enabled for every action. Opponent A without an action can record Point or Error only. | `specification_saisie_action`; `TO_DO/VolleyLive_Capture2_Portrait_Spec.md` |
 | `UI-CAPTURE-03` | The default mode is FOCUS on screens up to 620 px wide and SPEED+ above; the chosen mode is stored and changing it keeps the match, score, events and the selection in progress. | Product |
 | `UI-CAPTURE-04` | The authors offered are the six players on court as rebuilt by the rotation replay (libero included, DOM-ROTATION), placed by zone, plus the opponent « A ». The opponent is never stored as one of our players. | DOM-ROTATION |
 | `UI-CAPTURE-05` | The actions are always in the same order: SERVICE, RÉCEPTION, PASSE, ATTAQUE, BLOCK, DÉFENSE, RELANCE; with highlights on, the usual actions of the author's role are highlighted, without reordering or disabling any. | Product |
 | `UI-CAPTURE-06` | The results are « ✓ POSITIF » (point), « ○ NEUTRE » and « × ERREUR »; choosing a result records the action immediately as one event, identical whatever the mode. | DOM-MATCH-01 to -03 |
 | `UI-CAPTURE-07` | « Changer de joueur » clears the selection in progress without recording anything. | Product |
-| `UI-CAPTURE-08` | Taps are ignored for 500 ms after a recording (double-tap guard), and an event whose identifier already exists is refused. | Robustness |
+| `UI-CAPTURE-08` | Duplicate status taps are guarded for 300 ms in FLOW and 500 ms in the other modes; FLOW selection remains available immediately after a recorded event. An event whose identifier already exists is refused. | Robustness |
 | `UI-CAPTURE-09` | A message confirms the last recording; the status line shows « Dernière : » and the last action, or « Prêt pour une nouvelle action. ». | Feedback |
 | `UI-CAPTURE-10` | « Annuler » removes the last event and its score change in one step. | Product |
 
@@ -92,7 +93,9 @@ preferences (`volleyCapture.runtimeInput.preferences.v1`).
 (`[data-runtime-author]`, `[data-runtime-action]`, `[data-runtime-result]`, `[data-runtime-undo]`,
 `[data-runtime-options]`, `[data-runtime-sub-open]`), options `#runtimePrefs` (`[data-runtime-pref-mode]`,
 `[data-runtime-highlight]`, `[data-runtime-haptic]`), history `#historyToggle`, `#historyPanel`,
-`[data-delete-last]`, end of set `#setOver`, `#setOverTitle`, `#setOverText`, `#nextSetBtn`. Contract with the
+`[data-delete-last]`, end of set `#setOver`, `#setOverTitle`, `#setOverText`, `#nextSetBtn`. FLOW adds
+`.runtime-flow-actions`, `.runtime-flow-status-grid` and `.runtime-flow-players` in one portrait capture view.
+Contract with the
 capture modules: `window.VolleyCapture` (SYS-ARCH 7.3).
 
 ## 8. Accessibility and language
@@ -106,7 +109,7 @@ Steps are headings; selected buttons have `aria-pressed`; the options and substi
 | Requirement | Verified by |
 |---|---|
 | `UI-CAPTURE-01` | `tests/capture/test_capture_regressions.py::test_set_end_lock_undo_next_set_and_exports` (score and set badges); `tests/capture/test_history_delete.py::test_delete_home_point_restores_empty_score_and_history` |
-| `UI-CAPTURE-02` | `tests/capture/test_runtime_input.py::test_focus_is_three_distinct_steps_and_commits_immediately`, `::test_speed_keeps_court_visible_through_action_and_result`, `::test_flow_shows_fixed_three_blocks_and_disables_future_steps` |
+| `UI-CAPTURE-02` | `tests/capture/test_runtime_input.py::test_focus_is_three_distinct_steps_and_commits_immediately`, `::test_speed_keeps_court_visible_through_action_and_result`, `::test_flow_shows_player_action_and_shared_status_sections`, `::test_flow_allows_either_selection_order_and_toggles_selection`, `::test_flow_opponent_can_record_point_or_error_without_an_action` |
 | `UI-CAPTURE-03` | `tests/capture/test_runtime_input.py::test_runtime_options_are_available_and_persisted`, `::test_mode_change_preserves_match_score_events_and_pending_selection` |
 | `UI-CAPTURE-04` | `tests/capture/test_runtime_input.py::test_opponent_is_not_stored_as_a_local_player`; `tests/capture/test_set_lineup.py::test_next_set_line_up_is_prefilled_changed_and_used_for_that_set` (authors of set 2) |
 | `UI-CAPTURE-05` | `tests/capture/test_runtime_input.py::test_action_grid_order_is_identical_in_all_modes`, `::test_role_preferences_highlight_without_reordering_or_disabling` |
@@ -128,3 +131,4 @@ Steps are headings; selected buttons have `aria-pressed`; the options and substi
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-11-27 | First version; replaces `docs/specification_saisie_action.md` (design of the input modes) and the capture sections of `docs/FUNCTIONAL_SPEC.md` and `docs/IMPLEMENTATION_SPEC.md` (v1.6.x). |
+| 1.1 | 2026-11-28 | Adds the portrait, same-screen FLOW capture layout and its selection, status, opponent shortcut and debounce rules. |
