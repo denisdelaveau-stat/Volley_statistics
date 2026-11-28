@@ -4,7 +4,7 @@
 |---|---|
 | Spec ID | `SYS-SYNC` (proposed; the spec moves to `docs/specs/` when it is implemented) |
 | Status | Draft, not implemented (`TO_DO/`) |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Applies to | Target architecture after VolleyLive v1.28.0; reference document schema `volley-live` 2.1.0 |
 | Last review | 2026-11-28 |
 | Source of truth | None yet. The application as built is described by SYS-ARCH, SYS-DATA and SYS-JSON. |
@@ -24,7 +24,7 @@ specified in `docs/specs/` is referenced, not redefined.
 3. Overall architecture
 4. Canonical domain model
 5. Data producers
-6. Local-first client
+6. Local-first client and offline mode
 7. VolleyLive Data Server
 8. Statistics engine
 9. Match Summary JSON
@@ -116,7 +116,7 @@ Behavior is normative; technologies may be replaced if all contracts and guarant
 
 | Area | Recommended profile |
 |---|---|
-| Client | PWA with service worker and IndexedDB. The current client is classic JavaScript with no build step (SYS-ARCH-01); TypeScript or a bundler is decision 19 |
+| Client | PWA with service worker and IndexedDB. TypeScript with a build step (decision 19); the current client is classic JavaScript with no build step (SYS-ARCH-01) |
 | Synchronous API | HTTPS REST/JSON |
 | Real time | WebSocket; SSE is acceptable for read-only consumers |
 | Transactional database | PostgreSQL |
@@ -866,7 +866,7 @@ Two levels are supported: generic opponent (`teamId`, `playerId: null`) and deta
 
 ---
 
-## 6. Local-first client
+## 6. Local-first client and offline mode
 
 ### 6.1 Components and stores
 
@@ -904,6 +904,26 @@ Outbox items track event ID, match ID, client sequence, state, attempts, next at
 ### 6.3 Local snapshot
 
 A local snapshot includes `matchId`, `revision`, `lastServerSequence`, lifecycle state, active set, score, service/phase/rotation, current lineup, set counters, content hash, and generation time. It accelerates startup but never replaces events.
+
+### 6.4 Offline mode
+
+Data is sent to the server over the network when a network is available (decision 17). Without a network, the client
+works in offline mode. Offline mode is a normal operating mode, not an error: no feature that works on the device
+waits for the network.
+
+| Topic | Behaviour |
+|---|---|
+| Entering offline mode | The client is `OFFLINE` when the browser reports no network, when the server does not answer (request timeout, or two missed heartbeats, §12.5), or when the user chose « Travailler hors ligne ». It never blocks the interface while it checks. |
+| Manual offline mode | Settings offer « Travailler hors ligne » (on / off, default off). While on, nothing is sent or received; events are still queued. Turning it off starts synchronization. |
+| Starting without network | Once installed, the application opens and starts without network (SYS-PWA-01 to -03), from the local snapshot (§6.3) and the local journal. |
+| What works offline | Everything that runs on the device: New Match wizard, Team Management, set line-ups, capture in every input mode and with the gamepad, substitutions and liberos, undo (`EVENT_VOIDED`), end of set and of match, Match Hub and Match Library, Coach View, Spectator View and reports of local matches, JSON export, JSON and DVW import (§5.3.5). |
+| Without an account | The same features work; synchronization starts when the user signs in, and local matches can then be sent (`REALTIME_SHARING_WORKING_SPEC.md` R8, R10). |
+| Writes | Each action is committed locally in one transaction (§6.2) and queued in the outbox with its `eventId` and `clientSequence`. |
+| Indicator | The capture shows the connectivity state (`ONLINE`, `OFFLINE`, `SYNCING`, `CONFLICT`), the number of pending events and the time of the last successful synchronization (`REALTIME_SHARING_WORKING_SPEC.md` §9). Texts come from the translation dictionaries (SYS-I18N). |
+| Consumers on another device | A downloaded match is viewed without network (`OFFLINE COPY`, `REALTIME_SHARING_WORKING_SPEC.md` D12). A live view that loses the network keeps the last state and shows `STALE since HH:MM`; it never invents points. |
+| Features that need the server | Live provider feeds, share links, season consolidation across devices and the history of other devices are shown as « Disponible en ligne » and disabled; no error is raised. |
+| Return of the network | The outbox is sent in `clientSequence` order (§12.3), with retries and idempotency (§12.4): no event is duplicated or lost, and the user has nothing to do. Conflicts follow §12.6. |
+| Duration | No limit: pending events never expire (§12.4). Before the storage quota is reached, the client warns the user; it never drops an event to free space (decision 10). |
 
 ---
 
@@ -1422,7 +1442,7 @@ Verify final score, rally count, action order, lost-ACK retry without duplicatio
 
 Concurrency tests: same `eventId` twice; two IDs for one `actionOrder`; lease loss; concurrent correction; WebSocket before ACK; set change during reconnect; crash between event commit and outbox publication; two workers on one provider partition; provider duplicate before/after ACK; crash between canonical commit and provider checkpoint.
 
-Offline tests: lose network during a live set; capture a full set; close/reopen PWA; synchronize after hours; receive score conflict; prove no event loss; distinguish pending/synced/conflict.
+Offline tests: start the installed application without network; switch « Travailler hors ligne » on and off; use every feature of §6.4 offline; lose network during a live set; capture a full set; close/reopen PWA; synchronize after hours; receive score conflict; prove no event loss; distinguish pending/synced/conflict.
 
 Security tests: malicious JSON/DVW; invalid enumerations; oversized or compressed payloads; unauthorized match; modified replay; HTML injection; API saturation; expired token; unsigned/invalid/replayed provider webhook; cross-tenant access; unauthorized feed diagnostics.
 
@@ -1563,7 +1583,7 @@ tests/
 
 `domain`, `statistics`, and `sync-protocol` MUST NOT depend on UI components.
 
-This is a target layout. The current repository is described by SYS-ARCH; moving to this layout is decision 19.
+This is the target layout (decision 19). The current repository is described by SYS-ARCH until the move.
 
 ---
 
@@ -1604,10 +1624,10 @@ These do not block the baseline but require Architecture Decision Records:
 15. Takeover and provider-return rules after manual capture.
 
 16. Version of the canonical event envelope (proposed `3.0.0`) and of the next portable document (2.2 or 3.0) that would carry `UNKNOWN` roles, the new lifecycle and provenance values and the `acquisition` block (Appendix F.2).
-17. Network use: SYS-DATA-01 says nothing leaves the device. It is retired, or limited to use without an account (`REALTIME_SHARING_WORKING_SPEC.md` R8).
-18. Undo: the deletion of the last event (UI-CAPTURE-12, SYS-DATA-05) becomes `EVENT_VOIDED`, before synchronization too.
-19. Client language and build: classic JavaScript without build step (SYS-ARCH-01) or TypeScript with a build step and the layout of §21.
-20. Migration of the localStorage keys of SYS-DATA to IndexedDB, and what happens to the matches already stored.
+17. Network use — **decided 2026-11-28**: data is sent to the server over the network when a network is available; without a network the client works in offline mode (§6.4). SYS-DATA-01 is retired when this is implemented.
+18. Undo — **decided 2026-11-28**: the deletion of the last event (UI-CAPTURE-12, SYS-DATA-05) becomes `EVENT_VOIDED`, before synchronization too.
+19. Client language and build — **decided 2026-11-28**: TypeScript with a build step and the layout of §21, as recommended in §2.2. SYS-ARCH-01 changes when this is implemented.
+20. Storage — **decided 2026-11-28**: the localStorage keys of SYS-DATA move to IndexedDB; the matches already stored are migrated once, without loss, and the old keys are kept read-only until the migration has been verified.
 
 No decision may weaken idempotency, the canonical journal, or source/derived separation.
 
@@ -1632,6 +1652,7 @@ The architecture is implemented when all of the following hold:
 - DVW imports preserve provenance, source symbols, and quality warnings.
 - Exact or semantically equivalent DVW reimport is idempotent.
 - Offline DVW import converges to one server match.
+- Without network or account, every device-side feature of §6.4 works, and the pending events are sent once the network returns.
 - Provider live input is persisted, converted, and published without exposing provider schema to views.
 - Provider retry, duplicates, out-of-order events, and gaps create no extra point.
 - Divergent provider snapshots trigger audited reconciliation.
@@ -1756,10 +1777,10 @@ requirement, and the implementing commit updates that spec.
 
 | Current requirement | This document | Alignment |
 |---|---|---|
-| SYS-ARCH-01: static files, classic JavaScript, no build step | §2.2, §21 (TypeScript, monorepo layout) | Changes, decision 19 |
-| SYS-DATA-01: nothing is sent over the network | §6, §7, §12 | Changes, decision 17 |
-| SYS-DATA-02 to -04: localStorage keys, three keys for the active match | §6.1 (IndexedDB stores, outbox) | Changes, decision 20 |
-| SYS-DATA-05, UI-CAPTURE-12: only the last event can be deleted | §4.7, §7.2 (undo emits `EVENT_VOIDED`) | Changes, decision 18 |
+| SYS-ARCH-01: static files, classic JavaScript, no build step | §2.2, §21 (TypeScript, monorepo layout) | Changes (decision 19, decided) |
+| SYS-DATA-01: nothing is sent over the network | §6.4, §7, §12 | Changes (decision 17, decided): sent when a network is available, offline mode otherwise |
+| SYS-DATA-02 to -04: localStorage keys, three keys for the active match | §6.1 (IndexedDB stores, outbox) | Changes (decision 20, decided) |
+| SYS-DATA-05, UI-CAPTURE-12: only the last event can be deleted | §4.7, §7.2 (undo emits `EVENT_VOIDED`) | Changes (decision 18, decided) |
 | SYS-DATA-05: a double tap creates one event | §5.1 (one `eventId`) | Aligned |
 | SYS-DATA 6.3: `inputMode` `FOCUS`, `SPEED`, `FLOW` | §4.6, §5.1 | Aligned (was `SPEED_PLUS`) |
 | SYS-JSON-02: readers accept every 2.x document | §4.4 (envelope 3.0.0) | Aligned: the envelope gets its own major version, the document stays 2.1 |
@@ -1772,7 +1793,8 @@ requirement, and the implementing commit updates that spec.
 | SYS-JSON-16 to -18: Capture v1 migration | §22 | Aligned: a v1 match is imported as `IMPORT` |
 | SYS-SEC-01: escaping of names and imported fields | §15 | Aligned |
 | SYS-SEC-09: 10 MB JSON import, no unsafe keys | §15 | Aligned |
-| SYS-PWA-01 to -04: service worker, offline | §2.2, §6 | Aligned; the outbox adds offline writes |
+| SYS-PWA-01 to -04: service worker, offline | §2.2, §6.4 | Aligned; offline mode adds offline writes and the outbox |
+| UI-HOME (Settings) | §6.4 (« Travailler hors ligne ») | Changes: new setting |
 | SYS-QA: tests by screen, gate, CI | §19 | Aligned |
 | DOM-MATCH-01 to -03, -06, -07: point rules, set target, two-point lead | §18.1 | Aligned |
 | DOM-ROTATION-01, -02: rotation on side-out, winner serves | §4.7 | Aligned |
@@ -1853,10 +1875,6 @@ Values without a 2.1 equivalent wait for decision 16.
 | Topic | Where |
 |---|---|
 | Envelope and document versions, `UNKNOWN` role, `acquisition` in the document | Decision 16 |
-| Network use and accounts versus SYS-DATA-01 | Decision 17 |
-| Undo as `EVENT_VOIDED` | Decision 18 |
-| Client language, build step and repository layout | Decision 19 |
-| localStorage to IndexedDB migration | Decision 20 |
 | Requirement IDs (`SYS-SYNC-nn`) and traceability (template sections 4 and 9) | When the first work package is planned, the requirements of that package move to `docs/specs/` with IDs and tests. |
 
 ## History
@@ -1868,3 +1886,4 @@ Values without a 2.1 equivalent wait for decision 16.
 | 1.2.0 | 2026-11-27 | Two complementary acquisition modes, live-provider ingestion, server conversion, and common Coach/Spectator delivery |
 | 1.2.1 | 2026-11-27 | Consistency review: origin-specific envelopes, provider granularity, audited acquisition, aligned APIs and diagrams |
 | 1.3.0 | 2026-11-28 | Review and alignment with `docs/specs/` and the other `TO_DO/` specifications: identity table, enumerations and field names, envelope version, Match Summary contract, gamepad debounce, one writer per match, NA display, FIVB and spec references, decisions 16 to 20, Appendices F and G. Replaces the French version 1.0.0. |
+| 1.4.0 | 2026-11-28 | Owner decisions 17 to 20 recorded (network use, undo as `EVENT_VOIDED`, TypeScript with a build step, IndexedDB migration). New §6.4 Offline mode, with a manual « Travailler hors ligne » setting; offline tests and acceptance criterion. |
