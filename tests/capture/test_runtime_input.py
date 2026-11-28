@@ -130,11 +130,11 @@ def test_gamepad_capture_mode_displays_dual_selectors(browser):
 def test_runtime_options_are_available_and_persisted(browser):
     page, errors = open_runtime(browser)
     assert page.locator('[data-runtime-mode="SPEED"]').inner_text() == "BOARD"
-    assert page.locator('[data-runtime-mode="FLOW"]').inner_text() == "CARDS"
+    assert page.locator('[data-runtime-mode="FLOW"]').inner_text() == "POKER"
     page.locator('[data-runtime-options]').click()
     assert page.locator('[data-runtime-pref-mode]').count() == 4
     assert page.locator('[data-runtime-pref-mode="SPEED"]').inner_text() == "BOARD"
-    assert page.locator('[data-runtime-pref-mode="FLOW"]').inner_text() == "CARDS"
+    assert page.locator('[data-runtime-pref-mode="FLOW"]').inner_text() == "POKER"
     page.locator('[data-runtime-pref-mode="FLOW"]').click()
     saved = page.evaluate("JSON.parse(localStorage.getItem('volleyCapture.runtimeInput.preferences.v1'))")
     assert saved["runtimeMode"] == "FLOW"
@@ -835,8 +835,14 @@ def test_flow1_matches_action_and_player_card_visuals(browser):
     ) - page.locator('[data-runtime-result="neutral"]').evaluate(
         "node => node.getBoundingClientRect().top"
     )
-    assert 50 <= attack_offset <= 60
-    assert 50 <= block_offset <= 60
+    # Attack and Block span two rows and are centered on them: half a row (plus half a gap) below the status.
+    row_step = page.locator('[data-runtime-result="neutral"]').evaluate(
+        "node => node.getBoundingClientRect().top"
+    ) - page.locator('[data-runtime-result="point"]').evaluate(
+        "node => node.getBoundingClientRect().top"
+    )
+    assert abs(attack_offset - row_step / 2) < 1
+    assert abs(block_offset - row_step / 2) < 1
     assert page.locator('[data-runtime-result="point"]').evaluate(
         "node => getComputedStyle(node).gridColumnStart"
     ) == "3"
@@ -862,10 +868,13 @@ def test_flow1_matches_action_and_player_card_visuals(browser):
     assert page.locator(".runtime-error").evaluate(
         "node => getComputedStyle(node).display"
     ) == "none"
-    footer_gap = page.locator(".runtime-footer").evaluate(
-        "node => node.getBoundingClientRect().top - document.querySelector('.runtime-flow-players').getBoundingClientRect().bottom"
+    # Fit-to-screen: the bottom bar sits below the players and stays on screen.
+    footer = page.locator(".runtime-footer").evaluate(
+        "node => ({top: node.getBoundingClientRect().top, bottom: node.getBoundingClientRect().bottom,"
+        " players: document.querySelector('.runtime-flow-players').getBoundingClientRect().bottom})"
     )
-    assert 60 <= footer_gap <= 75
+    assert footer["players"] <= footer["top"]
+    assert footer["bottom"] <= 937
     centered_bottom_row = page.locator('[data-runtime-action="set"]').evaluate(
         "set => { const defence = document.querySelector('[data-runtime-action=\"defense\"]'); const grid = document.querySelector('.runtime-flow-action-grid').getBoundingClientRect(); const left = set.getBoundingClientRect(); const right = defence.getBoundingClientRect(); return Math.abs((left.left + right.right) / 2 - (grid.left + grid.width / 2)); }"
     )

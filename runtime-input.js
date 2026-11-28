@@ -10,7 +10,7 @@
   var SETTINGS_KEY = window.VolleyDomain.STORAGE.runtimeInputPreferences,
     EVENTS_KEY = window.VolleyDomain.STORAGE.captureEvents;
   var MODES = ['FOCUS', 'SPEED', 'FLOW', 'GAMEPAD'];
-  var FIT_MODES = ['FOCUS', 'SPEED', 'GAMEPAD'];
+  var FIT_MODES = ['FOCUS', 'SPEED', 'FLOW', 'GAMEPAD'];
   var ACTIONS = [
     { id: 'service', code: 'SERVE', label: t('action.service'), family: 'serve' },
     { id: 'reception', code: 'RECEPTION', label: t('action.reception'), family: 'build' },
@@ -213,7 +213,7 @@
     );
   }
   function modeLabel(mode) {
-    return mode === 'SPEED' ? 'BOARD' : mode === 'FLOW' ? 'CARDS' : mode;
+    return mode === 'SPEED' ? 'BOARD' : mode === 'FLOW' ? 'POKER' : mode;
   }
   function actionMeta(id) {
     for (var i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].id === id) return ACTIONS[i];
@@ -560,17 +560,7 @@
           '" aria-pressed="' +
           (selected ? 'true' : 'false') +
           '">' +
-          esc(
-            {
-              service: 'SERVE',
-              reception: 'RECEPTION',
-              set: 'SET',
-              attack: 'ATTACK',
-              block: 'BLOCK',
-              defense: 'DEFENCE',
-              freeball: 'FREE BALL',
-            }[action.id]
-          ) +
+          esc(action.label) +
           '</button>'
         );
       }).join('') +

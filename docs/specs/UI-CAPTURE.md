@@ -4,7 +4,7 @@
 |---|---|
 | Spec ID | `UI-CAPTURE` |
 | Status | Current |
-| Version | 1.6 |
+| Version | 1.7 |
 | Applies to | VolleyLive v1.28.0+ |
 | Last review | 2026-11-28 |
 | Source of truth | `runtime-input.js`, `runtime-input.css`, `js/index-capture-tools.js`, `js/index-capture-engine.js`, `index.html` (`#capturePanel`), `css/index-*.css` |
@@ -52,14 +52,22 @@ result. It shows the score and the sets, lets the scorer correct the last action
 
 Outside FOCUS, the selected player and action remain clearly highlighted until a status is recorded. Where role-preferred action highlights apply, they remain distinct and visible alongside the selection highlight. FOCUS keeps its existing selection behavior.
 
-The visible mode tabs label SPEED as **BOARD** and FLOW as **CARDS**; the internal mode identifiers remain unchanged.
-In CARDS, the opponent A button is as wide as one adjacent player button is high, while spanning both player rows; the A label matches the player-number font size.
+The visible mode tabs label SPEED as **BOARD** and FLOW as **POKER**; the internal mode identifiers remain unchanged.
+In POKER, the opponent A button is as wide as one adjacent player button is high, while spanning both player rows; the A label matches the player-number font size. POKER action labels use the interface language, like the other modes.
+
+**Fit to screen.** In every mode the input area takes exactly the screen height left under the score header (iPhone 13
+and newer, iPad, portrait and landscape): no player, action or status button lies below the screen edge, and button
+sizes derive from the available height without going below 44 px. FOCUS and BOARD step titles (« 1 Joueur »,
+« 2 Action », « 3 Statut ») are visually hidden but stay available to screen readers. On phone landscape, the mode tabs
+share the bottom row with Undo and Substitution; POKER switches to three rows (vertical Relance column, actions around
+the status column, players on the right); GAMEPAD sizes its wheels to the height. On phone portrait, GAMEPAD stacks the
+player wheel, a row of three status buttons and the action wheel.
 
 ### 4.3 Options
 
 | ID | Requirement | Rule / source |
 |---|---|---|
-| `UI-CAPTURE-11` | The options sheet (☰) sets the input mode, the role highlights and the vibration feedback; it is only available from the capture screen (not in Settings). | Product |
+| `UI-CAPTURE-11` | The options sheet (☰) sets the input mode, the role highlights and the vibration feedback; it is only available from the capture screen (not in Settings). The gamepad setup is opened from Settings (« Manette » card), not from the capture screen. | Product |
 
 ### 4.4 History
 
@@ -143,3 +151,4 @@ Steps are headings; selected buttons have `aria-pressed`; the options and substi
 | 1.1 | 2026-11-28 | Adds the portrait, same-screen FLOW capture layout and its selection, status, opponent shortcut and debounce rules. |
 | 1.2 | 2026-11-28 | Baselines FLOW1 section backgrounds, shared player-role colors and centered SET/DEFENCE placement. |
 | 1.3 | 2026-11-29 | Adds the SPEED+ Matrix Full layouts, flexible selection, status filtering and substitution-slot behavior. |
+| 1.7 | 2026-11-28 | Fit-to-screen layout for all modes; CARDS renamed POKER with translated labels; hidden step titles in FOCUS and BOARD; gamepad setup moved to Settings. |

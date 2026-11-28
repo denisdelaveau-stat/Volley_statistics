@@ -2461,7 +2461,151 @@ html.runtime-fit .gamepad-inline-status button {
   }
 }
 
+/* POKER (FLOW): the five action/status rows and the two player rows share one row height.
+   Fixed parts: last-action line 28 px, four action-row gaps 32 px, player block margin 10 px, padding 20 px,
+   border 2 px and row gap 8 px = 100 px. */
+html.runtime-fit .runtime-flow-screen {
+  --rt-flow-row: clamp(44px, calc((100cqh - 100px) / 7), 98px);
+  display: flex;
+  flex-direction: column;
+}
+html.runtime-fit .runtime-flow-last {
+  flex: none;
+  min-height: 24px;
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+html.runtime-fit .runtime-flow-actions {
+  flex: none;
+}
+html.runtime-fit .runtime-flow-action-grid {
+  grid-template-rows: repeat(5, var(--rt-flow-row));
+  gap: 8px;
+}
+html.runtime-fit .runtime-flow-action,
+html.runtime-fit .runtime-flow-status {
+  height: var(--rt-flow-row);
+  min-height: 0;
+}
+html.runtime-fit .runtime-flow-action {
+  padding: 2px 4px;
+  font-size: clamp(13px, 4cqw, 24px);
+}
+html.runtime-fit .runtime-flow-status {
+  font-size: clamp(28px, calc(var(--rt-flow-row) * 0.55), 62px);
+}
+html.runtime-fit .runtime-flow-players {
+  margin-top: 10px;
+  padding: 10px;
+}
+html.runtime-fit .runtime-flow-player-grid {
+  --runtime-flow-player-height: var(--rt-flow-row);
+  gap: 8px;
+}
+html.runtime-fit .runtime-flow-player {
+  min-height: 0;
+  padding: 0;
+}
+html.runtime-fit .runtime-flow-player b {
+  line-height: 1;
+}
+html.runtime-fit[data-runtime-mode='FLOW'] .runtime-footer {
+  gap: 0 16px;
+}
+html.runtime-fit[data-runtime-mode='FLOW'] .runtime-footer .runtime-sub-open,
+html.runtime-fit[data-runtime-mode='FLOW'] .runtime-footer .runtime-undo {
+  font-size: 16px;
+}
+
 @media (max-height: 520px) and (orientation: landscape) {
+  /* POKER on phone landscape: three rows. Actions (with a narrow vertical Relance column and the status column
+     in the middle) on the left, players (two columns and A) on the right.
+     Fixed parts: two row gaps 16 px, section padding 16 px, borders 2 px = 34 px. */
+  html.runtime-fit .runtime-flow-screen {
+    --rt-flow-row: clamp(44px, calc((100cqh - 34px) / 3), 80px);
+    max-width: none;
+  }
+  html.runtime-fit .runtime-flow-last {
+    display: none;
+  }
+  html.runtime-fit .runtime-flow-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: var(--rt-fit-gap);
+    align-items: start;
+    background: none;
+    box-shadow: none;
+  }
+  html.runtime-fit .runtime-flow-action-grid {
+    grid-template-columns: calc(var(--rt-flow-row) * 0.8) repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, var(--rt-flow-row));
+    padding: 8px;
+    border-radius: 16px;
+    background: rgba(13, 54, 93, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(95, 142, 180, 0.62);
+  }
+  html.runtime-fit .runtime-flow-action-grid::before {
+    grid-area: 1 / 3 / 4 / 4;
+    width: calc(100% + 8px);
+    transform: none;
+  }
+  html.runtime-fit .runtime-flow-action {
+    align-self: stretch;
+    font-size: clamp(12px, 2cqw, 18px);
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='freeball'] {
+    grid-area: 1 / 1 / 4 / 2;
+    height: auto;
+    padding: 0;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='attack'] {
+    grid-area: 1 / 2 / 2 / 3;
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='block'] {
+    grid-area: 2 / 2 / 3 / 3;
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='set'] {
+    grid-area: 3 / 2 / 4 / 3;
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='service'] {
+    grid-area: 1 / 4 / 2 / 5;
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='reception'] {
+    grid-area: 2 / 4 / 3 / 5;
+  }
+  html.runtime-fit .runtime-flow-action[data-runtime-action='defense'] {
+    grid-area: 3 / 4 / 4 / 5;
+  }
+  html.runtime-fit .runtime-flow-status {
+    grid-column: 3 / 4;
+  }
+  html.runtime-fit .runtime-flow-status.positive {
+    grid-row: 1;
+  }
+  html.runtime-fit .runtime-flow-status.neutral {
+    grid-row: 2;
+  }
+  html.runtime-fit .runtime-flow-status.error {
+    grid-row: 3;
+  }
+  html.runtime-fit .runtime-flow-players {
+    margin-top: 0;
+    padding: 8px;
+  }
+  html.runtime-fit .runtime-flow-player-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) var(--runtime-flow-player-height);
+    grid-template-rows: repeat(3, var(--runtime-flow-player-height));
+  }
+  html.runtime-fit .runtime-flow-opponent {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+  }
+  html.runtime-fit .runtime-shell[data-runtime-layout='FLOW'] .runtime-footer {
+    display: contents;
+  }
+
   /* GAMEPAD joins the shared bottom row: its own toolbar and last-action line give way to the footer buttons. */
   html.runtime-fit .runtime-shell[data-runtime-layout='GAMEPAD'] .runtime-footer {
     display: contents;
