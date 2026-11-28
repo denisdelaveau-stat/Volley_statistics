@@ -1,4 +1,4 @@
-/* VolleyLive Team Management controller. Spec: docs/VolleyLive_Team_Management_Specification.md */
+/* VolleyLive Team Management controller. Spec: docs/specs/UI-TEAMS.md */
 (function () {
   var shell = window.VolleyShell;
   if (!shell) return;

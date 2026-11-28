@@ -52,15 +52,15 @@ Requirements not implemented yet are in `TO_DO/`, not here. Earlier documents ar
 
 | ID | Title | Status |
 |---|---|---|
-| [UI-HOME](UI-HOME.md) | Home, navigation and Settings | Planned |
+| [UI-HOME](UI-HOME.md) | Home, navigation and Settings | Current |
 | [UI-WIZARD](UI-WIZARD.md) | New Match wizard | Current |
-| [UI-TEAMS](UI-TEAMS.md) | Team Management | Planned |
+| [UI-TEAMS](UI-TEAMS.md) | Team Management | Current |
 | [UI-CAPTURE](UI-CAPTURE.md) | Capture screen: score, input modes, history, end of set | Current |
 | [UI-SUBS](UI-SUBS.md) | Substitution and libero sheet | Current |
 | [UI-SETLINEUP](UI-SETLINEUP.md) | Set line-up sheet | Current |
-| [UI-HUB](UI-HUB.md) | Match Hub (Match Capture) | Planned |
-| [UI-LIBRARY](UI-LIBRARY.md) | Match Library | Planned |
-| [UI-REPORTS](UI-REPORTS.md) | Match reports and exports | Planned |
+| [UI-HUB](UI-HUB.md) | Match Hub (Match Capture) | Current |
+| [UI-LIBRARY](UI-LIBRARY.md) | Match Library | Current |
+| [UI-REPORTS](UI-REPORTS.md) | Match reports and exports | Current |
 | [UI-COACH](UI-COACH.md) | Coach View: shell, data source and overview | Planned |
 | [UI-COACH-ROTATIONS](UI-COACH-ROTATIONS.md) | Coach View: rotations | Planned |
 | [UI-COACH-PLAYERS](UI-COACH-PLAYERS.md) | Coach View: players and player detail | Planned |

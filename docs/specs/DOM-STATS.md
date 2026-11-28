@@ -69,7 +69,7 @@ these values; they never compute an indicator of their own.
 
 | ID | Requirement | Source |
 |---|---|---|
-| `DOM-STATS-20` | The HTML report counts, per player and per action, points, errors and neutral actions (P / F / N) and the team totals; the attacker cards (OH, MB, OPP) give points, errors, neutral and points − errors per action type. | `VolleyStats` |
+| `DOM-STATS-20` | The detailed match report (UI-REPORTS-07) counts, per player and per action, points, errors and neutral actions (P / F / N) and the team totals; the attacker cards (OH, MB, OPP) give points, errors, neutral and points − errors per action type. | `VolleyStats` |
 
 ## 5. States, errors and edge cases
 
@@ -108,7 +108,7 @@ Not applicable (rules only). Texts: `coach.*`, `spectator.*`, `stats.*` keys (SY
 | `DOM-STATS-15` to `-17` | `tests/spectator/test_score_fault_evolution.py::test_unit_deltas_classification_fault_cumulation_and_shared_rally_keys`, `::test_multiple_faults_in_one_rally_follow_shared_official_rule` |
 | `DOM-STATS-18` | `tests/spectator/test_live_score_momentum.py` |
 | `DOM-STATS-19` | `tests/spectator/test_ranking.py` |
-| `DOM-STATS-20` | `tests/capture/test_capture_regressions.py::test_set_end_lock_undo_next_set_and_exports` (report content); attacker cards: manual (Match Reports → Export HTML report, section "Attaquants") |
+| `DOM-STATS-20` | `tests/capture/test_capture_regressions.py::test_set_end_lock_undo_next_set_and_exports` (report content); attacker cards: manual (`VolleyCapture.buildReport()` in the browser console, section « Attaquants ») |
 
 ## 10. History
 
