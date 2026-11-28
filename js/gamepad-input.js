@@ -5,19 +5,19 @@
   var STORAGE_KEY = 'volleyCapture.gamepadConfig.v1';
   var MAPPING_NAMES = ['✕', '○', '□', '△', 'L1', 'R1', 'L2', 'R2', 'Create', 'Options', 'L3', 'R3', 'D-pad Up', 'D-pad Down', 'D-pad Left', 'D-pad Right', 'PS', 'Touchpad'];
   var ACTIONS = [
-    { id: 'service', code: 'SERVE', label: 'SERVE', color: '#ff7b18' },
-    { id: 'reception', code: 'RECEPTION', label: 'RECEPTION', color: '#24d7ef' },
-    { id: 'set', code: 'SET', label: 'SET', color: '#df3c88' },
-    { id: 'attack', code: 'ATTACK', label: 'ATTACK', color: '#9b72f3' },
-    { id: 'block', code: 'BLOCK', label: 'BLOCK', color: '#86d316' },
-    { id: 'defense', code: 'DEFENCE', label: 'DEFENCE', color: '#3a93db' },
-    { id: 'freeball', code: 'RELANCE', label: 'FREE BALL', color: '#5f8eb4' },
+    { id: 'service', code: 'SERVE', label: 'SERVE', color: 'var(--rt-action-service-surface)', textColor: 'var(--role-opp-text)' },
+    { id: 'reception', code: 'RECEPTION', label: 'RECEPTION', color: 'var(--rt-action-reception-surface)', textColor: 'var(--role-opp-text)' },
+    { id: 'set', code: 'SET', label: 'SET', color: 'var(--rt-action-set-surface)', textColor: 'var(--role-mb-text)' },
+    { id: 'attack', code: 'ATTACK', label: 'ATTACK', color: 'var(--rt-action-attack-surface)', textColor: 'var(--role-oh-text)' },
+    { id: 'block', code: 'BLOCK', label: 'BLOCK', color: 'var(--rt-action-block-surface)', textColor: 'var(--role-oh-text)' },
+    { id: 'defense', code: 'DEFENCE', label: 'DEFENCE', color: 'var(--rt-action-defense-surface)', textColor: 'var(--role-mb-text)' },
+    { id: 'freeball', code: 'RELANCE', label: 'FREE BALL', color: 'var(--rt-action-freeball-surface)', textColor: 'var(--role-setter-text)' },
   ];
   var INLINE_ACTIONS = ['reception', 'set', 'attack', 'block', 'defense', 'service'];
   var statusLabels = [
-    { id: 'positive', code: 'POSITIVE', label: 'POSITIVE', symbol: '✓', color: '#20c766' },
-    { id: 'neutral', code: 'NEUTRAL', label: 'NEUTRAL', symbol: 'O', color: '#f2b84b' },
-    { id: 'error', code: 'ERROR', label: 'NEGATIVE', symbol: '✕', color: '#ed4949' },
+    { id: 'positive', code: 'POSITIVE', label: 'POSITIVE', symbol: '✓' },
+    { id: 'neutral', code: 'NEUTRAL', label: 'NEUTRAL', symbol: 'O' },
+    { id: 'error', code: 'ERROR', label: 'NEGATIVE', symbol: '✕' },
   ];
 
   function readObject(key, fallback) {
@@ -111,13 +111,23 @@
     }
     return { number: number, position: '' };
   }
-  function roleColor(position) {
+  function roleToken(position) {
     var role = String(position || '').toLowerCase();
-    if (role === 'setter' || role === 'set') return '#f2b84b';
-    if (role === 'libero' || role === 'lib') return '#9aa5b1';
-    if (role === 'opposite' || role === 'opp') return '#4c9aff';
-    if (role === 'middle' || role === 'mb') return '#20c766';
-    return '#ed4949';
+    if (role === 'setter' || role === 'set') return 'setter';
+    if (role === 'libero' || role === 'lib') return 'libero';
+    if (role === 'opposite' || role === 'opp') return 'opp';
+    if (role === 'middle' || role === 'mb') return 'mb';
+    if (role === 'outside' || role === 'oh') return 'oh';
+    return 'libero';
+  }
+  function roleSurface(position) {
+    return 'var(--role-' + roleToken(position) + '-surface)';
+  }
+  function roleBorderColor(position) {
+    return 'var(--role-' + roleToken(position) + ')';
+  }
+  function roleTextColor(position) {
+    return 'var(--role-' + roleToken(position) + '-text)';
   }
   function escapeMarkup(value) {
     return String(value).replace(/[&<>"]/g, function (character) {
@@ -235,7 +245,7 @@
       players.map(function (number, index) {
         var p = playerMeta(number);
         var role = String(p.position || '').toLowerCase();
-        return '<div class="gamepad-bubble' + (index === playerIndex ? ' selected' : '') + '" style="' + bubbleStyle(players.length, index, 118) + ';--bubble-color:' + roleColor(p.position) + '"><b>' + (role === 'libero' || role === 'lib' ? 'A' : '#' + number) + '</b></div>';
+        return '<div class="gamepad-bubble' + (index === playerIndex ? ' selected' : '') + '" style="' + bubbleStyle(players.length, index, 118) + ';--bubble-color:' + roleSurface(p.position) + ';--bubble-border-color:' + roleBorderColor(p.position) + ';--bubble-text-color:' + roleTextColor(p.position) + '"><b>' + (role === 'libero' || role === 'lib' ? 'A' : '#' + number) + '</b></div>';
       }).join('') +
       '</div><div class="gamepad-needle" style="' + needleStyle(players.length, playerIndex) + '"></div><div class="gamepad-center"><b>#' + selectedNumber + '</b><small>' + position + '</small></div></div>';
   }
@@ -244,7 +254,7 @@
     var selected = ACTIONS[actionIndex];
     return '<div class="gamepad-circle gamepad-action-circle"><div class="gamepad-bubbles">' +
       ACTIONS.map(function (action, index) {
-        return '<div class="gamepad-bubble' + (index === actionIndex ? ' selected' : '') + '" style="' + bubbleStyle(ACTIONS.length, index, 118) + ';--bubble-color:' + action.color + '"><b>' + action.label.charAt(0) + '</b></div>';
+      return '<div class="gamepad-bubble' + (index === actionIndex ? ' selected' : '') + '" style="' + bubbleStyle(ACTIONS.length, index, 118) + ';--bubble-color:' + action.color + ';--bubble-text-color:' + action.textColor + '"><b>' + action.label.charAt(0) + '</b></div>';
       }).join('') +
       '</div><div class="gamepad-needle" style="' + needleStyle(ACTIONS.length, actionIndex) + '"></div><div class="gamepad-center"><b>' + selected.label + '</b></div></div>';
   }
@@ -258,9 +268,9 @@
       '<circle class="gamepad-wheel-disc" cx="180" cy="180" r="178"></circle>' +
       players.map(function (number, index) {
         var point = sectorLabelPoint(index, players.length);
-        var selected = !opponentSelected && index === playerIndex;
-        var color = roleColor(playerMeta(number).position);
-        var labelColor = color === '#ed4949' || color === '#4c9aff' ? '#fff' : '#061a33';
+        var selected = state.author != null && String(state.author) === String(number);
+        var color = roleSurface(playerMeta(number).position);
+        var labelColor = roleTextColor(playerMeta(number).position);
         return '<g class="gamepad-touch-sector' + (selected ? ' selected' : '') + '" data-gamepad-player="' + index +
           '" role="button" tabindex="0" aria-label="Joueur numéro ' + escapeMarkup(number) + '" aria-pressed="' + selected + '">' +
           '<path d="' + sectorPath(index, players.length) + '" fill="' + color + '"></path>' +
@@ -273,7 +283,7 @@
   }
   function renderInlineActionWheel() {
     var state = window.VLRuntimeInput ? window.VLRuntimeInput.getState() : {};
-    var selectedId = state.action || 'attack';
+    var selectedId = state.action;
     var freeballSelected = selectedId === 'freeball';
     return '<div class="gamepad-touch-wheel gamepad-action-circle"><svg viewBox="0 0 360 360" role="group" aria-label="Sélection de l action">' +
       '<circle class="gamepad-wheel-disc" cx="180" cy="180" r="178"></circle>' +
@@ -281,7 +291,7 @@
         var action = ACTIONS.filter(function (item) { return item.id === actionId; })[0];
         var point = sectorLabelPoint(index, INLINE_ACTIONS.length);
         var selected = selectedId === actionId;
-        var labelColor = actionId === 'set' || actionId === 'attack' ? '#fff' : '#061a33';
+        var labelColor = action.textColor;
         return '<g class="gamepad-touch-sector' + (selected ? ' selected' : '') + '" data-gamepad-action="' + action.id +
           '" role="button" tabindex="0" aria-label="' + escapeMarkup(action.label) + '" aria-pressed="' + selected + '">' +
           '<path d="' + sectorPath(index, INLINE_ACTIONS.length) + '" fill="' + action.color + '"></path>' +
@@ -299,7 +309,7 @@
     var actionLabel = ACTIONS.filter(function (item) { return item.id === action; })[0];
     return '<section class="gamepad-status-screen"><div class="gamepad-chips"><span>#' + (author || '—') + '</span><span>' + (actionLabel ? actionLabel.label : '—') + '</span></div><div class="gamepad-status-grid">' +
       statusLabels.map(function (status, index) {
-        return '<button type="button" class="gamepad-status-button' + (index === statusIndex ? ' selected' : '') + '" data-gamepad-status="' + status.id + '" style="--status-color:' + status.color + '"><b>' + status.symbol + '</b><span>' + status.label + '</span></button>';
+        return '<button type="button" class="gamepad-status-button ' + status.id + (index === statusIndex ? ' selected' : '') + '" data-gamepad-status="' + status.id + '"><b>' + status.symbol + '</b><span>' + status.label + '</span></button>';
       }).join('') +
       '</div></section>';
   }
@@ -344,7 +354,7 @@
     var status = statusLabels.filter(function (item) { return item.id === resultData.status; })[0] || statusLabels[0];
     var overlay = ensureOverlay();
     overlay.hidden = false;
-    overlay.innerHTML = '<section class="gamepad-result-screen" style="--status-color:' + status.color + '"><small>ENTRY RECORDED</small><div class="gamepad-result-player"><b>#' + (resultData.player || '—') + '</b><span>' + (playerMeta(resultData.player).position || 'PLAYER') + '</span></div><div class="gamepad-result-action">' + resultData.actionLabel + '</div><div class="gamepad-result-status"><b>' + status.symbol + '</b><span>' + status.label + '</span></div><div class="gamepad-progress"><i></i></div></section>';
+    overlay.innerHTML = '<section class="gamepad-result-screen ' + status.id + '"><small>ENTRY RECORDED</small><div class="gamepad-result-player"><b>#' + (resultData.player || '—') + '</b><span>' + (playerMeta(resultData.player).position || 'PLAYER') + '</span></div><div class="gamepad-result-action">' + resultData.actionLabel + '</div><div class="gamepad-result-status"><b>' + status.symbol + '</b><span>' + status.label + '</span></div><div class="gamepad-progress"><i></i></div></section>';
   }
   function closeResult() {
     if (resultTimer) clearTimeout(resultTimer);

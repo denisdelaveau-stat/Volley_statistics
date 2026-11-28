@@ -16,7 +16,7 @@
 
 ## 1. Purpose
 
-FLOW1 is the portrait manual-capture view. The application score header and mode selector remain outside this view; the reference image specifies the FLOW1 canvas itself. The canvas keeps the action/status grid above the **player selection**, with the undo and substitution controls at the bottom.
+FLOW1 is the portrait manual-capture view, labelled **CARDS** in the application mode selector (the internal mode value remains `FLOW`). The application score header and mode selector remain outside this view; the reference image specifies the FLOW1 canvas itself. The canvas keeps the action/status grid above the **player selection**, with the undo and substitution controls at the bottom.
 
 Every event is made of three pieces of information:
 
@@ -184,7 +184,8 @@ The panel fill is `rgba(155, 114, 243, 0.56)` with a violet inset border. It ext
 
 ### 6.3 Card "A" (opponent)
 
-- Tall **black** card with a thin slate border and a large white **A**.
+- Tall **black** card with a thin slate border and a white **A** matching the player-number font size.
+- Its width equals the height of one adjacent player card; it spans both player rows.
 - Selecting **A** means the event is attributed to the opponent team (no player detail).
 
 ### 6.4 Rules
@@ -192,6 +193,7 @@ The panel fill is `rgba(155, 114, 243, 0.56)` with a violet inset border. It ext
 - **PL-1** One player (or A) can be selected at a time. Tapping another card replaces the selection; tapping the selected card again deselects it.
 - **PL-2** Card order is fixed for the set. After a substitution, the incoming player takes the card position and role bar of the outgoing player.
 - **PL-3** The player section never changes size or position.
+- **PL-4** Selected player and action buttons remain distinctly outlined in white with a cyan accent until a status is recorded. Role-preferred action emphasis remains independently visible.
 
 ---
 
@@ -371,6 +373,7 @@ The event log is the source of truth for all statistics and views.
 | AT-17 | Restart the app | Log, score and caption restored |
 | AT-18 | Any state | All seven action buttons keep identical size and position; FREE BALL centred |
 | AT-19 | Render FLOW1 at the baseline viewport | Three distinct section backgrounds; shared role-card colors; SET and DEFENCE centered as a pair |
+| AT-20 | Render CARDS player section | A spans both rows; its width equals one player card's height and its label matches the player-number font size |
 
 ---
 
@@ -379,3 +382,4 @@ The event log is the source of truth for all statistics and views.
 | Version | Date | Change |
 |---|---|---|
 | 1.1 | 28 November 2026 | Baselines the current FLOW1 section colors, shared player-role palette, status panel and centered SET/DEFENCE pair. |
+| 1.2 | 28 November 2026 | Documents the CARDS label, selected-state emphasis and opponent A card dimensions. |

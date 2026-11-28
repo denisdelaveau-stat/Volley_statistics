@@ -19,6 +19,8 @@
     { id: 'defense', code: 'DEFENCE', label: t('action.defense'), family: 'defence' },
     { id: 'freeball', code: 'RELANCE', label: t('action.freeball'), family: 'defence', full: true },
   ];
+  var FOCUS_ACTION_ORDER = ['service', 'block', 'set', 'reception', 'attack', 'defense', 'freeball'];
+  var SPEED_ACTION_ORDER = ['service', 'reception', 'block', 'attack', 'set', 'defense', 'freeball'];
   var RESULTS = [
     { id: 'point', code: 'POSITIVE', label: t('result.point'), css: 'positive', symbol: '+' },
     { id: 'neutral', code: 'NEUTRAL', label: t('result.neutral'), css: 'neutral', symbol: '−' },
@@ -210,7 +212,7 @@
     );
   }
   function modeLabel(mode) {
-    return mode === 'SPEED' ? 'SPEED+' : mode === 'GAMEPAD' ? 'GAMEPAD' : mode;
+    return mode === 'SPEED' ? 'BOARD' : mode === 'FLOW' ? 'CARDS' : mode;
   }
   function actionMeta(id) {
     for (var i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].id === id) return ACTIONS[i];
@@ -317,15 +319,15 @@
   function opponentButton() {
     var selected = state.author === 'A';
     return (
-      '<div class="runtime-opponent-wrap"><button type="button" class="runtime-opponent' +
+      '<button type="button" class="runtime-player runtime-opponent-tile' +
       (selected ? ' selected' : '') +
       '" data-runtime-author="A" aria-pressed="' +
       (selected ? 'true' : 'false') +
       '" aria-label="' +
       esc(t('runtime.opponent')) +
-      '">A</button><span class="runtime-opponent-label">' +
+      '"><span class="number">A</span><span class="role">' +
       esc(t('runtime.opponent')) +
-      '</span></div>'
+      '</span></button>'
     );
   }
   function matrixPlayerButton(number) {
@@ -346,7 +348,7 @@
       esc(number) +
       ' ' +
       esc(ROLE_LABEL[r] || r) +
-      '"><span class="runtime-matrix-role-accent" aria-hidden="true"></span><b>' +
+      '"><b>' +
       esc(number) +
       '</b></button>'
     );
@@ -359,8 +361,8 @@
           return playerButton(n, false);
         })
         .join('') +
-      '</div>' +
       opponentButton() +
+      '</div>' +
       '</div>'
     );
   }
@@ -381,10 +383,15 @@
       '</button></div>'
     );
   }
-  function actionGrid(flow) {
+  function actionGrid(flow, order) {
+    var actions = order
+      ? order.map(function (id) {
+          return ACTIONS.filter(function (action) { return action.id === id; })[0];
+        })
+      : ACTIONS;
     return (
       '<div class="runtime-action-grid">' +
-      ACTIONS.map(function (a) {
+      actions.map(function (a) {
         var pref = isPreferred(a.id),
           secondary = state.author && state.author !== 'A' && prefs.runtimeHighlights && !pref,
           disabled = flow && !state.author,
@@ -433,44 +440,41 @@
     );
   }
   function focusLayout() {
-    if (state.stage === 'player')
-      return (
-        '<section class="runtime-stage"><h2 class="runtime-question"><span class="runtime-kicker">' +
-        esc(t('runtime.step1')) +
-        '</span>' +
-        esc(t('runtime.whoPlays')) +
-        '</h2>' +
-        plainPlayers() +
-        '</section>'
-      );
-    if (state.stage === 'action')
-      return (
-        '<section class="runtime-stage">' +
-        authorChip(false) +
-        inlineTools(false) +
-        '<h2 class="runtime-question"><span class="runtime-kicker">' +
-        esc(t('runtime.step2')) +
-        '</span>' +
-        esc(t('runtime.whichAction')) +
-        '</h2><div class="runtime-panel">' +
-        actionGrid(false) +
-        '</div></section>'
-      );
+    var playerStep = state.stage === 'player',
+      resultStep = state.stage === 'result',
+      step = playerStep ? t('runtime.step1') : resultStep ? t('runtime.step3') : t('runtime.step2'),
+      question = playerStep
+      ? ''
+        : resultStep
+          ? t('runtime.whichResult')
+          : t('runtime.whichAction'),
+      context = playerStep
+        ? '<div class="runtime-focus-context" aria-hidden="true"></div>'
+        : '<div class="runtime-focus-context">' +
+          authorChip(resultStep) +
+          inlineTools(resultStep) +
+          '</div>',
+      content = playerStep
+        ? plainPlayers()
+        : '<div class="runtime-panel">' +
+          (resultStep ? resultGrid(false) : actionGrid(false, FOCUS_ACTION_ORDER)) +
+          '</div>';
     return (
-      '<section class="runtime-stage">' +
-      authorChip(true) +
-      inlineTools(true) +
+      '<section class="runtime-stage runtime-focus-stage' +
+      (resultStep ? ' runtime-focus-status' : '') +
+      '">' +
+      context +
       '<h2 class="runtime-question"><span class="runtime-kicker">' +
-      esc(t('runtime.step3')) +
+      esc(step) +
       '</span>' +
-      esc(t('runtime.whichResult')) +
-      '</h2><div class="runtime-panel">' +
-      resultGrid(false) +
-      '</div></section>'
+      esc(question) +
+      '</h2>' +
+      content +
+      '</section>'
     );
   }
   function matrixLayout() {
-    var actions = ACTIONS.filter(function (action) { return !action.full; }),
+    var actions = SPEED_ACTION_ORDER.map(actionMeta),
       resultOrder = ['error', 'neutral', 'point'];
     return (
       '<section class="runtime-stage runtime-matrix runtime-matrix-' +

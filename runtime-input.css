@@ -12,6 +12,52 @@
   --rt-amber: #f2b84b;
   --rt-violet: #9b72f3;
   --rt-steel: #5f8eb4;
+  --rt-status-positive: linear-gradient(#2bd16d, #13ad50);
+  --rt-status-neutral: linear-gradient(#6585a3, #456680);
+  --rt-status-error: linear-gradient(#f15151, #d82f2f);
+  --rt-status-border: rgba(255, 255, 255, 0.58);
+  --rt-action-service-surface: var(--role-opp-surface);
+  --rt-action-reception-surface: color-mix(in srgb, var(--role-opp-surface) 55%, var(--role-opp));
+  --rt-action-block-surface: var(--role-oh-surface);
+  --rt-action-attack-surface: color-mix(in srgb, var(--role-oh-surface) 55%, var(--role-oh));
+  --rt-action-set-surface: var(--role-mb-surface);
+  --rt-action-defense-surface: color-mix(in srgb, var(--role-mb-surface) 55%, var(--role-mb));
+  --rt-action-freeball-surface: var(--role-setter-surface);
+}
+[data-runtime-action='service'] {
+  --runtime-action-surface: var(--rt-action-service-surface);
+  --runtime-action-border: var(--role-opp);
+  --runtime-action-text: var(--role-opp-text);
+}
+[data-runtime-action='reception'] {
+  --runtime-action-surface: var(--rt-action-reception-surface);
+  --runtime-action-border: var(--role-opp);
+  --runtime-action-text: var(--role-opp-text);
+}
+[data-runtime-action='block'] {
+  --runtime-action-surface: var(--rt-action-block-surface);
+  --runtime-action-border: var(--role-oh);
+  --runtime-action-text: var(--role-oh-text);
+}
+[data-runtime-action='attack'] {
+  --runtime-action-surface: var(--rt-action-attack-surface);
+  --runtime-action-border: var(--role-oh);
+  --runtime-action-text: var(--role-oh-text);
+}
+[data-runtime-action='set'] {
+  --runtime-action-surface: var(--rt-action-set-surface);
+  --runtime-action-border: var(--role-mb);
+  --runtime-action-text: var(--role-mb-text);
+}
+[data-runtime-action='defense'] {
+  --runtime-action-surface: var(--rt-action-defense-surface);
+  --runtime-action-border: var(--role-mb);
+  --runtime-action-text: var(--role-mb-text);
+}
+[data-runtime-action='freeball'] {
+  --runtime-action-surface: var(--rt-action-freeball-surface);
+  --runtime-action-border: var(--role-setter);
+  --runtime-action-text: var(--role-setter-text);
 }
 html.runtime-capture-active body {
   padding: 0;
@@ -159,6 +205,7 @@ html.runtime-capture-active .score-line {
   margin: 0 auto;
 }
 .runtime-question {
+  min-height: 26px;
   margin: 7px 0 10px;
   text-align: center;
   font-size: 21px;
@@ -174,6 +221,32 @@ html.runtime-capture-active .score-line {
 }
 .runtime-stage {
   animation: runtime-in 0.1s ease-out;
+}
+.runtime-focus-context {
+  height: 100px;
+}
+.runtime-focus-stage > .runtime-panel {
+  min-height: 283px;
+}
+.runtime-focus-stage > .runtime-panel.is-focus {
+  padding-top: 9px;
+}
+.runtime-focus-stage > .runtime-panel:not(.is-focus) {
+  border-width: 2px;
+  padding-top: 9px;
+}
+.runtime-focus-stage.runtime-focus-status > .runtime-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.runtime-focus-stage.runtime-focus-status .runtime-immediate {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  margin: 0;
 }
 @keyframes runtime-in {
   from {
@@ -200,6 +273,7 @@ html.runtime-capture-active .score-line {
 .runtime-player-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 8px;
 }
 .runtime-player {
@@ -261,34 +335,15 @@ html.runtime-capture-active .score-line {
   --role-surface: var(--role-libero-surface);
   --role-text: var(--role-libero-text);
 }
-.runtime-opponent-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 9px;
-}
-.runtime-opponent {
-  display: grid;
-  place-items: center;
-  width: 62px;
-  height: 62px;
-  padding: 0;
-  border: 4px solid #fff;
-  border-radius: 50%;
+.runtime-opponent-tile {
+  grid-column: 2;
+  border-color: #fff;
   background: #05080d;
   color: #fff;
-  font-size: 30px;
-  font-weight: 1000;
 }
-.runtime-opponent.selected {
+.runtime-opponent-tile.selected {
   outline: 3px solid var(--rt-cyan);
-  outline-offset: 3px;
-}
-.runtime-opponent-label {
-  margin-top: 4px;
-  color: #d9edfa;
-  font-size: 12px;
-  font-weight: 800;
+  outline-offset: 2px;
 }
 .runtime-court {
   position: relative;
@@ -361,7 +416,7 @@ html.runtime-capture-active .score-line {
 .runtime-action-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
+  gap: 8px;
 }
 .runtime-action {
   position: relative;
@@ -391,6 +446,22 @@ html.runtime-capture-active .score-line {
 .runtime-action.full {
   grid-column: 1/-1;
 }
+.runtime-focus-stage .runtime-action.full {
+  grid-column: 2;
+}
+.runtime-focus-stage [data-runtime-action='freeball'] {
+  grid-row: 3;
+}
+.runtime-focus-stage .runtime-action {
+  --family: var(--runtime-action-border);
+  border-color: var(--runtime-action-border);
+  background: var(--runtime-action-surface);
+  color: var(--runtime-action-text);
+}
+.runtime-focus-stage .runtime-action.preferred {
+  border-color: var(--runtime-action-border);
+  background: var(--runtime-action-surface);
+}
 .runtime-action.preferred {
   border-color: var(--family);
   background: #10456f;
@@ -417,11 +488,11 @@ html.runtime-capture-active .score-line {
 }
 .runtime-result-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 7px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 .runtime-result {
-  min-height: 70px;
+  min-height: 64px;
   border: 2px solid rgba(255, 255, 255, 0.58);
   border-radius: 10px;
   color: #fff;
@@ -430,14 +501,18 @@ html.runtime-capture-active .score-line {
   letter-spacing: 0.02em;
   touch-action: manipulation;
 }
+.runtime-focus-stage .runtime-action,
+.runtime-focus-stage .runtime-result {
+  min-height: 81px;
+}
 .runtime-result.positive {
-  background: linear-gradient(#2bd16d, #13ad50);
+  background: var(--rt-status-positive);
 }
 .runtime-result.neutral {
-  background: linear-gradient(#6585a3, #456680);
+  background: var(--rt-status-neutral);
 }
 .runtime-result.error {
-  background: linear-gradient(#f15151, #d82f2f);
+  background: var(--rt-status-error);
 }
 .runtime-result:disabled {
   filter: saturate(0.3);
@@ -456,6 +531,7 @@ html.runtime-capture-active .score-line {
   align-items: center;
 }
 .runtime-matrix {
+  --runtime-matrix-button-height: 56px;
   display: grid;
   gap: 10px;
   max-width: 1120px;
@@ -464,7 +540,7 @@ html.runtime-capture-active .score-line {
 }
 .runtime-matrix-horizontal-right,
 .runtime-matrix-horizontal-left {
-  grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr) minmax(230px, 0.9fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .runtime-matrix-horizontal-right {
   grid-template-areas: 'player action status';
@@ -520,64 +596,50 @@ html.runtime-capture-active .score-line {
 }
 .runtime-matrix-player-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: minmax(52px, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr)) var(--runtime-matrix-button-height);
+  grid-auto-rows: var(--runtime-matrix-button-height);
+  width: min(100%, calc(66.6667% + var(--runtime-matrix-button-height) + 4px));
+  margin-inline: auto;
   gap: 6px;
 }
 .runtime-matrix-horizontal-right .runtime-matrix-player-grid,
-.runtime-matrix-horizontal-left .runtime-matrix-player-grid {
+.runtime-matrix-horizontal-left .runtime-matrix-player-grid,
+.runtime-matrix-horizontal-right .runtime-matrix-action-grid,
+.runtime-matrix-horizontal-left .runtime-matrix-action-grid,
+.runtime-matrix-horizontal-right .runtime-matrix-status-grid,
+.runtime-matrix-horizontal-left .runtime-matrix-status-grid {
   margin-block: auto;
+  flex: none;
 }
 .runtime-matrix-player {
   position: relative;
   display: grid;
   place-items: center;
   min-width: 0;
-  min-height: 52px;
+  height: var(--runtime-matrix-button-height);
+  min-height: var(--runtime-matrix-button-height);
   padding: 4px 8px;
   overflow: hidden;
-  border: 1px solid rgba(34, 211, 238, 0.25);
+  border: 2px solid var(--role-color, #9aa5b1);
   border-radius: 9px;
-  background: #07142b;
-  color: #fff;
+  background: var(--role-surface, #dce1e6);
+  color: var(--role-text, #17202a);
   touch-action: manipulation;
 }
 .runtime-matrix-player b {
   font-size: clamp(32px, 4vw, 42px);
   line-height: 1;
 }
-.runtime-matrix-role-accent {
-  position: absolute;
-  top: 6px;
-  bottom: 6px;
-  left: 6px;
-  width: 5px;
-  border-radius: 4px;
-  background: var(--matrix-role, #9aa5b1);
-}
-.runtime-matrix-player.runtime-role-opp {
-  --matrix-role: var(--role-opp);
-}
-.runtime-matrix-player.runtime-role-setter {
-  --matrix-role: var(--role-setter);
-}
-.runtime-matrix-player.runtime-role-oh {
-  --matrix-role: var(--role-oh);
-}
-.runtime-matrix-player.runtime-role-mb {
-  --matrix-role: var(--role-mb);
-}
-.runtime-matrix-player.runtime-role-libero {
-  --matrix-role: var(--role-libero);
-}
 .runtime-matrix-opponent {
   display: grid;
   place-items: center;
-  grid-column: 1 / -1;
+  grid-column: 3;
+  grid-row: 1 / span 3;
   justify-self: center;
-  width: calc((100% - 6px) / 2);
+  width: 100%;
   min-width: 0;
-  min-height: 52px;
+  height: auto;
+  min-height: 0;
   padding: 0;
   border: 2px solid #536e96;
   border-radius: 9px;
@@ -587,58 +649,71 @@ html.runtime-capture-active .score-line {
   font-weight: 900;
   touch-action: manipulation;
 }
-.runtime-matrix-vertical-down .runtime-matrix-opponent,
-.runtime-matrix-vertical-up .runtime-matrix-opponent {
-  width: calc((100% - 12px) / 3);
-}
 .runtime-matrix-action-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: minmax(42px, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr)) var(--runtime-matrix-button-height);
+  grid-auto-rows: var(--runtime-matrix-button-height);
+  width: min(100%, calc(66.6667% + var(--runtime-matrix-button-height) + 4px));
+  margin-inline: auto;
   gap: 6px;
-  flex: 1;
 }
 .runtime-matrix-action {
   min-width: 0;
-  min-height: 42px;
+  height: var(--runtime-matrix-button-height);
+  min-height: var(--runtime-matrix-button-height);
   padding: 6px 8px;
-  border: 1px solid rgba(34, 211, 238, 0.24);
+  border: 2px solid var(--runtime-action-border);
   border-radius: 8px;
-  background: transparent;
-  color: #fff;
+  background: var(--runtime-action-surface);
+  color: var(--runtime-action-text);
   font-size: 15px;
   font-weight: 800;
   touch-action: manipulation;
 }
+.runtime-matrix-action-grid [data-runtime-action='freeball'] {
+  grid-column: 3;
+  grid-row: 1 / span 3;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
 .runtime-matrix-action.preferred {
-  border-color: rgba(34, 211, 238, 0.62);
-  background: rgba(34, 211, 238, 0.08);
+  border-color: var(--runtime-action-border);
+  background: var(--runtime-action-surface);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--runtime-action-border) 45%, transparent);
 }
 .runtime-matrix-status-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-auto-rows: minmax(58px, 1fr);
-  gap: 8px;
-  flex: 1;
+  grid-auto-rows: var(--runtime-matrix-button-height);
+  width: calc((100% - 12px) / 3);
+  align-self: center;
+  gap: 6px;
 }
 .runtime-matrix-status {
   min-width: 0;
-  min-height: 58px;
+  height: var(--runtime-matrix-button-height);
+  min-height: var(--runtime-matrix-button-height);
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
-  gap: 5px;
-  padding: 7px 10px;
+  gap: 4px;
+  padding: 4px 5px;
   border: 1px solid;
   border-radius: 9px;
   background: #102e50;
   color: #fff;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 900;
   touch-action: manipulation;
 }
 .runtime-matrix-status b {
-  font-size: 25px;
+  font-size: 20px;
   line-height: 1;
 }
 .runtime-matrix-status.error {
@@ -664,9 +739,11 @@ html.runtime-capture-active .score-line {
 .runtime-matrix-player.selected,
 .runtime-matrix-action.selected,
 .runtime-matrix-opponent.selected {
+  outline: 3px solid #fff;
+  outline-offset: -5px;
+}
+.runtime-matrix-opponent.selected {
   border-color: #22d3ee;
-  outline: 2px solid #22d3ee;
-  outline-offset: -4px;
   background-color: rgba(34, 211, 238, 0.16);
 }
 .runtime-matrix-player:focus-visible,
@@ -729,13 +806,16 @@ html.runtime-capture-active .score-line {
   z-index: 1;
   min-width: 0;
   min-height: clamp(62px, 10.4vh, 98px);
-  border: 2px solid #536e96;
+  border: 2px solid var(--runtime-action-border);
   border-radius: 16px;
-  background: transparent;
-  color: #fff;
+  background: var(--runtime-action-surface);
+  color: var(--runtime-action-text);
   font-size: clamp(19px, 3vw, 26px);
   font-weight: 900;
   touch-action: manipulation;
+}
+.runtime-flow-action.preferred {
+  box-shadow: 0 0 13px color-mix(in srgb, var(--runtime-action-border) 34%, transparent);
 }
 .runtime-flow-action[data-runtime-action='freeball'] {
   grid-area: 1 / 3 / 2 / 5;
@@ -765,7 +845,9 @@ html.runtime-capture-active .score-line {
 .runtime-flow-action.selected {
   border-color: #22d3ee;
   border-width: 4px;
-  background-color: #11364b;
+  background-color: var(--runtime-action-surface);
+  outline: 3px solid #fff;
+  outline-offset: -6px;
 }
 .runtime-flow-status-grid {
   display: contents;
@@ -828,14 +910,15 @@ html.runtime-capture-active .score-line {
   padding: 14px;
 }
 .runtime-flow-player-grid {
+  --runtime-flow-player-height: 68px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(100px, 0.72fr);
-  grid-template-rows: repeat(2, minmax(68px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr)) var(--runtime-flow-player-height);
+  grid-template-rows: repeat(2, var(--runtime-flow-player-height));
   gap: 11px;
 }
 .runtime-flow-player {
   min-width: 0;
-  min-height: 68px;
+  min-height: var(--runtime-flow-player-height);
   overflow: hidden;
   border: 2px solid var(--role-color, #9aa5b1);
   border-radius: 13px;
@@ -848,8 +931,9 @@ html.runtime-capture-active .score-line {
   font-weight: 1000;
 }
 .runtime-flow-player.selected {
-  outline: 4px solid #22d3ee;
+  outline: 3px solid #fff;
   outline-offset: -5px;
+  box-shadow: inset 0 0 0 2px #22d3ee;
 }
 .runtime-flow-opponent {
   grid-column: 4;
@@ -858,9 +942,6 @@ html.runtime-capture-active .score-line {
   border-radius: 13px;
   background: #000;
   color: #fff;
-}
-.runtime-flow-opponent b {
-  font-size: clamp(52px, 7vw, 72px);
 }
 .runtime-flow-player.runtime-flow-opponent.selected {
   outline-color: #22d3ee;
@@ -986,7 +1067,6 @@ html[data-runtime-mode='FLOW'] .runtime-footer .runtime-last {
 .runtime-shell[data-runtime-layout="GAMEPAD"] {
   max-width: none;
 }
-.runtime-shell[data-runtime-layout="GAMEPAD"] .runtime-mode-tabs,
 .runtime-shell[data-runtime-layout="GAMEPAD"] .runtime-gamepad-button {
   display: none;
 }
@@ -1062,6 +1142,11 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
   stroke-width: 8;
   transition: stroke 0.12s, stroke-width 0.12s;
 }
+.gamepad-touch-sector.selected path {
+  stroke: #fff;
+  stroke-width: 12;
+  filter: drop-shadow(0 0 3px #22d3ee);
+}
 .gamepad-player-circle .gamepad-wheel-disc {
   fill: rgba(32, 199, 102, 0.32);
   stroke: rgba(32, 199, 102, 0.62);
@@ -1113,6 +1198,18 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
   fill: #fff;
   font-size: 42px;
 }
+.gamepad-touch-center.gamepad-action-center circle {
+  fill: var(--rt-action-freeball-surface);
+  stroke: var(--role-setter);
+}
+.gamepad-touch-center.gamepad-action-center text {
+  fill: var(--role-setter-text);
+}
+.gamepad-touch-center.selected circle {
+  stroke: #fff;
+  stroke-width: 12;
+  filter: drop-shadow(0 0 3px #22d3ee);
+}
 .gamepad-touch-center:focus-visible circle {
   stroke: #35d9ff;
   stroke-width: 10;
@@ -1141,18 +1238,12 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
 }
 .gamepad-inline-status .positive {
   color: #fff;
-  border-color: #20c766;
-  background: rgba(10, 55, 33, 0.92);
 }
 .gamepad-inline-status .neutral {
   color: #fff;
-  border-color: #809bb8;
-  background: rgba(43, 61, 82, 0.96);
 }
 .gamepad-inline-status .negative {
   color: #fff;
-  border-color: #ed4949;
-  background: rgba(58, 18, 30, 0.96);
 }
 .gamepad-inline-status button:active {
   transform: scale(0.97);
@@ -1281,13 +1372,21 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
   transform: translate(-50%, -50%);
   display: grid;
   place-items: center;
-  border: 5px solid var(--bubble-color);
+  border: 5px solid var(--bubble-border-color, var(--bubble-color));
   border-radius: 50%;
   background: #102d4a;
   color: #fff;
   font-size: 18px;
   text-align: center;
   transition: transform 0.08s, background 0.08s;
+}
+.gamepad-player-circle .gamepad-bubble {
+  background: var(--bubble-color);
+  color: var(--bubble-text-color, #26313d);
+}
+.gamepad-action-circle .gamepad-bubble {
+  background: var(--bubble-color);
+  color: var(--bubble-text-color, #26313d);
 }
 .gamepad-bubble.selected {
   z-index: 4;
@@ -1376,14 +1475,14 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
 }
 .gamepad-status-button {
   min-height: 250px;
-  border: 5px solid var(--status-color);
+  border: 5px solid var(--rt-status-border);
   border-radius: 22px;
-  background: color-mix(in srgb, var(--status-color) 18%, #071e3b);
+  background: var(--rt-status-positive);
   color: #fff;
 }
 .gamepad-status-button b {
   display: block;
-  color: var(--status-color);
+  color: #fff;
   font-size: 80px;
   line-height: 1;
 }
@@ -1431,7 +1530,7 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
 }
 .gamepad-result-status b {
   display: block;
-  color: var(--status-color);
+  color: #fff;
   font-size: clamp(80px, 12vw, 150px);
   line-height: 0.8;
 }
@@ -1452,6 +1551,56 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
   height: 100%;
   background: var(--status-color);
   animation: gamepad-progress var(--gamepad-duration, 2.5s) linear forwards;
+}
+.runtime-result.positive,
+.runtime-matrix-status.positive,
+.runtime-flow-status.positive,
+.gamepad-inline-status .positive,
+.gamepad-status-button.positive {
+  border-color: var(--rt-status-border);
+  background: var(--rt-status-positive);
+  color: #fff;
+}
+.runtime-result.neutral,
+.runtime-matrix-status.neutral,
+.runtime-flow-status.neutral,
+.gamepad-inline-status .neutral,
+.gamepad-status-button.neutral {
+  border-color: var(--rt-status-border);
+  background: var(--rt-status-neutral);
+  color: #fff;
+}
+.runtime-result.error,
+.runtime-matrix-status.error,
+.runtime-flow-status.error,
+.gamepad-inline-status .negative,
+.gamepad-status-button.error {
+  border-color: var(--rt-status-border);
+  background: var(--rt-status-error);
+  color: #fff;
+}
+.gamepad-result-screen.positive {
+  --status-color: #2bd16d;
+}
+.gamepad-result-screen.neutral {
+  --status-color: #6585a3;
+}
+.gamepad-result-screen.error {
+  --status-color: #f15151;
+}
+.gamepad-result-screen .gamepad-result-status {
+  padding: 12px 24px;
+  border: 2px solid var(--rt-status-border);
+  border-radius: 12px;
+}
+.gamepad-result-screen.positive .gamepad-result-status {
+  background: var(--rt-status-positive);
+}
+.gamepad-result-screen.neutral .gamepad-result-status {
+  background: var(--rt-status-neutral);
+}
+.gamepad-result-screen.error .gamepad-result-status {
+  background: var(--rt-status-error);
 }
 @keyframes gamepad-progress {
   from { width: 100%; }
@@ -1721,7 +1870,7 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
   }
   .runtime-matrix-horizontal-right,
   .runtime-matrix-horizontal-left {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   html.runtime-capture-active #capturePanel > .capture-head {
     grid-template-columns: 44px minmax(140px, 1fr) auto;
@@ -1740,21 +1889,6 @@ html[data-runtime-mode="GAMEPAD"] #historyToggle {
 html[data-runtime-mode='SPEED'] .runtime-gamepad-button,
 html[data-runtime-mode='SPEED'] #gamepadCaptureIndicator {
   display: none;
-}
-.runtime-matrix-vertical-down .runtime-matrix-player-grid,
-.runtime-matrix-vertical-up .runtime-matrix-player-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(56px, 1fr);
-}
-.runtime-matrix-vertical-down .runtime-matrix-action-grid,
-.runtime-matrix-vertical-up .runtime-matrix-action-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: minmax(46px, 1fr);
-}
-.runtime-matrix-vertical-down .runtime-matrix-status-grid,
-.runtime-matrix-vertical-up .runtime-matrix-status-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(56px, 1fr);
 }
 .runtime-matrix-vertical-down .runtime-matrix-status,
 .runtime-matrix-vertical-up .runtime-matrix-status {
@@ -1816,32 +1950,26 @@ html[data-runtime-mode='SPEED'] .runtime-sub-open {
   }
 }
 @media (max-height: 520px) and (orientation: landscape) {
+  .runtime-matrix {
+    --runtime-matrix-button-height: 40px;
+  }
   .runtime-matrix-section {
     gap: 5px;
     padding: 6px;
   }
   .runtime-matrix-player-grid {
-    grid-auto-rows: minmax(40px, 1fr);
-  }
-  .runtime-matrix-player {
-    min-height: 40px;
+    grid-auto-rows: var(--runtime-matrix-button-height);
   }
   .runtime-matrix-player b {
     font-size: 30px;
   }
   .runtime-matrix-action-grid {
-    grid-auto-rows: minmax(34px, 1fr);
-    gap: 4px;
-  }
-  .runtime-matrix-action {
-    min-height: 34px;
+    grid-auto-rows: var(--runtime-matrix-button-height);
+    gap: 6px;
   }
   .runtime-matrix-status-grid {
-    grid-auto-rows: minmax(46px, 1fr);
-    gap: 5px;
-  }
-  .runtime-matrix-status {
-    min-height: 46px;
+    grid-auto-rows: var(--runtime-matrix-button-height);
+    gap: 6px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

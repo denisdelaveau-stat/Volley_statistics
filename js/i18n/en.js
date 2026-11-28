@@ -208,7 +208,6 @@ window.VolleyI18nMessages.en = {
   'runtime.step1': '1 · PLAYER',
   'runtime.step2': '2 · ACTION',
   'runtime.step3': '3 · RESULT',
-  'runtime.whoPlays': 'Who plays?',
   'runtime.whichAction': 'Which action?',
   'runtime.whichResult': 'Which result?',
   'runtime.matrixTitle': 'Matrix Full capture',

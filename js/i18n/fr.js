@@ -210,7 +210,6 @@ window.VolleyI18nMessages.fr = {
   'runtime.step1': '1 · JOUEUR',
   'runtime.step2': '2 · ACTION',
   'runtime.step3': '3 · RÉSULTAT',
-  'runtime.whoPlays': 'Qui joue ?',
   'runtime.whichAction': 'Quelle action ?',
   'runtime.whichResult': 'Quel résultat ?',
   'runtime.matrixTitle': 'Matrice de saisie complète',

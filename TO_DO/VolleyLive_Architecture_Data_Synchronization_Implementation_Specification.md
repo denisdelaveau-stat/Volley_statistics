@@ -385,7 +385,7 @@ Origin-specific requirements:
 
 The action requires `eventId`, `matchId`, `setId`, `rallyId`, `actionOrder`, `teamId`, `actionType`, `evaluation`, `scoreBefore`, `scoreAfter`, `phaseAtStart`, `setterRotationAtStart`, and `lineupVersionId`. `playerId` is required for an action attributed to a player and is `null` for a generic opponent action.
 
-Field names are those of the rally in document schema 2.1 (SYS-JSON-10); `phaseAtStart` is seen from our team. `inputMode` takes the stored values of the capture (SYS-DATA 6.3): `FOCUS`, `SPEED` (shown as SPEED+) and `FLOW`.
+Field names are those of the rally in document schema 2.1 (SYS-JSON-10); `phaseAtStart` is seen from our team. `inputMode` takes the stored values of the capture (SYS-DATA 6.3): `FOCUS`, `SPEED` (shown as BOARD) and `FLOW` (shown as CARDS).
 
 ### 4.7 Rally, lineup, rotation, and correction
 
@@ -432,7 +432,7 @@ Both paths converge before projection:
 
 ```mermaid
 flowchart LR
-    M[VolleyLive manual capture<br/>FOCUS · SPEED+ · FLOW · Gamepad]
+    M[VolleyLive manual capture<br/>FOCUS · BOARD · CARDS · Gamepad]
     P[Live data provider<br/>DataVolley · Hudl VolleyMetrics]
     LM[Local Match Engine<br/>Outbox]
     CV[Server-side provider conversion]
@@ -465,13 +465,13 @@ Rules:
 
 ### 5.1 Tablet/manual capture
 
-The input controller collects actor, action, and result; supports FOCUS, SPEED+, and FLOW without changing the domain contract; validates a local command; asks the match engine for score impact; atomically persists event, local projection, and outbox; and displays the result without waiting for the network.
+The input controller collects actor, action, and result; supports FOCUS, BOARD (`SPEED`), and CARDS (`FLOW`) without changing the domain contract; validates a local command; asks the match engine for score impact; atomically persists event, local projection, and outbox; and displays the result without waiting for the network.
 
 Standard capture SHOULD remain possible in three taps. A double tap on the result MUST create only one `eventId`.
 
 - **FOCUS:** sequential actor/action/result screens.
-- **SPEED+:** permanent court with contextual commands (stored value `SPEED`).
-- **FLOW:** actor, action, and result visible together.
+- **BOARD** (stored value `SPEED`): permanent court with contextual commands.
+- **CARDS** (stored value `FLOW`): actor, action, and result visible together.
 
 The modes, the authors offered and the double-tap guard are specified by UI-CAPTURE-02 to -04 and SYS-DATA-05; this section adds only the transaction and the outbox.
 

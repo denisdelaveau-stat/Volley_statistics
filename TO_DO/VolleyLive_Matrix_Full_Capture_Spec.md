@@ -44,6 +44,8 @@ Out of scope:
 - Match setup (teams, line-ups) — handled in **SETUP & CAPTURE**.
 - Statistics, Coach View, Spectator View.
 
+The capture mode tabs label Matrix Full as **BOARD** (`SPEED`) and FLOW1 as **CARDS** (`FLOW`). These labels do not change the stored mode identifiers.
+
 ---
 
 ## 3. Screen structure
@@ -56,16 +58,15 @@ The screen is made of a header, three permanent sections and a footer.
 ├──────────────────┬──────────────────┬────────────────────────┤
 │ 1 Player (number)│ 2 Action         │ 3 Status               │
 │                  │                  │                        │
-│  [7 ]  [12]      │  Service         │   ✕  Error             │
-│  [4 ]  [9 ]      │  Reception       │                        │
-│  [3 ]  [6 ]      │  Set             │   ↻  Continue          │
-│                  │  Attack          │                        │
-│  [ A ] opponent  │  Block           │   ✓  Point             │
-│                  │  Defence         │                        │
+│  [7 ]  [12]      │  Service   Reception  │  ✕ Error           │
+│  [4 ]  [ 9]      │  Block     Attack     │  ↻ Continue        │
+│  [3 ]  [ 6]      │  Set       Defence    │  ✓ Point           │
 ├──────────────────┴──────────────────┴────────────────────────┤
 │ FOOTER  ↶ Undo  |  Last action: #7 · Reception · Continue  |  Substitution │
 └──────────────────────────────────────────────────────────────┘
 ```
+
+The Player section's A button and the Action section's Relance button each occupy a third column and span all three rows.
 
 ### 3.1 Header
 
@@ -83,7 +84,7 @@ The header is read-only. It never contains capture controls.
 - Shows the **6 players currently on court** for the tracked team, plus the **Libero** when on court.
 - Each tile shows **only the jersey number** in large type, with a **slim vertical role accent strip** on the left.
 - Below the player grid: one **opponent button "A"** (black circle, white "A") used when the action is performed by the opposing team.
-- Grid in landscape: 2 columns × 3 rows. Grid in portrait: 3 columns × 2 rows.
+- Grid: 2 columns × 3 rows; the opponent "A" occupies a third column, spans all 3 rows and is as wide as a standard player tile is high.
 - Tile order is fixed for the whole set and only changes after a substitution (the incoming player takes the slot of the outgoing player).
 
 **Role colours (accent strip):**
@@ -98,18 +99,20 @@ The header is read-only. It never contains capture controls.
 
 ### 3.3 Section 2 — Action
 
-Six fixed buttons, always in this order:
+Seven fixed buttons, always in this order:
 
 1. Service
 2. Reception
-3. Set
+3. Block
 4. Attack
-5. Block
+5. Set
 6. Defence
+7. Relance
 
-- Landscape: 1 column × 6 rows. Portrait: 2 columns × 3 rows.
-- Buttons never move, never hide and never change size.
-- **Role-preferred actions** are emphasised with a subtle highlight (no text, no badge, no reordering):
+- The six paired actions use 2 columns × 3 rows in both orientations: Service/Reception, Block/Attack, Set/Defence.
+- Relance occupies a third column, spanning the same 3 rows. Its width matches the height of a standard action button, and its label reads vertically along the button.
+- Buttons never move or hide when the orientation changes; the six paired actions keep their order and Relance stays beside them.
+- **Role-preferred actions** are emphasised with a subtle highlight (no text, no badge, no reordering). If an action is both selected and preferred, both highlights remain visible:
 
 | Role | Preferred actions |
 |---|---|
@@ -167,9 +170,9 @@ Portrait internal arrangement:
 
 | Section | Arrangement |
 |---|---|
-| Player | 3 columns × 2 rows + "A" button |
-| Action | 2 columns × 3 rows |
-| Status | 3 buttons in one row |
+| Player | 2 columns × 3 rows + "A" in a third column spanning 3 rows |
+| Action | 2 columns × 3 rows + Relance in a third column spanning 3 rows |
+| Status | 1 column × 3 rows |
 
 ---
 
@@ -181,10 +184,10 @@ Portrait internal arrangement:
 Tap 1: Player   →   Tap 2: Action   →   Tap 3: Status   →   Event recorded
 ```
 
-- **FLOW-1** Tapping a player selects it (cyan outline + light cyan tint). Only one player can be selected.
-- **FLOW-2** Tapping an action selects it (cyan outline). Only one action can be selected.
+- **FLOW-1** Tapping a player selects it (high-contrast white outline with a cyan accent). Only one player can be selected.
+- **FLOW-2** Tapping an action selects it (high-contrast white outline with a cyan border). Only one action can be selected.
 - **FLOW-3** Tapping a status **records the event immediately**. No confirmation dialog.
-- **FLOW-4** After recording, Player and Action selections are cleared. The screen is back to its ready state.
+- **FLOW-4** Player and Action selections remain highlighted until the status tap commits the event. After commit, both selections clear and the screen returns to its ready state.
 - **FLOW-5** Tapping an already selected player or action deselects it.
 - **FLOW-6** Tapping another player/action replaces the current selection.
 - **FLOW-7** Player and Action may be selected in any order. Status is always the last tap.
@@ -227,6 +230,7 @@ The status group is shared, but some combinations are not possible. When an acti
 | Attack | ✅ | ✅ | ✅ |
 | Block | ✅ | ✅ | ✅ |
 | Defence | ✅ | ✅ | ❌ |
+| Relance | ✅ | ✅ | ❌ |
 | (none, opponent "A" only) | ✅ | ❌ | ✅ |
 
 - **VAL-1** A disabled status cannot be tapped; a tap on it has no effect.
@@ -358,7 +362,7 @@ Allowed values:
 
 | Field | Values |
 |---|---|
-| `action` | `service`, `reception`, `set`, `attack`, `block`, `defence`, `null` (opponent only) |
+| `action` | `service`, `reception`, `set`, `attack`, `block`, `defence`, `freeball`, `null` (opponent only) |
 | `result` | `error`, `neutral`, `point` |
 | `team` | `home`, `away` |
 
@@ -383,6 +387,7 @@ Allowed values:
 | AT-13 | Substitution #9 → #15 | #15 takes #9's tile position, event logged |
 | AT-14 | Network off, record 10 events | All events persisted locally |
 | AT-15 | Kill app and restart | Log, score and last action restored |
+| AT-16 | Select a player and action, then record a status | Both selections stay visibly highlighted until commit, then clear |
 
 ---
 
