@@ -1,5 +1,5 @@
 /* VolleyLive Settings controller: default match format and interface language.
-   Spec: docs/VolleyLive_Navigation_Home_Specification.md (Settings) */
+   Spec: docs/specs/UI-HOME.md (Settings) */
 (function () {
   var shell = window.VolleyShell;
   if (!shell) return;

@@ -37,6 +37,7 @@ imported document is checked before use, and a damaged or unexpected value never
 | `SYS-SEC-06` | Viewing a document (Coach View, Spectator View, reports) never modifies the active match (SYS-ARCH-07). | Data integrity |
 | `SYS-SEC-07` | An unreadable stored value falls back to its default without stopping the application, and is reported in the console (SYS-DATA-06). | Robustness |
 | `SYS-SEC-08` | Generated files are built in the browser (`Blob`) and their names keep only safe characters (letters, digits, `_`, `-`). | Robustness |
+| `SYS-SEC-09` | A file import accepts `.json` files only, of 10 MB at most, and rejects any object key `__proto__`, `prototype` or `constructor` at any depth (« Les clés d’objet non sûres sont interdites. »). | OWASP (prototype pollution) |
 
 ## 5. States, errors and edge cases
 
@@ -69,6 +70,7 @@ Not applicable. Refusal reasons are translated (`adapter.*`, `library.*` keys).
 | `SYS-SEC-06` | `tests/library/test_match_library.py::test_selected_match_actions_keep_coach_spectator_and_reports_routes` |
 | `SYS-SEC-07` | `tests/unit/storage.test.js` « returns the fallback for corrupted JSON and reports the key » |
 | `SYS-SEC-08` | `tests/capture/test_capture_regressions.py::test_set_end_lock_undo_next_set_and_exports` (downloaded JSON file) |
+| `SYS-SEC-09` | Manual: import a `.txt` file, a file over 10 MB and a JSON with a `__proto__` key; each is refused with its message |
 
 ## 10. History
 
