@@ -145,6 +145,26 @@ def test_runtime_options_are_available_and_persisted(browser):
     page.close()
 
 
+def test_settings_recommends_an_orientation_for_the_detected_device(browser):
+    page, errors = open_runtime(browser, viewport={"width": 390, "height": 844})
+    page.evaluate("sessionStorage.removeItem('volleyCapture.stage')")
+    page.reload()
+    page.locator("#homeSettings").click()
+    button = page.locator("[data-setting-orientation]")
+    assert "iPhone 13 / 14" in button.inner_text()
+    button.click()
+    rows = page.locator("[data-orientation-mode]")
+    assert rows.count() == 4
+    assert page.locator('[data-orientation-mode="FOCUS"]').get_attribute("data-orientation-advice") == "portrait"
+    assert page.locator(".su-matrix td.best").count() >= 1
+    page.locator("[data-setting-orientation-all]").click()
+    assert page.locator(".su-matrix-all tbody tr").count() >= 8
+    assert page.locator(".su-matrix-all tr.current").count() == 1
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    assert errors == []
+    page.close()
+
+
 def test_settings_screen_does_not_offer_runtime_mode(browser):
     page, errors = open_runtime(browser)
     page.evaluate("sessionStorage.removeItem('volleyCapture.stage')")

@@ -2294,3 +2294,74 @@ h2 {
   font-size: 11px;
   opacity: 0.55;
 }
+/* Settings > Recommended capture orientation (settings.js) */
+.su-orientation .su-format {
+  grid-template-columns: 1fr;
+}
+.su-matrix-wrap {
+  overflow-x: auto;
+}
+.su-matrix {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  color: #17202a;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.su-matrix th,
+.su-matrix td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #e3e7ec;
+  text-align: center;
+}
+.su-matrix thead th {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.su-matrix tbody th {
+  text-align: left;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.su-matrix td.best {
+  background: #e3f3ea;
+  color: #12693c;
+  font-weight: 900;
+}
+.su-matrix td.nofit {
+  color: #b3262f;
+}
+.su-matrix-all {
+  font-size: 12px;
+}
+.su-matrix-all th,
+.su-matrix-all td {
+  padding: 6px 3px;
+}
+.su-matrix-all tbody th {
+  white-space: normal;
+}
+.su-matrix-all td small {
+  display: block;
+  color: #64748b;
+  font-size: 10px;
+}
+.su-matrix-all tr.current th,
+.su-matrix-all tr.current td {
+  background: #eef4fb;
+}
+.su-link {
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1565c0;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: underline;
+}

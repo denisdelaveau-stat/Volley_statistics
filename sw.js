@@ -1,6 +1,6 @@
 /* Volley Live Capture v1.28.0 - offline service worker.
    Bump CACHE when any file changes so installed phones pick up the new version. */
-var CACHE = 'volley-live-capture-v1.28.0-b128';
+var CACHE = 'volley-live-capture-v1.28.0-b129';
 var ASSETS = [
   './',
   'index.html',
@@ -13,6 +13,8 @@ var ASSETS = [
   'match-hub.css',
   'team-management.css',
   'team-management.js',
+  'js/orientation-matrix.js',
+  'js/orientation-advice.js',
   'settings.js',
   'match-hub.js',
   'coach-live-config.js',
